@@ -263,7 +263,7 @@ public:
     // begin-global-memory-regions
     mems.push_back (new MepMemRegionCfg ("shared-mem0", 0x0, 0x200000, 10, 1, false, true));
     mems.push_back (new MepMemRegionCfg ("shared-mem1", 0x800000, 0x800000, 10, 1, true, false));
-    mems.push_back (new MepMemRegionCfg ("shared-mem2", 0x80800000, 0x800000, 10, 1, false, false));
+    mems.push_back (new MepMemRegionCfg ("shared-mem2", 0x80000000, 0x800000, 10, 1, true, false));
     // end-global-memory-regions
 
     // begin-shadow-regions
@@ -1871,6 +1871,9 @@ void MepBoardCfg::configure_icache ()
 
   // Pass the appropriate peripheral regions
   // begin-icache-settings
+  if (get_module_type () == "default")
+    {
+    }
   // end-icache-settings
 
   // pass the imem/dmem space, which is always present.
@@ -1949,6 +1952,9 @@ void MepBoardCfg::configure_dcache ()
 
   // Pass the appropriate peripheral regions
   // begin-dcache-settings
+  if (get_module_type () == "default")
+    {
+    }
   // end-dcache-settings
 
   // pass the imem/dmem space, which is always present.

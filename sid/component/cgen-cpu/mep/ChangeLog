@@ -1,3 +1,14 @@
+2009-02-02  DJ Delorie  <dj@redhat.com>
+
+	* Makefile.am: Update to new MeP configuration.
+	* Makefile.in: Likewise.
+	* common_model.cxx: Likewise.
+	* mep-core1-decode.cxx: Likewise.
+	* mep-cpu.h: Likewise.
+	* mep-decode.cxx: Likewise.
+	* mep-desc.h: Likewise.
+	* mep.h: Likewise.
+	
 2007-08-13  Frank Ch. Eigler  <fche@redhat.com>
 
 	* common_model.h: Change #include guard name.

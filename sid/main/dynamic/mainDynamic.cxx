@@ -48,50 +48,30 @@ mk_basic (const string name, SessionCfg *sess)
 #ifdef SIDTARGET_MEP
 /* begin-mepcfgtool-factories */
 static BoardCfg *
-mk_simple (const string name, SessionCfg *sess)
+mk_default (const string name, SessionCfg *sess)
 {
-  MepBoardCfg *b = new MepBoardCfg (name, "simple", sess);
-
-  b->set_core_type (MEP_CORE_C2);
+  MepBoardCfg *b = new MepBoardCfg (name, "default", sess);
+  b->set_core_type (MEP_CORE_C4);
   b->set_cpu ("mep-ext1");
   b->add_irq_board ();
-  b->set_core_id (1);
-  b->set_intc_channel_bitw (8);
+  b->set_imem_size (32);
+  b->set_dmem_bank_num (4);
+  b->set_dmem_size (128);
+  b->set_icache_size (16);
+  b->set_icache_way (1);
+  b->set_icache_line_size (32);
+  b->set_dcache_size (16);
+  b->set_dcache_way (1);
+  b->set_dcache_line_size (32);
+  b->set_core_id (50);
+  b->set_intc_channel_bitw (32);
   b->set_intc_level (15);
+  b->set_icache_cwf (false);
+  b->set_dcache_cwf (false);
+  b->add_timer (4);
+  b->add_dmac (6, 64, true);
   b->set_opt_biu (64);
-  b->set_endian ("big");
-  b->set_opt_abs (false);
-  b->set_opt_ave (false);
-  b->set_opt_bit (false);
-  b->set_opt_clp (false);
-  b->set_opt_div (false);
-  b->set_opt_ldz (false);
-  b->set_opt_min (false);
-  b->set_opt_mul (false);
-  b->set_opt_sat (false);
-  b->set_opt_dsu (false);
-  b->set_opt_uci (false);
-  return b;
-}
-
-static BoardCfg *
-mk_fmax (const string name, SessionCfg *sess)
-{
-  MepBoardCfg *b = new MepBoardCfg (name, "fmax", sess);
-
-  b->set_core_type (MEP_CORE_C2);
-  b->set_cpu ("mep-ext2");
-  b->add_irq_board ();
-  b->set_core_id (2);
-  b->set_intc_channel_bitw (8);
-  b->set_intc_level (15);
-  b->add_cop ("fmax_cop", 0);
-  b->set_cop_data_bus_width (32);
-  b->set_cop_ccr ( 0, 0x00000101);
-  b->set_cop_ccr ( 1, 0x00000000);
-  b->set_cop_ccr (15, 0x00000000);
-  b->set_opt_biu (64);
-  b->set_endian ("big");
+  b->set_endian ("little");
   b->set_opt_abs (true);
   b->set_opt_ave (true);
   b->set_opt_bit (true);
@@ -113,8 +93,7 @@ static boardspec boards [] = {
   {"basic", "basic cpu + memory board", & mk_basic},
 #ifdef SIDTARGET_MEP
 /* begin-mepcfgtool-boards */
-  { "simple", "MeP custom board 'simple'", & mk_simple },
-  { "fmax", "MeP custom board 'fmax'", & mk_fmax },
+  { "default", "MeP custom board 'default'", & mk_default },
 /* end-mepcfgtool-boards */
 #endif /* SIDTARGET_MEP */
 #if defined (SIDTARGET_SH) || defined (SIDTARGET_SH64)

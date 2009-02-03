@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2007 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -27,8 +27,6 @@ public:
   DI h_cr64[32];
   /* Coprocessor control registers */
   SI h_ccr[64];
-  /* flag */
-  USI h_fmax_compare_i_p;
   } hardware;
 
   void stream_cgen_hardware (std::ostream &ost) const 
@@ -42,7 +40,6 @@ public:
       ost << hardware.h_cr64[i] << ' ';
     for (int i = 0; i < 64; i++)
       ost << hardware.h_ccr[i] << ' ';
-    ost << hardware.h_fmax_compare_i_p << ' ';
   }
   void destream_cgen_hardware (std::istream &ist) 
   {
@@ -55,7 +52,6 @@ public:
       ist >> hardware.h_cr64[i];
     for (int i = 0; i < 64; i++)
       ist >> hardware.h_ccr[i];
-    ist >> hardware.h_fmax_compare_i_p;
   }
   // C++ register access function templates
 #define current_cpu this
@@ -80,17 +76,6 @@ public:
   inline SI h_ccr_get (UINT regno) const { return this->hardware.h_ccr[regno]; }
   inline void h_ccr_set (UINT regno, SI newval) { current_cpu->cgen_set_ccr_value (regno, newval);
  }
-
-  inline SF ext_core2_h_cr_fmax_get (UINT regno) const { return current_cpu->fmax_fr_get_handler (regno); }
-  inline void ext_core2_h_cr_fmax_set (UINT regno, SF newval) { current_cpu->fmax_fr_set_handler (regno, newval);
- }
-
-  inline USI ext_core2_h_ccr_fmax_get (UINT regno) const { return current_cpu->h_ccr_get (regno); }
-  inline void ext_core2_h_ccr_fmax_set (UINT regno, USI newval) { current_cpu->h_ccr_set (regno, newval);
- }
-
-  inline USI ext_core2_h_fmax_compare_i_p_get () const { return this->hardware.h_fmax_compare_i_p; }
-  inline void ext_core2_h_fmax_compare_i_p_set (USI newval) { this->hardware.h_fmax_compare_i_p = newval; }
 
 #undef current_cpu
 

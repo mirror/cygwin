@@ -30,7 +30,6 @@ extern "C" {
 #include "mep_basic.h"
 // begin-mep-includes
 #include "mep_ext1.h"
-#include "mep_ext2.h"
 // end-mep-includes
 #endif
 #if SIDTARGET_MT
@@ -331,7 +330,6 @@ compCGENListTypes ()
   types.push_back ("hw-cpu-mep");
   // begin-mep-types
   types.push_back ("hw-cpu-mep-ext1");
-  types.push_back ("hw-cpu-mep-ext2");
   // end-mep-types
 #endif
 #if SIDTARGET_MT
@@ -383,8 +381,6 @@ compCGENCreate (const string& typeName)
   // begin-mep-constructors
   if (typeName == "hw-cpu-mep-ext1")
     return new mep_ext1::mep_ext1_cpu ();
-  if (typeName == "hw-cpu-mep-ext2")
-    return new mep_ext2::mep_ext2_cpu ();
   // end-mep-constructors
 #endif
 #if SIDTARGET_MT

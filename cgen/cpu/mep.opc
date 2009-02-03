@@ -106,22 +106,6 @@ parse_csrn (CGEN_CPU_DESC cd, const char **strp,
 }
 
 /* begin-cop-ip-parse-handlers */
-static const char *
-parse_fmax_cr (CGEN_CPU_DESC cd,
-	const char **strp,
-	CGEN_KEYWORD *keyword_table  ATTRIBUTE_UNUSED,
-	long *field)
-{
-  return cgen_parse_keyword (cd, strp, & mep_cgen_opval_h_cr_fmax, field);
-}
-static const char *
-parse_fmax_ccr (CGEN_CPU_DESC cd,
-	const char **strp,
-	CGEN_KEYWORD *keyword_table  ATTRIBUTE_UNUSED,
-	long *field)
-{
-  return cgen_parse_keyword (cd, strp, & mep_cgen_opval_h_ccr_fmax, field);
-}
 /* end-cop-ip-parse-handlers */
 
 const char *
@@ -764,24 +748,6 @@ print_spreg (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED, PTR dis_info,
 }
 
 /* begin-cop-ip-print-handlers */
-static void
-print_fmax_cr (CGEN_CPU_DESC cd,
-	void *dis_info,
-	CGEN_KEYWORD *keyword_table ATTRIBUTE_UNUSED,
-	long value,
-	unsigned int attrs)
-{
-  print_keyword (cd, dis_info, & mep_cgen_opval_h_cr_fmax, value, attrs);
-}
-static void
-print_fmax_ccr (CGEN_CPU_DESC cd,
-	void *dis_info,
-	CGEN_KEYWORD *keyword_table ATTRIBUTE_UNUSED,
-	long value,
-	unsigned int attrs)
-{
-  print_keyword (cd, dis_info, & mep_cgen_opval_h_ccr_fmax, value, attrs);
-}
 /* end-cop-ip-print-handlers */
 
 /************************************************************\
@@ -1172,7 +1138,6 @@ init_mep_all_core_isas_mask (void)
   cgen_bitset_set (& mep_all_core_isas_mask, ISA_MEP);
   /* begin-all-core-isas */
   cgen_bitset_add (& mep_all_core_isas_mask, ISA_EXT_CORE1);
-  cgen_bitset_add (& mep_all_core_isas_mask, ISA_EXT_CORE2);
   /* end-all-core-isas */
 }
 
@@ -1185,10 +1150,6 @@ init_mep_all_cop_isas_mask (void)
     return;
   cgen_bitset_init (& mep_all_cop_isas_mask, ISA_MAX);
   /* begin-all-cop-isas */
-  cgen_bitset_add (& mep_all_cop_isas_mask, ISA_EXT_COP2_16);
-  cgen_bitset_add (& mep_all_cop_isas_mask, ISA_EXT_COP2_32);
-  cgen_bitset_add (& mep_all_cop_isas_mask, ISA_EXT_COP2_48);
-  cgen_bitset_add (& mep_all_cop_isas_mask, ISA_EXT_COP2_64);
   /* end-all-cop-isas */
 }
 
@@ -1220,12 +1181,9 @@ mep_config_map_struct mep_config_map[] =
 {
   /* config-map-start */
   /* Default entry: mep core only, all options enabled. */
-  { "", 0, EF_MEP_CPU_C2, 1, 0, {1,"\x0"}, {1,"\x0"}, {1,"\x0"}, {1,"\x0"}, {1,"\x0"}, {1,"\x80"}, OPTION_MASK },
-  { "simple", CONFIG_SIMPLE, EF_MEP_CPU_C2, 1, 0, { 1, "\x0" }, { 1, "\x0" }, { 1, "\x0" }, { 1, "\x0" }, { 1, "\x0" }, { 1, "\xc0" },
-	  0 },
-  { "fmax", CONFIG_FMAX, EF_MEP_CPU_C2, 1, 0, { 1, "\x10" }, { 1, "\x8" }, { 1, "\x4" }, { 1, "\x2" }, { 1, "\x1e" }, { 1, "\xa0" },
+  { "", 0, EF_MEP_CPU_C4, 1, 0, {1,"\x0"}, {1,"\x0"}, {1,"\x0"}, {1,"\x0"}, {1,"\x0"}, {1,"\x80"}, OPTION_MASK },
+  { "default", CONFIG_DEFAULT, EF_MEP_CPU_C4, 0, 0, { 1, "\x0" }, { 1, "\x0" }, { 1, "\x0" }, { 1, "\x0" }, { 1, "\x0" }, { 1, "\xc0" },
 	  0
-	| (1 << CGEN_INSN_OPTIONAL_CP_INSN)
 	| (1 << CGEN_INSN_OPTIONAL_MUL_INSN)
 	| (1 << CGEN_INSN_OPTIONAL_DIV_INSN)
 	| (1 << CGEN_INSN_OPTIONAL_BIT_INSN)

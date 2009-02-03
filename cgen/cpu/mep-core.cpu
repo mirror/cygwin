@@ -9,7 +9,6 @@
   (isas mep 
 ; begin-isa-enum
 	ext_core1
-	ext_core2 ext_cop2_16 ext_cop2_32 ext_cop2_48 ext_cop2_64
 ; end-isa-enum
   )
 )
@@ -39,51 +38,11 @@
   (base-insn-bitsize 32)
 )
 
-(define-isa
-  (name ext_core2)
-  (comment "MeP core extension instruction set")
-  (default-insn-word-bitsize 32)
-  (default-insn-bitsize 32)
-  (base-insn-bitsize 32)
-)
+(define-pmacro all-mep-isas () (ISA mep,ext_core1))
 
-(define-isa
-  (name ext_cop2_16)
-  (comment "MeP coprocessor instruction set")
-  (default-insn-word-bitsize 32)
-  (default-insn-bitsize 32)
-  (base-insn-bitsize 32)
-)
+(define-pmacro all-mep-core-isas () (ISA mep,ext_core1))
 
-(define-isa
-  (name ext_cop2_32)
-  (comment "MeP coprocessor instruction set")
-  (default-insn-word-bitsize 32)
-  (default-insn-bitsize 32)
-  (base-insn-bitsize 32)
-)
-
-(define-isa
-  (name ext_cop2_48)
-  (comment "MeP coprocessor instruction set")
-  (default-insn-word-bitsize 32)
-  (default-insn-bitsize 32)
-  (base-insn-bitsize 32)
-)
-
-(define-isa
-  (name ext_cop2_64)
-  (comment "MeP coprocessor instruction set")
-  (default-insn-word-bitsize 32)
-  (default-insn-bitsize 32)
-  (base-insn-bitsize 32)
-)
-
-(define-pmacro all-mep-isas () (ISA mep,ext_core1,ext_core2,ext_cop2_16,ext_cop2_32,ext_cop2_48,ext_cop2_64))
-
-(define-pmacro all-mep-core-isas () (ISA mep,ext_core1,ext_core2))
-
-(define-pmacro all-core-isa-list () mep,ext_core1,ext_core2)
+(define-pmacro all-core-isa-list () mep,ext_core1)
 ; end-isas
 
 (define-cpu
@@ -245,6 +204,7 @@
 	    (psw 16) (id 17)  (tmp 18)  (epc 19) (exc 20)  (cfg 21)
 	    (npc 23) (dbg 24) (depc 25) (opt 26) (rcfg 27) (ccfg 28)
 ; begin-extra-csr-registers
+	    (vid 22)
 ; end-extra-csr-registers
   ))
   (get (index) (c-call SI "cgen_get_csr_value" index))
@@ -893,8 +853,7 @@
   (for insn)
   (name CONFIG)
   (values NONE ; config-attr-start
-	simple
-	fmax
+	default
 	  ) ; config-attr-end
 )
 

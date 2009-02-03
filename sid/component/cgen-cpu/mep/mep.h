@@ -16,8 +16,6 @@ using namespace cgen;
 using sidutil::callback_pin;
 
 // begin-fpu-includes
-#include "fmax-fp.h"
-using sidutil::fmax_fp;
 // end-fpu-includes
 
 namespace mep
@@ -27,7 +25,6 @@ namespace mep
       // Include cgen generated elements.
 #include "mep-cpu.h"
 // begin-copro-cpu-includes
-#include "fmax-cpu.h"
 // end-copro-cpu-includes
 
     public:

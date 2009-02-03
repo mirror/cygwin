@@ -48,7 +48,7 @@ private:
   friend class mm_int_interface;
 
   // parameters
-  static const int max_modules = 2;
+  static const int max_modules = 1;
   static const int max_channels = 0x100 / 4;
   // Control bus.
   mm_int_interface ctrl_bus; 

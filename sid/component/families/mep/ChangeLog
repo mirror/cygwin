@@ -1,3 +1,7 @@
+2009-02-03  DJ Delorie  <dj@redhat.com>
+
+	* mm_int.h (no_relation_component): Update to new MeP configuration.
+
 2007-10-31  Dave Brolley  <brolley@redhat.com>
 
         * components.cxx (mepfamily_component_library): Correct DLLEXPORT

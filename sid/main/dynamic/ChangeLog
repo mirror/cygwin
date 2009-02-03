@@ -1,3 +1,8 @@
+2009-02-03  DJ Delorie  <dj@redhat.com>
+
+	* mepCfg.cxx (MepMemCfg): Update to new MeP configuration.
+	* mainDynamic.cxx (mk_sample): Update to new MeP configuration.
+
 2008-06-17  Dave Brolley  <brolley@redhat.com>
 
 	* mainDynamic.cxx (usage): Document --reversible.

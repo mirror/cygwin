@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2007 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -25,14 +25,6 @@ typedef enum major {
  , MAJ_8, MAJ_9, MAJ_10, MAJ_11
  , MAJ_12, MAJ_13, MAJ_14, MAJ_15
 } MAJOR;
-
-/* Enum declaration for condition opcode enum.  */
-typedef enum fmax_cond {
-  FMAX_F, FMAX_U, FMAX_E, FMAX_UE
- , FMAX_L, FMAX_UL, FMAX_LE, FMAX_ULE
- , FMAX_FI, FMAX_UI, FMAX_EI, FMAX_UEI
- , FMAX_LI, FMAX_ULI, FMAX_LEI, FMAX_ULEI
-} FMAX_COND;
 
 // Insn attribute indices.
 
@@ -62,8 +54,7 @@ typedef enum mach_attr {
 
 /* Enum declaration for instruction set selection.  */
 typedef enum isa_attr {
-  ISA_MEP, ISA_EXT_CORE1, ISA_EXT_CORE2, ISA_EXT_COP2_16
- , ISA_EXT_COP2_32, ISA_EXT_COP2_48, ISA_EXT_COP2_64, ISA_MAX
+  ISA_MEP, ISA_EXT_CORE1, ISA_MAX
 } ISA_ATTR;
 
 /* Enum declaration for datatype to use for C intrinsics mapping.  */
@@ -75,7 +66,7 @@ typedef enum cdata_attr {
 
 /* Enum declaration for .  */
 typedef enum config_attr {
-  CONFIG_NONE, CONFIG_SIMPLE, CONFIG_FMAX
+  CONFIG_NONE, CONFIG_DEFAULT
 } CONFIG_ATTR;
 
 // Insn attributes.

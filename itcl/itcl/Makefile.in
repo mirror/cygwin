@@ -145,8 +145,8 @@ CONFIG_CLEAN_FILES = @CONFIG_CLEAN_FILES@ Makefile itclConfig.sh pkgIndex.tcl
 CPPFLAGS	= @CPPFLAGS@
 LIBS		= @PKG_LIBS@ @LIBS@
 AR		= @AR@
-CFLAGS		= @CFLAGS@
-COMPILE		= $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+ITCL_CFLAGS	= @CFLAGS@
+COMPILE		= $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $(ITCL_CFLAGS)
 
 #========================================================================
 # Start of user-definable TARGETS section

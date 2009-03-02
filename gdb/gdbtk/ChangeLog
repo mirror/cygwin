@@ -1,3 +1,8 @@
+2009-03-02  Kevin Buettner  <kevinb@redhat.com>
+
+	* generic/gdbtk-stack.c (gdb_get_vars_command): Revise cast of
+	`clientData' to avoid build error on 64-bit hosts.
+
 2008-12-16  Denis Pilat  <denis.pilat@st.com> 
 	on behalf of Nunzio Raciti  <nunzio.raciti@st.com>
 

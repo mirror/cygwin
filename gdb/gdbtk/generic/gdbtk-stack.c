@@ -285,7 +285,7 @@ gdb_get_vars_command (ClientData clientData, Tcl_Interp *interp,
       return TCL_ERROR;
     }
 
-  arguments = (int) clientData;
+  arguments = (long) clientData;
 
   /* Initialize the result pointer to an empty list. */
 

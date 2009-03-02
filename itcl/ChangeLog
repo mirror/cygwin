@@ -1,3 +1,10 @@
+2009-03-02  Kevin Buettner  <kevinb@redhat.com>
+
+	* itcl/Makefile.in (ITCL_CFLAGS): Renamed from CFLAGS.
+	(COMPILE): Use ITCL_CFLAGS in addition to CFLAGS.
+	* itk/Makefile.in (ITK_CFLAGS): Renamed from CFLAGS.
+	(COMPILE): Use ITK_CFLAGS in addition to CFLAGS.
+
 2008-08-02  Keith Seitz  <keiths@redhat.com>
 
 	* itk/configure.ac: Add missing bits to actually fill in

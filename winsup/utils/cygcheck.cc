@@ -58,7 +58,7 @@ void package_list (int, char **);
 void dump_dodgy_apps (int verbose);
 
 
-static const char version[] = "$Revision: 1.110 $";
+static const char version[] = "$Revision: 1.111 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1979,7 +1979,7 @@ At least one command option or a PROGRAM is required, as shown above.\n\
   -f, --find-package   find the package that FILE belongs to\n\
   -l, --list-package   list contents of PACKAGE (or all packages if none given)\n\
   -p, --package-query  search for REGEXP in the entire cygwin.com package\n\
-                       repository (requies internet connectivity)\n\
+                       repository (requires internet connectivity)\n\
   -v, --verbose        produce more verbose output\n\
   -h, --help           annotate output with explanatory comments when given\n\
                        with another command, otherwise print this help\n\

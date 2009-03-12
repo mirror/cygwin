@@ -1,3 +1,7 @@
+2009-03-12  Keith Seitz  <keiths@redhat.com>
+
+	* library/pkgIndex.tcl: Update combobox version to 2.3.
+
 2008-08-02  Keith Seitz  <keiths@redhat.com>
 
 	* tcl.m4: Remove. I changed my mind.

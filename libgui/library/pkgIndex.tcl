@@ -8,5 +8,5 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-package ifneeded combobox 2.2.1 [list source [file join $dir combobox.tcl]]
+package ifneeded combobox 2.3 [list source [file join $dir combobox.tcl]]
 package ifneeded debug 1.0 [list source [file join $dir debug.tcl]]

@@ -59,7 +59,7 @@ void package_list (int, char **);
 void dump_dodgy_apps (int verbose);
 
 
-static const char version[] = "$Revision: 1.112 $";
+static const char version[] = "$Revision: 1.113 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1540,7 +1540,7 @@ dump_sysinfo ()
                        (LPBYTE) &obcaseinsensitive, &size);
       RegCloseKey (key);
     }
-  printf ("obcaseinsensitive set to %d\n\n", obcaseinsensitive);
+  printf ("obcaseinsensitive set to %lu\n\n", obcaseinsensitive);
 
   if (givehelp)
     {

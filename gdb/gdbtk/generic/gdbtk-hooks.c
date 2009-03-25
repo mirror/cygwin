@@ -379,7 +379,7 @@ void
 gdbtk_ignorable_warning (const char *class, const char *warning)
 {
   char *buf;
-  xasprintf (&buf, "gdbtk_tcl_ignorable_warning {%s} {%s}", class, warning);
+  buf = xstrprintf ("gdbtk_tcl_ignorable_warning {%s} {%s}", class, warning);
   if (Tcl_Eval (gdbtk_interp, buf) != TCL_OK)
     report_error ();
   free(buf);
@@ -599,12 +599,12 @@ gdbtk_set_hook (struct cmd_list_element *cmdblk)
 
     case var_uinteger:
     case var_zinteger:
-      xasprintf (&buffer, "%u", *(unsigned int *) cmdblk->var);
+      buffer = xstrprintf ("%u", *(unsigned int *) cmdblk->var);
       Tcl_DStringAppendElement (&cmd, buffer);
       break;
 
     case var_integer:
-      xasprintf (&buffer, "%d", *(int *) cmdblk->var);
+      buffer = xstrprintf ("%d", *(int *) cmdblk->var);
       Tcl_DStringAppendElement (&cmd, buffer);
       break;
 
@@ -629,7 +629,7 @@ int
 gdbtk_load_hash (const char *section, unsigned long num)
 {
   char *buf;
-  xasprintf (&buf, "Download::download_hash %s %ld", section, num);
+  buf = xstrprintf ("Download::download_hash %s %ld", section, num);
   if (Tcl_Eval (gdbtk_interp, buf) != TCL_OK)
     report_error ();
   free(buf);
@@ -753,7 +753,7 @@ gdbtk_selected_frame_changed (int level)
 {
 #if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION < 1
   char *a;
-  xasprintf (&a, "%d", level);
+  a = xstrprintf ("%d", level);
   Tcl_SetVar (gdbtk_interp, "gdb_selected_frame_level", a, TCL_GLOBAL_ONLY);
   xfree (a);
 #else
@@ -806,7 +806,7 @@ gdbtk_annotate_signal (void)
      timeout. */
   Tcl_Eval (gdbtk_interp, "gdbtk_stop_idle_callback");
 
-  xasprintf (&buf, "gdbtk_signal %s {%s}",
+  buf = xstrprintf ("gdbtk_signal %s {%s}",
 	     target_signal_to_name (tp->stop_signal),
 	     target_signal_to_string (tp->stop_signal));
   if (Tcl_Eval (gdbtk_interp, buf) != TCL_OK)

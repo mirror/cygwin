@@ -1811,7 +1811,7 @@ gdbtk_load_source (ClientData clientData, struct symtab *symtab,
 	      /* FIXME: Convert to Tcl_SetVar2Ex when we move to 8.2.  This
 		 will allow us avoid converting widget_line_no into a string. */
 	      
-	      xasprintf (&buffer, "%d", client_data->widget_line_no);
+	      buffer = xstrprintf ("%d", client_data->widget_line_no);
 	      
 	      Tcl_SetVar2 (client_data->interp, client_data->map_arr,
 			   Tcl_DStringValue (&client_data->src_to_line_prefix),
@@ -1927,7 +1927,7 @@ gdbtk_load_asm (ClientData clientData, CORE_ADDR pc,
       /* FIXME: Convert to Tcl_SetVar2Ex when we move to 8.2.  This
 	 will allow us avoid converting widget_line_no into a string. */
       
-      xasprintf (&buffer, "%d", client_data->widget_line_no);
+      buffer = xstrprintf ("%d", client_data->widget_line_no);
       
       Tcl_SetVar2 (client_data->interp, client_data->map_arr,
 		   Tcl_DStringValue (&client_data->pc_to_line_prefix),

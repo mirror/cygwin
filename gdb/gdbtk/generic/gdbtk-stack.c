@@ -211,11 +211,11 @@ gdb_get_blocks (ClientData clientData, Tcl_Interp *interp,
 	      char *addr;
 
 	      Tcl_Obj *elt = Tcl_NewListObj (0, NULL);
-	      xasprintf (&addr, "0x%s", paddr_nz (BLOCK_START (block)));
+	      addr = xstrprintf ("0x%s", paddr_nz (BLOCK_START (block)));
 	      Tcl_ListObjAppendElement (interp, elt,
 					Tcl_NewStringObj (addr, -1));
 	      free(addr);
-	      xasprintf (&addr, "0x%s", paddr_nz (BLOCK_END (block)));
+	      addr = xstrprintf ("0x%s", paddr_nz (BLOCK_END (block)));
 	      Tcl_ListObjAppendElement (interp, elt,
 					Tcl_NewStringObj (addr, -1));
 	      Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr, elt);
@@ -377,15 +377,15 @@ gdb_selected_block (ClientData clientData, Tcl_Interp *interp,
 
   if (!target_has_registers)
     {
-      xasprintf (&start, "%s", "");
-      xasprintf (&end, "%s", "");
+      start = xstrprintf ("%s", "");
+      end = xstrprintf ("%s", "");
     }
   else
     {
       struct block *block;
       block = get_frame_block (get_selected_frame (NULL), 0);
-      xasprintf (&start, "0x%s", paddr_nz (BLOCK_START (block)));
-      xasprintf (&end, "0x%s", paddr_nz (BLOCK_END (block)));
+      start = xstrprintf ("0x%s", paddr_nz (BLOCK_START (block)));
+      end = xstrprintf ("0x%s", paddr_nz (BLOCK_END (block)));
     }
 
   Tcl_SetListObj (result_ptr->obj_ptr, 0, NULL);
@@ -416,11 +416,11 @@ gdb_selected_frame (ClientData clientData, Tcl_Interp *interp,
   char *frame;
 
   if (!target_has_registers)
-    xasprintf (&frame, "%s","");
+    frame = xstrprintf ("%s","");
   else
     /* FIXME: cagney/2002-11-19: This should be using get_frame_id()
        to identify the frame and *NOT* get_frame_base().  */
-    xasprintf (&frame, "0x%s",
+    frame = xstrprintf ("0x%s",
 	       paddr_nz (get_frame_base (get_selected_frame (NULL))));
 
   Tcl_SetStringObj (result_ptr->obj_ptr, frame, -1);

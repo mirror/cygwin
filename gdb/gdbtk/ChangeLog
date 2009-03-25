@@ -1,3 +1,17 @@
+2009-03-25  Pierre Muller  <muller@ics.u-strasbg.fr>
+
+	ARI fix: "xasprintf" rule.
+	* generic/gdbtk-bp.c (gdb_set_bp): Replace xasprintf by xstrprintf.
+	(breakpoint_notify, tracepoint_notify):Ditto.
+	* generic/gdbtk-cmds.c (gdbtk_load_source, gdbtk_load_asm):Ditto.
+	* generic/gdbtk-hooks.c (gdbtk_ignorable_warning): Ditto.
+	(gdbtk_set_hook, gdbtk_load_hash): Ditto.
+	(gdbtk_selected_frame_changed, gdbtk_annotate_signal): Ditto.
+	* generic/gdbtk-register.c (get_register_types):Ditto.
+	* generic/gdbtk-stack.c (gdb_get_blocks): Ditto.
+	(gdb_selected_block, gdb_selected_frame): Ditto.
+	* generic/gdbtk.c (gdbtk_init, view_command): Ditto.
+
 2009-03-02  Kevin Buettner  <kevinb@redhat.com>
 
 	* generic/gdbtk-stack.c (gdb_get_vars_command): Revise cast of

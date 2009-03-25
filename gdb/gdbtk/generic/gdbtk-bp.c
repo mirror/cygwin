@@ -552,7 +552,7 @@ gdb_set_bp (ClientData clientData, Tcl_Interp *interp,
   b->thread = thread;
 
   /* FIXME: this won't work for duplicate basenames! */
-  xasprintf (&buf, "%s:%d", lbasename (Tcl_GetStringFromObj (objv[1], NULL)),
+  buf = xstrprintf ("%s:%d", lbasename (Tcl_GetStringFromObj (objv[1], NULL)),
 	     line);
   b->addr_string = xstrdup (buf);
   free(buf);
@@ -706,7 +706,7 @@ breakpoint_notify (int num, const char *action)
 
   /* We ensure that ACTION contains no special Tcl characters, so we
      can do this.  */
-  xasprintf (&buf, "gdbtk_tcl_breakpoint %s %d", action, num);
+  buf = xstrprintf ("gdbtk_tcl_breakpoint %s %d", action, num);
 
   if (Tcl_Eval (gdbtk_interp, buf) != TCL_OK)
     report_error ();
@@ -1004,7 +1004,7 @@ tracepoint_notify (int num, const char *action)
 
   /* We ensure that ACTION contains no special Tcl characters, so we
      can do this.  */
-  xasprintf (&buf, "gdbtk_tcl_tracepoint %s %d", action, num);
+  buf = xstrprintf ("gdbtk_tcl_tracepoint %s %d", action, num);
 
   if (Tcl_Eval (gdbtk_interp, buf) != TCL_OK)
     report_error ();

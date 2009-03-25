@@ -237,7 +237,7 @@ get_register_types (int regnum, map_arg arg)
 	{
 	  Tcl_Obj *ar[3], *list;
 	  char *buff;
-	  xasprintf (&buff, "%lx", (long)TYPE_FIELD_TYPE (reg_vtype, i));
+	  buff = xstrprintf ("%lx", (long)TYPE_FIELD_TYPE (reg_vtype, i));
 	  ar[0] = Tcl_NewStringObj (TYPE_FIELD_NAME (reg_vtype, i), -1);
 	  ar[1] = Tcl_NewStringObj (buff, -1);
 	  if (TYPE_CODE (TYPE_FIELD_TYPE (reg_vtype, i)) == TYPE_CODE_FLT)
@@ -253,7 +253,7 @@ get_register_types (int regnum, map_arg arg)
     {
       Tcl_Obj *ar[3], *list;
       char *buff;
-      xasprintf (&buff, "%lx", (long)reg_vtype);
+      buff = xstrprintf ("%lx", (long)reg_vtype);
       ar[0] = Tcl_NewStringObj (TYPE_NAME(reg_vtype), -1);
       ar[1] = Tcl_NewStringObj (buff, -1);
       if (TYPE_CODE (reg_vtype) == TYPE_CODE_FLT)

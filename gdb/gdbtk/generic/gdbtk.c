@@ -385,7 +385,7 @@ gdbtk_init (void)
 
   /* Set up some globals used by gdb to pass info to gdbtk
      for start up options and the like */
-  xasprintf (&s, "%d", inhibit_gdbinit);
+  s = xstrprintf ("%d", inhibit_gdbinit);
   Tcl_SetVar2 (gdbtk_interp, "GDBStartup", "inhibit_prefs", s, TCL_GLOBAL_ONLY);
   free(s);
    
@@ -758,7 +758,7 @@ view_command (char *args, int from_tty)
 
   if (args != NULL)
     {
-      xasprintf (&script,
+      script = xstrprintf (
 		 "[lindex [ManagedWin::find SrcWin] 0] location BROWSE_TAG [gdb_loc %s]",
 		 args);
       old_chain = make_cleanup (xfree, script);

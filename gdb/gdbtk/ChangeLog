@@ -1,3 +1,11 @@
+2009-03-27  Stan Shebs  <stan@codesourcery.com>
+
+	* generic/gdbtk-bp.c (gdb_actions_command): Update to handle
+	tracepoints as breakpoints.
+	(gdb_get_tracepoint_info): Ditto, plus use get_tracepoint and
+	breakpoint locations.
+	(tracepoint_exists): Ditto, plus use all_tracepoints.
+
 2009-03-25  Pierre Muller  <muller@ics.u-strasbg.fr>
 
 	ARI fix: "xasprintf" rule.

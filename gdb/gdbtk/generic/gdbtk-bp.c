@@ -731,7 +731,7 @@ static int
 gdb_actions_command (ClientData clientData, Tcl_Interp *interp,
 		     int objc, Tcl_Obj *CONST objv[])
 {
-  struct tracepoint *tp;
+  struct breakpoint *tp;
   Tcl_Obj **actions;
   int nactions, i, len;
   char *number, *args, *action;
@@ -814,7 +814,7 @@ gdb_get_tracepoint_info (ClientData clientData, Tcl_Interp *interp,
 {
   struct symtab_and_line sal;
   int tpnum;
-  struct tracepoint *tp;
+  struct breakpoint *tp;
   struct action_line *al;
   Tcl_Obj *action_list;
   char *filename, *funcname;
@@ -831,9 +831,7 @@ gdb_get_tracepoint_info (ClientData clientData, Tcl_Interp *interp,
       return TCL_ERROR;
     }
 
-  ALL_TRACEPOINTS (tp)
-    if (tp->number == tpnum)
-      break;
+  tp = get_tracepoint (tpnum);
 
   if (tp == NULL)
     {
@@ -842,23 +840,23 @@ gdb_get_tracepoint_info (ClientData clientData, Tcl_Interp *interp,
     }
 
   Tcl_SetListObj (result_ptr->obj_ptr, 0, NULL);
-  sal = find_pc_line (tp->address, 0);
+  sal = find_pc_line (tp->loc->address, 0);
   filename = symtab_to_filename (sal.symtab);
   if (filename == NULL)
     filename = "N/A";
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
 			    Tcl_NewStringObj (filename, -1));
 
-  funcname = pc_function_name (tp->address);
+  funcname = pc_function_name (tp->loc->address);
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr, Tcl_NewStringObj
 			    (funcname, -1));
 
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
 			    Tcl_NewIntObj (sal.line));
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
-			    Tcl_NewStringObj (core_addr_to_string (tp->address), -1));
+			    Tcl_NewStringObj (core_addr_to_string (tp->loc->address), -1));
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
-			    Tcl_NewIntObj (tp->enabled_p));
+			    Tcl_NewIntObj (tp->enable_state == bp_enabled));
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
 			    Tcl_NewIntObj (tp->pass_count));
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
@@ -887,13 +885,17 @@ gdb_get_tracepoint_list (ClientData clientData,
 			 int objc,
 			 Tcl_Obj *CONST objv[])
 {
-  struct tracepoint *tp;
+  VEC(breakpoint_p) *tp_vec = NULL;
+  int ix;
+  struct breakpoint *tp;
 
   Tcl_SetListObj (result_ptr->obj_ptr, 0, NULL);
 
-  ALL_TRACEPOINTS (tp)
+  tp_vec = all_tracepoints ();
+  for (ix = 0; VEC_iterate (breakpoint_p, tp_vec, ix, tp); ix++)
     Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
 			      Tcl_NewIntObj (tp->number));
+  VEC_free (breakpoint_p, tp_vec);
 
   return TCL_OK;
 }
@@ -917,7 +919,9 @@ gdb_trace_status (ClientData clientData,
 static int
 tracepoint_exists (char *args)
 {
-  struct tracepoint *tp;
+  VEC(breakpoint_p) *tp_vec = NULL;
+  int ix;
+  struct breakpoint *tp;
   char **canonical;
   struct symtabs_and_lines sals;
   char *file = NULL;
@@ -934,9 +938,10 @@ tracepoint_exists (char *args)
 	  strcpy (file, sals.sals[0].symtab->dirname);
 	  strcat (file, sals.sals[0].symtab->filename);
 
-	  ALL_TRACEPOINTS (tp)
+	  tp_vec = all_tracepoints ();
+	  for (ix = 0; VEC_iterate (breakpoint_p, tp_vec, ix, tp); ix++)
 	    {
-	      if (tp->address == sals.sals[0].pc)
+	      if (tp->loc && tp->loc->address == sals.sals[0].pc)
 		result = tp->number;
 #if 0
 	      /* Why is this here? This messes up assembly traces */
@@ -946,6 +951,7 @@ tracepoint_exists (char *args)
 		result = tp->number;
 #endif
 	    }
+	  VEC_free (breakpoint_p, tp_vec);
 	}
     }
   if (file != NULL)

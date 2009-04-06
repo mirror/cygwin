@@ -348,7 +348,7 @@ static void
 gdbtk_warning (const char *warning, va_list args)
 {
   char *buf;
-  xvasprintf (&buf, warning, args);
+  buf = xstrvprintf (warning, args);
   gdbtk_two_elem_cmd ("gdbtk_tcl_warning", buf);
   free(buf);
 }
@@ -488,7 +488,7 @@ gdbtk_readline_begin (char *format,...)
   char *buf;
 
   va_start (args, format);
-  xvasprintf (&buf, format, args);
+  buf = xstrvprintf (format, args);
   gdbtk_two_elem_cmd ("gdbtk_tcl_readline_begin", buf);
   free(buf);
 }
@@ -684,7 +684,7 @@ gdbtk_query (const char *query, va_list args)
   char *buf;
   long val;
 
-  xvasprintf (&buf, query, args);
+  buf = xstrvprintf (query, args);
   gdbtk_two_elem_cmd ("gdbtk_tcl_query", buf);
   free(buf);
 

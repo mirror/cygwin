@@ -323,7 +323,7 @@ variable_create (Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
   else
     {
       /* specified name for object */
-      obj_name = strdup (name);
+      obj_name = xstrdup (name);
       objv++;
       objc--;
     }

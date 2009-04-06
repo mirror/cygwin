@@ -2911,7 +2911,7 @@ gdbtk_set_result (Tcl_Interp *interp, const char *fmt,...)
   char *buf;
 
   va_start (args, fmt);
-  xvasprintf (&buf, fmt, args);
+  buf = xstrvprintf (fmt, args);
   va_end (args);
   Tcl_SetObjResult (interp, Tcl_NewStringObj (buf, -1));
   xfree(buf);

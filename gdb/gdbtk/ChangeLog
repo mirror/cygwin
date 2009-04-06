@@ -1,3 +1,13 @@
+2009-04-07  Pierre Muller  <muller.u-strasbg.fr²>
+
+	ARI fixes: xvasprintf and strdup rules.
+	* generic/gdbtk-cmds.c (gdbtk_set_result): Replace xvasprintf by
+	xstrvprintf.
+	* generic/gdbtk-hooks.c (gdbtk_warning): Ditto.
+	(gdbtk_readline_begin, gdbtk_query): Ditto.
+	* generic/gdbtk.c (TclDebug): Ditto.
+	* generic/gdbtk-varobj.c (variable_create): Replace strdup by xstrdup.
+
 2009-03-27  Stan Shebs  <stan@codesourcery.com>
 
 	* generic/gdbtk-bp.c (gdb_actions_command): Update to handle

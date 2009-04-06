@@ -215,7 +215,7 @@ TclDebug (char level, const char *fmt,...)
   va_start (args, fmt);
 
 
-  xvasprintf (&buf, fmt, args);
+  buf = xstrvprintf (fmt, args);
   va_end (args);
 
   v[0] = "dbug";

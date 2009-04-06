@@ -1,5 +1,11 @@
 2009-04-07  Pierre Muller  <muller.u-strasbg.fr²>
 
+	ARI fix: Use "gdb_stat.h" header instead of <sys/stat.h>.
+	* generic/gdbtk-cmds.c: Apply change. 
+	* generic/gdbtk.c: Ditto.
+
+2009-04-07  Pierre Muller  <muller.u-strasbg.fr²>
+
 	ARI fixes: xvasprintf and strdup rules.
 	* generic/gdbtk-cmds.c (gdbtk_set_result): Replace xvasprintf by
 	xstrvprintf.

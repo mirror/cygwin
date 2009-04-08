@@ -17,7 +17,7 @@ libmep_la_SOURCES = mep.cxx common_model.cxx mep-decode.cxx mep-sem.cxx mep-mode
 libmep_la_LDFLAGS =
 libmep_la_LIBADD = mep-asm.lo mep-dis.lo mep-opc.lo mep-ibld.lo mep-desc.lo
 
-CGEN_MACH = mep
+CGEN_MACH = c5
 
 OPCODES_COMPILE_FLAGS = -DHAVE_CONFIG_H \
 	-I../../../../opcodes \

@@ -233,7 +233,7 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
 pkglib_LTLIBRARIES = libmepfamily.la
 INCLUDES = -I. -I../.. -I../../../include -I$(srcdir)/../../../include -I$(srcdir)/toshapi
-TOSHAPI_SOURCES = 
+TOSHAPI_SOURCES =
 libmepfamily_la_SOURCES = dsu.cxx dmac.cxx intc.cxx components.cxx \
 			  mm_int.cxx timer.cxx gbif.cxx lbif.cxx gbmif.cxx toshapi.cxx $(TOSHAPI_SOURCES)
 

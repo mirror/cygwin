@@ -51,7 +51,7 @@ static BoardCfg *
 mk_default (const string name, SessionCfg *sess)
 {
   MepBoardCfg *b = new MepBoardCfg (name, "default", sess);
-  b->set_core_type (MEP_CORE_C4);
+  b->set_core_type (MEP_CORE_C5);
   b->set_cpu ("mep-ext1");
   b->add_irq_board ();
   b->set_imem_size (32);

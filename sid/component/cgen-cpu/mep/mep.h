@@ -166,7 +166,7 @@ namespace mep
       SI do_ldcb (UINT word_addr);
       VOID do_stcb (SI rn, UINT word_addr);
       VOID do_cache (USI& op, int& addr, PCADDR& pc);
-      VOID do_cache_prefetch (USI& op, int& addr, PCADDR& pc);
+      VOID do_cache_prefetch (USI& op, int addr, PCADDR& pc);
 
       VOID do_smcp (USI rma, DI crn, PCADDR &pc);
       VOID do_smcpa (UINT rma_ix, SI cdisp8a8, DI crn, PCADDR &pc);
@@ -178,6 +178,11 @@ namespace mep
       DI do_lmcp16 (USI rma, SI sdisp16, PCADDR &pc);
       VOID do_sleep ();
       VOID check_write_to_text (UINT address);
+
+      // C5 instructions
+      VOID do_casb3 (SI rl, SI rn, UINT word_addr, UINT pc);
+      VOID do_cash3 (SI rl, SI rn, UINT word_addr, UINT pc);
+      VOID do_casw3 (SI rl, SI rn, UINT word_addr, UINT pc);
 
       // Methods for checking if an instruction class is activated.
       VOID check_option_abs    (PCADDR &pc) { check_option (ABS, pc);    }
@@ -247,10 +252,17 @@ namespace mep
       static const int CORE_C2 = 0x02;
       static const int CORE_C3 = 0x03;
       static const int CORE_C4 = 0x04;
+      static const int CORE_C5 = 0x50;
       static const int CORE_H1 = 0x10;
       int core_type () const { return (h_csr_get (17) >> 8) & 0xff; }
-      int machine () const { return core_type () == CORE_H1 ? bfd_mach_mep_h1 : bfd_mach_mep; }
-      const char *machine_name () const { return core_type () == CORE_H1 ? "h1" : "mep"; }
+      int machine () const { switch (core_type ()) {
+	case CORE_H1 : return bfd_mach_mep_h1;
+	case CORE_C5 : return bfd_mach_mep_c5;
+	default: return bfd_mach_mep; } }
+      const char *machine_name () const { switch (core_type ()) {
+	case CORE_H1 : return "h1";
+	case CORE_C5 : return "c5";
+	default: return "mep"; } }
 
     private:
       bool hw_debugger_p;
@@ -343,6 +355,7 @@ namespace mep
       output_pin cache_flush_and_invalidate_pin;
       output_pin cache_index_flush_and_invalidate_pin;
       output_pin cache_prefetch_pin;
+      output_pin cache_write_hint_pin;
       output_pin data_cache_invalidate_all_pin;
       output_pin insn_cache_invalidate_all_pin;
 

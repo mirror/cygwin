@@ -168,6 +168,9 @@ protected:
   callback_pin<cache_component> prefetch_pin;
   virtual void prefetch_line (host_int_4 addr);
 
+  callback_pin<cache_component> write_hint_pin;
+  virtual void write_hint (host_int_4 addr);
+
   callback_pin<cache_component> lock_pin;
   virtual void lock_line (host_int_4 addr);
 

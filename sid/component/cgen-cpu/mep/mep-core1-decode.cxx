@@ -20,9 +20,30 @@ using namespace mep_ext1; // FIXME: namespace organization still wip
 
 // The instruction descriptor array. 
 
-mepcore1_idesc mepcore1_idesc::idesc_table[MEPCORE1_INSN_RI_19 + 1] =
+mepcore1_idesc mepcore1_idesc::idesc_table[MEPCORE1_INSN_RI_26 + 1] =
 {
   { mepcore1_sem_x_invalid, "X_INVALID", MEPCORE1_INSN_X_INVALID, { 0|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), { 1, "\x40" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_stcb_r, "STCB_R", MEPCORE1_INSN_STCB_R, { 0|(1<<CGEN_INSN_VOLATILE), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_ldcb_r, "LDCB_R", MEPCORE1_INSN_LDCB_R, { 0|(1<<CGEN_INSN_VOLATILE), (1<<MACH_C5), { 1, "\xc0" }, 3, CONFIG_NONE } },
+  { mepcore1_sem_pref, "PREF", MEPCORE1_INSN_PREF, { 0|(1<<CGEN_INSN_VOLATILE), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_prefd, "PREFD", MEPCORE1_INSN_PREFD, { 0|(1<<CGEN_INSN_VOLATILE), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_casb3, "CASB3", MEPCORE1_INSN_CASB3, { 0|(1<<CGEN_INSN_OPTIONAL_BIT_INSN)|(1<<CGEN_INSN_VOLATILE), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_cash3, "CASH3", MEPCORE1_INSN_CASH3, { 0|(1<<CGEN_INSN_OPTIONAL_BIT_INSN)|(1<<CGEN_INSN_VOLATILE), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_casw3, "CASW3", MEPCORE1_INSN_CASW3, { 0|(1<<CGEN_INSN_OPTIONAL_BIT_INSN)|(1<<CGEN_INSN_VOLATILE), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_sbcp, "SBCP", MEPCORE1_INSN_SBCP, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_lbcp, "LBCP", MEPCORE1_INSN_LBCP, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_lbucp, "LBUCP", MEPCORE1_INSN_LBUCP, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_shcp, "SHCP", MEPCORE1_INSN_SHCP, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_lhcp, "LHCP", MEPCORE1_INSN_LHCP, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_lhucp, "LHUCP", MEPCORE1_INSN_LHUCP, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_lbucpa, "LBUCPA", MEPCORE1_INSN_LBUCPA, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_lhucpa, "LHUCPA", MEPCORE1_INSN_LHUCPA, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_lbucpm0, "LBUCPM0", MEPCORE1_INSN_LBUCPM0, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_lhucpm0, "LHUCPM0", MEPCORE1_INSN_LHUCPM0, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_lbucpm1, "LBUCPM1", MEPCORE1_INSN_LBUCPM1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_lhucpm1, "LHUCPM1", MEPCORE1_INSN_LHUCPM1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_uci, "UCI", MEPCORE1_INSN_UCI, { 0|(1<<CGEN_INSN_VOLATILE), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
+  { mepcore1_sem_dsp, "DSP", MEPCORE1_INSN_DSP, { 0|(1<<CGEN_INSN_VOLATILE), (1<<MACH_C5), { 1, "\xc0" }, 0, CONFIG_NONE } },
   { mepcore1_sem_sb, "SB", MEPCORE1_INSN_SB, { 0, (1<<MACH_BASE), { 1, "\xc0" }, 0, CONFIG_NONE } },
   { mepcore1_sem_sh, "SH", MEPCORE1_INSN_SH, { 0, (1<<MACH_BASE), { 1, "\xc0" }, 0, CONFIG_NONE } },
   { mepcore1_sem_sw, "SW", MEPCORE1_INSN_SW, { 0, (1<<MACH_BASE), { 1, "\xc0" }, 0, CONFIG_NONE } },
@@ -224,12 +245,7 @@ mepcore1_idesc mepcore1_idesc::idesc_table[MEPCORE1_INSN_RI_19 + 1] =
   { mepcore1_sem_ri_21, "RI_21", MEPCORE1_INSN_RI_21, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), { 1, "\xc0" }, 0, CONFIG_NONE } },
   { mepcore1_sem_ri_22, "RI_22", MEPCORE1_INSN_RI_22, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), { 1, "\xc0" }, 0, CONFIG_NONE } },
   { mepcore1_sem_ri_23, "RI_23", MEPCORE1_INSN_RI_23, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), { 1, "\xc0" }, 0, CONFIG_NONE } },
-  { mepcore1_sem_ri_24, "RI_24", MEPCORE1_INSN_RI_24, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), { 1, "\xc0" }, 0, CONFIG_NONE } },
-  { mepcore1_sem_ri_25, "RI_25", MEPCORE1_INSN_RI_25, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), { 1, "\xc0" }, 0, CONFIG_NONE } },
   { mepcore1_sem_ri_26, "RI_26", MEPCORE1_INSN_RI_26, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), { 1, "\xc0" }, 0, CONFIG_NONE } },
-  { mepcore1_sem_ri_16, "RI_16", MEPCORE1_INSN_RI_16, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), { 1, "\xc0" }, 0, CONFIG_NONE } },
-  { mepcore1_sem_ri_18, "RI_18", MEPCORE1_INSN_RI_18, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), { 1, "\xc0" }, 0, CONFIG_NONE } },
-  { mepcore1_sem_ri_19, "RI_19", MEPCORE1_INSN_RI_19, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), { 1, "\xc0" }, 0, CONFIG_NONE } },
 
 };
 
@@ -251,6 +267,38 @@ mepcore1_idesc::lookup_virtual (virtual_insn_type vit)
 
 static void
 mepcore1_extract_sfmt_empty (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_stcb_r (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_ldcb_r (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_pref (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_prefd (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_casb3 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_sbcp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_lbcp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_shcp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_lhcp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_lbucpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_lhucpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_lbucpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_lhucpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_lbucpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_lhucpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
+mepcore1_extract_sfmt_uci (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
 mepcore1_extract_sfmt_sb (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
@@ -414,8 +462,6 @@ mepcore1_extract_sfmt_btstm (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 static void
 mepcore1_extract_sfmt_tas (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
-mepcore1_extract_sfmt_cache (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
-static void
 mepcore1_extract_sfmt_mul (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
 mepcore1_extract_sfmt_mulr (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
@@ -466,11 +512,7 @@ mepcore1_extract_sfmt_lmcp16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 static void
 mepcore1_extract_sfmt_sbcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
-mepcore1_extract_sfmt_lbcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
-static void
 mepcore1_extract_sfmt_shcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
-static void
-mepcore1_extract_sfmt_lhcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
 mepcore1_extract_sfmt_swcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
@@ -482,11 +524,7 @@ mepcore1_extract_sfmt_lmcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 static void
 mepcore1_extract_sfmt_sbcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
-mepcore1_extract_sfmt_lbcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
-static void
 mepcore1_extract_sfmt_shcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
-static void
-mepcore1_extract_sfmt_lhcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
 mepcore1_extract_sfmt_swcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
@@ -498,11 +536,7 @@ mepcore1_extract_sfmt_lmcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 static void
 mepcore1_extract_sfmt_sbcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
-mepcore1_extract_sfmt_lbcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
-static void
 mepcore1_extract_sfmt_shcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
-static void
-mepcore1_extract_sfmt_lhcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
 mepcore1_extract_sfmt_swcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
@@ -1131,12 +1165,12 @@ mepcore1_scache::decode (mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_wor
       case 116 :
         entire_insn = entire_insn >> 16;
         if ((entire_insn & 0xf00f) == 0x7004)
-          { itype = MEPCORE1_INSN_CACHE; mepcore1_extract_sfmt_cache (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = MEPCORE1_INSN_CACHE; mepcore1_extract_sfmt_pref (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 117 :
         entire_insn = entire_insn >> 16;
         if ((entire_insn & 0xf00f) == 0x7005)
-          { itype = MEPCORE1_INSN_RI_16; mepcore1_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = MEPCORE1_INSN_PREF; mepcore1_extract_sfmt_pref (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 118 :
         entire_insn = entire_insn >> 16;
@@ -1241,12 +1275,12 @@ mepcore1_scache::decode (mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_wor
       case 124 :
         entire_insn = entire_insn >> 16;
         if ((entire_insn & 0xf00f) == 0x700c)
-          { itype = MEPCORE1_INSN_RI_18; mepcore1_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = MEPCORE1_INSN_STCB_R; mepcore1_extract_sfmt_stcb_r (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 125 :
         entire_insn = entire_insn >> 16;
         if ((entire_insn & 0xf00f) == 0x700d)
-          { itype = MEPCORE1_INSN_RI_19; mepcore1_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = MEPCORE1_INSN_LDCB_R; mepcore1_extract_sfmt_ldcb_r (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 126 :
         entire_insn = entire_insn >> 16;
@@ -1655,6 +1689,10 @@ mepcore1_scache::decode (mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_wor
         if ((entire_insn & 0xf00f) == 0xe00d)
           { itype = MEPCORE1_INSN_RI_23; mepcore1_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 240 :
+        if ((entire_insn & 0xf00f0000) == 0xf0000000)
+          { itype = MEPCORE1_INSN_DSP; mepcore1_extract_sfmt_uci (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 241 :
         {
           unsigned int val = (((insn >> 8) & (3 << 4)) | ((insn >> 0) & (15 << 0)));
@@ -1714,6 +1752,18 @@ mepcore1_scache::decode (mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_wor
             if ((entire_insn & 0xf0ffff07) == 0xf0011001)
               { itype = MEPCORE1_INSN_CLIPU; mepcore1_extract_sfmt_clipu (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 32 :
+            if ((entire_insn & 0xf00ff0ff) == 0xf0012000)
+              { itype = MEPCORE1_INSN_CASB3; mepcore1_extract_sfmt_casb3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 33 :
+            if ((entire_insn & 0xf00ff0ff) == 0xf0012001)
+              { itype = MEPCORE1_INSN_CASH3; mepcore1_extract_sfmt_casb3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 34 :
+            if ((entire_insn & 0xf00ff0ff) == 0xf0012002)
+              { itype = MEPCORE1_INSN_CASW3; mepcore1_extract_sfmt_casb3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 52 :
             if ((entire_insn & 0xf00fffff) == 0xf0013004)
               { itype = MEPCORE1_INSN_MADD; mepcore1_extract_sfmt_madd (this, current_cpu, pc, base_insn, entire_insn); goto done; }
@@ -1733,10 +1783,13 @@ mepcore1_scache::decode (mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_wor
           default : itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
+      case 242 :
+        if ((entire_insn & 0xf00f0000) == 0xf0020000)
+          { itype = MEPCORE1_INSN_UCI; mepcore1_extract_sfmt_uci (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 243 :
-        entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xf003)
-          { itype = MEPCORE1_INSN_RI_24; mepcore1_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        if ((entire_insn & 0xf00f0000) == 0xf0030000)
+          { itype = MEPCORE1_INSN_PREFD; mepcore1_extract_sfmt_prefd (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 244 :
         {
@@ -1756,113 +1809,164 @@ mepcore1_scache::decode (mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_wor
         }
       case 245 :
         {
-          unsigned int val = (((insn >> 10) & (31 << 0)));
+          unsigned int val = (((insn >> 10) & (63 << 0)));
           switch (val)
           {
           case 0 :
-            if ((entire_insn & 0xf00fff00) == 0xf0050000)
+            if ((entire_insn & 0xf00ffc00) == 0xf0050000)
               { itype = MEPCORE1_INSN_SBCPA; mepcore1_extract_sfmt_sbcpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 2 :
-            if ((entire_insn & 0xf00fff00) == 0xf0050800)
+            if ((entire_insn & 0xf00ffc00) == 0xf0050800)
               { itype = MEPCORE1_INSN_SBCPM0; mepcore1_extract_sfmt_sbcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 3 :
-            if ((entire_insn & 0xf00fff00) == 0xf0050c00)
+            if ((entire_insn & 0xf00ffc00) == 0xf0050c00)
               { itype = MEPCORE1_INSN_SBCPM1; mepcore1_extract_sfmt_sbcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 4 :
-            if ((entire_insn & 0xf00fff01) == 0xf0051000)
+            if ((entire_insn & 0xf00ffc00) == 0xf0051000)
               { itype = MEPCORE1_INSN_SHCPA; mepcore1_extract_sfmt_shcpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 6 :
-            if ((entire_insn & 0xf00fff01) == 0xf0051800)
+            if ((entire_insn & 0xf00ffc00) == 0xf0051800)
               { itype = MEPCORE1_INSN_SHCPM0; mepcore1_extract_sfmt_shcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 7 :
-            if ((entire_insn & 0xf00fff01) == 0xf0051c00)
+            if ((entire_insn & 0xf00ffc00) == 0xf0051c00)
               { itype = MEPCORE1_INSN_SHCPM1; mepcore1_extract_sfmt_shcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 8 :
-            if ((entire_insn & 0xf00fff03) == 0xf0052000)
+            if ((entire_insn & 0xf00ffc00) == 0xf0052000)
               { itype = MEPCORE1_INSN_SWCPA; mepcore1_extract_sfmt_swcpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 10 :
-            if ((entire_insn & 0xf00fff03) == 0xf0052800)
+            if ((entire_insn & 0xf00ffc00) == 0xf0052800)
               { itype = MEPCORE1_INSN_SWCPM0; mepcore1_extract_sfmt_swcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 11 :
-            if ((entire_insn & 0xf00fff03) == 0xf0052c00)
+            if ((entire_insn & 0xf00ffc00) == 0xf0052c00)
               { itype = MEPCORE1_INSN_SWCPM1; mepcore1_extract_sfmt_swcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 12 :
-            if ((entire_insn & 0xf00fff07) == 0xf0053000)
+            if ((entire_insn & 0xf00ffc00) == 0xf0053000)
               { itype = MEPCORE1_INSN_SMCPA; mepcore1_extract_sfmt_smcpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 14 :
-            if ((entire_insn & 0xf00fff07) == 0xf0053800)
+            if ((entire_insn & 0xf00ffc00) == 0xf0053800)
               { itype = MEPCORE1_INSN_SMCPM0; mepcore1_extract_sfmt_smcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 15 :
-            if ((entire_insn & 0xf00fff07) == 0xf0053c00)
+            if ((entire_insn & 0xf00ffc00) == 0xf0053c00)
               { itype = MEPCORE1_INSN_SMCPM1; mepcore1_extract_sfmt_smcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 16 :
-            if ((entire_insn & 0xf00fff00) == 0xf0054000)
-              { itype = MEPCORE1_INSN_LBCPA; mepcore1_extract_sfmt_lbcpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            if ((entire_insn & 0xf00ffc00) == 0xf0054000)
+              { itype = MEPCORE1_INSN_LBCPA; mepcore1_extract_sfmt_lbucpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 18 :
-            if ((entire_insn & 0xf00fff00) == 0xf0054800)
-              { itype = MEPCORE1_INSN_LBCPM0; mepcore1_extract_sfmt_lbcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            if ((entire_insn & 0xf00ffc00) == 0xf0054800)
+              { itype = MEPCORE1_INSN_LBCPM0; mepcore1_extract_sfmt_lbucpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 19 :
-            if ((entire_insn & 0xf00fff00) == 0xf0054c00)
-              { itype = MEPCORE1_INSN_LBCPM1; mepcore1_extract_sfmt_lbcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            if ((entire_insn & 0xf00ffc00) == 0xf0054c00)
+              { itype = MEPCORE1_INSN_LBCPM1; mepcore1_extract_sfmt_lbucpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 20 :
-            if ((entire_insn & 0xf00fff01) == 0xf0055000)
-              { itype = MEPCORE1_INSN_LHCPA; mepcore1_extract_sfmt_lhcpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            if ((entire_insn & 0xf00ffc00) == 0xf0055000)
+              { itype = MEPCORE1_INSN_LHCPA; mepcore1_extract_sfmt_lhucpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 22 :
-            if ((entire_insn & 0xf00fff01) == 0xf0055800)
-              { itype = MEPCORE1_INSN_LHCPM0; mepcore1_extract_sfmt_lhcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            if ((entire_insn & 0xf00ffc00) == 0xf0055800)
+              { itype = MEPCORE1_INSN_LHCPM0; mepcore1_extract_sfmt_lhucpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 23 :
-            if ((entire_insn & 0xf00fff01) == 0xf0055c00)
-              { itype = MEPCORE1_INSN_LHCPM1; mepcore1_extract_sfmt_lhcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            if ((entire_insn & 0xf00ffc00) == 0xf0055c00)
+              { itype = MEPCORE1_INSN_LHCPM1; mepcore1_extract_sfmt_lhucpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 24 :
-            if ((entire_insn & 0xf00fff03) == 0xf0056000)
+            if ((entire_insn & 0xf00ffc00) == 0xf0056000)
               { itype = MEPCORE1_INSN_LWCPA; mepcore1_extract_sfmt_lwcpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 26 :
-            if ((entire_insn & 0xf00fff03) == 0xf0056800)
+            if ((entire_insn & 0xf00ffc00) == 0xf0056800)
               { itype = MEPCORE1_INSN_LWCPM0; mepcore1_extract_sfmt_lwcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 27 :
-            if ((entire_insn & 0xf00fff03) == 0xf0056c00)
+            if ((entire_insn & 0xf00ffc00) == 0xf0056c00)
               { itype = MEPCORE1_INSN_LWCPM1; mepcore1_extract_sfmt_lwcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 28 :
-            if ((entire_insn & 0xf00fff07) == 0xf0057000)
+            if ((entire_insn & 0xf00ffc00) == 0xf0057000)
               { itype = MEPCORE1_INSN_LMCPA; mepcore1_extract_sfmt_lmcpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 30 :
-            if ((entire_insn & 0xf00fff07) == 0xf0057800)
+            if ((entire_insn & 0xf00ffc00) == 0xf0057800)
               { itype = MEPCORE1_INSN_LMCPM0; mepcore1_extract_sfmt_lmcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 31 :
-            if ((entire_insn & 0xf00fff07) == 0xf0057c00)
+            if ((entire_insn & 0xf00ffc00) == 0xf0057c00)
               { itype = MEPCORE1_INSN_LMCPM1; mepcore1_extract_sfmt_lmcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 48 :
+            if ((entire_insn & 0xf00ffc00) == 0xf005c000)
+              { itype = MEPCORE1_INSN_LBUCPA; mepcore1_extract_sfmt_lbucpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 50 :
+            if ((entire_insn & 0xf00ffc00) == 0xf005c800)
+              { itype = MEPCORE1_INSN_LBUCPM0; mepcore1_extract_sfmt_lbucpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 51 :
+            if ((entire_insn & 0xf00ffc00) == 0xf005cc00)
+              { itype = MEPCORE1_INSN_LBUCPM1; mepcore1_extract_sfmt_lbucpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 52 :
+            if ((entire_insn & 0xf00ffc00) == 0xf005d000)
+              { itype = MEPCORE1_INSN_LHUCPA; mepcore1_extract_sfmt_lhucpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 54 :
+            if ((entire_insn & 0xf00ffc00) == 0xf005d800)
+              { itype = MEPCORE1_INSN_LHUCPM0; mepcore1_extract_sfmt_lhucpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 55 :
+            if ((entire_insn & 0xf00ffc00) == 0xf005dc00)
+              { itype = MEPCORE1_INSN_LHUCPM1; mepcore1_extract_sfmt_lhucpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 246 :
-        entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xf006)
-          { itype = MEPCORE1_INSN_RI_25; mepcore1_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        {
+          unsigned int val = (((insn >> 13) & (3 << 1)) | ((insn >> 12) & (1 << 0)));
+          switch (val)
+          {
+          case 0 :
+            if ((entire_insn & 0xf00ff000) == 0xf0060000)
+              { itype = MEPCORE1_INSN_SBCP; mepcore1_extract_sfmt_sbcp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xf00ff000) == 0xf0061000)
+              { itype = MEPCORE1_INSN_SHCP; mepcore1_extract_sfmt_shcp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 :
+            if ((entire_insn & 0xf00ff000) == 0xf0064000)
+              { itype = MEPCORE1_INSN_LBCP; mepcore1_extract_sfmt_lbcp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 3 :
+            if ((entire_insn & 0xf00ff000) == 0xf0065000)
+              { itype = MEPCORE1_INSN_LHCP; mepcore1_extract_sfmt_lhcp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 6 :
+            if ((entire_insn & 0xf00ff000) == 0xf006c000)
+              { itype = MEPCORE1_INSN_LBUCP; mepcore1_extract_sfmt_lbcp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 7 :
+            if ((entire_insn & 0xf00ff000) == 0xf006d000)
+              { itype = MEPCORE1_INSN_LHUCP; mepcore1_extract_sfmt_lhcp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = MEPCORE1_INSN_X_INVALID; mepcore1_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          }
+        }
       case 248 :
         entire_insn = entire_insn >> 16;
         if ((entire_insn & 0xf00f) == 0xf008)
@@ -1914,6 +2018,580 @@ mepcore1_extract_sfmt_empty (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
         << endl;
     }
 
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_stcb_r (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_stcb_r.f
+    UINT f_rn;
+    UINT f_rm;
+
+    f_rn = EXTRACT_MSB0_UINT (insn, 16, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 16, 8, 4);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_rm) = f_rm;
+  FLD (f_rn) = f_rn;
+  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
+  FLD (i_rn) = & current_cpu->hardware.h_gpr[f_rn];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_stcb_r)\t"
+        << " f_rm:0x" << hex << f_rm << dec
+        << " f_rn:0x" << hex << f_rn << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rma) = f_rm;
+      FLD (in_rn) = f_rn;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_ldcb_r (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_ldcb_r.f
+    UINT f_rn;
+    UINT f_rm;
+
+    f_rn = EXTRACT_MSB0_UINT (insn, 16, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 16, 8, 4);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_rm) = f_rm;
+  FLD (f_rn) = f_rn;
+  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
+  FLD (i_rn) = & current_cpu->hardware.h_gpr[f_rn];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_ldcb_r)\t"
+        << " f_rm:0x" << hex << f_rm << dec
+        << " f_rn:0x" << hex << f_rn << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rma) = f_rm;
+      FLD (out_rn) = f_rn;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_pref (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_ldcb_r.f
+    UINT f_rn;
+    UINT f_rm;
+
+    f_rn = EXTRACT_MSB0_UINT (insn, 16, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 16, 8, 4);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_rn) = f_rn;
+  FLD (f_rm) = f_rm;
+  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_pref)\t"
+        << " f_rn:0x" << hex << f_rn << dec
+        << " f_rm:0x" << hex << f_rm << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rma) = f_rm;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_prefd (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_lhu16.f
+    UINT f_rn;
+    UINT f_rm;
+    INT f_16s16;
+
+    f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_rn) = f_rn;
+  FLD (f_rm) = f_rm;
+  FLD (f_16s16) = f_16s16;
+  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_prefd)\t"
+        << " f_rn:0x" << hex << f_rn << dec
+        << " f_rm:0x" << hex << f_rm << dec
+        << " f_16s16:0x" << hex << f_16s16 << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rma) = f_rm;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_casb3 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_casb3.f
+    UINT f_rn;
+    UINT f_rm;
+    UINT f_rl5;
+
+    f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_rl5 = EXTRACT_MSB0_UINT (insn, 32, 20, 4);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_rl5) = f_rl5;
+  FLD (f_rm) = f_rm;
+  FLD (f_rn) = f_rn;
+  FLD (i_rl5) = & current_cpu->hardware.h_gpr[f_rl5];
+  FLD (i_rm) = & current_cpu->hardware.h_gpr[f_rm];
+  FLD (i_rn) = & current_cpu->hardware.h_gpr[f_rn];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_casb3)\t"
+        << " f_rl5:0x" << hex << f_rl5 << dec
+        << " f_rm:0x" << hex << f_rm << dec
+        << " f_rn:0x" << hex << f_rn << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rl5) = f_rl5;
+      FLD (in_rm) = f_rm;
+      FLD (in_rn) = f_rn;
+      FLD (out_rl5) = f_rl5;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_sbcp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_sbcp.f
+    UINT f_crn;
+    UINT f_rm;
+    UINT f_12s20;
+
+    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_12s20 = EXTRACT_MSB0_UINT (insn, 32, 20, 12);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_12s20) = f_12s20;
+  FLD (f_crn) = f_crn;
+  FLD (f_rm) = f_rm;
+  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_sbcp)\t"
+        << " f_12s20:0x" << hex << f_12s20 << dec
+        << " f_crn:0x" << hex << f_crn << dec
+        << " f_rm:0x" << hex << f_rm << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rma) = f_rm;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_lbcp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_sbcp.f
+    UINT f_crn;
+    UINT f_rm;
+    UINT f_12s20;
+
+    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_12s20 = EXTRACT_MSB0_UINT (insn, 32, 20, 12);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_12s20) = f_12s20;
+  FLD (f_rm) = f_rm;
+  FLD (f_crn) = f_crn;
+  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_lbcp)\t"
+        << " f_12s20:0x" << hex << f_12s20 << dec
+        << " f_rm:0x" << hex << f_rm << dec
+        << " f_crn:0x" << hex << f_crn << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rma) = f_rm;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_shcp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_sbcp.f
+    UINT f_crn;
+    UINT f_rm;
+    UINT f_12s20;
+
+    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_12s20 = EXTRACT_MSB0_UINT (insn, 32, 20, 12);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_12s20) = f_12s20;
+  FLD (f_crn) = f_crn;
+  FLD (f_rm) = f_rm;
+  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_shcp)\t"
+        << " f_12s20:0x" << hex << f_12s20 << dec
+        << " f_crn:0x" << hex << f_crn << dec
+        << " f_rm:0x" << hex << f_rm << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rma) = f_rm;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_lhcp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_sbcp.f
+    UINT f_crn;
+    UINT f_rm;
+    UINT f_12s20;
+
+    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_12s20 = EXTRACT_MSB0_UINT (insn, 32, 20, 12);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_12s20) = f_12s20;
+  FLD (f_rm) = f_rm;
+  FLD (f_crn) = f_crn;
+  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_lhcp)\t"
+        << " f_12s20:0x" << hex << f_12s20 << dec
+        << " f_rm:0x" << hex << f_rm << dec
+        << " f_crn:0x" << hex << f_crn << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rma) = f_rm;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_lbucpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
+    UINT f_crn;
+    UINT f_rm;
+    SI f_cdisp10;
+
+    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_cdisp10) = f_cdisp10;
+  FLD (f_rm) = f_rm;
+  FLD (f_crn) = f_crn;
+  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_lbucpa)\t"
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
+        << " f_rm:0x" << hex << f_rm << dec
+        << " f_crn:0x" << hex << f_crn << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rma) = f_rm;
+      FLD (out_rma) = f_rm;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_lhucpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
+    UINT f_crn;
+    UINT f_rm;
+    SI f_cdisp10;
+
+    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_cdisp10) = f_cdisp10;
+  FLD (f_rm) = f_rm;
+  FLD (f_crn) = f_crn;
+  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_lhucpa)\t"
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
+        << " f_rm:0x" << hex << f_rm << dec
+        << " f_crn:0x" << hex << f_crn << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rma) = f_rm;
+      FLD (out_rma) = f_rm;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_lbucpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
+    UINT f_crn;
+    UINT f_rm;
+    SI f_cdisp10;
+
+    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_cdisp10) = f_cdisp10;
+  FLD (f_rm) = f_rm;
+  FLD (f_crn) = f_crn;
+  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_lbucpm0)\t"
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
+        << " f_rm:0x" << hex << f_rm << dec
+        << " f_crn:0x" << hex << f_crn << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_mb0) = 12;
+      FLD (in_me0) = 13;
+      FLD (in_rma) = f_rm;
+      FLD (out_rma) = f_rm;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_lhucpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
+    UINT f_crn;
+    UINT f_rm;
+    SI f_cdisp10;
+
+    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_cdisp10) = f_cdisp10;
+  FLD (f_rm) = f_rm;
+  FLD (f_crn) = f_crn;
+  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_lhucpm0)\t"
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
+        << " f_rm:0x" << hex << f_rm << dec
+        << " f_crn:0x" << hex << f_crn << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_mb0) = 12;
+      FLD (in_me0) = 13;
+      FLD (in_rma) = f_rm;
+      FLD (out_rma) = f_rm;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_lbucpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
+    UINT f_crn;
+    UINT f_rm;
+    SI f_cdisp10;
+
+    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_cdisp10) = f_cdisp10;
+  FLD (f_rm) = f_rm;
+  FLD (f_crn) = f_crn;
+  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_lbucpm1)\t"
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
+        << " f_rm:0x" << hex << f_rm << dec
+        << " f_crn:0x" << hex << f_crn << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_mb1) = 14;
+      FLD (in_me1) = 15;
+      FLD (in_rma) = f_rm;
+      FLD (out_rma) = f_rm;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_lhucpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
+    UINT f_crn;
+    UINT f_rm;
+    SI f_cdisp10;
+
+    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_cdisp10) = f_cdisp10;
+  FLD (f_rm) = f_rm;
+  FLD (f_crn) = f_crn;
+  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_lhucpm1)\t"
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
+        << " f_rm:0x" << hex << f_rm << dec
+        << " f_crn:0x" << hex << f_crn << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_mb1) = 14;
+      FLD (in_me1) = 15;
+      FLD (in_rma) = f_rm;
+      FLD (out_rma) = f_rm;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_uci (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_uci.f
+    UINT f_rn;
+    UINT f_rm;
+    UINT f_16u16;
+
+    f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_16u16 = EXTRACT_MSB0_UINT (insn, 32, 16, 16);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_rm) = f_rm;
+  FLD (f_rn) = f_rn;
+  FLD (f_16u16) = f_16u16;
+  FLD (i_rm) = & current_cpu->hardware.h_gpr[f_rm];
+  FLD (i_rn) = & current_cpu->hardware.h_gpr[f_rn];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_uci)\t"
+        << " f_rm:0x" << hex << f_rm << dec
+        << " f_rn:0x" << hex << f_rn << dec
+        << " f_16u16:0x" << hex << f_16u16 << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rm) = f_rm;
+      FLD (in_rn) = f_rn;
+      FLD (out_rn) = f_rn;
+    }
 #undef FLD
 }
 
@@ -2986,7 +3664,7 @@ mepcore1_extract_sfmt_ssarb (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 void
 mepcore1_extract_sfmt_mov (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_add3x.f
     UINT f_rn;
     UINT f_rm;
 
@@ -3116,7 +3794,7 @@ mepcore1_extract_sfmt_movu24 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_movu16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_uci.f
     UINT f_rn;
     UINT f_16u16;
 
@@ -3458,7 +4136,7 @@ mepcore1_extract_sfmt_slt3x (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 void
 mepcore1_extract_sfmt_sltu3x (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_uci.f
     UINT f_rn;
     UINT f_rm;
     UINT f_16u16;
@@ -3495,7 +4173,7 @@ mepcore1_extract_sfmt_sltu3x (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_or3 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_uci.f
     UINT f_rn;
     UINT f_rm;
     UINT f_16u16;
@@ -4384,7 +5062,7 @@ mepcore1_extract_sfmt_break (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 void
 mepcore1_extract_sfmt_stcb (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_stcb.f
+#define FLD(f) abuf->fields.sfmt_uci.f
     UINT f_rn;
     UINT f_16u16;
 
@@ -4478,7 +5156,7 @@ mepcore1_extract_sfmt_btstm (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 void
 mepcore1_extract_sfmt_tas (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_tas.f
+#define FLD(f) abuf->fields.sfmt_ldcb_r.f
     UINT f_rn;
     UINT f_rm;
 
@@ -4504,37 +5182,6 @@ mepcore1_extract_sfmt_tas (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCA
     {
       FLD (in_rma) = f_rm;
       FLD (out_rn) = f_rn;
-    }
-#undef FLD
-}
-
-void
-mepcore1_extract_sfmt_cache (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
-    mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_tas.f
-    UINT f_rn;
-    UINT f_rm;
-
-    f_rn = EXTRACT_MSB0_UINT (insn, 16, 4, 4);
-    f_rm = EXTRACT_MSB0_UINT (insn, 16, 8, 4);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_rn) = f_rn;
-  FLD (f_rm) = f_rm;
-  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_cache)\t"
-        << " f_rn:0x" << hex << f_rn << dec
-        << " f_rm:0x" << hex << f_rm << dec
-        << endl;
-    }
-
-  /* Record the fields for profiling.  */
-  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
-    {
-      FLD (in_rma) = f_rm;
     }
 #undef FLD
 }
@@ -4770,7 +5417,7 @@ mepcore1_extract_sfmt_dbreak (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_ldz (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_add3x.f
     UINT f_rn;
     UINT f_rm;
 
@@ -5059,7 +5706,7 @@ mepcore1_extract_sfmt_lmcp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PC
 void
 mepcore1_extract_sfmt_swcpi (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
 
@@ -5091,7 +5738,7 @@ mepcore1_extract_sfmt_swcpi (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 void
 mepcore1_extract_sfmt_lwcpi (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
 
@@ -5123,7 +5770,7 @@ mepcore1_extract_sfmt_lwcpi (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 void
 mepcore1_extract_sfmt_smcpi (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
 
@@ -5155,7 +5802,7 @@ mepcore1_extract_sfmt_smcpi (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 void
 mepcore1_extract_sfmt_lmcpi (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
 
@@ -5327,17 +5974,17 @@ mepcore1_extract_sfmt_lmcp16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_sbcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_sbcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
-    INT f_8s24;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24 = EXTRACT_MSB0_INT (insn, 32, 24, 8);
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24) = f_8s24;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_crn) = f_crn;
   FLD (f_rm) = f_rm;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -5345,45 +5992,9 @@ mepcore1_extract_sfmt_sbcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_sbcpa)\t"
-        << " f_8s24:0x" << hex << f_8s24 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_crn:0x" << hex << f_crn << dec
         << " f_rm:0x" << hex << f_rm << dec
-        << endl;
-    }
-
-  /* Record the fields for profiling.  */
-  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
-    {
-      FLD (in_rma) = f_rm;
-      FLD (out_rma) = f_rm;
-    }
-#undef FLD
-}
-
-void
-mepcore1_extract_sfmt_lbcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
-    mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_sbcpm1.f
-    UINT f_crn;
-    UINT f_rm;
-    INT f_8s24;
-
-    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
-    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24 = EXTRACT_MSB0_INT (insn, 32, 24, 8);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_8s24) = f_8s24;
-  FLD (f_rm) = f_rm;
-  FLD (f_crn) = f_crn;
-  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_lbcpa)\t"
-        << " f_8s24:0x" << hex << f_8s24 << dec
-        << " f_rm:0x" << hex << f_rm << dec
-        << " f_crn:0x" << hex << f_crn << dec
         << endl;
     }
 
@@ -5399,17 +6010,17 @@ mepcore1_extract_sfmt_lbcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 void
 mepcore1_extract_sfmt_shcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_shcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a2;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a2 = ((EXTRACT_MSB0_INT (insn, 32, 24, 7)) << (1));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a2) = f_8s24a2;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_crn) = f_crn;
   FLD (f_rm) = f_rm;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -5417,45 +6028,9 @@ mepcore1_extract_sfmt_shcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_shcpa)\t"
-        << " f_8s24a2:0x" << hex << f_8s24a2 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_crn:0x" << hex << f_crn << dec
         << " f_rm:0x" << hex << f_rm << dec
-        << endl;
-    }
-
-  /* Record the fields for profiling.  */
-  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
-    {
-      FLD (in_rma) = f_rm;
-      FLD (out_rma) = f_rm;
-    }
-#undef FLD
-}
-
-void
-mepcore1_extract_sfmt_lhcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
-    mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_shcpm1.f
-    UINT f_crn;
-    UINT f_rm;
-    SI f_8s24a2;
-
-    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
-    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a2 = ((EXTRACT_MSB0_INT (insn, 32, 24, 7)) << (1));
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a2) = f_8s24a2;
-  FLD (f_rm) = f_rm;
-  FLD (f_crn) = f_crn;
-  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_lhcpa)\t"
-        << " f_8s24a2:0x" << hex << f_8s24a2 << dec
-        << " f_rm:0x" << hex << f_rm << dec
-        << " f_crn:0x" << hex << f_crn << dec
         << endl;
     }
 
@@ -5471,17 +6046,17 @@ mepcore1_extract_sfmt_lhcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 void
 mepcore1_extract_sfmt_swcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_swcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a4;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a4 = ((EXTRACT_MSB0_INT (insn, 32, 24, 6)) << (2));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a4) = f_8s24a4;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_crn) = f_crn;
   FLD (f_rm) = f_rm;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -5489,7 +6064,7 @@ mepcore1_extract_sfmt_swcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_swcpa)\t"
-        << " f_8s24a4:0x" << hex << f_8s24a4 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_crn:0x" << hex << f_crn << dec
         << " f_rm:0x" << hex << f_rm << dec
         << endl;
@@ -5507,17 +6082,17 @@ mepcore1_extract_sfmt_swcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 void
 mepcore1_extract_sfmt_lwcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_swcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a4;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a4 = ((EXTRACT_MSB0_INT (insn, 32, 24, 6)) << (2));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a4) = f_8s24a4;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_rm) = f_rm;
   FLD (f_crn) = f_crn;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -5525,7 +6100,7 @@ mepcore1_extract_sfmt_lwcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_lwcpa)\t"
-        << " f_8s24a4:0x" << hex << f_8s24a4 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_rm:0x" << hex << f_rm << dec
         << " f_crn:0x" << hex << f_crn << dec
         << endl;
@@ -5543,17 +6118,17 @@ mepcore1_extract_sfmt_lwcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 void
 mepcore1_extract_sfmt_smcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a8;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a8 = ((EXTRACT_MSB0_INT (insn, 32, 24, 5)) << (3));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a8) = f_8s24a8;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_crn) = f_crn;
   FLD (f_rm) = f_rm;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -5561,7 +6136,7 @@ mepcore1_extract_sfmt_smcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_smcpa)\t"
-        << " f_8s24a8:0x" << hex << f_8s24a8 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_crn:0x" << hex << f_crn << dec
         << " f_rm:0x" << hex << f_rm << dec
         << endl;
@@ -5579,17 +6154,17 @@ mepcore1_extract_sfmt_smcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 void
 mepcore1_extract_sfmt_lmcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a8;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a8 = ((EXTRACT_MSB0_INT (insn, 32, 24, 5)) << (3));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a8) = f_8s24a8;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_rm) = f_rm;
   FLD (f_crn) = f_crn;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -5597,7 +6172,7 @@ mepcore1_extract_sfmt_lmcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_lmcpa)\t"
-        << " f_8s24a8:0x" << hex << f_8s24a8 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_rm:0x" << hex << f_rm << dec
         << " f_crn:0x" << hex << f_crn << dec
         << endl;
@@ -5615,17 +6190,17 @@ mepcore1_extract_sfmt_lmcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 void
 mepcore1_extract_sfmt_sbcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_sbcpm0.f
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
     UINT f_crn;
     UINT f_rm;
-    INT f_8s24;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24 = EXTRACT_MSB0_INT (insn, 32, 24, 8);
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24) = f_8s24;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_crn) = f_crn;
   FLD (f_rm) = f_rm;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -5633,47 +6208,9 @@ mepcore1_extract_sfmt_sbcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_sbcpm0)\t"
-        << " f_8s24:0x" << hex << f_8s24 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_crn:0x" << hex << f_crn << dec
         << " f_rm:0x" << hex << f_rm << dec
-        << endl;
-    }
-
-  /* Record the fields for profiling.  */
-  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
-    {
-      FLD (in_mb0) = 12;
-      FLD (in_me0) = 13;
-      FLD (in_rma) = f_rm;
-      FLD (out_rma) = f_rm;
-    }
-#undef FLD
-}
-
-void
-mepcore1_extract_sfmt_lbcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
-    mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_sbcpm0.f
-    UINT f_crn;
-    UINT f_rm;
-    INT f_8s24;
-
-    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
-    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24 = EXTRACT_MSB0_INT (insn, 32, 24, 8);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_8s24) = f_8s24;
-  FLD (f_rm) = f_rm;
-  FLD (f_crn) = f_crn;
-  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_lbcpm0)\t"
-        << " f_8s24:0x" << hex << f_8s24 << dec
-        << " f_rm:0x" << hex << f_rm << dec
-        << " f_crn:0x" << hex << f_crn << dec
         << endl;
     }
 
@@ -5691,17 +6228,17 @@ mepcore1_extract_sfmt_lbcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_shcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_shcpm0.f
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a2;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a2 = ((EXTRACT_MSB0_INT (insn, 32, 24, 7)) << (1));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a2) = f_8s24a2;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_crn) = f_crn;
   FLD (f_rm) = f_rm;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -5709,47 +6246,9 @@ mepcore1_extract_sfmt_shcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_shcpm0)\t"
-        << " f_8s24a2:0x" << hex << f_8s24a2 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_crn:0x" << hex << f_crn << dec
         << " f_rm:0x" << hex << f_rm << dec
-        << endl;
-    }
-
-  /* Record the fields for profiling.  */
-  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
-    {
-      FLD (in_mb0) = 12;
-      FLD (in_me0) = 13;
-      FLD (in_rma) = f_rm;
-      FLD (out_rma) = f_rm;
-    }
-#undef FLD
-}
-
-void
-mepcore1_extract_sfmt_lhcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
-    mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_shcpm0.f
-    UINT f_crn;
-    UINT f_rm;
-    SI f_8s24a2;
-
-    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
-    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a2 = ((EXTRACT_MSB0_INT (insn, 32, 24, 7)) << (1));
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a2) = f_8s24a2;
-  FLD (f_rm) = f_rm;
-  FLD (f_crn) = f_crn;
-  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_lhcpm0)\t"
-        << " f_8s24a2:0x" << hex << f_8s24a2 << dec
-        << " f_rm:0x" << hex << f_rm << dec
-        << " f_crn:0x" << hex << f_crn << dec
         << endl;
     }
 
@@ -5767,17 +6266,17 @@ mepcore1_extract_sfmt_lhcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_swcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_swcpm0.f
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a4;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a4 = ((EXTRACT_MSB0_INT (insn, 32, 24, 6)) << (2));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a4) = f_8s24a4;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_crn) = f_crn;
   FLD (f_rm) = f_rm;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -5785,7 +6284,7 @@ mepcore1_extract_sfmt_swcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_swcpm0)\t"
-        << " f_8s24a4:0x" << hex << f_8s24a4 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_crn:0x" << hex << f_crn << dec
         << " f_rm:0x" << hex << f_rm << dec
         << endl;
@@ -5805,17 +6304,17 @@ mepcore1_extract_sfmt_swcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_lwcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_swcpm0.f
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a4;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a4 = ((EXTRACT_MSB0_INT (insn, 32, 24, 6)) << (2));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a4) = f_8s24a4;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_rm) = f_rm;
   FLD (f_crn) = f_crn;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -5823,7 +6322,7 @@ mepcore1_extract_sfmt_lwcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_lwcpm0)\t"
-        << " f_8s24a4:0x" << hex << f_8s24a4 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_rm:0x" << hex << f_rm << dec
         << " f_crn:0x" << hex << f_crn << dec
         << endl;
@@ -5843,17 +6342,17 @@ mepcore1_extract_sfmt_lwcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_smcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_smcpm0.f
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a8;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a8 = ((EXTRACT_MSB0_INT (insn, 32, 24, 5)) << (3));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a8) = f_8s24a8;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_crn) = f_crn;
   FLD (f_rm) = f_rm;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -5861,7 +6360,7 @@ mepcore1_extract_sfmt_smcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_smcpm0)\t"
-        << " f_8s24a8:0x" << hex << f_8s24a8 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_crn:0x" << hex << f_crn << dec
         << " f_rm:0x" << hex << f_rm << dec
         << endl;
@@ -5881,17 +6380,17 @@ mepcore1_extract_sfmt_smcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_lmcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_smcpm0.f
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a8;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a8 = ((EXTRACT_MSB0_INT (insn, 32, 24, 5)) << (3));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a8) = f_8s24a8;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_rm) = f_rm;
   FLD (f_crn) = f_crn;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -5899,7 +6398,7 @@ mepcore1_extract_sfmt_lmcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_lmcpm0)\t"
-        << " f_8s24a8:0x" << hex << f_8s24a8 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_rm:0x" << hex << f_rm << dec
         << " f_crn:0x" << hex << f_crn << dec
         << endl;
@@ -5919,17 +6418,17 @@ mepcore1_extract_sfmt_lmcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_sbcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_sbcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
-    INT f_8s24;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24 = EXTRACT_MSB0_INT (insn, 32, 24, 8);
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24) = f_8s24;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_crn) = f_crn;
   FLD (f_rm) = f_rm;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -5937,47 +6436,9 @@ mepcore1_extract_sfmt_sbcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_sbcpm1)\t"
-        << " f_8s24:0x" << hex << f_8s24 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_crn:0x" << hex << f_crn << dec
         << " f_rm:0x" << hex << f_rm << dec
-        << endl;
-    }
-
-  /* Record the fields for profiling.  */
-  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
-    {
-      FLD (in_mb1) = 14;
-      FLD (in_me1) = 15;
-      FLD (in_rma) = f_rm;
-      FLD (out_rma) = f_rm;
-    }
-#undef FLD
-}
-
-void
-mepcore1_extract_sfmt_lbcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
-    mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_sbcpm1.f
-    UINT f_crn;
-    UINT f_rm;
-    INT f_8s24;
-
-    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
-    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24 = EXTRACT_MSB0_INT (insn, 32, 24, 8);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_8s24) = f_8s24;
-  FLD (f_rm) = f_rm;
-  FLD (f_crn) = f_crn;
-  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_lbcpm1)\t"
-        << " f_8s24:0x" << hex << f_8s24 << dec
-        << " f_rm:0x" << hex << f_rm << dec
-        << " f_crn:0x" << hex << f_crn << dec
         << endl;
     }
 
@@ -5995,17 +6456,17 @@ mepcore1_extract_sfmt_lbcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_shcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_shcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a2;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a2 = ((EXTRACT_MSB0_INT (insn, 32, 24, 7)) << (1));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a2) = f_8s24a2;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_crn) = f_crn;
   FLD (f_rm) = f_rm;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -6013,47 +6474,9 @@ mepcore1_extract_sfmt_shcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_shcpm1)\t"
-        << " f_8s24a2:0x" << hex << f_8s24a2 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_crn:0x" << hex << f_crn << dec
         << " f_rm:0x" << hex << f_rm << dec
-        << endl;
-    }
-
-  /* Record the fields for profiling.  */
-  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
-    {
-      FLD (in_mb1) = 14;
-      FLD (in_me1) = 15;
-      FLD (in_rma) = f_rm;
-      FLD (out_rma) = f_rm;
-    }
-#undef FLD
-}
-
-void
-mepcore1_extract_sfmt_lhcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
-    mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_shcpm1.f
-    UINT f_crn;
-    UINT f_rm;
-    SI f_8s24a2;
-
-    f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
-    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a2 = ((EXTRACT_MSB0_INT (insn, 32, 24, 7)) << (1));
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a2) = f_8s24a2;
-  FLD (f_rm) = f_rm;
-  FLD (f_crn) = f_crn;
-  FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_lhcpm1)\t"
-        << " f_8s24a2:0x" << hex << f_8s24a2 << dec
-        << " f_rm:0x" << hex << f_rm << dec
-        << " f_crn:0x" << hex << f_crn << dec
         << endl;
     }
 
@@ -6071,17 +6494,17 @@ mepcore1_extract_sfmt_lhcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_swcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_swcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a4;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a4 = ((EXTRACT_MSB0_INT (insn, 32, 24, 6)) << (2));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a4) = f_8s24a4;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_crn) = f_crn;
   FLD (f_rm) = f_rm;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -6089,7 +6512,7 @@ mepcore1_extract_sfmt_swcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_swcpm1)\t"
-        << " f_8s24a4:0x" << hex << f_8s24a4 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_crn:0x" << hex << f_crn << dec
         << " f_rm:0x" << hex << f_rm << dec
         << endl;
@@ -6109,17 +6532,17 @@ mepcore1_extract_sfmt_swcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_lwcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_swcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a4;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a4 = ((EXTRACT_MSB0_INT (insn, 32, 24, 6)) << (2));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a4) = f_8s24a4;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_rm) = f_rm;
   FLD (f_crn) = f_crn;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -6127,7 +6550,7 @@ mepcore1_extract_sfmt_lwcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_lwcpm1)\t"
-        << " f_8s24a4:0x" << hex << f_8s24a4 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_rm:0x" << hex << f_rm << dec
         << " f_crn:0x" << hex << f_crn << dec
         << endl;
@@ -6147,17 +6570,17 @@ mepcore1_extract_sfmt_lwcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_smcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a8;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a8 = ((EXTRACT_MSB0_INT (insn, 32, 24, 5)) << (3));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a8) = f_8s24a8;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_crn) = f_crn;
   FLD (f_rm) = f_rm;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -6165,7 +6588,7 @@ mepcore1_extract_sfmt_smcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_smcpm1)\t"
-        << " f_8s24a8:0x" << hex << f_8s24a8 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_crn:0x" << hex << f_crn << dec
         << " f_rm:0x" << hex << f_rm << dec
         << endl;
@@ -6185,17 +6608,17 @@ mepcore1_extract_sfmt_smcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 void
 mepcore1_extract_sfmt_lmcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
     UINT f_crn;
     UINT f_rm;
-    SI f_8s24a8;
+    SI f_cdisp10;
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_8s24a8 = ((EXTRACT_MSB0_INT (insn, 32, 24, 5)) << (3));
+    f_cdisp10 = ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_UINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_UINT (insn, 32, 22, 10)));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_8s24a8) = f_8s24a8;
+  FLD (f_cdisp10) = f_cdisp10;
   FLD (f_rm) = f_rm;
   FLD (f_crn) = f_crn;
   FLD (i_rma) = & current_cpu->hardware.h_gpr[f_rm];
@@ -6203,7 +6626,7 @@ mepcore1_extract_sfmt_lmcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_lmcpm1)\t"
-        << " f_8s24a8:0x" << hex << f_8s24a8 << dec
+        << " f_cdisp10:0x" << hex << f_cdisp10 << dec
         << " f_rm:0x" << hex << f_rm << dec
         << " f_crn:0x" << hex << f_crn << dec
         << endl;

@@ -17,7 +17,7 @@
   (name mep)
   (comment "Toshiba MeP Media Engine")
   (insn-lsb0? #f) ;; work around cgen limitation
-  (machs mep h1)
+  (machs mep h1 c5)
   isa-enum
 )
 
@@ -67,10 +67,17 @@
   isa-enum
 )
 
+(define-mach
+  (name c5)
+  (comment "C5 media engine")
+  (cpu mepf)
+  isa-enum
+)
+
 (define-model
   (name mep)
   (comment "MeP media engine processor")
-  (mach mep) ; mach gets changed by MeP-Integrator
+  (mach c5) ; mach gets changed by MeP-Integrator
 
   (unit u-exec "execution unit" ()
 	1 1 ; issue done
@@ -281,6 +288,8 @@
 (dnf f-sub3    "sub opcode (3 bits)"     (all-mep-core-isas)   13  3)
 (dnf f-sub4    "sub opcode (4 bits)"     (all-mep-core-isas)   12  4)
 (dnf f-ext     "extended field"          (all-mep-core-isas)   16  8)
+(dnf f-ext4    "extended field 16:4"     (all-mep-core-isas)   16  4)
+(dnf f-ext62   "extended field 20:2"     (all-mep-core-isas)   20  2)
 (dnf f-crn     "copro register n"        (all-mep-core-isas)    4  4)
 
 (df f-csrn-hi "cr hi 1u15" (all-mep-core-isas) 15 1 UINT #f #f)
@@ -436,16 +445,21 @@
 
 ; These are all for the coprocessor opcodes
 
-(df f-8s24   "copro b-offset (8 bits)" (all-mep-core-isas) 24 8 INT #f #f)
-(df f-8s24a2 "copro h-offset (8 bits)" (all-mep-core-isas) 24 7 INT
-    ((value pc) (sra SI value 1))
-    ((value pc) (sll SI value 1)))
-(df f-8s24a4 "copro w-offset (8 bits)" (all-mep-core-isas) 24 6 INT
-    ((value pc) (sra SI value 2))
-    ((value pc) (sll SI value 2)))
-(df f-8s24a8 "copro m-offset (8 bits)" (all-mep-core-isas) 24 5 INT
-    ((value pc) (sra SI value 3))
-    ((value pc) (sll SI value 3)))
+; The field is like IJKiiiiiii where I and J are toggled if K is set,
+; for compatibility with older cores.
+(define-pmacro (compute-cdisp10 val)
+  (cond SI
+	((and SI (cond SI ((and SI val #x80) (xor SI val #x300)) (else val)) #x200)
+	 (sub (cond SI ((and SI val #x80) (xor SI val #x300)) (else val)) #x400))
+	(else
+	 (cond SI ((and SI val #x80) (xor SI val #x300)) (else val)))
+	)
+  )
+
+(df f-cdisp10    "cop imm10"          (all-mep-core-isas)   22  10 UINT
+    ((value pc) (compute-cdisp10 value))
+    ((value pc) (compute-cdisp10 value))
+    )
 
 ; Non-contiguous fields.
 
@@ -667,10 +681,11 @@
 
 (dnop cimm4     "cache immed'te (4 bits)" (all-mep-core-isas) h-uint  f-rn)
 (dnop cimm5     "clip immediate (5 bits)" (all-mep-core-isas) h-uint  f-5u24)
-(dnop cdisp8    "copro addend (8 bits)"   (all-mep-core-isas) h-sint  f-8s24)
-(dpop cdisp8a2  "copro addend (8 bits)"   (all-mep-core-isas (ALIGN 2)) h-sint  f-8s24a2   "mep_align")
-(dpop cdisp8a4  "copro addend (8 bits)"   (all-mep-core-isas (ALIGN 4)) h-sint  f-8s24a4   "mep_align")
-(dpop cdisp8a8  "copro addend (8 bits)"   (all-mep-core-isas (ALIGN 8)) h-sint  f-8s24a8   "mep_align")
+
+(dpop cdisp10   "copro addend (8/10 bits)" (all-mep-core-isas) h-sint  f-cdisp10  "cdisp10")
+(dpop cdisp10a2 "copro addend (8/10 bits)" (all-mep-core-isas) h-sint  f-cdisp10  "cdisp10")
+(dpop cdisp10a4 "copro addend (8/10 bits)" (all-mep-core-isas) h-sint  f-cdisp10  "cdisp10")
+(dpop cdisp10a8 "copro addend (8/10 bits)" (all-mep-core-isas) h-sint  f-cdisp10  "cdisp10")
 
 ; Special operand representing the various ways that the literal zero can be
 ; specified.
@@ -955,6 +970,36 @@
 
 
 
+; pmacros needed for coprocessor modulo addressing.
+
+; Taken from supplement ``The operation of the modulo addressing'' in
+; Toshiba documentation rev 2.2, p. 34.
+
+(define-pmacro (compute-mask0)
+  (sequence SI ((SI temp))
+    (set temp (or mb0 me0))
+    (srl (const SI -1) (c-call SI "do_ldz" temp))))
+
+(define-pmacro (mod0 immed)
+  (sequence SI ((SI modulo-mask))
+	    (set modulo-mask (compute-mask0))
+	    (if SI (eq (and rma modulo-mask) me0)
+		(or (and rma (inv modulo-mask)) mb0)
+		(add rma (ext SI immed)))))
+
+(define-pmacro (compute-mask1)
+  (sequence SI ((SI temp))
+    (set temp (or mb1 me1))
+    (srl (const SI -1) (c-call SI "do_ldz" temp))))
+
+(define-pmacro (mod1 immed)
+  (sequence SI ((SI modulo-mask))
+	    (set modulo-mask (compute-mask1))
+	    (if SI (eq (and rma modulo-mask) me1)
+		(or (and rma (inv modulo-mask)) mb1)
+		(add rma (ext SI immed)))))
+
+
 ; Instructions.
 
 ; A pmacro for use in semantic bodies of unimplemented insns.
@@ -962,6 +1007,7 @@
 
 ; Core specific instructions
 ; (include "mep-h1.cpu") ; -- exposed by MeP-Integrator
+(include "mep-c5.cpu") ; -- exposed by MeP-Integrator
 
 ; Load/store instructions.
 
@@ -2482,290 +2528,261 @@
 	   (unit u-exec))))
 
 (dnci sbcpa "store byte coprocessor" (OPTIONAL_CP_INSN (STALL STORE))
-     "sbcpa $crn,($rma+),$cdisp8"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext 0) cdisp8)
+     "sbcpa $crn,($rma+),$cdisp10"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 0) (f-ext62 0) cdisp10)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call VOID "check_write_to_text" rma)
 	       (set (mem QI rma) (and crn #xff))
-	       (set rma (add rma (ext SI cdisp8))))
+	       (set rma (add rma (ext SI cdisp10))))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci lbcpa "load byte coprocessor" (OPTIONAL_CP_INSN (STALL LOAD))
-     "lbcpa $crn,($rma+),$cdisp8"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x40) cdisp8)
+     "lbcpa $crn,($rma+),$cdisp10"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x4) (f-ext62 #x0) cdisp10)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (set crn (ext SI (mem QI rma)))
-	       (set rma (add rma (ext SI cdisp8))))
+	       (set rma (add rma (ext SI cdisp10))))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci shcpa "store half-word coprocessor" (OPTIONAL_CP_INSN (STALL STORE))
-     "shcpa $crn,($rma+),$cdisp8a2"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x10) cdisp8a2 (f-31 0))
+     "shcpa $crn,($rma+),$cdisp10a2"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x1) (f-ext62 #x0) cdisp10a2)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call VOID "check_write_to_text" (and rma (inv SI 1)))
 	       (set (mem HI (and rma (inv SI 1))) (and crn #xffff))
-	       (set rma (add rma (ext SI cdisp8a2))))
+	       (set rma (add rma (ext SI cdisp10a2))))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci lhcpa "load half-word coprocessor" (OPTIONAL_CP_INSN (STALL LOAD))
-     "lhcpa $crn,($rma+),$cdisp8a2"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x50) cdisp8a2 (f-31 0))
+     "lhcpa $crn,($rma+),$cdisp10a2"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x5) (f-ext62 #x0) cdisp10a2)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (set crn (ext SI (mem HI (and rma (inv SI 1)))))
-	       (set rma (add rma (ext SI cdisp8a2))))
+	       (set rma (add rma (ext SI cdisp10a2))))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci swcpa "store word coprocessor" (OPTIONAL_CP_INSN (STALL STORE))
-     "swcpa $crn,($rma+),$cdisp8a4"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x20) cdisp8a4 (f-30 0) (f-31 0))
+     "swcpa $crn,($rma+),$cdisp10a4"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x2) (f-ext62 #x0) cdisp10a4)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call VOID "check_write_to_text" (and rma (inv SI 3)))
 	       (set (mem SI (and rma (inv SI 3))) crn)
-	       (set rma (add rma (ext SI cdisp8a4))))
+	       (set rma (add rma (ext SI cdisp10a4))))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci lwcpa "load word coprocessor" (OPTIONAL_CP_INSN (STALL LOAD))
-     "lwcpa $crn,($rma+),$cdisp8a4"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x60) cdisp8a4 (f-30 0) (f-31 0))
+     "lwcpa $crn,($rma+),$cdisp10a4"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x6) (f-ext62 #x0) cdisp10a4)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (set crn (mem SI (and rma (inv SI 3))))
-	       (set rma (add rma (ext SI cdisp8a4))))
+	       (set rma (add rma (ext SI cdisp10a4))))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci smcpa "smcpa" (OPTIONAL_CP_INSN OPTIONAL_CP64_INSN (STALL STORE))
-     "smcpa $crn64,($rma+),$cdisp8a8"
-     (+ MAJ_15 crn64 rma (f-sub4 5) (f-ext #x30) cdisp8a8 (f-29 0) (f-30 0) (f-31 0))
+     "smcpa $crn64,($rma+),$cdisp10a8"
+     (+ MAJ_15 crn64 rma (f-sub4 5) (f-ext4 #x3) (f-ext62 #x0) cdisp10a8)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call "check_option_cp64" pc)
 	       (c-call VOID "check_write_to_text" rma)
-	       (c-call "do_smcpa" (index-of rma) cdisp8a8 crn64 pc)
+	       (c-call "do_smcpa" (index-of rma) cdisp10a8 crn64 pc)
 	       (set rma rma)) ; reference as output for intrinsic generation
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci lmcpa "lmcpa" (OPTIONAL_CP_INSN OPTIONAL_CP64_INSN (STALL LOAD))
-     "lmcpa $crn64,($rma+),$cdisp8a8"
-     (+ MAJ_15 crn64 rma (f-sub4 5) (f-ext #x70) cdisp8a8 (f-29 0) (f-30 0) (f-31 0))
+     "lmcpa $crn64,($rma+),$cdisp10a8"
+     (+ MAJ_15 crn64 rma (f-sub4 5) (f-ext4 #x7) (f-ext62 #x0) cdisp10a8)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call "check_option_cp64" pc)
-	       (set crn64 (c-call DI "do_lmcpa" (index-of rma) cdisp8a8 pc))
+	       (set crn64 (c-call DI "do_lmcpa" (index-of rma) cdisp10a8 pc))
 	       (set rma rma)) ; reference as output for intrinsic generation
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 
-; pmacros needed for coprocessor modulo addressing.
-
-; Taken from supplement ``The operation of the modulo addressing'' in
-; Toshiba documentation rev 2.2, p. 34.
-
-(define-pmacro (compute-mask0)
-  (sequence SI ((SI temp))
-    (set temp (or mb0 me0))
-    (srl (const SI -1) (c-call SI "do_ldz" temp))))
-
-(define-pmacro (mod0 immed)
-  (sequence SI ((SI modulo-mask))
-	    (set modulo-mask (compute-mask0))
-	    (if SI (eq (and rma modulo-mask) me0)
-		(or (and rma (inv modulo-mask)) mb0)
-		(add rma (ext SI immed)))))
-
-(define-pmacro (compute-mask1)
-  (sequence SI ((SI temp))
-    (set temp (or mb1 me1))
-    (srl (const SI -1) (c-call SI "do_ldz" temp))))
-
-(define-pmacro (mod1 immed)
-  (sequence SI ((SI modulo-mask))
-	    (set modulo-mask (compute-mask1))
-	    (if SI (eq (and rma modulo-mask) me1)
-		(or (and rma (inv modulo-mask)) mb1)
-		(add rma (ext SI immed)))))
-
 (dnci sbcpm0 "sbcpm0" (OPTIONAL_CP_INSN)
-     "sbcpm0 $crn,($rma+),$cdisp8"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x08) cdisp8)
+     "sbcpm0 $crn,($rma+),$cdisp10"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x0) (f-ext62 #x2) cdisp10)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call VOID "check_write_to_text" rma)
 	       (set (mem QI rma) (and crn #xff))
-	       (set rma (mod0 cdisp8)))
+	       (set rma (mod0 cdisp10)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci lbcpm0 "lbcpm0" (OPTIONAL_CP_INSN)
-     "lbcpm0 $crn,($rma+),$cdisp8"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x48) cdisp8)
+     "lbcpm0 $crn,($rma+),$cdisp10"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x4) (f-ext62 #x2) cdisp10)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (set crn (ext SI (mem QI rma)))
-	       (set rma (mod0 cdisp8)))
+	       (set rma (mod0 cdisp10)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci shcpm0 "shcpm0" (OPTIONAL_CP_INSN)
-     "shcpm0 $crn,($rma+),$cdisp8a2"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x18) cdisp8a2 (f-31 0))
+     "shcpm0 $crn,($rma+),$cdisp10a2"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x1) (f-ext62 #x2) cdisp10a2)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call VOID "check_write_to_text" (and rma (inv SI 1)))
 	       (set (mem HI (and rma (inv SI 1))) (and crn #xffff))
-	       (set rma (mod0 cdisp8a2)))
+	       (set rma (mod0 cdisp10a2)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci lhcpm0 "lhcpm0" (OPTIONAL_CP_INSN)
-     "lhcpm0 $crn,($rma+),$cdisp8a2"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x58) cdisp8a2 (f-31 0))
+     "lhcpm0 $crn,($rma+),$cdisp10a2"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x5) (f-ext62 #x2) cdisp10a2)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (set crn (ext SI (mem HI (and rma (inv SI 1)))))
-	       (set rma (mod0 cdisp8a2)))
+	       (set rma (mod0 cdisp10a2)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci swcpm0 "swcpm0" (OPTIONAL_CP_INSN)
-     "swcpm0 $crn,($rma+),$cdisp8a4"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x28) cdisp8a4 (f-30 0) (f-31 0))
+     "swcpm0 $crn,($rma+),$cdisp10a4"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x2) (f-ext62 #x2) cdisp10a4)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call VOID "check_write_to_text" (and rma (inv SI 3)))
 	       (set (mem SI (and rma (inv SI 3))) crn)
-	       (set rma (mod0 cdisp8a4)))
+	       (set rma (mod0 cdisp10a4)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci lwcpm0 "lwcpm0" (OPTIONAL_CP_INSN)
-     "lwcpm0 $crn,($rma+),$cdisp8a4"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x68) cdisp8a4 (f-30 0) (f-31 0))
+     "lwcpm0 $crn,($rma+),$cdisp10a4"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x6) (f-ext62 #x2) cdisp10a4)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (set crn (mem SI (and rma (inv SI 3))))
-	       (set rma (mod0 cdisp8a4)))
+	       (set rma (mod0 cdisp10a4)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci smcpm0 "smcpm0" (OPTIONAL_CP_INSN OPTIONAL_CP64_INSN)
-     "smcpm0 $crn64,($rma+),$cdisp8a8"
-     (+ MAJ_15 crn64 rma (f-sub4 5) (f-ext #x38) cdisp8a8 (f-29 0) (f-30 0) (f-31 0))
+     "smcpm0 $crn64,($rma+),$cdisp10a8"
+     (+ MAJ_15 crn64 rma (f-sub4 5) (f-ext4 #x3) (f-ext62 #x2) cdisp10a8)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call "check_option_cp64" pc)
 	       (c-call VOID "check_write_to_text" rma)
 	       (c-call "do_smcp" rma crn64 pc)
-	       (set rma (mod0 cdisp8a8)))
+	       (set rma (mod0 cdisp10a8)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci lmcpm0 "lmcpm0" (OPTIONAL_CP_INSN OPTIONAL_CP64_INSN)
-     "lmcpm0 $crn64,($rma+),$cdisp8a8"
-     (+ MAJ_15 crn64 rma (f-sub4 5) (f-ext #x78) cdisp8a8 (f-29 0) (f-30 0) (f-31 0))
+     "lmcpm0 $crn64,($rma+),$cdisp10a8"
+     (+ MAJ_15 crn64 rma (f-sub4 5) (f-ext4 #x7) (f-ext62 #x2) cdisp10a8)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call "check_option_cp64" pc)
 	       (set crn64 (c-call DI "do_lmcp" rma pc))
-	       (set rma (mod0 cdisp8a8)))
+	       (set rma (mod0 cdisp10a8)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci sbcpm1 "sbcpm1" (OPTIONAL_CP_INSN)
-     "sbcpm1 $crn,($rma+),$cdisp8"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x0c) cdisp8)
+     "sbcpm1 $crn,($rma+),$cdisp10"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x0) (f-ext62 #x3) cdisp10)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call VOID "check_write_to_text" rma)
 	       (set (mem QI rma) (and crn #xff))
-	       (set rma (mod1 cdisp8)))
+	       (set rma (mod1 cdisp10)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci lbcpm1 "lbcpm1" (OPTIONAL_CP_INSN)
-     "lbcpm1 $crn,($rma+),$cdisp8"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x4c) cdisp8)
+     "lbcpm1 $crn,($rma+),$cdisp10"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x4) (f-ext62 #x3) cdisp10)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (set crn (ext SI (mem QI rma)))
-	       (set rma (mod1 cdisp8)))
+	       (set rma (mod1 cdisp10)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci shcpm1 "shcpm1" (OPTIONAL_CP_INSN)
-     "shcpm1 $crn,($rma+),$cdisp8a2"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x1c) cdisp8a2 (f-31 0))
+     "shcpm1 $crn,($rma+),$cdisp10a2"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x1) (f-ext62 #x3) cdisp10a2)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call VOID "check_write_to_text" (and rma (inv SI 1)))
 	       (set (mem HI (and rma (inv SI 1))) (and crn #xffff))
-	       (set rma (mod1 cdisp8a2)))
+	       (set rma (mod1 cdisp10a2)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci lhcpm1 "lhcpm1" (OPTIONAL_CP_INSN)
-     "lhcpm1 $crn,($rma+),$cdisp8a2"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x5c) cdisp8a2 (f-31 0))
+     "lhcpm1 $crn,($rma+),$cdisp10a2"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x5) (f-ext62 #x3) cdisp10a2)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (set crn (ext SI (mem HI (and rma (inv SI 1)))))
-	       (set rma (mod1 cdisp8a2)))
+	       (set rma (mod1 cdisp10a2)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci swcpm1 "swcpm1" (OPTIONAL_CP_INSN)
-     "swcpm1 $crn,($rma+),$cdisp8a4"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x2c) cdisp8a4 (f-30 0) (f-31 0))
+     "swcpm1 $crn,($rma+),$cdisp10a4"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x2) (f-ext62 #x3) cdisp10a4)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call VOID "check_write_to_text" (and rma (inv SI 3)))
 	       (set (mem SI (and rma (inv SI 3))) crn)
-	       (set rma (mod1 cdisp8a4)))
+	       (set rma (mod1 cdisp10a4)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci lwcpm1 "lwcpm1" (OPTIONAL_CP_INSN)
-     "lwcpm1 $crn,($rma+),$cdisp8a4"
-     (+ MAJ_15 crn rma (f-sub4 5) (f-ext #x6c) cdisp8a4 (f-30 0) (f-31 0))
+     "lwcpm1 $crn,($rma+),$cdisp10a4"
+     (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #x6) (f-ext62 #x3) cdisp10a4)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (set crn (ext SI (mem SI (and rma (inv SI 3)))))
-	       (set rma (mod1 cdisp8a4)))
+	       (set rma (mod1 cdisp10a4)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci smcpm1 "smcpm1" (OPTIONAL_CP_INSN OPTIONAL_CP64_INSN)
-     "smcpm1 $crn64,($rma+),$cdisp8a8"
-     (+ MAJ_15 crn64 rma (f-sub4 5) (f-ext #x3c) cdisp8a8 (f-29 0) (f-30 0) (f-31 0))
+     "smcpm1 $crn64,($rma+),$cdisp10a8"
+     (+ MAJ_15 crn64 rma (f-sub4 5) (f-ext4 #x3) (f-ext62 #x3) cdisp10a8)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call "check_option_cp64" pc)
 	       (c-call "do_smcp" rma crn64 pc)
 	       (c-call VOID "check_write_to_text" rma)
-	       (set rma (mod1 cdisp8a8)))
+	       (set rma (mod1 cdisp10a8)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
 (dnci lmcpm1 "lmcpm1" (OPTIONAL_CP_INSN OPTIONAL_CP64_INSN)
-     "lmcpm1 $crn64,($rma+),$cdisp8a8"
-     (+ MAJ_15 crn64 rma (f-sub4 5) (f-ext #x7c) cdisp8a8 (f-29 0) (f-30 0) (f-31 0))
+     "lmcpm1 $crn64,($rma+),$cdisp10a8"
+     (+ MAJ_15 crn64 rma (f-sub4 5) (f-ext4 #x7) (f-ext62 #x3) cdisp10a8)
      (sequence ()
 	       (c-call "check_option_cp" pc)
 	       (c-call "check_option_cp64" pc)
 	       (set crn64 (c-call DI "do_lmcp" rma pc))
-	       (set rma (mod1 cdisp8a8)))
+	       (set rma (mod1 cdisp10a8)))
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
@@ -2911,14 +2928,10 @@
 (dnri 21 MAJ_7  15)
 (dnri 22 MAJ_12  7)
 (dnri 23 MAJ_14 13)
-(dnri 24 MAJ_15  3)
-(dnri 25 MAJ_15  6)
+;(dnri 24 MAJ_15  3)
 (dnri 26 MAJ_15  8)
-; begin non-mep-h1 reserved insns
-(dnri 16 MAJ_7   5)
-(dnri 18 MAJ_7  12)
-(dnri 19 MAJ_7  13)
-; end non-mep-h1 reserved insns
+; begin core-specific reserved insns
+; end core-specific reserved insns
 
 
 ; Macro instructions.

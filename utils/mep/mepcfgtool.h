@@ -37,7 +37,8 @@ typedef enum { MEP_CORE_UNKNOWN,
 	       MEP_CORE_C2 = 1, MEP_CORE_c2 = MEP_CORE_C2,
 	       MEP_CORE_C3 = 2, MEP_CORE_c3 = MEP_CORE_C3,
 	       MEP_CORE_C4 = 3, MEP_CORE_c4 = MEP_CORE_C4,
-	       MEP_CORE_H1 = 4, MEP_CORE_h1 = MEP_CORE_H1
+	       MEP_CORE_H1 = 4, MEP_CORE_h1 = MEP_CORE_H1,
+	       MEP_CORE_C5 = 5, MEP_CORE_c5 = MEP_CORE_C5
 } mep_core_ty;
 
 typedef enum { MEP_ENDIAN_BIG, MEP_ENDIAN_LITTLE } mep_endian_ty;

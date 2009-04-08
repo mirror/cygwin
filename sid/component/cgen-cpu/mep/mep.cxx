@@ -133,6 +133,7 @@ mep_cpu::mep_cpu ()
   add_watchable_pin ("cache-index-invalidate", &cache_index_invalidate_pin);
   add_watchable_pin ("cache-index-flush-and-invalidate", &cache_index_flush_and_invalidate_pin);
   add_watchable_pin ("cache-prefetch", &cache_prefetch_pin);
+  add_watchable_pin ("cache-write-hint", &cache_write_hint_pin);
   add_watchable_pin ("data-cache-invalidate-all", &data_cache_invalidate_all_pin);
   add_watchable_pin ("insn-cache-invalidate-all", &insn_cache_invalidate_all_pin);
   add_watchable_pin ("cache-operation-status", &cache_operation_status_pin);
@@ -922,8 +923,16 @@ mep_cpu::do_cache (USI& op, int& rma, PCADDR& pc)
 	  check_option_dcache (pc);
 	  cache_index_flush_and_invalidate_pin.drive (value); 
 	  break;
+	case 5:
+	  if (core_type () == CORE_C5)
+	    {
+	      check_option_dcache (pc);
+	      cache_write_hint_pin.drive (value);
+	    }
+	  break;
 	case 6: // address
-	  if (core_type () == CORE_H1)
+	  if (core_type () == CORE_H1
+	      || core_type () == CORE_C5)
 	    {
 	      check_option_dcache (pc);
 	      cache_invalidate_pin.drive (value); 
@@ -962,10 +971,11 @@ mep_cpu::do_cache (USI& op, int& rma, PCADDR& pc)
 }
 
 VOID
-mep_cpu::do_cache_prefetch (USI& op, int& rma, PCADDR& pc)
+mep_cpu::do_cache_prefetch (USI& op, int rma, PCADDR& pc)
 {
-  // Only implemented on the H1 core.
-  if (core_type () != CORE_H1)
+  // Only implemented on the H1 and C5 cores.
+  if (core_type () != CORE_H1
+      && core_type () != CORE_C5)
     {
       invalid_insn (pc);
       return;
@@ -1188,6 +1198,58 @@ VOID
 mep_cpu::do_sleep ()
 {
   sleeping_p = true;
+}
+
+// C5 Instructions
+
+VOID
+mep_cpu::do_casb3 (SI rl, SI rn, UINT word_addr, UINT pc)
+{
+  SI temp;
+
+  // Compare and swap byte:
+  // temp <- Rl
+  // Rl <- ZeroExt (MemByte (Rm))
+  // if (temp == Rl)
+  //   MemByte (Rm) <- Rn [0..7]
+  // else
+  //   MemByte (Rm) <- Rl [0..7]
+
+  temp = h_gpr_get (rl);
+  h_gpr_set (rl, ZEXTQISI (GETMEMQI (pc, word_addr)));
+
+  if (temp == h_gpr_get (rl))
+    SETMEMQI (pc, word_addr, rn);
+  else
+    SETMEMQI (pc, word_addr, rl);
+}
+
+VOID
+mep_cpu::do_cash3 (SI rl, SI rn, UINT word_addr, UINT pc)
+{
+  SI temp;
+
+  temp = h_gpr_get (rl);
+  h_gpr_set (rl, ZEXTHISI (GETMEMHI (pc, word_addr)));
+
+  if (temp == h_gpr_get (rl))
+    SETMEMHI (pc, word_addr, rn);
+  else
+    SETMEMHI (pc, word_addr, rl);
+}
+
+VOID
+mep_cpu::do_casw3 (SI rl, SI rn, UINT word_addr, UINT pc)
+{
+  SI temp;
+
+  temp = h_gpr_get (rl);
+  h_gpr_set (rl, GETMEMSI (pc, word_addr));
+
+  if (temp == h_gpr_get (rl))
+    SETMEMSI (pc, word_addr, rn);
+  else
+    SETMEMSI (pc, word_addr, rl);
 }
 
 // UCI/DSP pin protocols

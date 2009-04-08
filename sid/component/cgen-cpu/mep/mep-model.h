@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2007 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -135,6 +135,48 @@ public:
 
 protected:
   // These methods call the appropriate unit modeller(s) for each insn.
+  UINT model_stcb_r_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_stcb_r_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_ldcb_r_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_ldcb_r_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_pref_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_pref_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_prefd_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_prefd_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_casb3_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_casb3_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_cash3_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_cash3_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_casw3_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_casw3_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_sbcp_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_sbcp_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lbcp_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lbcp_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lbucp_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lbucp_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_shcp_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_shcp_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lhcp_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lhcp_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lhucp_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lhucp_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lbucpa_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lbucpa_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lhucpa_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lhucpa_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lbucpm0_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lbucpm0_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lhucpm0_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lhucpm0_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lbucpm1_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lbucpm1_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lhucpm1_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_lhucpm1_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_uci_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_uci_after (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_dsp_before (mep_basic_cpu *current_cpu, mep_scache *sem);
+  UINT model_dsp_after (mep_basic_cpu *current_cpu, mep_scache *sem);
   UINT model_sb_before (mep_basic_cpu *current_cpu, mep_scache *sem);
   UINT model_sb_after (mep_basic_cpu *current_cpu, mep_scache *sem);
   UINT model_sh_before (mep_basic_cpu *current_cpu, mep_scache *sem);
@@ -537,18 +579,8 @@ protected:
   UINT model_ri_22_after (mep_basic_cpu *current_cpu, mep_scache *sem);
   UINT model_ri_23_before (mep_basic_cpu *current_cpu, mep_scache *sem);
   UINT model_ri_23_after (mep_basic_cpu *current_cpu, mep_scache *sem);
-  UINT model_ri_24_before (mep_basic_cpu *current_cpu, mep_scache *sem);
-  UINT model_ri_24_after (mep_basic_cpu *current_cpu, mep_scache *sem);
-  UINT model_ri_25_before (mep_basic_cpu *current_cpu, mep_scache *sem);
-  UINT model_ri_25_after (mep_basic_cpu *current_cpu, mep_scache *sem);
   UINT model_ri_26_before (mep_basic_cpu *current_cpu, mep_scache *sem);
   UINT model_ri_26_after (mep_basic_cpu *current_cpu, mep_scache *sem);
-  UINT model_ri_16_before (mep_basic_cpu *current_cpu, mep_scache *sem);
-  UINT model_ri_16_after (mep_basic_cpu *current_cpu, mep_scache *sem);
-  UINT model_ri_18_before (mep_basic_cpu *current_cpu, mep_scache *sem);
-  UINT model_ri_18_after (mep_basic_cpu *current_cpu, mep_scache *sem);
-  UINT model_ri_19_before (mep_basic_cpu *current_cpu, mep_scache *sem);
-  UINT model_ri_19_after (mep_basic_cpu *current_cpu, mep_scache *sem);
 
   /* Enum declaration for unit types.  */
 typedef enum unit_number {

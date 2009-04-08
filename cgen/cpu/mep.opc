@@ -74,6 +74,8 @@ extern int mep_cgen_insn_supported (CGEN_CPU_DESC, const CGEN_INSN *);
 
 /* -- asm.c */
 
+#include "elf/mep.h"
+
 #define CGEN_VALIDATE_INSN_SUPPORTED
 
        const char * parse_csrn       (CGEN_CPU_DESC, const char **, CGEN_KEYWORD *, long *);
@@ -149,9 +151,6 @@ parse_mep_align (CGEN_CPU_DESC cd, const char ** strp,
     case MEP_OPERAND_PCREL12A2:
     case MEP_OPERAND_PCREL17A2:
     case MEP_OPERAND_PCREL24A2:
-    case MEP_OPERAND_CDISP8A2:
-    case MEP_OPERAND_CDISP8A4:
-    case MEP_OPERAND_CDISP8A8:
       err = cgen_parse_signed_integer   (cd, strp, type, field);
       break;
     case MEP_OPERAND_PCABS24A2:
@@ -178,16 +177,13 @@ parse_mep_align (CGEN_CPU_DESC cd, const char ** strp,
     case MEP_OPERAND_PCREL24A2:
     case MEP_OPERAND_PCABS24A2:
     case MEP_OPERAND_UDISP7A2:
-    case MEP_OPERAND_CDISP8A2:
       lsbs = *field & 1;
       break;
     case MEP_OPERAND_UDISP7A4:
     case MEP_OPERAND_UIMM7A4:
     case MEP_OPERAND_ADDR24A4:
-    case MEP_OPERAND_CDISP8A4:
       lsbs = *field & 3;
       break;
-    case MEP_OPERAND_CDISP8A8:
       lsbs = *field & 7;
       break;
     default:
@@ -462,6 +458,66 @@ parse_unsigned7 (CGEN_CPU_DESC cd, const char **strp,
     return _("invalid %function() here");
 
   return parse_mep_alignu (cd, strp, opindex, valuep);
+}
+
+static ATTRIBUTE_UNUSED const char *
+parse_cdisp10 (CGEN_CPU_DESC cd,
+	       const char **strp,
+	       int opindex,
+	       long *valuep)
+{
+  const char *errmsg = 0;
+  signed long value;
+  long have_zero = 0;
+  int wide = 0;
+  int alignment;
+
+  switch (opindex)
+    {
+    case MEP_OPERAND_CDISP10A4:
+      alignment = 2;
+      break;
+    case MEP_OPERAND_CDISP10A2:
+      alignment = 1;
+      break;
+    case MEP_OPERAND_CDISP10:
+    default:
+      alignment = 0;
+      break;
+    }
+
+  if (MEP_CPU == EF_MEP_CPU_C5)
+    wide = 1;
+
+  if (strncmp (*strp, "0x0", 3) == 0 
+      || (**strp == '0' && *(*strp + 1) != 'x'))
+    have_zero = 1;
+
+  errmsg = cgen_parse_signed_integer (cd, strp, opindex, & value);
+  if (errmsg)
+    return errmsg;
+
+  if (wide)
+    {
+      if (value < -512 || value > 511)
+	return _("Immediate is out of range -512 to 511");
+    }
+  else
+    {
+      if (value < -128 || value > 127)
+	return _("Immediate is out of range -128 to 127");
+    }
+
+  if (value & ((1<<alignment)-1))
+    return _("Value is not aligned enough");
+
+  /* If this field may require a relocation then use larger dsp16.  */
+  if (! have_zero && value == 0)
+    return (wide ? _("Immediate is out of range -512 to 511")
+	    : _("Immediate is out of range -128 to 127"));
+
+  *valuep = value;
+  return 0;
 }
 
 /* BEGIN LIGHTWEIGHT MACRO PROCESSOR.  */
@@ -1181,8 +1237,8 @@ mep_config_map_struct mep_config_map[] =
 {
   /* config-map-start */
   /* Default entry: mep core only, all options enabled. */
-  { "", 0, EF_MEP_CPU_C4, 1, 0, {1,"\x0"}, {1,"\x0"}, {1,"\x0"}, {1,"\x0"}, {1,"\x0"}, {1,"\x80"}, OPTION_MASK },
-  { "default", CONFIG_DEFAULT, EF_MEP_CPU_C4, 0, 0, { 1, "\x0" }, { 1, "\x0" }, { 1, "\x0" }, { 1, "\x0" }, { 1, "\x0" }, { 1, "\xc0" },
+  { "", 0, EF_MEP_CPU_C5, 1, 0, {1,"\x0"}, {1,"\x0"}, {1,"\x0"}, {1,"\x0"}, {1,"\x0"}, {1,"\x80"}, OPTION_MASK },
+  { "default", CONFIG_DEFAULT, EF_MEP_CPU_C5, 0, 0, { 1, "\x0" }, { 1, "\x0" }, { 1, "\x0" }, { 1, "\x0" }, { 1, "\x0" }, { 1, "\xc0" },
 	  0
 	| (1 << CGEN_INSN_OPTIONAL_MUL_INSN)
 	| (1 << CGEN_INSN_OPTIONAL_DIV_INSN)
@@ -1212,6 +1268,10 @@ check_configured_mach (int machs)
       break;
     case EF_MEP_CPU_H1:
       mach |= (1 << MACH_H1);
+      break;
+    case EF_MEP_CPU_C5:
+      mach |= (1 << MACH_MEP);
+      mach |= (1 << MACH_C5);
       break;
     default:
       break;

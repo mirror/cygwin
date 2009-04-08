@@ -24,6 +24,7 @@ using namespace sid;
 #define MEP_CORE_C2      0x02
 #define MEP_CORE_C3      0x03
 #define MEP_CORE_C4      0x04
+#define MEP_CORE_C5      0x08
 #define MEP_CORE_H1      0x10
 
 class mep_dsu;
@@ -133,7 +134,8 @@ private:
   big_int_4 get_ibc0_te () { return ibc0_te; }
   void set_ibc0_te (big_int_4 value, big_int_4 mask)
     {
-      if (core_type == MEP_CORE_C4 || core_type == MEP_CORE_H1)
+      if (core_type == MEP_CORE_C4 || core_type == MEP_CORE_H1
+	  || core_type == MEP_CORE_C5)
 	ibc0_te = value & mask;
     }
 
@@ -141,7 +143,8 @@ private:
   big_int_4 get_dbc0_te () { return dbc0_te; }
   void set_dbc0_te (big_int_4 value, big_int_4 mask)
     {
-      if (core_type == MEP_CORE_C4 || core_type == MEP_CORE_H1)
+      if (core_type == MEP_CORE_C4 || core_type == MEP_CORE_H1
+	  || core_type == MEP_CORE_C5)
 	dbc0_te = value & mask;
     }
 

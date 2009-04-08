@@ -49,7 +49,8 @@ typedef enum cgen_insn_attr {
 
 /* Enum declaration for machine type selection.  */
 typedef enum mach_attr {
-  MACH_BASE, MACH_MEP, MACH_H1, MACH_MAX
+  MACH_BASE, MACH_MEP, MACH_H1, MACH_C5
+ , MACH_MAX
 } MACH_ATTR;
 
 /* Enum declaration for instruction set selection.  */
@@ -115,7 +116,7 @@ struct mep_insn_attr {
   inline int get_volatile_attr () { return (bools & (1<<CGEN_INSN_VOLATILE)) != 0; }
 };
 
-#define MACH_MEP_INSN_CHUNK_BITSIZE 16
+#define MACH_C5_INSN_CHUNK_BITSIZE 16
 
 } // end mep namespace
 

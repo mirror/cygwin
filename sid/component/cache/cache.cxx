@@ -68,6 +68,7 @@ cache_component::cache_component (unsigned assocy,
    invalidate_set_pin (this, &cache_component::invalidate_set),
    flush_and_invalidate_pin (this, &cache_component::flush_and_invalidate_line),
    prefetch_pin (this, &cache_component::prefetch_line),
+   write_hint_pin (this, &cache_component::write_hint),
    lock_pin (this, &cache_component::lock_line),
    unlock_pin (this, &cache_component::unlock_line),
    write_allocate_p (false),
@@ -101,6 +102,7 @@ cache_component::cache_component (unsigned assocy,
   add_pin ("invalidate", &invalidate_pin);
   add_pin ("flush-and-invalidate", &flush_and_invalidate_pin);
   add_pin ("prefetch", &prefetch_pin);
+  add_pin ("write-hint", &write_hint_pin);
   add_pin ("lock", &lock_pin);  
   add_pin ("unlock", &unlock_pin);
   add_pin ("operation-status", &operation_status_pin);
@@ -353,6 +355,64 @@ cache_component::read_any (host_int_4 addr, DataType& data)
   else
     st.latency = read_status.latency + miss_latency;
   return st;
+}
+
+// Prepare a line for writing.  This means we are expecting to write
+// to all the bytes in the line, so we set it up to *not* read the
+// line from the cache on the first write to it, by making the line
+// valid if needed.  As a side effect, if you don't write to all the
+// bytes in the line, unwritten bytes are undefined when written to
+// memory.
+void
+cache_component::write_hint (host_int_4 addr)
+{
+  bus::status st, read_status;
+
+  if (UNLIKELY (downstream == 0))
+    return;
+
+  if (LIKELY (collect_p))
+    stats.reads++;
+
+  cache_tag tag = acache.addr_to_tag (addr);
+  cache_line* line = acache.find (tag);
+  if (LIKELY (line))
+    {
+      // Line already exists in cache, nothing to do.
+    }
+  else
+    {
+      // miss!
+      if (acache.vacancy_p (addr))
+	{
+	  if (LIKELY (collect_p))
+	    stats.replacements++;
+	  
+	  cache_line *expelled_line = acache.expell_line (tag);
+	  assert (expelled_line);
+	  if (expelled_line->valid_p () && expelled_line->dirty_p ())
+	    {
+	      // flush a dirty line being replaced
+	      if ((st = write_line (*expelled_line)) != bus::ok)
+		  return;
+	    }
+	  expelled_line->set_tag (tag);
+	  // We don't actually read the line, though.
+	  expelled_line->validate ();
+	}
+      else
+	{
+	  // No room in the cache, so our hint must go uneeded.
+	}
+    }
+
+  st = bus::ok;
+  if (line)
+    st.latency += hit_latency;
+  else
+    st.latency = miss_latency;
+  report_status (st);
+  return;
 }
 
 bus::status

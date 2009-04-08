@@ -27,6 +27,7 @@ class MepBusArbitratorCfg;
 #define MEP_CORE_C2      0x02
 #define MEP_CORE_C3      0x03
 #define MEP_CORE_C4      0x04
+#define MEP_CORE_C5      0x08
 #define MEP_CORE_H1      0x10
 
 class MepBoardCfg :

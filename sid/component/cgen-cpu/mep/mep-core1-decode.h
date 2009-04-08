@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2007 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -21,58 +21,62 @@ typedef UINT mepcore1_insn_word;
 
 /* Enum declaration for instructions in cpu family mepcore1.  */
 typedef enum mepcore1_insn_type {
-  MEPCORE1_INSN_X_INVALID, MEPCORE1_INSN_SB, MEPCORE1_INSN_SH, MEPCORE1_INSN_SW
- , MEPCORE1_INSN_LB, MEPCORE1_INSN_LH, MEPCORE1_INSN_LW, MEPCORE1_INSN_LBU
- , MEPCORE1_INSN_LHU, MEPCORE1_INSN_SW_SP, MEPCORE1_INSN_LW_SP, MEPCORE1_INSN_SB_TP
- , MEPCORE1_INSN_SH_TP, MEPCORE1_INSN_SW_TP, MEPCORE1_INSN_LB_TP, MEPCORE1_INSN_LH_TP
- , MEPCORE1_INSN_LW_TP, MEPCORE1_INSN_LBU_TP, MEPCORE1_INSN_LHU_TP, MEPCORE1_INSN_SB16
- , MEPCORE1_INSN_SH16, MEPCORE1_INSN_SW16, MEPCORE1_INSN_LB16, MEPCORE1_INSN_LH16
- , MEPCORE1_INSN_LW16, MEPCORE1_INSN_LBU16, MEPCORE1_INSN_LHU16, MEPCORE1_INSN_SW24
- , MEPCORE1_INSN_LW24, MEPCORE1_INSN_EXTB, MEPCORE1_INSN_EXTH, MEPCORE1_INSN_EXTUB
- , MEPCORE1_INSN_EXTUH, MEPCORE1_INSN_SSARB, MEPCORE1_INSN_MOV, MEPCORE1_INSN_MOVI8
- , MEPCORE1_INSN_MOVI16, MEPCORE1_INSN_MOVU24, MEPCORE1_INSN_MOVU16, MEPCORE1_INSN_MOVH
- , MEPCORE1_INSN_ADD3, MEPCORE1_INSN_ADD, MEPCORE1_INSN_ADD3I, MEPCORE1_INSN_ADVCK3
- , MEPCORE1_INSN_SUB, MEPCORE1_INSN_SBVCK3, MEPCORE1_INSN_NEG, MEPCORE1_INSN_SLT3
- , MEPCORE1_INSN_SLTU3, MEPCORE1_INSN_SLT3I, MEPCORE1_INSN_SLTU3I, MEPCORE1_INSN_SL1AD3
- , MEPCORE1_INSN_SL2AD3, MEPCORE1_INSN_ADD3X, MEPCORE1_INSN_SLT3X, MEPCORE1_INSN_SLTU3X
- , MEPCORE1_INSN_OR, MEPCORE1_INSN_AND, MEPCORE1_INSN_XOR, MEPCORE1_INSN_NOR
- , MEPCORE1_INSN_OR3, MEPCORE1_INSN_AND3, MEPCORE1_INSN_XOR3, MEPCORE1_INSN_SRA
- , MEPCORE1_INSN_SRL, MEPCORE1_INSN_SLL, MEPCORE1_INSN_SRAI, MEPCORE1_INSN_SRLI
- , MEPCORE1_INSN_SLLI, MEPCORE1_INSN_SLL3, MEPCORE1_INSN_FSFT, MEPCORE1_INSN_BRA
- , MEPCORE1_INSN_BEQZ, MEPCORE1_INSN_BNEZ, MEPCORE1_INSN_BEQI, MEPCORE1_INSN_BNEI
- , MEPCORE1_INSN_BLTI, MEPCORE1_INSN_BGEI, MEPCORE1_INSN_BEQ, MEPCORE1_INSN_BNE
- , MEPCORE1_INSN_BSR12, MEPCORE1_INSN_BSR24, MEPCORE1_INSN_JMP, MEPCORE1_INSN_JMP24
- , MEPCORE1_INSN_JSR, MEPCORE1_INSN_RET, MEPCORE1_INSN_REPEAT, MEPCORE1_INSN_EREPEAT
- , MEPCORE1_INSN_STC_LP, MEPCORE1_INSN_STC_HI, MEPCORE1_INSN_STC_LO, MEPCORE1_INSN_STC
- , MEPCORE1_INSN_LDC_LP, MEPCORE1_INSN_LDC_HI, MEPCORE1_INSN_LDC_LO, MEPCORE1_INSN_LDC
- , MEPCORE1_INSN_DI, MEPCORE1_INSN_EI, MEPCORE1_INSN_RETI, MEPCORE1_INSN_HALT
- , MEPCORE1_INSN_SLEEP, MEPCORE1_INSN_SWI, MEPCORE1_INSN_BREAK, MEPCORE1_INSN_SYNCM
- , MEPCORE1_INSN_STCB, MEPCORE1_INSN_LDCB, MEPCORE1_INSN_BSETM, MEPCORE1_INSN_BCLRM
- , MEPCORE1_INSN_BNOTM, MEPCORE1_INSN_BTSTM, MEPCORE1_INSN_TAS, MEPCORE1_INSN_CACHE
- , MEPCORE1_INSN_MUL, MEPCORE1_INSN_MULU, MEPCORE1_INSN_MULR, MEPCORE1_INSN_MULRU
- , MEPCORE1_INSN_MADD, MEPCORE1_INSN_MADDU, MEPCORE1_INSN_MADDR, MEPCORE1_INSN_MADDRU
- , MEPCORE1_INSN_DIV, MEPCORE1_INSN_DIVU, MEPCORE1_INSN_DRET, MEPCORE1_INSN_DBREAK
- , MEPCORE1_INSN_LDZ, MEPCORE1_INSN_ABS, MEPCORE1_INSN_AVE, MEPCORE1_INSN_MIN
- , MEPCORE1_INSN_MAX, MEPCORE1_INSN_MINU, MEPCORE1_INSN_MAXU, MEPCORE1_INSN_CLIP
- , MEPCORE1_INSN_CLIPU, MEPCORE1_INSN_SADD, MEPCORE1_INSN_SSUB, MEPCORE1_INSN_SADDU
- , MEPCORE1_INSN_SSUBU, MEPCORE1_INSN_SWCP, MEPCORE1_INSN_LWCP, MEPCORE1_INSN_SMCP
- , MEPCORE1_INSN_LMCP, MEPCORE1_INSN_SWCPI, MEPCORE1_INSN_LWCPI, MEPCORE1_INSN_SMCPI
- , MEPCORE1_INSN_LMCPI, MEPCORE1_INSN_SWCP16, MEPCORE1_INSN_LWCP16, MEPCORE1_INSN_SMCP16
- , MEPCORE1_INSN_LMCP16, MEPCORE1_INSN_SBCPA, MEPCORE1_INSN_LBCPA, MEPCORE1_INSN_SHCPA
- , MEPCORE1_INSN_LHCPA, MEPCORE1_INSN_SWCPA, MEPCORE1_INSN_LWCPA, MEPCORE1_INSN_SMCPA
- , MEPCORE1_INSN_LMCPA, MEPCORE1_INSN_SBCPM0, MEPCORE1_INSN_LBCPM0, MEPCORE1_INSN_SHCPM0
- , MEPCORE1_INSN_LHCPM0, MEPCORE1_INSN_SWCPM0, MEPCORE1_INSN_LWCPM0, MEPCORE1_INSN_SMCPM0
- , MEPCORE1_INSN_LMCPM0, MEPCORE1_INSN_SBCPM1, MEPCORE1_INSN_LBCPM1, MEPCORE1_INSN_SHCPM1
- , MEPCORE1_INSN_LHCPM1, MEPCORE1_INSN_SWCPM1, MEPCORE1_INSN_LWCPM1, MEPCORE1_INSN_SMCPM1
- , MEPCORE1_INSN_LMCPM1, MEPCORE1_INSN_BCPEQ, MEPCORE1_INSN_BCPNE, MEPCORE1_INSN_BCPAT
- , MEPCORE1_INSN_BCPAF, MEPCORE1_INSN_SYNCCP, MEPCORE1_INSN_JSRV, MEPCORE1_INSN_BSRV
- , MEPCORE1_INSN_SIM_SYSCALL, MEPCORE1_INSN_RI_0, MEPCORE1_INSN_RI_1, MEPCORE1_INSN_RI_2
- , MEPCORE1_INSN_RI_3, MEPCORE1_INSN_RI_4, MEPCORE1_INSN_RI_5, MEPCORE1_INSN_RI_6
- , MEPCORE1_INSN_RI_7, MEPCORE1_INSN_RI_8, MEPCORE1_INSN_RI_9, MEPCORE1_INSN_RI_10
- , MEPCORE1_INSN_RI_11, MEPCORE1_INSN_RI_12, MEPCORE1_INSN_RI_13, MEPCORE1_INSN_RI_14
- , MEPCORE1_INSN_RI_15, MEPCORE1_INSN_RI_17, MEPCORE1_INSN_RI_20, MEPCORE1_INSN_RI_21
- , MEPCORE1_INSN_RI_22, MEPCORE1_INSN_RI_23, MEPCORE1_INSN_RI_24, MEPCORE1_INSN_RI_25
- , MEPCORE1_INSN_RI_26, MEPCORE1_INSN_RI_16, MEPCORE1_INSN_RI_18, MEPCORE1_INSN_RI_19
+  MEPCORE1_INSN_X_INVALID, MEPCORE1_INSN_STCB_R, MEPCORE1_INSN_LDCB_R, MEPCORE1_INSN_PREF
+ , MEPCORE1_INSN_PREFD, MEPCORE1_INSN_CASB3, MEPCORE1_INSN_CASH3, MEPCORE1_INSN_CASW3
+ , MEPCORE1_INSN_SBCP, MEPCORE1_INSN_LBCP, MEPCORE1_INSN_LBUCP, MEPCORE1_INSN_SHCP
+ , MEPCORE1_INSN_LHCP, MEPCORE1_INSN_LHUCP, MEPCORE1_INSN_LBUCPA, MEPCORE1_INSN_LHUCPA
+ , MEPCORE1_INSN_LBUCPM0, MEPCORE1_INSN_LHUCPM0, MEPCORE1_INSN_LBUCPM1, MEPCORE1_INSN_LHUCPM1
+ , MEPCORE1_INSN_UCI, MEPCORE1_INSN_DSP, MEPCORE1_INSN_SB, MEPCORE1_INSN_SH
+ , MEPCORE1_INSN_SW, MEPCORE1_INSN_LB, MEPCORE1_INSN_LH, MEPCORE1_INSN_LW
+ , MEPCORE1_INSN_LBU, MEPCORE1_INSN_LHU, MEPCORE1_INSN_SW_SP, MEPCORE1_INSN_LW_SP
+ , MEPCORE1_INSN_SB_TP, MEPCORE1_INSN_SH_TP, MEPCORE1_INSN_SW_TP, MEPCORE1_INSN_LB_TP
+ , MEPCORE1_INSN_LH_TP, MEPCORE1_INSN_LW_TP, MEPCORE1_INSN_LBU_TP, MEPCORE1_INSN_LHU_TP
+ , MEPCORE1_INSN_SB16, MEPCORE1_INSN_SH16, MEPCORE1_INSN_SW16, MEPCORE1_INSN_LB16
+ , MEPCORE1_INSN_LH16, MEPCORE1_INSN_LW16, MEPCORE1_INSN_LBU16, MEPCORE1_INSN_LHU16
+ , MEPCORE1_INSN_SW24, MEPCORE1_INSN_LW24, MEPCORE1_INSN_EXTB, MEPCORE1_INSN_EXTH
+ , MEPCORE1_INSN_EXTUB, MEPCORE1_INSN_EXTUH, MEPCORE1_INSN_SSARB, MEPCORE1_INSN_MOV
+ , MEPCORE1_INSN_MOVI8, MEPCORE1_INSN_MOVI16, MEPCORE1_INSN_MOVU24, MEPCORE1_INSN_MOVU16
+ , MEPCORE1_INSN_MOVH, MEPCORE1_INSN_ADD3, MEPCORE1_INSN_ADD, MEPCORE1_INSN_ADD3I
+ , MEPCORE1_INSN_ADVCK3, MEPCORE1_INSN_SUB, MEPCORE1_INSN_SBVCK3, MEPCORE1_INSN_NEG
+ , MEPCORE1_INSN_SLT3, MEPCORE1_INSN_SLTU3, MEPCORE1_INSN_SLT3I, MEPCORE1_INSN_SLTU3I
+ , MEPCORE1_INSN_SL1AD3, MEPCORE1_INSN_SL2AD3, MEPCORE1_INSN_ADD3X, MEPCORE1_INSN_SLT3X
+ , MEPCORE1_INSN_SLTU3X, MEPCORE1_INSN_OR, MEPCORE1_INSN_AND, MEPCORE1_INSN_XOR
+ , MEPCORE1_INSN_NOR, MEPCORE1_INSN_OR3, MEPCORE1_INSN_AND3, MEPCORE1_INSN_XOR3
+ , MEPCORE1_INSN_SRA, MEPCORE1_INSN_SRL, MEPCORE1_INSN_SLL, MEPCORE1_INSN_SRAI
+ , MEPCORE1_INSN_SRLI, MEPCORE1_INSN_SLLI, MEPCORE1_INSN_SLL3, MEPCORE1_INSN_FSFT
+ , MEPCORE1_INSN_BRA, MEPCORE1_INSN_BEQZ, MEPCORE1_INSN_BNEZ, MEPCORE1_INSN_BEQI
+ , MEPCORE1_INSN_BNEI, MEPCORE1_INSN_BLTI, MEPCORE1_INSN_BGEI, MEPCORE1_INSN_BEQ
+ , MEPCORE1_INSN_BNE, MEPCORE1_INSN_BSR12, MEPCORE1_INSN_BSR24, MEPCORE1_INSN_JMP
+ , MEPCORE1_INSN_JMP24, MEPCORE1_INSN_JSR, MEPCORE1_INSN_RET, MEPCORE1_INSN_REPEAT
+ , MEPCORE1_INSN_EREPEAT, MEPCORE1_INSN_STC_LP, MEPCORE1_INSN_STC_HI, MEPCORE1_INSN_STC_LO
+ , MEPCORE1_INSN_STC, MEPCORE1_INSN_LDC_LP, MEPCORE1_INSN_LDC_HI, MEPCORE1_INSN_LDC_LO
+ , MEPCORE1_INSN_LDC, MEPCORE1_INSN_DI, MEPCORE1_INSN_EI, MEPCORE1_INSN_RETI
+ , MEPCORE1_INSN_HALT, MEPCORE1_INSN_SLEEP, MEPCORE1_INSN_SWI, MEPCORE1_INSN_BREAK
+ , MEPCORE1_INSN_SYNCM, MEPCORE1_INSN_STCB, MEPCORE1_INSN_LDCB, MEPCORE1_INSN_BSETM
+ , MEPCORE1_INSN_BCLRM, MEPCORE1_INSN_BNOTM, MEPCORE1_INSN_BTSTM, MEPCORE1_INSN_TAS
+ , MEPCORE1_INSN_CACHE, MEPCORE1_INSN_MUL, MEPCORE1_INSN_MULU, MEPCORE1_INSN_MULR
+ , MEPCORE1_INSN_MULRU, MEPCORE1_INSN_MADD, MEPCORE1_INSN_MADDU, MEPCORE1_INSN_MADDR
+ , MEPCORE1_INSN_MADDRU, MEPCORE1_INSN_DIV, MEPCORE1_INSN_DIVU, MEPCORE1_INSN_DRET
+ , MEPCORE1_INSN_DBREAK, MEPCORE1_INSN_LDZ, MEPCORE1_INSN_ABS, MEPCORE1_INSN_AVE
+ , MEPCORE1_INSN_MIN, MEPCORE1_INSN_MAX, MEPCORE1_INSN_MINU, MEPCORE1_INSN_MAXU
+ , MEPCORE1_INSN_CLIP, MEPCORE1_INSN_CLIPU, MEPCORE1_INSN_SADD, MEPCORE1_INSN_SSUB
+ , MEPCORE1_INSN_SADDU, MEPCORE1_INSN_SSUBU, MEPCORE1_INSN_SWCP, MEPCORE1_INSN_LWCP
+ , MEPCORE1_INSN_SMCP, MEPCORE1_INSN_LMCP, MEPCORE1_INSN_SWCPI, MEPCORE1_INSN_LWCPI
+ , MEPCORE1_INSN_SMCPI, MEPCORE1_INSN_LMCPI, MEPCORE1_INSN_SWCP16, MEPCORE1_INSN_LWCP16
+ , MEPCORE1_INSN_SMCP16, MEPCORE1_INSN_LMCP16, MEPCORE1_INSN_SBCPA, MEPCORE1_INSN_LBCPA
+ , MEPCORE1_INSN_SHCPA, MEPCORE1_INSN_LHCPA, MEPCORE1_INSN_SWCPA, MEPCORE1_INSN_LWCPA
+ , MEPCORE1_INSN_SMCPA, MEPCORE1_INSN_LMCPA, MEPCORE1_INSN_SBCPM0, MEPCORE1_INSN_LBCPM0
+ , MEPCORE1_INSN_SHCPM0, MEPCORE1_INSN_LHCPM0, MEPCORE1_INSN_SWCPM0, MEPCORE1_INSN_LWCPM0
+ , MEPCORE1_INSN_SMCPM0, MEPCORE1_INSN_LMCPM0, MEPCORE1_INSN_SBCPM1, MEPCORE1_INSN_LBCPM1
+ , MEPCORE1_INSN_SHCPM1, MEPCORE1_INSN_LHCPM1, MEPCORE1_INSN_SWCPM1, MEPCORE1_INSN_LWCPM1
+ , MEPCORE1_INSN_SMCPM1, MEPCORE1_INSN_LMCPM1, MEPCORE1_INSN_BCPEQ, MEPCORE1_INSN_BCPNE
+ , MEPCORE1_INSN_BCPAT, MEPCORE1_INSN_BCPAF, MEPCORE1_INSN_SYNCCP, MEPCORE1_INSN_JSRV
+ , MEPCORE1_INSN_BSRV, MEPCORE1_INSN_SIM_SYSCALL, MEPCORE1_INSN_RI_0, MEPCORE1_INSN_RI_1
+ , MEPCORE1_INSN_RI_2, MEPCORE1_INSN_RI_3, MEPCORE1_INSN_RI_4, MEPCORE1_INSN_RI_5
+ , MEPCORE1_INSN_RI_6, MEPCORE1_INSN_RI_7, MEPCORE1_INSN_RI_8, MEPCORE1_INSN_RI_9
+ , MEPCORE1_INSN_RI_10, MEPCORE1_INSN_RI_11, MEPCORE1_INSN_RI_12, MEPCORE1_INSN_RI_13
+ , MEPCORE1_INSN_RI_14, MEPCORE1_INSN_RI_15, MEPCORE1_INSN_RI_17, MEPCORE1_INSN_RI_20
+ , MEPCORE1_INSN_RI_21, MEPCORE1_INSN_RI_22, MEPCORE1_INSN_RI_23, MEPCORE1_INSN_RI_26
 } MEPCORE1_INSN_TYPE;
 
 
@@ -132,12 +136,6 @@ union mepcore1_sem_fields {
     unsigned char in_opt;
     unsigned char in_psw;
   } sfmt_jmp24;
-  struct { /*  */
-    SI* i_rn;
-    UINT f_16u16;
-    UINT f_rn;
-    unsigned char in_rn;
-  } sfmt_stcb;
   struct { /*  */
     unsigned char in_epc;
     unsigned char in_npc;
@@ -327,12 +325,11 @@ union mepcore1_sem_fields {
   } sfmt_sw_sp;
   struct { /*  */
     SI* i_rma;
-    SI* i_rn;
+    UINT f_12s20;
+    UINT f_crn;
     UINT f_rm;
-    UINT f_rn;
     unsigned char in_rma;
-    unsigned char out_rn;
-  } sfmt_tas;
+  } sfmt_sbcp;
   struct { /*  */
     SI* i_rm;
     UINT f_rm;
@@ -349,6 +346,22 @@ union mepcore1_sem_fields {
     unsigned char in_psw;
     unsigned char in_rn;
   } sfmt_beqz;
+  struct { /*  */
+    SI* i_rma;
+    SI* i_rn;
+    UINT f_rm;
+    UINT f_rn;
+    unsigned char in_rma;
+    unsigned char out_rn;
+  } sfmt_ldcb_r;
+  struct { /*  */
+    SI* i_rma;
+    SI* i_rn;
+    UINT f_rm;
+    UINT f_rn;
+    unsigned char in_rma;
+    unsigned char in_rn;
+  } sfmt_stcb_r;
   struct { /*  */
     SI* i_rn;
     UINT f_csrn;
@@ -367,15 +380,6 @@ union mepcore1_sem_fields {
     unsigned char in_psw;
     unsigned char in_rn;
   } sfmt_beqi;
-  struct { /*  */
-    SI* i_rm;
-    SI* i_rn;
-    UINT f_16u16;
-    UINT f_rm;
-    UINT f_rn;
-    unsigned char in_rm;
-    unsigned char out_rn;
-  } sfmt_sltu3x;
   struct { /*  */
     SI* i_rm;
     SI* i_rn;
@@ -467,86 +471,6 @@ union mepcore1_sem_fields {
     unsigned char in_rnc;
   } sfmt_sb16;
   struct { /*  */
-    SI* i_rma;
-    SI f_8s24a8;
-    UINT f_crn;
-    UINT f_rm;
-    unsigned char in_mb1;
-    unsigned char in_me1;
-    unsigned char in_rma;
-    unsigned char out_rma;
-  } sfmt_smcpm1;
-  struct { /*  */
-    SI* i_rma;
-    SI f_8s24a4;
-    UINT f_crn;
-    UINT f_rm;
-    unsigned char in_mb1;
-    unsigned char in_me1;
-    unsigned char in_rma;
-    unsigned char out_rma;
-  } sfmt_swcpm1;
-  struct { /*  */
-    SI* i_rma;
-    SI f_8s24a2;
-    UINT f_crn;
-    UINT f_rm;
-    unsigned char in_mb1;
-    unsigned char in_me1;
-    unsigned char in_rma;
-    unsigned char out_rma;
-  } sfmt_shcpm1;
-  struct { /*  */
-    SI* i_rma;
-    INT f_8s24;
-    UINT f_crn;
-    UINT f_rm;
-    unsigned char in_mb1;
-    unsigned char in_me1;
-    unsigned char in_rma;
-    unsigned char out_rma;
-  } sfmt_sbcpm1;
-  struct { /*  */
-    SI* i_rma;
-    SI f_8s24a8;
-    UINT f_crn;
-    UINT f_rm;
-    unsigned char in_mb0;
-    unsigned char in_me0;
-    unsigned char in_rma;
-    unsigned char out_rma;
-  } sfmt_smcpm0;
-  struct { /*  */
-    SI* i_rma;
-    SI f_8s24a4;
-    UINT f_crn;
-    UINT f_rm;
-    unsigned char in_mb0;
-    unsigned char in_me0;
-    unsigned char in_rma;
-    unsigned char out_rma;
-  } sfmt_swcpm0;
-  struct { /*  */
-    SI* i_rma;
-    SI f_8s24a2;
-    UINT f_crn;
-    UINT f_rm;
-    unsigned char in_mb0;
-    unsigned char in_me0;
-    unsigned char in_rma;
-    unsigned char out_rma;
-  } sfmt_shcpm0;
-  struct { /*  */
-    SI* i_rma;
-    INT f_8s24;
-    UINT f_crn;
-    UINT f_rm;
-    unsigned char in_mb0;
-    unsigned char in_me0;
-    unsigned char in_rma;
-    unsigned char out_rma;
-  } sfmt_sbcpm0;
-  struct { /*  */
     SI* i_rm;
     SI* i_rn;
     UINT f_rm;
@@ -556,6 +480,36 @@ union mepcore1_sem_fields {
     unsigned char in_sar;
     unsigned char out_rn;
   } sfmt_fsft;
+  struct { /*  */
+    SI* i_rm;
+    SI* i_rn;
+    UINT f_16u16;
+    UINT f_rm;
+    UINT f_rn;
+    unsigned char in_rm;
+    unsigned char in_rn;
+    unsigned char out_rn;
+  } sfmt_uci;
+  struct { /*  */
+    SI* i_rma;
+    SI f_cdisp10;
+    UINT f_crn;
+    UINT f_rm;
+    unsigned char in_mb1;
+    unsigned char in_me1;
+    unsigned char in_rma;
+    unsigned char out_rma;
+  } sfmt_lbucpm1;
+  struct { /*  */
+    SI* i_rma;
+    SI f_cdisp10;
+    UINT f_crn;
+    UINT f_rm;
+    unsigned char in_mb0;
+    unsigned char in_me0;
+    unsigned char in_rma;
+    unsigned char out_rma;
+  } sfmt_lbucpm0;
   struct { /*  */
     SI* i_rn;
     SI f_17s16a2;
@@ -589,6 +543,18 @@ union mepcore1_sem_fields {
     unsigned char in_rn;
     unsigned char out_rl;
   } sfmt_add3;
+  struct { /*  */
+    SI* i_rl5;
+    SI* i_rm;
+    SI* i_rn;
+    UINT f_rl5;
+    UINT f_rm;
+    UINT f_rn;
+    unsigned char in_rl5;
+    unsigned char in_rm;
+    unsigned char in_rn;
+    unsigned char out_rl5;
+  } sfmt_casb3;
   struct { /*  */
     SI* i_rm;
     SI* i_rn;
@@ -652,6 +618,27 @@ struct mepcore1_scache {
 
 using mep_ext1::mepcore1_sem_fn;
 extern mepcore1_sem_fn mepcore1_sem_x_invalid;
+extern mepcore1_sem_fn mepcore1_sem_stcb_r;
+extern mepcore1_sem_fn mepcore1_sem_ldcb_r;
+extern mepcore1_sem_fn mepcore1_sem_pref;
+extern mepcore1_sem_fn mepcore1_sem_prefd;
+extern mepcore1_sem_fn mepcore1_sem_casb3;
+extern mepcore1_sem_fn mepcore1_sem_cash3;
+extern mepcore1_sem_fn mepcore1_sem_casw3;
+extern mepcore1_sem_fn mepcore1_sem_sbcp;
+extern mepcore1_sem_fn mepcore1_sem_lbcp;
+extern mepcore1_sem_fn mepcore1_sem_lbucp;
+extern mepcore1_sem_fn mepcore1_sem_shcp;
+extern mepcore1_sem_fn mepcore1_sem_lhcp;
+extern mepcore1_sem_fn mepcore1_sem_lhucp;
+extern mepcore1_sem_fn mepcore1_sem_lbucpa;
+extern mepcore1_sem_fn mepcore1_sem_lhucpa;
+extern mepcore1_sem_fn mepcore1_sem_lbucpm0;
+extern mepcore1_sem_fn mepcore1_sem_lhucpm0;
+extern mepcore1_sem_fn mepcore1_sem_lbucpm1;
+extern mepcore1_sem_fn mepcore1_sem_lhucpm1;
+extern mepcore1_sem_fn mepcore1_sem_uci;
+extern mepcore1_sem_fn mepcore1_sem_dsp;
 extern mepcore1_sem_fn mepcore1_sem_sb;
 extern mepcore1_sem_fn mepcore1_sem_sh;
 extern mepcore1_sem_fn mepcore1_sem_sw;
@@ -853,11 +840,6 @@ extern mepcore1_sem_fn mepcore1_sem_ri_20;
 extern mepcore1_sem_fn mepcore1_sem_ri_21;
 extern mepcore1_sem_fn mepcore1_sem_ri_22;
 extern mepcore1_sem_fn mepcore1_sem_ri_23;
-extern mepcore1_sem_fn mepcore1_sem_ri_24;
-extern mepcore1_sem_fn mepcore1_sem_ri_25;
 extern mepcore1_sem_fn mepcore1_sem_ri_26;
-extern mepcore1_sem_fn mepcore1_sem_ri_16;
-extern mepcore1_sem_fn mepcore1_sem_ri_18;
-extern mepcore1_sem_fn mepcore1_sem_ri_19;
 
 #endif /* MEPCORE1_DECODE_H */

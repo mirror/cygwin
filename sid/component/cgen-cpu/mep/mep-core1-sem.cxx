@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2007 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -35,6 +35,600 @@ mepcore1_sem_x_invalid (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
     current_cpu->invalid_insn (pc);
     assert (0);
     /* NOTREACHED */
+  }
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** stcb_r: stcb $rn,($rma)
+
+sem_status
+mepcore1_sem_stcb_r (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_stcb_r.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 2;
+
+current_cpu->do_stcb (* FLD (i_rn), ANDSI (* FLD (i_rma), 65535));
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** ldcb_r: ldcb $rn,($rma)
+
+sem_status
+mepcore1_sem_ldcb_r (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_ldcb_r.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 2;
+
+  {
+    SI opval = current_cpu->do_ldcb (ANDSI (* FLD (i_rma), 65535));
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gpr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+    * FLD (i_rn) = opval;
+  }
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** pref: pref $cimm4,($rma)
+
+sem_status
+mepcore1_sem_pref (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_ldcb_r.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 2;
+
+{
+current_cpu->check_option_dcache (pc);
+current_cpu->do_cache_prefetch (FLD (f_rn), * FLD (i_rma), pc);
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** prefd: pref $cimm4,$sdisp16($rma)
+
+sem_status
+mepcore1_sem_prefd (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_lhu16.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->check_option_dcache (pc);
+current_cpu->do_cache_prefetch (FLD (f_rn), ADDSI (* FLD (i_rma), EXTSISI (FLD (f_16s16))), pc);
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** casb3: casb3 $rl5,$rn,($rm)
+
+sem_status
+mepcore1_sem_casb3 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_casb3.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->do_casb3 (FLD (f_rl5), * FLD (i_rn), * FLD (i_rm), pc);
+  {
+    SI opval = * FLD (i_rl5);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gpr" << '[' << FLD (f_rl5) << ']' << ":=0x" << hex << opval << dec << "  ";
+    * FLD (i_rl5) = opval;
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** cash3: cash3 $rl5,$rn,($rm)
+
+sem_status
+mepcore1_sem_cash3 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_casb3.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->do_cash3 (FLD (f_rl5), * FLD (i_rn), * FLD (i_rm), pc);
+  {
+    SI opval = * FLD (i_rl5);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gpr" << '[' << FLD (f_rl5) << ']' << ":=0x" << hex << opval << dec << "  ";
+    * FLD (i_rl5) = opval;
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** casw3: casw3 $rl5,$rn,($rm)
+
+sem_status
+mepcore1_sem_casw3 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_casb3.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->do_casw3 (FLD (f_rl5), * FLD (i_rn), * FLD (i_rm), pc);
+  {
+    SI opval = * FLD (i_rl5);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gpr" << '[' << FLD (f_rl5) << ']' << ":=0x" << hex << opval << dec << "  ";
+    * FLD (i_rl5) = opval;
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** sbcp: sbcp $crn,$cdisp12($rma)
+
+sem_status
+mepcore1_sem_sbcp (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_sbcp.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->check_option_cp (pc);
+current_cpu->check_write_to_text (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_12s20))));
+  {
+    QI opval = ANDSI (current_cpu->h_cr_get (FLD (f_crn)), 255);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (* FLD (i_rma), EXTSISI (FLD (f_12s20))) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
+    current_cpu->SETMEMQI (pc, ADDSI (* FLD (i_rma), EXTSISI (FLD (f_12s20))), opval);
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** lbcp: lbcp $crn,$cdisp12($rma)
+
+sem_status
+mepcore1_sem_lbcp (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_sbcp.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->check_option_cp (pc);
+  {
+    SI opval = EXTQISI (current_cpu->GETMEMQI (pc, ADDSI (* FLD (i_rma), EXTSISI (FLD (f_12s20)))));
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "cr" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_cr_set (FLD (f_crn), opval);
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** lbucp: lbucp $crn,$cdisp12($rma)
+
+sem_status
+mepcore1_sem_lbucp (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_sbcp.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->check_option_cp (pc);
+  {
+    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, ADDSI (* FLD (i_rma), EXTSISI (FLD (f_12s20)))));
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "cr" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_cr_set (FLD (f_crn), opval);
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** shcp: shcp $crn,$cdisp12($rma)
+
+sem_status
+mepcore1_sem_shcp (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_sbcp.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->check_option_cp (pc);
+current_cpu->check_write_to_text (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_12s20))));
+  {
+    HI opval = ANDSI (current_cpu->h_cr_get (FLD (f_crn)), 65535);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (* FLD (i_rma), EXTSISI (FLD (f_12s20))) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->SETMEMHI (pc, ADDSI (* FLD (i_rma), EXTSISI (FLD (f_12s20))), opval);
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** lhcp: lhcp $crn,$cdisp12($rma)
+
+sem_status
+mepcore1_sem_lhcp (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_sbcp.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->check_option_cp (pc);
+  {
+    SI opval = EXTHISI (current_cpu->GETMEMHI (pc, ADDSI (* FLD (i_rma), EXTSISI (FLD (f_12s20)))));
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "cr" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_cr_set (FLD (f_crn), opval);
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** lhucp: lhucp $crn,$cdisp12($rma)
+
+sem_status
+mepcore1_sem_lhucp (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_sbcp.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->check_option_cp (pc);
+  {
+    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, ADDSI (* FLD (i_rma), EXTSISI (FLD (f_12s20)))));
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "cr" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_cr_set (FLD (f_crn), opval);
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** lbucpa: lbucpa $crn,($rma+),$cdisp10
+
+sem_status
+mepcore1_sem_lbucpa (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->check_option_cp (pc);
+  {
+    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, * FLD (i_rma)));
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "cr" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_cr_set (FLD (f_crn), opval);
+  }
+  {
+    SI opval = ADDSI (* FLD (i_rma), FLD (f_cdisp10));
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
+    * FLD (i_rma) = opval;
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** lhucpa: lhucpa $crn,($rma+),$cdisp10a2
+
+sem_status
+mepcore1_sem_lhucpa (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->check_option_cp (pc);
+  {
+    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, ANDSI (* FLD (i_rma), INVSI (1))));
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "cr" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_cr_set (FLD (f_crn), opval);
+  }
+  {
+    SI opval = ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10)));
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
+    * FLD (i_rma) = opval;
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** lbucpm0: lbucpm0 $crn,($rma+),$cdisp10
+
+sem_status
+mepcore1_sem_lbucpm0 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->check_option_cp (pc);
+  {
+    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, * FLD (i_rma)));
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "cr" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_cr_set (FLD (f_crn), opval);
+  }
+  {
+    SI opval = ({   SI tmp_modulo_mask;
+  tmp_modulo_mask = ({   SI tmp_temp;
+  tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 12)), current_cpu->h_csr_get (((UINT) 13)));
+; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
+    * FLD (i_rma) = opval;
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** lhucpm0: lhucpm0 $crn,($rma+),$cdisp10a2
+
+sem_status
+mepcore1_sem_lhucpm0 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->check_option_cp (pc);
+  {
+    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, ANDSI (* FLD (i_rma), INVSI (1))));
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "cr" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_cr_set (FLD (f_crn), opval);
+  }
+  {
+    SI opval = ({   SI tmp_modulo_mask;
+  tmp_modulo_mask = ({   SI tmp_temp;
+  tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 12)), current_cpu->h_csr_get (((UINT) 13)));
+; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
+    * FLD (i_rma) = opval;
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** lbucpm1: lbucpm1 $crn,($rma+),$cdisp10
+
+sem_status
+mepcore1_sem_lbucpm1 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->check_option_cp (pc);
+  {
+    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, * FLD (i_rma)));
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "cr" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_cr_set (FLD (f_crn), opval);
+  }
+  {
+    SI opval = ({   SI tmp_modulo_mask;
+  tmp_modulo_mask = ({   SI tmp_temp;
+  tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 14)), current_cpu->h_csr_get (((UINT) 15)));
+; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
+    * FLD (i_rma) = opval;
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** lhucpm1: lhucpm1 $crn,($rma+),$cdisp10a2
+
+sem_status
+mepcore1_sem_lhucpm1 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->check_option_cp (pc);
+  {
+    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, ANDSI (* FLD (i_rma), INVSI (1))));
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "cr" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_cr_set (FLD (f_crn), opval);
+  }
+  {
+    SI opval = ({   SI tmp_modulo_mask;
+  tmp_modulo_mask = ({   SI tmp_temp;
+  tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 14)), current_cpu->h_csr_get (((UINT) 15)));
+; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
+    * FLD (i_rma) = opval;
+  }
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** uci: uci $rn,$rm,$uimm16
+
+sem_status
+mepcore1_sem_uci (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_uci.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+  {
+    SI opval = current_cpu->do_UCI (* FLD (i_rn), * FLD (i_rm), ZEXTSISI (FLD (f_16u16)), pc);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gpr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+    * FLD (i_rn) = opval;
+  }
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** dsp: dsp $rn,$rm,$uimm16
+
+sem_status
+mepcore1_sem_dsp (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_uci.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcore1_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+  {
+    SI opval = current_cpu->do_DSP (* FLD (i_rn), * FLD (i_rm), ZEXTSISI (FLD (f_16u16)), pc);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gpr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+    * FLD (i_rn) = opval;
   }
 
   current_cpu->done_insn (npc, status);
@@ -884,7 +1478,7 @@ if (current_cpu->big_endian_p ()) {
 sem_status
 mepcore1_sem_mov (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_add3x.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -980,7 +1574,7 @@ mepcore1_sem_movu24 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 sem_status
 mepcore1_sem_movu16 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_uci.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -1004,7 +1598,7 @@ mepcore1_sem_movu16 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 sem_status
 mepcore1_sem_movh (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_uci.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -1196,7 +1790,7 @@ if (SUBOFSI (* FLD (i_rn), * FLD (i_rm), 0)) {
 sem_status
 mepcore1_sem_neg (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_add3x.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -1472,7 +2066,7 @@ if (LTSI (* FLD (i_rm), EXTSISI (FLD (f_16s16)))) {
 sem_status
 mepcore1_sem_sltu3x (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_uci.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -1604,7 +2198,7 @@ mepcore1_sem_nor (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 sem_status
 mepcore1_sem_or3 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_uci.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -1628,7 +2222,7 @@ mepcore1_sem_or3 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 sem_status
 mepcore1_sem_and3 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_uci.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -1652,7 +2246,7 @@ mepcore1_sem_and3 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 sem_status
 mepcore1_sem_xor3 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_uci.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -3418,7 +4012,7 @@ mepcore1_sem_syncm (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 sem_status
 mepcore1_sem_stcb (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_stcb.f
+#define FLD(f) abuf->fields.sfmt_uci.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -3437,7 +4031,7 @@ current_cpu->do_stcb (* FLD (i_rn), FLD (f_16u16));
 sem_status
 mepcore1_sem_ldcb (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_uci.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -3569,7 +4163,7 @@ current_cpu->check_option_bit (pc);
 sem_status
 mepcore1_sem_tas (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_tas.f
+#define FLD(f) abuf->fields.sfmt_ldcb_r.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -3604,7 +4198,7 @@ current_cpu->check_option_bit (pc);
 sem_status
 mepcore1_sem_cache (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_tas.f
+#define FLD(f) abuf->fields.sfmt_ldcb_r.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4106,7 +4700,7 @@ current_cpu->check_option_debug (pc);
 sem_status
 mepcore1_sem_ldz (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sltu3x.f
+#define FLD(f) abuf->fields.sfmt_add3x.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4698,7 +5292,7 @@ current_cpu->check_option_cp64 (pc);
 sem_status
 mepcore1_sem_swcpi (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4732,7 +5326,7 @@ current_cpu->check_write_to_text (ANDSI (* FLD (i_rma), INVSI (3)));
 sem_status
 mepcore1_sem_lwcpi (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4765,7 +5359,7 @@ current_cpu->check_option_cp (pc);
 sem_status
 mepcore1_sem_smcpi (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4795,7 +5389,7 @@ current_cpu->do_smcpi (FLD (f_rm), current_cpu->hardware.h_cr64[FLD (f_crn)], pc
 sem_status
 mepcore1_sem_lmcpi (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4929,12 +5523,12 @@ current_cpu->check_option_cp64 (pc);
 #undef FLD
 }
 
-// ********** sbcpa: sbcpa $crn,($rma+),$cdisp8
+// ********** sbcpa: sbcpa $crn,($rma+),$cdisp10
 
 sem_status
 mepcore1_sem_sbcpa (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sbcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4951,7 +5545,7 @@ current_cpu->check_write_to_text (* FLD (i_rma));
     current_cpu->SETMEMQI (pc, * FLD (i_rma), opval);
   }
   {
-    SI opval = ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24)));
+    SI opval = ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10)));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -4963,12 +5557,12 @@ current_cpu->check_write_to_text (* FLD (i_rma));
 #undef FLD
 }
 
-// ********** lbcpa: lbcpa $crn,($rma+),$cdisp8
+// ********** lbcpa: lbcpa $crn,($rma+),$cdisp10
 
 sem_status
 mepcore1_sem_lbcpa (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sbcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4984,7 +5578,7 @@ current_cpu->check_option_cp (pc);
     current_cpu->h_cr_set (FLD (f_crn), opval);
   }
   {
-    SI opval = ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24)));
+    SI opval = ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10)));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -4996,12 +5590,12 @@ current_cpu->check_option_cp (pc);
 #undef FLD
 }
 
-// ********** shcpa: shcpa $crn,($rma+),$cdisp8a2
+// ********** shcpa: shcpa $crn,($rma+),$cdisp10a2
 
 sem_status
 mepcore1_sem_shcpa (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_shcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5018,7 +5612,7 @@ current_cpu->check_write_to_text (ANDSI (* FLD (i_rma), INVSI (1)));
     current_cpu->SETMEMHI (pc, ANDSI (* FLD (i_rma), INVSI (1)), opval);
   }
   {
-    SI opval = ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a2)));
+    SI opval = ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10)));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5030,12 +5624,12 @@ current_cpu->check_write_to_text (ANDSI (* FLD (i_rma), INVSI (1)));
 #undef FLD
 }
 
-// ********** lhcpa: lhcpa $crn,($rma+),$cdisp8a2
+// ********** lhcpa: lhcpa $crn,($rma+),$cdisp10a2
 
 sem_status
 mepcore1_sem_lhcpa (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_shcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5051,7 +5645,7 @@ current_cpu->check_option_cp (pc);
     current_cpu->h_cr_set (FLD (f_crn), opval);
   }
   {
-    SI opval = ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a2)));
+    SI opval = ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10)));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5063,12 +5657,12 @@ current_cpu->check_option_cp (pc);
 #undef FLD
 }
 
-// ********** swcpa: swcpa $crn,($rma+),$cdisp8a4
+// ********** swcpa: swcpa $crn,($rma+),$cdisp10a4
 
 sem_status
 mepcore1_sem_swcpa (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_swcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5085,7 +5679,7 @@ current_cpu->check_write_to_text (ANDSI (* FLD (i_rma), INVSI (3)));
     current_cpu->SETMEMSI (pc, ANDSI (* FLD (i_rma), INVSI (3)), opval);
   }
   {
-    SI opval = ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a4)));
+    SI opval = ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10)));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5097,12 +5691,12 @@ current_cpu->check_write_to_text (ANDSI (* FLD (i_rma), INVSI (3)));
 #undef FLD
 }
 
-// ********** lwcpa: lwcpa $crn,($rma+),$cdisp8a4
+// ********** lwcpa: lwcpa $crn,($rma+),$cdisp10a4
 
 sem_status
 mepcore1_sem_lwcpa (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_swcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5118,7 +5712,7 @@ current_cpu->check_option_cp (pc);
     current_cpu->h_cr_set (FLD (f_crn), opval);
   }
   {
-    SI opval = ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a4)));
+    SI opval = ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10)));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5130,12 +5724,12 @@ current_cpu->check_option_cp (pc);
 #undef FLD
 }
 
-// ********** smcpa: smcpa $crn64,($rma+),$cdisp8a8
+// ********** smcpa: smcpa $crn64,($rma+),$cdisp10a8
 
 sem_status
 mepcore1_sem_smcpa (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5146,7 +5740,7 @@ mepcore1_sem_smcpa (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 current_cpu->check_option_cp (pc);
 current_cpu->check_option_cp64 (pc);
 current_cpu->check_write_to_text (* FLD (i_rma));
-current_cpu->do_smcpa (FLD (f_rm), FLD (f_8s24a8), current_cpu->hardware.h_cr64[FLD (f_crn)], pc);
+current_cpu->do_smcpa (FLD (f_rm), FLD (f_cdisp10), current_cpu->hardware.h_cr64[FLD (f_crn)], pc);
   {
     SI opval = * FLD (i_rma);
     if (UNLIKELY(current_cpu->trace_result_p))
@@ -5160,12 +5754,12 @@ current_cpu->do_smcpa (FLD (f_rm), FLD (f_8s24a8), current_cpu->hardware.h_cr64[
 #undef FLD
 }
 
-// ********** lmcpa: lmcpa $crn64,($rma+),$cdisp8a8
+// ********** lmcpa: lmcpa $crn64,($rma+),$cdisp10a8
 
 sem_status
 mepcore1_sem_lmcpa (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5176,7 +5770,7 @@ mepcore1_sem_lmcpa (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 current_cpu->check_option_cp (pc);
 current_cpu->check_option_cp64 (pc);
   {
-    DI opval = current_cpu->do_lmcpa (FLD (f_rm), FLD (f_8s24a8), pc);
+    DI opval = current_cpu->do_lmcpa (FLD (f_rm), FLD (f_cdisp10), pc);
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cr64" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
     current_cpu->hardware.h_cr64[FLD (f_crn)] = opval;
@@ -5194,12 +5788,12 @@ current_cpu->check_option_cp64 (pc);
 #undef FLD
 }
 
-// ********** sbcpm0: sbcpm0 $crn,($rma+),$cdisp8
+// ********** sbcpm0: sbcpm0 $crn,($rma+),$cdisp10
 
 sem_status
 mepcore1_sem_sbcpm0 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sbcpm0.f
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5220,7 +5814,7 @@ current_cpu->check_write_to_text (* FLD (i_rma));
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 12)), current_cpu->h_csr_get (((UINT) 13)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5232,12 +5826,12 @@ current_cpu->check_write_to_text (* FLD (i_rma));
 #undef FLD
 }
 
-// ********** lbcpm0: lbcpm0 $crn,($rma+),$cdisp8
+// ********** lbcpm0: lbcpm0 $crn,($rma+),$cdisp10
 
 sem_status
 mepcore1_sem_lbcpm0 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sbcpm0.f
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5257,7 +5851,7 @@ current_cpu->check_option_cp (pc);
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 12)), current_cpu->h_csr_get (((UINT) 13)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5269,12 +5863,12 @@ current_cpu->check_option_cp (pc);
 #undef FLD
 }
 
-// ********** shcpm0: shcpm0 $crn,($rma+),$cdisp8a2
+// ********** shcpm0: shcpm0 $crn,($rma+),$cdisp10a2
 
 sem_status
 mepcore1_sem_shcpm0 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_shcpm0.f
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5295,7 +5889,7 @@ current_cpu->check_write_to_text (ANDSI (* FLD (i_rma), INVSI (1)));
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 12)), current_cpu->h_csr_get (((UINT) 13)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a2))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5307,12 +5901,12 @@ current_cpu->check_write_to_text (ANDSI (* FLD (i_rma), INVSI (1)));
 #undef FLD
 }
 
-// ********** lhcpm0: lhcpm0 $crn,($rma+),$cdisp8a2
+// ********** lhcpm0: lhcpm0 $crn,($rma+),$cdisp10a2
 
 sem_status
 mepcore1_sem_lhcpm0 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_shcpm0.f
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5332,7 +5926,7 @@ current_cpu->check_option_cp (pc);
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 12)), current_cpu->h_csr_get (((UINT) 13)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a2))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5344,12 +5938,12 @@ current_cpu->check_option_cp (pc);
 #undef FLD
 }
 
-// ********** swcpm0: swcpm0 $crn,($rma+),$cdisp8a4
+// ********** swcpm0: swcpm0 $crn,($rma+),$cdisp10a4
 
 sem_status
 mepcore1_sem_swcpm0 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_swcpm0.f
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5370,7 +5964,7 @@ current_cpu->check_write_to_text (ANDSI (* FLD (i_rma), INVSI (3)));
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 12)), current_cpu->h_csr_get (((UINT) 13)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a4))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5382,12 +5976,12 @@ current_cpu->check_write_to_text (ANDSI (* FLD (i_rma), INVSI (3)));
 #undef FLD
 }
 
-// ********** lwcpm0: lwcpm0 $crn,($rma+),$cdisp8a4
+// ********** lwcpm0: lwcpm0 $crn,($rma+),$cdisp10a4
 
 sem_status
 mepcore1_sem_lwcpm0 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_swcpm0.f
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5407,7 +6001,7 @@ current_cpu->check_option_cp (pc);
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 12)), current_cpu->h_csr_get (((UINT) 13)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a4))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5419,12 +6013,12 @@ current_cpu->check_option_cp (pc);
 #undef FLD
 }
 
-// ********** smcpm0: smcpm0 $crn64,($rma+),$cdisp8a8
+// ********** smcpm0: smcpm0 $crn64,($rma+),$cdisp10a8
 
 sem_status
 mepcore1_sem_smcpm0 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_smcpm0.f
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5441,7 +6035,7 @@ current_cpu->do_smcp (* FLD (i_rma), current_cpu->hardware.h_cr64[FLD (f_crn)], 
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 12)), current_cpu->h_csr_get (((UINT) 13)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a8))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5453,12 +6047,12 @@ current_cpu->do_smcp (* FLD (i_rma), current_cpu->hardware.h_cr64[FLD (f_crn)], 
 #undef FLD
 }
 
-// ********** lmcpm0: lmcpm0 $crn64,($rma+),$cdisp8a8
+// ********** lmcpm0: lmcpm0 $crn64,($rma+),$cdisp10a8
 
 sem_status
 mepcore1_sem_lmcpm0 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_smcpm0.f
+#define FLD(f) abuf->fields.sfmt_lbucpm0.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5479,7 +6073,7 @@ current_cpu->check_option_cp64 (pc);
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 12)), current_cpu->h_csr_get (((UINT) 13)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a8))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 13)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 12)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5491,12 +6085,12 @@ current_cpu->check_option_cp64 (pc);
 #undef FLD
 }
 
-// ********** sbcpm1: sbcpm1 $crn,($rma+),$cdisp8
+// ********** sbcpm1: sbcpm1 $crn,($rma+),$cdisp10
 
 sem_status
 mepcore1_sem_sbcpm1 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sbcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5517,7 +6111,7 @@ current_cpu->check_write_to_text (* FLD (i_rma));
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 14)), current_cpu->h_csr_get (((UINT) 15)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5529,12 +6123,12 @@ current_cpu->check_write_to_text (* FLD (i_rma));
 #undef FLD
 }
 
-// ********** lbcpm1: lbcpm1 $crn,($rma+),$cdisp8
+// ********** lbcpm1: lbcpm1 $crn,($rma+),$cdisp10
 
 sem_status
 mepcore1_sem_lbcpm1 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_sbcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5554,7 +6148,7 @@ current_cpu->check_option_cp (pc);
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 14)), current_cpu->h_csr_get (((UINT) 15)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5566,12 +6160,12 @@ current_cpu->check_option_cp (pc);
 #undef FLD
 }
 
-// ********** shcpm1: shcpm1 $crn,($rma+),$cdisp8a2
+// ********** shcpm1: shcpm1 $crn,($rma+),$cdisp10a2
 
 sem_status
 mepcore1_sem_shcpm1 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_shcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5592,7 +6186,7 @@ current_cpu->check_write_to_text (ANDSI (* FLD (i_rma), INVSI (1)));
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 14)), current_cpu->h_csr_get (((UINT) 15)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a2))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5604,12 +6198,12 @@ current_cpu->check_write_to_text (ANDSI (* FLD (i_rma), INVSI (1)));
 #undef FLD
 }
 
-// ********** lhcpm1: lhcpm1 $crn,($rma+),$cdisp8a2
+// ********** lhcpm1: lhcpm1 $crn,($rma+),$cdisp10a2
 
 sem_status
 mepcore1_sem_lhcpm1 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_shcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5629,7 +6223,7 @@ current_cpu->check_option_cp (pc);
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 14)), current_cpu->h_csr_get (((UINT) 15)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a2))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5641,12 +6235,12 @@ current_cpu->check_option_cp (pc);
 #undef FLD
 }
 
-// ********** swcpm1: swcpm1 $crn,($rma+),$cdisp8a4
+// ********** swcpm1: swcpm1 $crn,($rma+),$cdisp10a4
 
 sem_status
 mepcore1_sem_swcpm1 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_swcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5667,7 +6261,7 @@ current_cpu->check_write_to_text (ANDSI (* FLD (i_rma), INVSI (3)));
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 14)), current_cpu->h_csr_get (((UINT) 15)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a4))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5679,12 +6273,12 @@ current_cpu->check_write_to_text (ANDSI (* FLD (i_rma), INVSI (3)));
 #undef FLD
 }
 
-// ********** lwcpm1: lwcpm1 $crn,($rma+),$cdisp8a4
+// ********** lwcpm1: lwcpm1 $crn,($rma+),$cdisp10a4
 
 sem_status
 mepcore1_sem_lwcpm1 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_swcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5704,7 +6298,7 @@ current_cpu->check_option_cp (pc);
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 14)), current_cpu->h_csr_get (((UINT) 15)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a4))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5716,12 +6310,12 @@ current_cpu->check_option_cp (pc);
 #undef FLD
 }
 
-// ********** smcpm1: smcpm1 $crn64,($rma+),$cdisp8a8
+// ********** smcpm1: smcpm1 $crn64,($rma+),$cdisp10a8
 
 sem_status
 mepcore1_sem_smcpm1 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5738,7 +6332,7 @@ current_cpu->check_write_to_text (* FLD (i_rma));
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 14)), current_cpu->h_csr_get (((UINT) 15)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a8))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -5750,12 +6344,12 @@ current_cpu->check_write_to_text (* FLD (i_rma));
 #undef FLD
 }
 
-// ********** lmcpm1: lmcpm1 $crn64,($rma+),$cdisp8a8
+// ********** lmcpm1: lmcpm1 $crn64,($rma+),$cdisp10a8
 
 sem_status
 mepcore1_sem_lmcpm1 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_smcpm1.f
+#define FLD(f) abuf->fields.sfmt_lbucpm1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcore1_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5776,7 +6370,7 @@ current_cpu->check_option_cp64 (pc);
   tmp_modulo_mask = ({   SI tmp_temp;
   tmp_temp = ORSI (current_cpu->h_csr_get (((UINT) 14)), current_cpu->h_csr_get (((UINT) 15)));
 ; SRLSI (-1, current_cpu->do_ldz (tmp_temp)); });
-; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_8s24a8))))); });
+; ((EQSI (ANDSI (* FLD (i_rma), tmp_modulo_mask), current_cpu->h_csr_get (((UINT) 15)))) ? (ORSI (ANDSI (* FLD (i_rma), INVSI (tmp_modulo_mask)), current_cpu->h_csr_get (((UINT) 14)))) : (ADDSI (* FLD (i_rma), EXTSISI (FLD (f_cdisp10))))); });
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rma) = opval;
@@ -6717,130 +7311,10 @@ mepcore1_sem_ri_23 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 #undef FLD
 }
 
-// ********** ri-24: --reserved--
-
-sem_status
-mepcore1_sem_ri_24 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
-{
-#define FLD(f) abuf->fields.fmt_empty.f
-  sem_status status = SEM_STATUS_NORMAL;
-  mepcore1_scache* abuf = sem;
-  unsigned long long written = 0;
-  PCADDR pc = abuf->addr;
-  PCADDR npc = pc + 2;
-
-  {
-    USI opval = current_cpu->ri_exception (pc);
-    if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
-    current_cpu->branch (opval, npc, status);
-  }
-
-  current_cpu->done_cti_insn (npc, status);
-  return status;
-#undef FLD
-}
-
-// ********** ri-25: --reserved--
-
-sem_status
-mepcore1_sem_ri_25 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
-{
-#define FLD(f) abuf->fields.fmt_empty.f
-  sem_status status = SEM_STATUS_NORMAL;
-  mepcore1_scache* abuf = sem;
-  unsigned long long written = 0;
-  PCADDR pc = abuf->addr;
-  PCADDR npc = pc + 2;
-
-  {
-    USI opval = current_cpu->ri_exception (pc);
-    if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
-    current_cpu->branch (opval, npc, status);
-  }
-
-  current_cpu->done_cti_insn (npc, status);
-  return status;
-#undef FLD
-}
-
 // ********** ri-26: --reserved--
 
 sem_status
 mepcore1_sem_ri_26 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
-{
-#define FLD(f) abuf->fields.fmt_empty.f
-  sem_status status = SEM_STATUS_NORMAL;
-  mepcore1_scache* abuf = sem;
-  unsigned long long written = 0;
-  PCADDR pc = abuf->addr;
-  PCADDR npc = pc + 2;
-
-  {
-    USI opval = current_cpu->ri_exception (pc);
-    if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
-    current_cpu->branch (opval, npc, status);
-  }
-
-  current_cpu->done_cti_insn (npc, status);
-  return status;
-#undef FLD
-}
-
-// ********** ri-16: --reserved--
-
-sem_status
-mepcore1_sem_ri_16 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
-{
-#define FLD(f) abuf->fields.fmt_empty.f
-  sem_status status = SEM_STATUS_NORMAL;
-  mepcore1_scache* abuf = sem;
-  unsigned long long written = 0;
-  PCADDR pc = abuf->addr;
-  PCADDR npc = pc + 2;
-
-  {
-    USI opval = current_cpu->ri_exception (pc);
-    if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
-    current_cpu->branch (opval, npc, status);
-  }
-
-  current_cpu->done_cti_insn (npc, status);
-  return status;
-#undef FLD
-}
-
-// ********** ri-18: --reserved--
-
-sem_status
-mepcore1_sem_ri_18 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
-{
-#define FLD(f) abuf->fields.fmt_empty.f
-  sem_status status = SEM_STATUS_NORMAL;
-  mepcore1_scache* abuf = sem;
-  unsigned long long written = 0;
-  PCADDR pc = abuf->addr;
-  PCADDR npc = pc + 2;
-
-  {
-    USI opval = current_cpu->ri_exception (pc);
-    if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
-    current_cpu->branch (opval, npc, status);
-  }
-
-  current_cpu->done_cti_insn (npc, status);
-  return status;
-#undef FLD
-}
-
-// ********** ri-19: --reserved--
-
-sem_status
-mepcore1_sem_ri_19 (mep_ext1_cpu* current_cpu, mepcore1_scache* sem)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;

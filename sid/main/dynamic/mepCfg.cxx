@@ -910,6 +910,7 @@ public:
 	conn_pin (my_cpu, "cache-flush-and-invalidate", my_cache, "flush-and-invalidate");
 	conn_pin (my_cpu, "cache-index-flush-and-invalidate", my_cache, "flush-and-invalidate-set");
 	conn_pin (my_cpu, "cache-prefetch", my_cache, "prefetch");
+	conn_pin (my_cpu, "cache-write-hint", my_cache, "write-hint");
 	conn_pin (my_cpu, "data-cache-invalidate-all", my_cache, "invalidate-all");
 
 	if (bit_insn_probe)

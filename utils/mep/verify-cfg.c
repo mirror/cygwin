@@ -640,6 +640,8 @@ check_mep_core_type (Node *top)
     mep_core_type = MEP_CORE_C4;
   else if (strcasecmp (top->val, "h1") == 0)
     mep_core_type = MEP_CORE_H1;
+  else if (strcasecmp (top->val, "c5") == 0)
+    mep_core_type = MEP_CORE_C5;
   else
     {
       errorn (top, "%s has unexpected value \"%s\"", top->id, top->val);
@@ -653,7 +655,8 @@ check_mep_endian (Node *top)
   mep_endian_type = MEP_ENDIAN_BIG; /* default */
 
   /* Only allowed for MEP_CORE_TYPE=c4 */
-  if (mep_core_type != MEP_CORE_C4)
+  if (mep_core_type != MEP_CORE_C4
+      && mep_core_type != MEP_CORE_C5)
     return;
 
   check_string (top, 0, "LITTLE_ENDIAN", "YES", "NO", 0);
@@ -810,7 +813,8 @@ verify_dsu (Node *top)
   default_string (top, "DATA_TRACE", "OFF", N_WORD);
 #endif
 
-  if (mep_core_type == MEP_CORE_C4 || mep_core_type == MEP_CORE_H1)
+  if (mep_core_type == MEP_CORE_C4 || mep_core_type == MEP_CORE_H1
+      || mep_core_type == MEP_CORE_C5)
     check_string (top, 1, "PC_TRACE", "ON", "OFF", 0);
   else
     check_string (top, 1, "PC_TRACE", "OFF", 0);
@@ -1180,6 +1184,7 @@ verify_cache (Node *top)
     case MEP_CORE_C3:
     case MEP_CORE_C4:
     case MEP_CORE_H1:
+    case MEP_CORE_C5:
       if (get_biu_width (top->up->up) == 64)
 	check_int_list (top, "LINE_SIZE", 3, 32, 64, 128);
       else
@@ -1229,6 +1234,7 @@ verify_dmem (Node *top)
 	case 96:  b1 = 3; break;
 	case 64:
 	case 128: b1 = 4; break;
+	case 256: b1 = 4; break;
 	}
     }
 
@@ -1245,7 +1251,8 @@ verify_dmem (Node *top)
   check_subnode (top, "PHYSICAL_CFG", 0, 1, verify_physical_cfg);
 	      long dmem_base[4];
 
-  if (mep_core_type == MEP_CORE_C4 || mep_core_type == MEP_CORE_H1)
+  if (mep_core_type == MEP_CORE_C4 || mep_core_type == MEP_CORE_H1
+      || mep_core_type == MEP_CORE_C5)
     check_string (top, 1, "FIXED_START_ADDRESS", "YES", "NO", 0);
   else
     check_string (top, 1, "FIXED_START_ADDRESS", "NO", 0);
@@ -1283,12 +1290,14 @@ static void
 verify_imem (Node *top)
 {
   default_int (top, "SIZE", 8);
+  default_int (top, "BANK_NUM", 2);
 #if 0 /* No point in adding these defaults, since they will be ignored.  */
   default_node (top, "PHYSICAL_CFG", 0);
 #endif
 
   check_no_name (top);
-  check_int_list (top, "SIZE", 9, 1, 2, 4, 6, 8, 12, 16, 24, 32);
+  check_int_list (top, "BANK_NUM", 1, 2);
+  check_int_list (top, "SIZE", 12, 1, 2, 4, 6, 8, 12, 16, 24, 32, 64, 128, 256);
   check_subnode (top, "PHYSICAL_CFG", 0, 1, verify_physical_cfg);
   check_unexpected (top);
 

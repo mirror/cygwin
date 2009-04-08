@@ -89,8 +89,8 @@ static const char *main_argv0;
 
 mep_core_ty mep_core_type = MEP_CORE_C2;
 mep_endian_ty mep_endian_type = MEP_ENDIAN_BIG;
-static const char* mep_core_names[] = {"MeP", "c2", "c3", "c4", "h1"};
-static const char* mep_mach_names[] = {"mep", "mep", "mep", "mep", "h1"};
+static const char* mep_core_names[] = {"MeP", "c2", "c3", "c4", "h1", "c5"};
+static const char* mep_mach_names[] = {"mep", "mep", "mep", "mep", "h1", "c5"};
 
 int errors = 0;
 
@@ -1357,7 +1357,6 @@ do_config_cc_spec ()
 	}
     }
 
-  fprintf (dst_file, "%%{!mconfig*:%%nwarning: Missing -mconfig option}\\\n");
   fprintf (dst_file, "\"\n");
   find_line ("/* end-config-cc-spec */", 0, 1, 1);
 }
@@ -1674,6 +1673,7 @@ do_cpu_config ()
       break;
     case MEP_CORE_C3:
     case MEP_CORE_C4:
+    case MEP_CORE_C5:
       fputs ("	    (vid 22)\n", dst_file);
       break;
     default:
@@ -1695,15 +1695,27 @@ do_cpu_config ()
   if (mep_core_type != MEP_CORE_H1)
     fputs ("; ", dst_file);
   fputs ("(include \"mep-h1.cpu\") ; -- exposed by MeP-Integrator\n", dst_file);
+  find_line ("mep-c5.cpu", 1, 0, 1);
+  if (mep_core_type != MEP_CORE_C5)
+    fputs ("; ", dst_file);
+  fputs ("(include \"mep-c5.cpu\") ; -- exposed by MeP-Integrator\n", dst_file);
 
-  find_line ("begin non-mep-h1 reserved insns", 1, 1, 1);
-  if (mep_core_type != MEP_CORE_H1)
+  find_line ("begin core-specific reserved insns", 1, 1, 1);
+  switch (mep_core_type)
     {
+    case MEP_CORE_H1:
+      fputs ("(dnri 25 MAJ_7   6)\n", dst_file);
+      break;
+    case MEP_CORE_C5:
+      break;
+    default:
       fputs ("(dnri 16 MAJ_7   5)\n", dst_file);
       fputs ("(dnri 18 MAJ_7  12)\n", dst_file);
       fputs ("(dnri 19 MAJ_7  13)\n", dst_file);
+      fputs ("(dnri 25 MAJ_7   6)\n", dst_file);
+      break;
     }
-  find_line ("end non-mep-h1 reserved insns", 0, 1, 1);
+  find_line ("end core-specific reserved insns", 0, 1, 1);
 }
 
 void 
@@ -3881,7 +3893,7 @@ gen_isa_masks (Node *module, int isa_start)
 static void
 do_cgen_config_opc ()
 {
-  Node *cfgs, *modules;
+  Node *cfgs, *modules, *cop_ip;
   int vliw_bits;
   int i;
   struct cop_ip *ip;
@@ -4556,6 +4568,26 @@ static int dmem_len = 0;
 static int n_dmem = 0;
 enum {dmem_hw_bound = 6};
 
+/* Each imem/dmem area is aligned to its power-of-two enclosing block
+   size, with a given minimum alignment.  */
+static long
+align_xmem_base (long prev_xmem_base, long size, long minalign)
+{
+  while (minalign < size)
+    minalign <<= 1;
+  prev_xmem_base += minalign-1;
+  prev_xmem_base &= ~(minalign-1);
+  return prev_xmem_base;
+}
+
+static long
+next_xmem_base (long prev_xmem_base, long size, long minalign)
+{
+  long b;
+  b = align_xmem_base (prev_xmem_base, size, minalign);
+  return align_xmem_base (prev_xmem_base+size, size, minalign);
+}
+
 /* Parse the DMEM clause and cache into dmem.  
    ??? Enhance for use by find_ld_imem_dmem.  */
 
@@ -4564,6 +4596,7 @@ scan_dmem (Node *module)
 {
   const Node *item;
   long imem_size = 0;
+  long mem_base = 0x00200000;
 
   dmem_len += 32;
   dmem = xrealloc (dmem, sizeof (dmem_t) * dmem_len);
@@ -4573,7 +4606,8 @@ scan_dmem (Node *module)
   item = find_sub (module, "me_engine", "imem", "size", 0);
   if (item)
     {
-      imem_size = item->ival;
+      imem_size = item->ival * 1024;
+      mem_base = next_xmem_base (mem_base, imem_size, 0x2000);
     }
 
   /* Add the DMEM sections.  */
@@ -4588,50 +4622,9 @@ scan_dmem (Node *module)
 	  long i;
 	  if ((item = find_sub (module, "me_engine", "dmem", "fixed_start_address", 0))
 	      && strcmp (item->val, "YES") == 0)
-	    dmem_base[0] = 0x80000;
+	    dmem_base[0] = mem_base + 0x80000;
 	  else
-	    {
-	      /* 
-	       * These tables represent the dmem base address values for the various
-	       * dmem (rows) and imem (columns) combinations possible as per the 
-	       * MeP Media User's Manual Rev. 5.0, section 4.6.2.
-	       * 
-	       */
-	      int imem_limit[] = {0, 8, 16, 32};
-	      int dmem_limit[] = {0, 8, 16, 32, 64, 128};
-	      long dmem_base_address[][4] = {
-/*             imem:	none,    1-8k,  12-16k,  24-32k */
-/* dmem:    none */ {0x00000, 0x02000, 0x04000, 0x08000},
-/* dmem:   1-8k  */ {0x00000, 0x02000, 0x04000, 0x08000},
-/* dmem:  12-16k */ {0x00000, 0x04000, 0x04000, 0x08000},
-/* dmem:  24-32k */ {0x00000, 0x08000, 0x08000, 0x08000},
-/* dmem:  48-64k */ {0x00000, 0x10000, 0x10000, 0x10000},
-/* dmem: 96-128k */ {0x00000, 0x20000, 0x20000, 0x20000},
-	      };
-	      int imem_index = -1;
-	      int dmem_index = -1;
-	      /*  find the imem limit in the table.  */
-	      for (i = 0; i < sizeof (imem_limit)/sizeof (*imem_limit); i++) 
-		{
-		  if (imem_size <= imem_limit[i]) 
-		    {
-		      imem_index = i;
-		      break;
-		    }
-		}
-	      /*  find the dmem limit in the table.  */
-	      assert (dmem_size);
-	      for (i = 0; i < sizeof (dmem_limit)/sizeof (*dmem_limit); i++) 
-		{
-		  if (dmem_size <= dmem_limit[i]) 
-		    {
-		      dmem_index = i;
-		      break;
-		    }
-		}
-	      assert (dmem_index >= 0 && imem_index >= 0);
-	      dmem_base[0] = dmem_base_address[dmem_index][imem_index];
-	    }
+	    dmem_base[0] = align_xmem_base (mem_base, dmem_size, 0x2000);
 
 	  item = find_sub (module, "me_engine", "dmem", "bank_num", 0);
 	  dmem_banks = item ? item->ival : 2;
@@ -4652,7 +4645,7 @@ scan_dmem (Node *module)
 	      else 
 		dmem_base[i] = dmem_base[0] + (i * (dmem_size * 1024 / dmem_banks));
 
-	      dmem [n_dmem].origin = 0x200000 + dmem_base[i];
+	      dmem [n_dmem].origin = dmem_base[i];
 	      dmem [n_dmem].length = (dmem_size * 1024) / dmem_banks;
 	      n_dmem += 1;
 	    }
@@ -6485,8 +6478,10 @@ find_ld_sections (Gmap **vec, Gmap **hwinit, Gmap **rom, Gmap **ram)
 static void
 find_ld_imem_dmem (Node *module, Gmap **imem, Gmap **dmem)
 {
-  Node *item;
+  Node *item, *ibank;
   long imem_size = 0;
+  long banks, bank_size;
+  long mem_base = 0x00200000;
 
   *imem = NULL;
   *dmem = NULL;
@@ -6495,21 +6490,21 @@ find_ld_imem_dmem (Node *module, Gmap **imem, Gmap **dmem)
   item = find_sub (module, "me_engine", "imem", "size", 0);
   if (item)
     {
-      imem_size = item->ival;
+      imem_size = item->ival * 1024;
       if (imem_size)
 	{
 	  long bank_size;
 	  name_and_num s = {0, 0};
 
-	  if (imem_size == 6 || imem_size == 12 || imem_size == 24)
-	    bank_size = (imem_size * 1024) * 2 / 3;
-	  else
-	    bank_size = (imem_size * 1024) / 2;
+	  /* We only support 2 banks.  */
+
+	  bank_size = align_xmem_base (imem_size/2, imem_size/2, 1);
 
 	  *imem = new_gmap (0x200000, bank_size, "IMEM0", nocache, s,
-			   sc_local, memory, readwrite);
-	  (*imem)->next = new_gmap (0x200000 + bank_size, imem_size*1024 - bank_size, "IMEM1", nocache, s,
+			    sc_local, memory, readwrite);
+	  (*imem)->next = new_gmap (0x200000 + bank_size, imem_size - bank_size, "IMEM1", nocache, s,
 				    sc_local, memory, readwrite);
+	  mem_base = next_xmem_base (mem_base, imem_size, 0x2000);
 	}
     }
 
@@ -6517,7 +6512,7 @@ find_ld_imem_dmem (Node *module, Gmap **imem, Gmap **dmem)
   item = find_sub (module, "me_engine", "dmem", "size", 0);
   if (item)
     {
-      long dmem_size = item->ival;
+      long dmem_size = item->ival * 1024;
       if (dmem_size)
 	{
 	  long dmem_base[4];
@@ -6529,48 +6524,7 @@ find_ld_imem_dmem (Node *module, Gmap **imem, Gmap **dmem)
 	      && strcmp (item->val, "YES") == 0)
 	    dmem_base[0] = 0x80000;
 	  else
-	    {
-	      /* 
-	       * These tables represent the dmem base address values for the various
-	       * dmem (rows) and imem (columns) combinations possible as per the 
-	       * MeP Media User's Manual Rev. 5.0, section 4.6.2.
-	       * 
-	       */
-	      int imem_limit[] = {0, 8, 16, 32};
-	      int dmem_limit[] = {0, 8, 16, 32, 64, 128};
-	      long dmem_base_address[][4] = {
-/*             imem:	none,    1-8k,  12-16k,  24-32k */
-/* dmem:    none */ {0x00000, 0x02000, 0x04000, 0x08000},
-/* dmem:   1-8k  */ {0x00000, 0x02000, 0x04000, 0x08000},
-/* dmem:  12-16k */ {0x00000, 0x04000, 0x04000, 0x08000},
-/* dmem:  24-32k */ {0x00000, 0x08000, 0x08000, 0x08000},
-/* dmem:  48-64k */ {0x00000, 0x10000, 0x10000, 0x10000},
-/* dmem: 96-128k */ {0x00000, 0x20000, 0x20000, 0x20000},
-	      };
-	      int imem_index = -1;
-	      int dmem_index = -1;
-	      /*  find the imem limit in the table.  */
-	      for (i = 0; i < sizeof (imem_limit)/sizeof (*imem_limit); i++) 
-		{
-		  if (imem_size <= imem_limit[i]) 
-		    {
-		      imem_index = i;
-		      break;
-		    }
-		}
-	      /*  find the dmem limit in the table.  */
-	      assert (dmem_size);
-	      for (i = 0; i < sizeof (dmem_limit)/sizeof (*dmem_limit); i++) 
-		{
-		  if (dmem_size <= dmem_limit[i]) 
-		    {
-		      dmem_index = i;
-		      break;
-		    }
-		}
-	      assert (dmem_index >= 0 && imem_index >= 0);
-	      dmem_base[0] = dmem_base_address[dmem_index][imem_index];
-	    }
+	    dmem_base[0] = align_xmem_base (mem_base, dmem_size, 0x2000);
 
 	  item = find_sub (module, "me_engine", "dmem", "bank_num", 0);
 	  dmem_banks = item ? item->ival : 2;
@@ -6582,14 +6536,14 @@ find_ld_imem_dmem (Node *module, Gmap **imem, Gmap **dmem)
 	      if (((dmem_size == 6) || (dmem_size == 12) || (dmem_size == 24)) &&
 		  (dmem_banks == 2)) 
 		{ /* adjust up to the next power of two  */
-		  dmem_base[i] = dmem_base[0] + (i * ((dmem_size * 1024) * 2 / 3));	
+		  dmem_base[i] = dmem_base[0] + (i * (dmem_size * 2 / 3));	
 		} 
 	      else 
-		dmem_base[i] = dmem_base[0] + (i * (dmem_size * 1024 / dmem_banks));
+		dmem_base[i] = dmem_base[0] + (i * (dmem_size / dmem_banks));
 
 	      name = xmalloc (5 + 1);
 	      sprintf (name, "DMEM%c", '0' + i);
-	      d = new_gmap (0x200000 + dmem_base[i], (dmem_size * 1024) / dmem_banks,
+	      d = new_gmap (dmem_base[i], dmem_size / dmem_banks,
 			    name, nocache, s,
 			    sc_local, memory, readwrite);
 	      d->next = *dmem;

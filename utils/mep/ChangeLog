@@ -1,3 +1,25 @@
+2009-04-07  DJ Delorie  <dj@redhat.com>
+
+	* default.cfg: Update to C5.
+	* current.cfg: Regenerate.
+	* lex.cfg.c: Regenerate.
+	* lex.cmodel.c: Regenerate.
+	* lex.gmap.c: Regenerate.
+	* mepcfgtool.c: Add C5 support.
+	(do_config_cc_support): Allow -mconfig to be optional.
+	(align_xmem_base): New.
+	(next_xmem_base): New.
+	(scan_dmem): Use them to place memory regions.
+	(find_ld_imem_dmem): Likewise.
+	* mepcfgtool.h: Add C5 support.
+	* parse.cfg.c: Regenerate.
+	* parse.cfg.h: Regenerate.
+	* parse.cmodel.c: Regenerate.
+	* parse.cmodel.h: Regenerate.
+	* parse.gmap.c: Regenerate.
+	* parse.gmap.h: Regenerate.
+	* verify-cfg.c: Add C5 support.
+
 2009-02-02  DJ Delorie  <dj@redhat.com>
 
 	* default.cfg: Updated to new config.

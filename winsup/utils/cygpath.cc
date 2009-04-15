@@ -30,7 +30,7 @@ details. */
 #include <ddk/ntifs.h>
 #include "wide_path.h"
 
-static const char version[] = "$Revision: 1.52 $";
+static const char version[] = "$Revision: 1.53 $";
 
 static char *prog_name;
 static char *file_arg, *output_arg;
@@ -744,17 +744,20 @@ do_pathconv (char *filename)
 	    buf = get_short_name (buf);
 	  if (longname_flag)
 	    buf = get_long_name (buf, len);
+	  if (strncmp (buf, "\\\\?\\", 4) == 0)
+	    {
+	      len = 4;
+	      if (strncmp (buf + 4, "UNC\\", 4) == 0)
+		len = 6;
+	      if (strlen (buf) < MAX_PATH + len)
+		{
+		  buf += len;
+		  if (len == 6)
+		    *buf = '\\';
+		}
+	    }
 	  if (mixed_flag)
 	    buf = get_mixed_name (buf);
-	  len = 4;
-	  if (strncmp (buf, "\\\\?\\UNC\\", 8) == 0)
-	    len = 6;
-	  if (strlen (buf) < MAX_PATH + len)
-	    {
-	      buf += len;
-	      if (len == 6)
-	        *buf = '\\';
-	    }
 	}
     }
 

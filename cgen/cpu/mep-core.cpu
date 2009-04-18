@@ -455,10 +455,18 @@
 	 (cond SI ((and SI val #x80) (xor SI val #x300)) (else val)))
 	)
   )
+(define-pmacro (extend-cdisp10 val)
+  (cond SI
+	((and SI (compute-cdisp10 val) #x200)
+	 (sub (and SI (compute-cdisp10 val) #x3ff) #x400))
+	(else
+	 (and SI (compute-cdisp10 val) #x3ff))
+	)
+  )
 
-(df f-cdisp10    "cop imm10"          (all-mep-core-isas)   22  10 UINT
-    ((value pc) (compute-cdisp10 value))
-    ((value pc) (compute-cdisp10 value))
+(df f-cdisp10    "cop imm10"          (all-mep-core-isas)   22  10 INT
+    ((value pc) (extend-cdisp10 value))
+    ((value pc) (extend-cdisp10 value))
     )
 
 ; Non-contiguous fields.

@@ -325,7 +325,7 @@ union mepcore1_sem_fields {
   } sfmt_sw_sp;
   struct { /*  */
     SI* i_rma;
-    UINT f_12s20;
+    INT f_12s20;
     UINT f_crn;
     UINT f_rm;
     unsigned char in_rma;

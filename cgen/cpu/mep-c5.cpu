@@ -6,7 +6,7 @@
 (dnf f-c5n6     "extended field"     (all-mep-core-isas)   24  4)
 (dnf f-c5n7     "extended field"     (all-mep-core-isas)   28  4)
 (dnf f-rl5      "register l c5"      (all-mep-core-isas)   20  4)
-(dnf f-12s20    "extended field"     (all-mep-core-isas)   20  12)
+(df  f-12s20    "extended field"     (all-mep-core-isas)   20  12  INT #f #f)
 
 (dnop rl5       "register Rl c5"     (all-mep-core-isas) h-gpr   f-rl5)
 (dnop cdisp12   "copro addend (12 bits)" (all-mep-core-isas) h-sint  f-12s20)
@@ -190,7 +190,7 @@
      ((mep (unit u-use-gpr (in usereg rma))
 	   (unit u-exec))))
 
-(dnci lhucpm1 "lhucpm1" (OPTIONAL_CP_INSN)
+(dnci lhucpm1 "lhucpm1" (OPTIONAL_CP_INSN (MACH c5))
      "lhucpm1 $crn,($rma+),$cdisp10a2"
      (+ MAJ_15 crn rma (f-sub4 5) (f-ext4 #xd) (f-ext62 #x3) cdisp10a2)
      (sequence ()
@@ -246,18 +246,15 @@
 	   (unit u-use-gpr (in usereg rn))
 	   (unit u-exec))))
 
-(dncmi dsp0 "dsp0" ((MACH c5) NO-DIS VOLATILE)
+(dnci dsp0 "dsp0" ((MACH c5) VOLATILE NO-DIS ALIAS)
      "dsp0 $c5rnmuimm24"
-     (emit dsp
-	   (rn (sll c5rnmuimm24 20))
-	   (rm (and (sll c5rnmuimm24 16) #xf))
-	   (uimm16 (and c5rnmuimm24 #xffff)))
-     )
+     (+ MAJ_15 c5rnmuimm24 (f-sub4 0))
+     (c-call VOID "do_DSP" (zext SI c5rnmuimm24) pc)
+     ((mep (unit u-exec))))
 
-(dncmi dsp1 "dsp1" ((MACH c5) NO-DIS VOLATILE)
+(dnci dsp1 "dsp1" ((MACH c5) VOLATILE NO-DIS ALIAS)
      "dsp1 $rn,$c5rmuimm20"
-     (emit dsp
-	   rn
-	   (rm (sll c5rnmuimm24 16))
-	   (uimm16 (and c5rnmuimm24 #xffff)))
-     )
+     (+ MAJ_15 rn (f-sub4 0) c5rmuimm20)
+     (set rn (c-call SI "do_DSP" rn (zext SI c5rmuimm20) pc))
+     ((mep (unit u-use-gpr (in usereg rn))
+	   (unit u-exec))))

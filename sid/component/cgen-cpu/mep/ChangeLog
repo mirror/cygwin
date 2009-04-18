@@ -1,3 +1,10 @@
+2009-04-17  DJ Delorie  <dj@redhat.com>
+	
+	* mep-core1-decode.cxx: Regenerate.
+	* mep-core1-decode.h: Regenerate.
+	* mep-decode.cxx: Regenerate.
+	* mep-decode.h: Regenerate.
+
 2009-04-08  DJ Delorie  <dj@redhat.com>
 
 	* Makefile.am: Regenerate.

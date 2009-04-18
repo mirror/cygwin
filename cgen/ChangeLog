@@ -1,3 +1,9 @@
+2009-04-08  DJ Delorie  <dj@redhat.com>
+
+	* cpu/mep-c5.cpu: New.
+	* cpu/mep-core.cpu: Add C5 support.
+	* cpu/mep.opc: Likewise.
+
 2009-02-18  Pierre Muller  <muller@ics.u-strasbg.fr>
 
 	* opc-itab.scm (<>_cgen_init_opcode_table): Avoid compiler warning

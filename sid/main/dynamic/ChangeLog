@@ -1,3 +1,9 @@
+2009-04-08  DJ Delorie  <dj@redhat.com>
+
+	* mainDynamic.cxx: Add C5 support.
+	* mepCfg.cxx: Connect write-hint pin.
+	* mepCfg.h: Add C5 support.
+
 2009-02-03  DJ Delorie  <dj@redhat.com>
 
 	* mepCfg.cxx (MepMemCfg): Update to new MeP configuration.

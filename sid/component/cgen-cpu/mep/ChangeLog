@@ -1,3 +1,28 @@
+2009-04-08  DJ Delorie  <dj@redhat.com>
+
+	* Makefile.am: Regenerate.
+	* Makefile.in: Regenerate.
+	* mep-core1-decode.cxx: Regenerate.
+	* mep-core1-decode.h: Regenerate.
+	* mep-core1-defs.h: Regenerate.
+	* mep-core1-model.cxx: Regenerate.
+	* mep-core1-model.h: Regenerate.
+	* mep-core1-sem.cxx: Regenerate.
+	* mep-decode.cxx: Regenerate.
+	* mep-decode.h: Regenerate.
+	* mep-defs.h: Regenerate.
+	* mep-desc.h: Regenerate.
+	* mep-model.cxx: Regenerate.
+	* mep-model.h: Regenerate.
+	* mep-sem.cxx: Regenerate.
+	* mep.cxx (mep_cpu): Connect
+	write-hint pin.
+	(do_cache): Add C5 support.
+	(do_cache_prefetch): Likewise.
+	(do_casb3, do_cash3, do_casw3): New.
+	* mep.h: Add C5 support and write-hint pin.
+	(do_casb3, do_cash3, do_casw3): New.
+
 2009-02-02  DJ Delorie  <dj@redhat.com>
 
 	* Makefile.am: Update to new MeP configuration.

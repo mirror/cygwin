@@ -1,3 +1,11 @@
+2009-04-08  DJ Delorie  <dj@redhat.com>
+
+	* cache.cxx (cache_component::cache_component):
+	Add write_hint_pin().  Attach it to write-hint.
+	(cache_component::write_hint): New.
+	* cache.h (write_hint_pin): New.
+	(write_hint): New.
+
 2007-02-05  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:

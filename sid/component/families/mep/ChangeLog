@@ -1,3 +1,8 @@
+2009-04-08  DJ Delorie  <dj@redhat.com>
+
+	* Makefile.in: Regenerate.
+	* dsu.in: Add C5 support.
+
 2009-02-03  DJ Delorie  <dj@redhat.com>
 
 	* mm_int.h (no_relation_component): Update to new MeP configuration.

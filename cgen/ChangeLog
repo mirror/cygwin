@@ -1,3 +1,11 @@
+2009-04-17  DJ Delorie  <dj@redhat.com>
+
+	* cpu/mep-c5.cpu (f-12s20): Change to signed.
+	(lhucpm1): Limit to C5 mach.
+	(dsp0,dsp1): Rewrite as aliases so that intrinsics are generated.
+	* cpu/mep-core.cpu (extend-cdisp10): New.
+	(f-cdisp10): Change to signed, use extend-cdisp10 to sign extend.
+	
 2009-04-08  DJ Delorie  <dj@redhat.com>
 
 	* cpu/mep-c5.cpu: New.

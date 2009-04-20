@@ -1,3 +1,13 @@
+2009-04-20  DJ Delorie  <dj@redhat.com>
+
+	* intrinsics.scm (intrinsics-analyze!): Include aliases.
+	(guess-mode): Drop COP* syntax.
+	(need-insn): Add "--syscall--" to the list.
+	(enum-type): Drop COP* syntax.
+	(intrinsics.h): Likewise.
+	(intrinsic-protos.h): Change file header to allow it to be
+	included.
+
 2009-04-17  DJ Delorie  <dj@redhat.com>
 
 	* cpu/mep-c5.cpu (f-12s20): Change to signed.

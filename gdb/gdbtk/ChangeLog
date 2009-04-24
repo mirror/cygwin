@@ -1,3 +1,14 @@
+2009-04-23  Keith Seitz  <keiths@redhat.com>
+
+	* library/targetselection.itb (init_target_db): Add comment
+	about "arguments" vs "options" on native debuggers.
+	(build_win): If the target is "default", choose "Exec" for native
+	debuggers. For cross debuggers, let the user choose.
+	(write_saved): For exec targets, save target options to gdb via
+	gdb_set_inferior_args.
+	(config_dialog): For "exec" targets, save gdb's stored arguments
+	into the options preference.
+
 2009-04-07  Pierre Muller  <muller.u-strasbg.fr²>
 
 	ARI fix: Use "gdb_stat.h" header instead of <sys/stat.h>.

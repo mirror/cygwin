@@ -1,5 +1,10 @@
 2009-04-23  Keith Seitz  <keiths@redhat.com>
 
+	* library/vartree.itb (constructor): Remove the borderwidth 0
+	argument.
+
+2009-04-23  Keith Seitz  <keiths@redhat.com>
+
 	* library/mempref.itb (build_win): Replace libgui's "Labelledframe"
 	with the iwidget's LabeledFrame. Replaced all occurrances.
 	* libarary/memwin.itb (create_prefs): Use ManagedWin::open_dlg

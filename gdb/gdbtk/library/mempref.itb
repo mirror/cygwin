@@ -1,5 +1,5 @@
 # Memory display preferences window for Insight.
-# Copyright (C) 1998, 1999, 2002, 2003, 2006 Red Hat
+# Copyright (C) 1998, 1999, 2002, 2003, 2006, 2009 Red Hat, Inc
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License (GPL) as published by
@@ -72,8 +72,8 @@ itcl::body MemPref::build_win {} {
   frame $itk_interior.f.b
 
   # SIZE
-  Labelledframe $f.f1 -anchor nw -text Size
-  set fr [$f.f1 get_frame]
+  iwidgets::Labeledframe $f.f1 -labelpos nw -labeltext [gettext "Size"]
+  set fr [$f.f1 childsite]
 
   set Widgets(rb-Byte) [radiobutton $fr.1 -variable [scope gsize] -text Byte \
 			  -value 1 -command [code $this enable_format]]
@@ -91,8 +91,8 @@ itcl::body MemPref::build_win {} {
   grid $fr.2 $fr.8 $fr.d -sticky w -padx 4
 
   # FORMAT
-  Labelledframe $f.f2 -anchor nw -text Format
-  set fr [$f.f2 get_frame]
+  iwidgets::Labeledframe $f.f2 -labelpos nw -labeltext [gettext "Format"]
+  set fr [$f.f2 childsite]
   set Widgets(rb-binary) [radiobutton $fr.1 -variable [scope gformat] \
 			    -text Binary -value t]
   set Widgets(rb-octal) [radiobutton $fr.2 -variable [scope gformat] \
@@ -108,7 +108,8 @@ itcl::body MemPref::build_win {} {
   grid $fr.4 $fr.5 x -sticky w -padx 4
 
   # TOTAL BYTES
-  Labelledframe $f.fx -anchor nw -text "Number of Bytes"
+  iwidgets::Labeledframe $f.fx -labelpos nw \
+      -labeltext [gettext "Number of Bytes"]
 
   if {$gnumbytes == 0} {
     set gnumbytes $default_numbytes
@@ -117,7 +118,7 @@ itcl::body MemPref::build_win {} {
     set gvar 1
   }
 
-  set fr [$f.fx get_frame] 
+  set fr [$f.fx childsite]
   set Widgets(rb-win_size) [radiobutton $fr.1 -variable [scope gvar] -text "Depends on window size" \
 			      -value 0 -command [code $this toggle_size_control]]
   frame $fr.2
@@ -143,8 +144,9 @@ itcl::body MemPref::build_win {} {
   grid columnconfigure $fr 1 -weight 1
 
   # MISC
-  Labelledframe $f.1 -anchor nw -text "Miscellaneous"
-  set fr [$f.1 get_frame] 
+  iwidgets::Labeledframe $f.1 -labelpos nw \
+      -labeltext [gettext "Miscellaneous"]
+  set fr [$f.1 childsite]
   frame $fr.1
   label $fr.1.plabel -height 1 -width 1 -bg $color -relief raised  
   set Widgets(b-color) [button $fr.1.pc -text "Change color..."  \

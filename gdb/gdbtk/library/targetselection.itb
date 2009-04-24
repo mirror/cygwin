@@ -74,6 +74,8 @@ itcl::body TargetSelection::init_target_db {} {
   set gdb_target(exec,baud-rates) {}
   set gdb_target(exec,cmd) ""
   set gdb_target(exec,runlist) {0 0 1 0}
+  # NOTE: for native "options", we use the sessions-stored preference
+  # which is really inferior arguments
   set gdb_target(exec,options) ""
   set gdb_target(exec,after_attaching) {}
 
@@ -589,6 +591,12 @@ itcl::body TargetSelection::build_win {} {
   pack $MoreFrame -fill x -expand yes
   pack $f $opts -side top -fill x
 
+  # If the target is set to "default", select an appropriate
+  # default: on native debuggers, choose "Exec"; otherwise, make
+  # the user choose.
+  if {[string compare $target "default"] == 0 && [native_debugging]} {
+    set target exec
+  }
   change_target $gdb_target($target,pretty-name)
 
   button $btns.ok -text [gettext OK] -width 7 -command [code $this save] \
@@ -657,6 +665,10 @@ itcl::body TargetSelection::write_saved {} {
   pref setd gdb/load/$target-runlist [list $saved_attach $saved_load $saved_run $saved_cont]
   if {[info exists gdb_target($target,options)]} {
     pref setd gdb/load/$target-opts $saved_options
+
+    # For the case of "exec" targets, also save the options
+    # so that the command line picks them up.
+    gdb_set_inferior_args $saved_options
   }
   if {[catch {$_after_entry get} saved_after_attaching]} {
     set saved_after_attaching ""
@@ -785,6 +797,8 @@ itcl::body TargetSelection::config_dialog {t} {
       # FIXME: this is really overloaded!!
       if {$t == "exec"} {
 	set text "Arguments:"
+        # Also set the target options to the session's saved arguments
+        pref set gdb/load/$t-opts [gdb_get_inferior_args]
       } else {
 	set text "Options:"
       }
@@ -808,7 +822,6 @@ itcl::body TargetSelection::change_target {w {name ""}} {
     $RunMethod.cont configure -state normal
   }
 
-  debug "$target"
   set defbaud $gdb_target($target,defbaud)
   pref define gdb/load/$target-baud $defbaud
   pref define gdb/load/$target-portname 1000

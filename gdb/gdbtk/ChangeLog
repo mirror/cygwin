@@ -1,5 +1,12 @@
 2009-04-23  Keith Seitz  <keiths@redhat.com>
 
+	* library/mempref.itb (build_win): Replace libgui's "Labelledframe"
+	with the iwidget's LabeledFrame. Replaced all occurrances.
+	* libarary/memwin.itb (create_prefs): Use ManagedWin::open_dlg
+	instead of ManagedWin::open.
+
+2009-04-23  Keith Seitz  <keiths@redhat.com>
+
 	* library/targetselection.itb (init_target_db): Add comment
 	about "arguments" vs "options" on native debuggers.
 	(build_win): If the target is "default", choose "Exec" for native

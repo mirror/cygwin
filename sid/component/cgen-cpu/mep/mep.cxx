@@ -106,6 +106,7 @@ mep_cpu::mep_cpu ()
   add_attribute ("mul-option?",    &insn_options[MUL],    "setting");
   add_attribute ("sat-option?",    &insn_options[SAT],    "setting");
   add_attribute ("uci-option?",    &insn_options[UCI],    "setting"); 
+  add_attribute ("ivc2-decode?",   &ivc2_decode_p,        "setting"); 
   add_attribute ("warn-write-to-code-option?", &warn_write_to_code, "setting");
   add_attribute ("dsp-user-out-option?", &dsp_user_out, "setting");
   add_attribute ("corrupt-caches?", &corrupt_caches, "setting");
@@ -1471,6 +1472,9 @@ mep_cpu::step_insns()
 {
   PCADDR save_pc;
   stepping = true;
+
+  this->h_regs_flush_write_queue ();
+
   while (true)
     {
       // Check whether the scaches need to be flushed.
@@ -1527,6 +1531,9 @@ mep_cpu::step_insns()
 	{
 	  // Call down to VLIW or non-VLIW steppers
 	  s = this->step_one_insn (pc, insn_size);
+
+	  // Now copy any queued writes to the main registers.
+	  this->h_regs_flush_write_queue ();
 
 	  // Handle fresh DSP exception
 	  if (UNLIKELY (this->dsp_exception_pending_p))

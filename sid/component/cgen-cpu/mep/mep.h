@@ -13,6 +13,11 @@ using namespace cgen;
 
 #include "mep-desc.h"
 
+/* This is a hack.  This function is in libopcodes; we call it to tell
+   the disassembler what mode and slot we want the bits disassembled
+   for.  */
+extern "C" void mep_print_insn_set_ivc2_mode (int, int, int);
+
 using sidutil::callback_pin;
 
 // begin-fpu-includes
@@ -25,6 +30,7 @@ namespace mep
       // Include cgen generated elements.
 #include "mep-cpu.h"
 // begin-copro-cpu-includes
+#include "ivc2-cpu.h"
 // end-copro-cpu-includes
 
     public:
@@ -40,6 +46,51 @@ namespace mep
 	{
 	  cerr << "mep-cpu rtx error: " << msg << endl;
 	}
+
+      // Each queue is a list of which foo_w[] registers need to be
+      // copied back to the foo[] registers after an insn bundle
+      // cycle.
+      unsigned char cr64_queue[64]; /* num regs * num parallel insns */
+      unsigned int  cr64_queuelen;
+      unsigned char ccr_queue[64]; /* num regs * num parallel insns */
+      unsigned int  ccr_queuelen;
+
+      inline void h_cr64_queue_set (int index, DI newval)
+        {
+	  hardware.h_cr64_w[index] = newval;
+	  cr64_queue[cr64_queuelen++] = index;
+        }
+      inline void h_ccr_queue_set (int index, DI newval)
+        {
+	  hardware.h_ccr_w[index] = newval;
+	  ccr_queue[ccr_queuelen++] = index;
+        }
+      inline void h_regs_flush_write_queue ()
+        {
+  	  while (cr64_queuelen)
+	    {
+	      -- cr64_queuelen;
+	      hardware.h_cr64 [cr64_queue [cr64_queuelen]]
+		= hardware.h_cr64_w [cr64_queue [cr64_queuelen]];
+	    }
+	  while (ccr_queuelen)
+	    {
+	      -- ccr_queuelen;
+	      hardware.h_ccr [ccr_queue [ccr_queuelen]]
+		= hardware.h_ccr_w [ccr_queue [ccr_queuelen]];
+	    }
+      }
+
+      // IVC2 instructions
+      enum ivc2_slot_types {
+	IVC2_CORE, IVC2_C3, IVC2_P0S, IVC2_P0, IVC2_P1
+      };
+      enum ivc2_slot_types ivc2_slot;
+
+      mep_cpu_cgen()
+	: cr64_queuelen(0),
+	  ccr_queuelen(0)
+        { }
     };
 
   class debugger_bus_with_control_bus_vision :
@@ -242,6 +293,8 @@ namespace mep
       bool step_insn_count_1_required;
       bool hwe_option;
       bool bit_insn_p;
+      bool ivc2_decode_p;
+      USI p0_insn, p1_insn;
       sid::host_int_4 config_index;
       int cop_data_bus_width;
       int dsp_dmem_if_width;
@@ -252,7 +305,7 @@ namespace mep
       static const int CORE_C2 = 0x02;
       static const int CORE_C3 = 0x03;
       static const int CORE_C4 = 0x04;
-      static const int CORE_C5 = 0x50;
+      static const int CORE_C5 = 0x08;
       static const int CORE_H1 = 0x10;
       int core_type () const { return (h_csr_get (17) >> 8) & 0xff; }
       int machine () const { switch (core_type ()) {
@@ -385,12 +438,18 @@ namespace mep
 	cgen_bitset_add (isas, isa);
 	host_int_4 save_passthrough = this->downstream_passthrough_pin.recall ();
 	downstream_passthrough_pin.on ();
+	if (ivc2_decode_p)
+	  mep_print_insn_set_ivc2_mode (ivc2_decode_p,
+					(h_csr_get (16) & 0x1000) && (h_csr_get (26) & 0x40),
+					config_index);
 	cgen_bi_endian_cpu::disassemble (pc, print_insn_mep,
 					 bfd_target_elf_flavour,
 					 bfd_arch_mep,
 					 (current_endianness() == endian_little ?
 					 BFD_ENDIAN_LITTLE : BFD_ENDIAN_BIG),
 					 machine_name (), isas, machine ());
+	if (ivc2_decode_p)
+	  mep_print_insn_set_ivc2_mode (0, 0, 0);
 	downstream_passthrough_pin.set (save_passthrough);
       }
 
@@ -462,6 +521,7 @@ namespace mep
       MEP_COPRO_32,
       MEP_COPRO_64,
       MEP_CORE_16_COPRO_16, MEP_CORE_16_COPRO_48, MEP_CORE_32_COPRO_32,
+      MEP_IVC2_V1, MEP_IVC2_V2, MEP_IVC2_V3,
     };
   
   template <class CPU, class CORE, class VLIW16, class VLIW32, class VLIW48, class VLIW64>
@@ -566,8 +626,18 @@ namespace mep
       {
 	// We are in vliw64 mode.  We have to find the instruction
 	// proportions before we continue.
+
+	if (ivc2_decode_p)
+	  {
+	    if ((insn_0 & 0xf00f) == 0xf007)
+	      result = MEP_IVC2_V3;
+	    else if ((insn_0 & 0xc000) == 0xc000)
+	      result = MEP_IVC2_V2;
+	    else
+	      result = MEP_IVC2_V1;
+	  }
       
-	if ((insn_0 & 0x8000) && (insn_0 & 0x4000))
+	else if ((insn_0 & 0x8000) && (insn_0 & 0x4000))
 	  {
 	    // We either have a 64-bit copro insn or a 32-bit
 	    // core insn with a 32-bit copro insn.
@@ -602,7 +672,11 @@ namespace mep
       {
 	// Core mode.
       
-	if ((insn_0 & 0x8000) && (insn_0 & 0x4000))
+	if ( ivc2_decode_p
+	     && ((insn_0 & 0xf000) == 0xf000)
+	     && ((insn_0 & 0x000f) == 0x0007) )
+	  result = MEP_COPRO_32;
+	else if ((insn_0 & 0x8000) && (insn_0 & 0x4000))
 	  result = MEP_CORE_32;
 	else
 	  result = MEP_CORE_16;
@@ -618,6 +692,9 @@ namespace mep
 	   result == MEP_CORE_16_COPRO_16 ? "core-16-copro-16" :
 	   result == MEP_CORE_16_COPRO_48 ? "core-16-copro-48" :
 	   result == MEP_CORE_32_COPRO_32 ? "core-32-copro-32" :
+	   result == MEP_IVC2_V1 ? "ivc2-v1" :
+	   result == MEP_IVC2_V2 ? "ivc2-v2" :
+	   result == MEP_IVC2_V3 ? "ivc2-v3" :
 	   "core-?-copro-?") << " ";
       }
 
@@ -802,6 +879,106 @@ namespace mep
 	}
 	break;
 
+      // IVC instructions need to be unpacked; they're not
+      // byte-aligned.  CGEN encodes these msb-justified in a 32 bit
+      // word in a single list (p0/p1 format) with a SLOTS attribute
+      // that says which instructions can run in which slots.  The p0s
+      // instructions are zero-extended to 28 bits, then treated as p0
+      // instructions.
+
+      // We use COP16 for p0s instructions, COP48 for p0, and COP64
+      // for p1.  COP32 is used for 32-bit core-mode insns.  We store
+      // the unpacked instructions in p0_insn and p1_insn.
+
+      case MEP_IVC2_V1:
+	{
+	  // 01234567 01234567 01234567 01234567 01234567 01234567 01234567 01234567
+	  // [-----core------] [--------p0s---------][--------------p1-------------]
+	  insn_size = 8;
+	  UHI insn_1 = GETIMEMHI (pc, pc + 2);
+	  UHI insn_2 = GETIMEMHI (pc, pc + 4);
+	  UHI insn_3 = GETIMEMHI (pc, pc + 6);
+
+	  bool found;
+	  sem = this->engine_core.find (pc, found);
+	  if (UNLIKELY (! found))
+	    {
+	      USI insn = (insn_0 << 16);
+	      sem->decode (thisp, pc, insn, insn);
+	    }
+
+	  sem_cop_16 = this->engine_cop_16.find (pc, found);
+	  if (UNLIKELY (! found))
+	    {
+	      p0_insn = (insn_1 << 8) | ((insn_2 >> 8) & 0xf0);
+	      sem_cop_16->decode (thisp, pc, p0_insn, p0_insn);
+	    }
+
+	  sem_cop_64 = this->engine_cop_64.find (pc, found);
+	  if (UNLIKELY (! found))
+	    {
+	      p1_insn = (insn_2 << 20) | (insn_3 << 4);
+	      sem_cop_64->decode (thisp, pc, p1_insn, p1_insn);
+	    }
+	}
+	break;
+
+      case MEP_IVC2_V2:
+	{
+	  // 01234567 01234567 01234567 01234567 01234567 01234567 01234567 01234567
+	  // [---------------core--------------] xxxx[--------------p1-------------]
+	  insn_size = 8;
+	  UHI insn_1 = GETIMEMHI (pc, pc + 2);
+	  UHI insn_2 = GETIMEMHI (pc, pc + 4);
+	  UHI insn_3 = GETIMEMHI (pc, pc + 6);
+
+	  bool found;
+	  sem = this->engine_core.find (pc, found);
+	  if (UNLIKELY (! found))
+	    {
+	      USI insn = (insn_0 << 16) | insn_1;
+	      sem->decode (thisp, pc, insn, insn);
+	    }
+
+	  sem_cop_64 = this->engine_cop_64.find (pc, found);
+	  if (UNLIKELY (! found))
+	    {
+	      p1_insn = (insn_2 << 20) | (insn_3 << 4);
+	      sem_cop_64->decode (thisp, pc, p1_insn, p1_insn);
+	    }
+	}
+	break;
+
+      case MEP_IVC2_V3:
+	{
+	  // 01234567 01234567 01234567 01234567 01234567 01234567 01234567 01234567
+	  // 1111[--p0---]0111 [--------p0----------][--------------p1-------------]
+	  //     1234 5678     12345678 12345678 12345678
+
+	  insn_size = 8;
+	  UHI insn_1 = GETIMEMHI (pc, pc + 2);
+	  UHI insn_2 = GETIMEMHI (pc, pc + 4);
+	  UHI insn_3 = GETIMEMHI (pc, pc + 6);
+
+	  bool found;
+	  sem_cop_48 = this->engine_cop_48.find (pc, found);
+	  if (UNLIKELY (! found))
+	    {
+	      p0_insn = (((insn_0 << 20) & 0xff000000)
+			 | (insn_1 << 8)
+			 | ((insn_2 >> 8) & 0xf0));
+	      sem_cop_48->decode (thisp, pc, p0_insn, p0_insn);
+	    }
+
+	  sem_cop_64 = this->engine_cop_64.find (pc, found);
+	  if (UNLIKELY (! found))
+	    {
+	      p1_insn = (insn_2 << 20) | (insn_3 << 4);
+	      sem_cop_64->decode (thisp, pc, p1_insn, p1_insn);
+	    }
+	}
+	break;
+
       case MEP_BUNDLING_UNKNOWN:
       default:
 	// Shouldn't happen.
@@ -818,9 +995,20 @@ namespace mep
 	cycles = 1;
       }
 
+    if (ivc2_decode_p)
+      {
+	// For IVC2 we disassemble the whole bundle at once, rather
+	// than one insn at a time like we do for other coprocessors,
+	// as the disassembler needs to know which slot each insn
+	// comes from.
+	if (UNLIKELY (trace_disass_p))
+	  this->disassemble (pc, (b == MEP_COPRO_32) ? cop32isa : coreisa);
+      }
+
     s = SEM_STATUS_NORMAL;
     if (sem) 
       {
+	ivc2_slot = IVC2_CORE;
 	if (UNLIKELY (trace_counter_p || final_insn_count_p))
 	  {
 	    // Determine whether there was insn fetch latency. If so,
@@ -861,7 +1049,7 @@ namespace mep
 	    this->set_total_latency (pre_fetch_latency + this->pending_latency);
 	    this->pending_latency = 0;
 	  }
-	if (UNLIKELY (trace_disass_p))
+	if (UNLIKELY (trace_disass_p && !ivc2_decode_p))
 	  {
 	    if (LIKELY (! dsp_user_out
 			|| !(sem->idesc->attrs.bools & (1 << CGEN_INSN_OPTIONAL_DSP_INSN))))
@@ -883,11 +1071,11 @@ namespace mep
 
     if (sem_cop_16)
       {
-	if (UNLIKELY (trace_disass_p))
+	ivc2_slot = IVC2_P0S;
+	if (UNLIKELY (trace_disass_p && !ivc2_decode_p))
 	  this->disassemble (pc + 2, cop16isa);
 	if (UNLIKELY (trace_semantics_p))
 	  this->begin_trace (pc, sem_cop_16->idesc->insn_name);
-
 	sem_status s1 = sem_cop_16->idesc->execute (thisp, sem_cop_16);
 	if (UNLIKELY (trace_counter_p || final_insn_count_p))
 	  {
@@ -897,14 +1085,15 @@ namespace mep
 	  }
 	if (s1 != SEM_STATUS_NORMAL) s = s1;
       }
-    else if (sem_cop_32)
+    if (sem_cop_32)
       {
+	ivc2_slot = IVC2_C3;
 	if (UNLIKELY (trace_counter_p && b == MEP_COPRO_32))
 	  {
 	    this->trace_stream << ((h_csr_get (17) >> 16) & 0xff) << " ";
 	    this->trace_counter (pc);
 	  }
-	if (UNLIKELY (trace_disass_p))
+	if (UNLIKELY (trace_disass_p && !ivc2_decode_p))
 	  {
 	    if (b == MEP_COPRO_32)
 	      this->disassemble (pc, cop32isa);
@@ -923,9 +1112,10 @@ namespace mep
 	  }
 	if (s1 != SEM_STATUS_NORMAL) s = s1;
       }
-    else if (sem_cop_48)
+    if (sem_cop_48)
       {
-	if (UNLIKELY (trace_disass_p))
+	ivc2_slot = IVC2_P0;
+	if (UNLIKELY (trace_disass_p && !ivc2_decode_p))
 	  this->disassemble (pc + 2, cop48isa);
 	if (UNLIKELY (trace_semantics_p))
 	  this->begin_trace (pc, sem_cop_48->idesc->insn_name);
@@ -939,14 +1129,15 @@ namespace mep
 	  }
 	if (s1 != SEM_STATUS_NORMAL) s = s1;
       }
-    else if (sem_cop_64)
+    if (sem_cop_64)
       {
+	ivc2_slot = IVC2_P1;
 	if (UNLIKELY (trace_counter_p))
 	  {
 	    this->trace_stream << ((h_csr_get (17) >> 16) & 0xff) << " ";
 	    this->trace_counter (pc);
 	  }
-	if (UNLIKELY (trace_disass_p))
+	if (UNLIKELY (trace_disass_p && !ivc2_decode_p))
 	  this->disassemble (pc, cop64isa);
 	if (UNLIKELY (trace_semantics_p))
 	  this->begin_trace (pc, sem_cop_64->idesc->insn_name);

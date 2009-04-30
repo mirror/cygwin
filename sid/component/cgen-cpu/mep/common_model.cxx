@@ -38,6 +38,10 @@ mep_common_model<BASE, CPU, IDESC, SCACHE>::model_u_ldcb_before (CPU *cpu, const
 // begin-generated-instantiations
 template UINT mep_common_model<mep_mep_model,mep_basic_cpu,mep_idesc,mep_scache>::model_u_ldcb_before (mep_basic_cpu *, const mep_idesc *, int unit_num);
 template UINT mep_common_model<mepcore1_mep_model,mep_ext1_cpu,mepcore1_idesc,mepcore1_scache>::model_u_ldcb_before (mep_ext1_cpu *, const mepcore1_idesc *, int unit_num);
+template UINT mep_common_model<mepcop1_16_mep_model,mep_ext1_cpu,mepcop1_16_idesc,mepcop1_16_scache>::model_u_ldcb_before (mep_ext1_cpu *, const mepcop1_16_idesc *, int unit_num);
+template UINT mep_common_model<mepcop1_32_mep_model,mep_ext1_cpu,mepcop1_32_idesc,mepcop1_32_scache>::model_u_ldcb_before (mep_ext1_cpu *, const mepcop1_32_idesc *, int unit_num);
+template UINT mep_common_model<mepcop1_48_mep_model,mep_ext1_cpu,mepcop1_48_idesc,mepcop1_48_scache>::model_u_ldcb_before (mep_ext1_cpu *, const mepcop1_48_idesc *, int unit_num);
+template UINT mep_common_model<mepcop1_64_mep_model,mep_ext1_cpu,mepcop1_64_idesc,mepcop1_64_scache>::model_u_ldcb_before (mep_ext1_cpu *, const mepcop1_64_idesc *, int unit_num);
 // end-generated-instantiations
 
 template <class BASE, class CPU, class IDESC, class SCACHE>
@@ -52,6 +56,10 @@ mep_common_model<BASE, CPU, IDESC, SCACHE>::model_u_divide_before (CPU *cpu, con
 // begin-generated-instantiations
 template UINT mep_common_model<mep_mep_model,mep_basic_cpu,mep_idesc,mep_scache>::model_u_divide_before (mep_basic_cpu *, const mep_idesc *, int unit_num);
 template UINT mep_common_model<mepcore1_mep_model,mep_ext1_cpu,mepcore1_idesc,mepcore1_scache>::model_u_divide_before (mep_ext1_cpu *, const mepcore1_idesc *, int unit_num);
+template UINT mep_common_model<mepcop1_16_mep_model,mep_ext1_cpu,mepcop1_16_idesc,mepcop1_16_scache>::model_u_divide_before (mep_ext1_cpu *, const mepcop1_16_idesc *, int unit_num);
+template UINT mep_common_model<mepcop1_32_mep_model,mep_ext1_cpu,mepcop1_32_idesc,mepcop1_32_scache>::model_u_divide_before (mep_ext1_cpu *, const mepcop1_32_idesc *, int unit_num);
+template UINT mep_common_model<mepcop1_48_mep_model,mep_ext1_cpu,mepcop1_48_idesc,mepcop1_48_scache>::model_u_divide_before (mep_ext1_cpu *, const mepcop1_48_idesc *, int unit_num);
+template UINT mep_common_model<mepcop1_64_mep_model,mep_ext1_cpu,mepcop1_64_idesc,mepcop1_64_scache>::model_u_divide_before (mep_ext1_cpu *, const mepcop1_64_idesc *, int unit_num);
 // end-generated-instantiations
 
 template <class BASE, class CPU, class IDESC, class SCACHE>
@@ -66,6 +74,10 @@ mep_common_model<BASE, CPU, IDESC, SCACHE>::model_u_multiply_before (CPU *cpu, c
 // begin-generated-instantiations
 template UINT mep_common_model<mep_mep_model,mep_basic_cpu,mep_idesc,mep_scache>::model_u_multiply_before (mep_basic_cpu *, const mep_idesc *, int unit_num);
 template UINT mep_common_model<mepcore1_mep_model,mep_ext1_cpu,mepcore1_idesc,mepcore1_scache>::model_u_multiply_before (mep_ext1_cpu *, const mepcore1_idesc *, int unit_num);
+template UINT mep_common_model<mepcop1_16_mep_model,mep_ext1_cpu,mepcop1_16_idesc,mepcop1_16_scache>::model_u_multiply_before (mep_ext1_cpu *, const mepcop1_16_idesc *, int unit_num);
+template UINT mep_common_model<mepcop1_32_mep_model,mep_ext1_cpu,mepcop1_32_idesc,mepcop1_32_scache>::model_u_multiply_before (mep_ext1_cpu *, const mepcop1_32_idesc *, int unit_num);
+template UINT mep_common_model<mepcop1_48_mep_model,mep_ext1_cpu,mepcop1_48_idesc,mepcop1_48_scache>::model_u_multiply_before (mep_ext1_cpu *, const mepcop1_48_idesc *, int unit_num);
+template UINT mep_common_model<mepcop1_64_mep_model,mep_ext1_cpu,mepcop1_64_idesc,mepcop1_64_scache>::model_u_multiply_before (mep_ext1_cpu *, const mepcop1_64_idesc *, int unit_num);
 // end-generated-instantiations
 
 template <class BASE, class CPU, class IDESC, class SCACHE>
@@ -80,6 +92,10 @@ mep_common_model<BASE, CPU, IDESC, SCACHE>::model_u_use_ctrl_reg_before (CPU *cp
 // begin-generated-instantiations
 template UINT mep_common_model<mep_mep_model,mep_basic_cpu,mep_idesc,mep_scache>::model_u_use_ctrl_reg_before (mep_basic_cpu *, const mep_idesc *, int unit_num, INT usereg);
 template UINT mep_common_model<mepcore1_mep_model,mep_ext1_cpu,mepcore1_idesc,mepcore1_scache>::model_u_use_ctrl_reg_before (mep_ext1_cpu *, const mepcore1_idesc *, int unit_num, INT usereg);
+template UINT mep_common_model<mepcop1_16_mep_model,mep_ext1_cpu,mepcop1_16_idesc,mepcop1_16_scache>::model_u_use_ctrl_reg_before (mep_ext1_cpu *, const mepcop1_16_idesc *, int unit_num, INT usereg);
+template UINT mep_common_model<mepcop1_32_mep_model,mep_ext1_cpu,mepcop1_32_idesc,mepcop1_32_scache>::model_u_use_ctrl_reg_before (mep_ext1_cpu *, const mepcop1_32_idesc *, int unit_num, INT usereg);
+template UINT mep_common_model<mepcop1_48_mep_model,mep_ext1_cpu,mepcop1_48_idesc,mepcop1_48_scache>::model_u_use_ctrl_reg_before (mep_ext1_cpu *, const mepcop1_48_idesc *, int unit_num, INT usereg);
+template UINT mep_common_model<mepcop1_64_mep_model,mep_ext1_cpu,mepcop1_64_idesc,mepcop1_64_scache>::model_u_use_ctrl_reg_before (mep_ext1_cpu *, const mepcop1_64_idesc *, int unit_num, INT usereg);
 // end-generated-instantiations
 
 template <class BASE, class CPU, class IDESC, class SCACHE>
@@ -95,6 +111,10 @@ mep_common_model<BASE, CPU, IDESC, SCACHE>::model_u_use_gpr_before (CPU *cpu, co
 // begin-generated-instantiations
 template UINT mep_common_model<mep_mep_model,mep_basic_cpu,mep_idesc,mep_scache>::model_u_use_gpr_before (mep_basic_cpu *, const mep_idesc *, int unit_num, INT usereg);
 template UINT mep_common_model<mepcore1_mep_model,mep_ext1_cpu,mepcore1_idesc,mepcore1_scache>::model_u_use_gpr_before (mep_ext1_cpu *, const mepcore1_idesc *, int unit_num, INT usereg);
+template UINT mep_common_model<mepcop1_16_mep_model,mep_ext1_cpu,mepcop1_16_idesc,mepcop1_16_scache>::model_u_use_gpr_before (mep_ext1_cpu *, const mepcop1_16_idesc *, int unit_num, INT usereg);
+template UINT mep_common_model<mepcop1_32_mep_model,mep_ext1_cpu,mepcop1_32_idesc,mepcop1_32_scache>::model_u_use_gpr_before (mep_ext1_cpu *, const mepcop1_32_idesc *, int unit_num, INT usereg);
+template UINT mep_common_model<mepcop1_48_mep_model,mep_ext1_cpu,mepcop1_48_idesc,mepcop1_48_scache>::model_u_use_gpr_before (mep_ext1_cpu *, const mepcop1_48_idesc *, int unit_num, INT usereg);
+template UINT mep_common_model<mepcop1_64_mep_model,mep_ext1_cpu,mepcop1_64_idesc,mepcop1_64_scache>::model_u_use_gpr_before (mep_ext1_cpu *, const mepcop1_64_idesc *, int unit_num, INT usereg);
 // end-generated-instantiations
 
 template <class BASE, class CPU, class IDESC, class SCACHE>
@@ -117,6 +137,10 @@ mep_common_model<BASE, CPU, IDESC, SCACHE>::model_u_branch_after (CPU *cpu, cons
 // begin-generated-instantiations
 template UINT mep_common_model<mep_mep_model,mep_basic_cpu,mep_idesc,mep_scache>::model_u_branch_after (mep_basic_cpu *, const mep_idesc *, int unit_num, unsigned long long referenced);
 template UINT mep_common_model<mepcore1_mep_model,mep_ext1_cpu,mepcore1_idesc,mepcore1_scache>::model_u_branch_after (mep_ext1_cpu *, const mepcore1_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_16_mep_model,mep_ext1_cpu,mepcop1_16_idesc,mepcop1_16_scache>::model_u_branch_after (mep_ext1_cpu *, const mepcop1_16_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_32_mep_model,mep_ext1_cpu,mepcop1_32_idesc,mepcop1_32_scache>::model_u_branch_after (mep_ext1_cpu *, const mepcop1_32_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_48_mep_model,mep_ext1_cpu,mepcop1_48_idesc,mepcop1_48_scache>::model_u_branch_after (mep_ext1_cpu *, const mepcop1_48_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_64_mep_model,mep_ext1_cpu,mepcop1_64_idesc,mepcop1_64_scache>::model_u_branch_after (mep_ext1_cpu *, const mepcop1_64_idesc *, int unit_num, unsigned long long referenced);
 // end-generated-instantiations
 
 template <class BASE, class CPU, class IDESC, class SCACHE>
@@ -134,6 +158,10 @@ mep_common_model<BASE, CPU, IDESC, SCACHE>::model_u_multiply_after (CPU *cpu, co
 // begin-generated-instantiations
 template UINT mep_common_model<mep_mep_model,mep_basic_cpu,mep_idesc,mep_scache>::model_u_multiply_after (mep_basic_cpu *, const mep_idesc *, int unit_num, unsigned long long referenced);
 template UINT mep_common_model<mepcore1_mep_model,mep_ext1_cpu,mepcore1_idesc,mepcore1_scache>::model_u_multiply_after (mep_ext1_cpu *, const mepcore1_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_16_mep_model,mep_ext1_cpu,mepcop1_16_idesc,mepcop1_16_scache>::model_u_multiply_after (mep_ext1_cpu *, const mepcop1_16_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_32_mep_model,mep_ext1_cpu,mepcop1_32_idesc,mepcop1_32_scache>::model_u_multiply_after (mep_ext1_cpu *, const mepcop1_32_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_48_mep_model,mep_ext1_cpu,mepcop1_48_idesc,mepcop1_48_scache>::model_u_multiply_after (mep_ext1_cpu *, const mepcop1_48_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_64_mep_model,mep_ext1_cpu,mepcop1_64_idesc,mepcop1_64_scache>::model_u_multiply_after (mep_ext1_cpu *, const mepcop1_64_idesc *, int unit_num, unsigned long long referenced);
 // end-generated-instantiations
 
 template <class BASE, class CPU, class IDESC, class SCACHE>
@@ -151,6 +179,10 @@ mep_common_model<BASE, CPU, IDESC, SCACHE>::model_u_stcb_after (CPU *cpu, const 
 // begin-generated-instantiations
 template UINT mep_common_model<mep_mep_model,mep_basic_cpu,mep_idesc,mep_scache>::model_u_stcb_after (mep_basic_cpu *, const mep_idesc *, int unit_num, unsigned long long referenced);
 template UINT mep_common_model<mepcore1_mep_model,mep_ext1_cpu,mepcore1_idesc,mepcore1_scache>::model_u_stcb_after (mep_ext1_cpu *, const mepcore1_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_16_mep_model,mep_ext1_cpu,mepcop1_16_idesc,mepcop1_16_scache>::model_u_stcb_after (mep_ext1_cpu *, const mepcop1_16_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_32_mep_model,mep_ext1_cpu,mepcop1_32_idesc,mepcop1_32_scache>::model_u_stcb_after (mep_ext1_cpu *, const mepcop1_32_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_48_mep_model,mep_ext1_cpu,mepcop1_48_idesc,mepcop1_48_scache>::model_u_stcb_after (mep_ext1_cpu *, const mepcop1_48_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_64_mep_model,mep_ext1_cpu,mepcop1_64_idesc,mepcop1_64_scache>::model_u_stcb_after (mep_ext1_cpu *, const mepcop1_64_idesc *, int unit_num, unsigned long long referenced);
 // end-generated-instantiations
 
 template <class BASE, class CPU, class IDESC, class SCACHE>
@@ -175,6 +207,10 @@ mep_common_model<BASE, CPU, IDESC, SCACHE>::model_u_divide_after (CPU *cpu, cons
 // begin-generated-instantiations
 template UINT mep_common_model<mep_mep_model,mep_basic_cpu,mep_idesc,mep_scache>::model_u_divide_after (mep_basic_cpu *, const mep_idesc *, int unit_num, unsigned long long referenced);
 template UINT mep_common_model<mepcore1_mep_model,mep_ext1_cpu,mepcore1_idesc,mepcore1_scache>::model_u_divide_after (mep_ext1_cpu *, const mepcore1_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_16_mep_model,mep_ext1_cpu,mepcop1_16_idesc,mepcop1_16_scache>::model_u_divide_after (mep_ext1_cpu *, const mepcop1_16_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_32_mep_model,mep_ext1_cpu,mepcop1_32_idesc,mepcop1_32_scache>::model_u_divide_after (mep_ext1_cpu *, const mepcop1_32_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_48_mep_model,mep_ext1_cpu,mepcop1_48_idesc,mepcop1_48_scache>::model_u_divide_after (mep_ext1_cpu *, const mepcop1_48_idesc *, int unit_num, unsigned long long referenced);
+template UINT mep_common_model<mepcop1_64_mep_model,mep_ext1_cpu,mepcop1_64_idesc,mepcop1_64_scache>::model_u_divide_after (mep_ext1_cpu *, const mepcop1_64_idesc *, int unit_num, unsigned long long referenced);
 // end-generated-instantiations
 
 template <class BASE, class CPU, class IDESC, class SCACHE>
@@ -194,6 +230,10 @@ mep_common_model<BASE, CPU, IDESC, SCACHE>::model_u_load_gpr_after (CPU *cpu, co
 // begin-generated-instantiations
 template UINT mep_common_model<mep_mep_model,mep_basic_cpu,mep_idesc,mep_scache>::model_u_load_gpr_after (mep_basic_cpu *, const mep_idesc *, int unit_num, unsigned long long referenced, INT loadreg);
 template UINT mep_common_model<mepcore1_mep_model,mep_ext1_cpu,mepcore1_idesc,mepcore1_scache>::model_u_load_gpr_after (mep_ext1_cpu *, const mepcore1_idesc *, int unit_num, unsigned long long referenced, INT loadreg);
+template UINT mep_common_model<mepcop1_16_mep_model,mep_ext1_cpu,mepcop1_16_idesc,mepcop1_16_scache>::model_u_load_gpr_after (mep_ext1_cpu *, const mepcop1_16_idesc *, int unit_num, unsigned long long referenced, INT loadreg);
+template UINT mep_common_model<mepcop1_32_mep_model,mep_ext1_cpu,mepcop1_32_idesc,mepcop1_32_scache>::model_u_load_gpr_after (mep_ext1_cpu *, const mepcop1_32_idesc *, int unit_num, unsigned long long referenced, INT loadreg);
+template UINT mep_common_model<mepcop1_48_mep_model,mep_ext1_cpu,mepcop1_48_idesc,mepcop1_48_scache>::model_u_load_gpr_after (mep_ext1_cpu *, const mepcop1_48_idesc *, int unit_num, unsigned long long referenced, INT loadreg);
+template UINT mep_common_model<mepcop1_64_mep_model,mep_ext1_cpu,mepcop1_64_idesc,mepcop1_64_scache>::model_u_load_gpr_after (mep_ext1_cpu *, const mepcop1_64_idesc *, int unit_num, unsigned long long referenced, INT loadreg);
 // end-generated-instantiations
 
 template <class BASE, class CPU, class IDESC, class SCACHE>
@@ -213,6 +253,10 @@ mep_common_model<BASE, CPU, IDESC, SCACHE>::model_u_ldcb_gpr_after (CPU *cpu, co
 // begin-generated-instantiations
 template UINT mep_common_model<mep_mep_model,mep_basic_cpu,mep_idesc,mep_scache>::model_u_ldcb_gpr_after (mep_basic_cpu *, const mep_idesc *, int unit_num, unsigned long long referenced, INT loadreg);
 template UINT mep_common_model<mepcore1_mep_model,mep_ext1_cpu,mepcore1_idesc,mepcore1_scache>::model_u_ldcb_gpr_after (mep_ext1_cpu *, const mepcore1_idesc *, int unit_num, unsigned long long referenced, INT loadreg);
+template UINT mep_common_model<mepcop1_16_mep_model,mep_ext1_cpu,mepcop1_16_idesc,mepcop1_16_scache>::model_u_ldcb_gpr_after (mep_ext1_cpu *, const mepcop1_16_idesc *, int unit_num, unsigned long long referenced, INT loadreg);
+template UINT mep_common_model<mepcop1_32_mep_model,mep_ext1_cpu,mepcop1_32_idesc,mepcop1_32_scache>::model_u_ldcb_gpr_after (mep_ext1_cpu *, const mepcop1_32_idesc *, int unit_num, unsigned long long referenced, INT loadreg);
+template UINT mep_common_model<mepcop1_48_mep_model,mep_ext1_cpu,mepcop1_48_idesc,mepcop1_48_scache>::model_u_ldcb_gpr_after (mep_ext1_cpu *, const mepcop1_48_idesc *, int unit_num, unsigned long long referenced, INT loadreg);
+template UINT mep_common_model<mepcop1_64_mep_model,mep_ext1_cpu,mepcop1_64_idesc,mepcop1_64_scache>::model_u_ldcb_gpr_after (mep_ext1_cpu *, const mepcop1_64_idesc *, int unit_num, unsigned long long referenced, INT loadreg);
 // end-generated-instantiations
 
 template <class BASE, class CPU, class IDESC, class SCACHE>
@@ -232,6 +276,10 @@ mep_common_model<BASE, CPU, IDESC, SCACHE>::model_u_mul_gpr_after (CPU *cpu, con
 // begin-generated-instantiations
 template UINT mep_common_model<mep_mep_model,mep_basic_cpu,mep_idesc,mep_scache>::model_u_mul_gpr_after (mep_basic_cpu *, const mep_idesc *, int unit_num, unsigned long long referenced, INT resultreg);
 template UINT mep_common_model<mepcore1_mep_model,mep_ext1_cpu,mepcore1_idesc,mepcore1_scache>::model_u_mul_gpr_after (mep_ext1_cpu *, const mepcore1_idesc *, int unit_num, unsigned long long referenced, INT resultreg);
+template UINT mep_common_model<mepcop1_16_mep_model,mep_ext1_cpu,mepcop1_16_idesc,mepcop1_16_scache>::model_u_mul_gpr_after (mep_ext1_cpu *, const mepcop1_16_idesc *, int unit_num, unsigned long long referenced, INT resultreg);
+template UINT mep_common_model<mepcop1_32_mep_model,mep_ext1_cpu,mepcop1_32_idesc,mepcop1_32_scache>::model_u_mul_gpr_after (mep_ext1_cpu *, const mepcop1_32_idesc *, int unit_num, unsigned long long referenced, INT resultreg);
+template UINT mep_common_model<mepcop1_48_mep_model,mep_ext1_cpu,mepcop1_48_idesc,mepcop1_48_scache>::model_u_mul_gpr_after (mep_ext1_cpu *, const mepcop1_48_idesc *, int unit_num, unsigned long long referenced, INT resultreg);
+template UINT mep_common_model<mepcop1_64_mep_model,mep_ext1_cpu,mepcop1_64_idesc,mepcop1_64_scache>::model_u_mul_gpr_after (mep_ext1_cpu *, const mepcop1_64_idesc *, int unit_num, unsigned long long referenced, INT resultreg);
 // end-generated-instantiations
 
 template <class BASE, class CPU, class IDESC, class SCACHE>
@@ -268,4 +316,8 @@ mep_common_model<BASE, CPU, IDESC, SCACHE>::step_latency (sid::host_int_4 cycles
 // begin-generated-instantiations
 template void mep_common_model<mep_mep_model,mep_basic_cpu,mep_idesc,mep_scache>::step_latency (sid::host_int_4 cycles);
 template void mep_common_model<mepcore1_mep_model,mep_ext1_cpu,mepcore1_idesc,mepcore1_scache>::step_latency (sid::host_int_4 cycles);
+template void mep_common_model<mepcop1_16_mep_model,mep_ext1_cpu,mepcop1_16_idesc,mepcop1_16_scache>::step_latency (sid::host_int_4 cycles);
+template void mep_common_model<mepcop1_32_mep_model,mep_ext1_cpu,mepcop1_32_idesc,mepcop1_32_scache>::step_latency (sid::host_int_4 cycles);
+template void mep_common_model<mepcop1_48_mep_model,mep_ext1_cpu,mepcop1_48_idesc,mepcop1_48_scache>::step_latency (sid::host_int_4 cycles);
+template void mep_common_model<mepcop1_64_mep_model,mep_ext1_cpu,mepcop1_64_idesc,mepcop1_64_scache>::step_latency (sid::host_int_4 cycles);
 // end-generated-instantiations

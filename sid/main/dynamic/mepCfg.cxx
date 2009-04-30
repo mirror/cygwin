@@ -3131,6 +3131,12 @@ void MepBoardCfg::add_cop (const string name, int cbus_if)
     }
 }
 
+void MepBoardCfg::set_ivc2_decode (bool b)
+{
+  assert (cpu);
+  cpu->set (cpu, "ivc2-decode?", b ? "true" : "false");
+}
+
 void MepBoardCfg::set_cop_vliw_bitw (sid::host_int_4 v)
 {
   assert ((v == 32) || (v == 64));

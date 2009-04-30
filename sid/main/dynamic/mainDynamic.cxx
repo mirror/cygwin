@@ -70,6 +70,12 @@ mk_default (const string name, SessionCfg *sess)
   b->set_dcache_cwf (false);
   b->add_timer (4);
   b->add_dmac (6, 64, true);
+  b->add_cop ("ivc2", 0);
+  b->set_ivc2_decode (1);
+  b->set_cop_vliw_bitw (64);
+  b->set_cop_data_bus_width (64);
+  for (int ccr = 0; ccr < 64; ++ccr)
+    b->set_cop_ccr (ccr, 0x00000000);
   b->set_opt_biu (64);
   b->set_endian ("little");
   b->set_opt_abs (true);

@@ -39,7 +39,7 @@ typedef enum cgen_insn_attr {
  , CGEN_INSN_OPTIONAL_VLIW64, CGEN_INSN_MAY_TRAP, CGEN_INSN_VLIW_ALONE, CGEN_INSN_VLIW_NO_CORE_NOP
  , CGEN_INSN_VLIW_NO_COP_NOP, CGEN_INSN_VLIW64_NO_MATCHING_NOP, CGEN_INSN_VLIW32_NO_MATCHING_NOP, CGEN_INSN_VOLATILE
  , CGEN_INSN_END_BOOLS, CGEN_INSN_START_NBOOLS = 31, CGEN_INSN_MACH, CGEN_INSN_ISA
- , CGEN_INSN_LATENCY, CGEN_INSN_CONFIG, CGEN_INSN_END_NBOOLS
+ , CGEN_INSN_LATENCY, CGEN_INSN_CONFIG, CGEN_INSN_SLOTS, CGEN_INSN_END_NBOOLS
 } CGEN_INSN_ATTR;
 
 /* Number of non-boolean elements in cgen_insn_attr.  */
@@ -55,7 +55,8 @@ typedef enum mach_attr {
 
 /* Enum declaration for instruction set selection.  */
 typedef enum isa_attr {
-  ISA_MEP, ISA_EXT_CORE1, ISA_MAX
+  ISA_MEP, ISA_EXT_CORE1, ISA_EXT_COP1_16, ISA_EXT_COP1_32
+ , ISA_EXT_COP1_48, ISA_EXT_COP1_64, ISA_MAX
 } ISA_ATTR;
 
 /* Enum declaration for datatype to use for C intrinsics mapping.  */
@@ -70,6 +71,12 @@ typedef enum config_attr {
   CONFIG_NONE, CONFIG_DEFAULT
 } CONFIG_ATTR;
 
+/* Enum declaration for slots for which this opcode is valid - c3, p0s, p0, p1.  */
+typedef enum slots_attr {
+  SLOTS_CORE, SLOTS_C3, SLOTS_P0S, SLOTS_P0
+ , SLOTS_P1
+} SLOTS_ATTR;
+
 // Insn attributes.
 
 struct mep_insn_attr {
@@ -78,10 +85,12 @@ struct mep_insn_attr {
   CGEN_BITSET isa;
   int latency;
   enum config_attr config;
+  unsigned int slots;
   inline unsigned int get_mach_attr () { return mach; }
   inline CGEN_BITSET get_isa_attr () { return isa; }
   inline int get_latency_attr () { return latency; }
   inline enum config_attr get_config_attr () { return config; }
+  inline unsigned int get_slots_attr () { return slots; }
   inline int get_alias_attr () { return (bools & (1<<CGEN_INSN_ALIAS)) != 0; }
   inline int get_virtual_attr () { return (bools & (1<<CGEN_INSN_VIRTUAL)) != 0; }
   inline int get_uncond_cti_attr () { return (bools & (1<<CGEN_INSN_UNCOND_CTI)) != 0; }

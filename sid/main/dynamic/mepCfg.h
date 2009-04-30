@@ -112,6 +112,7 @@ class MepBoardCfg :
   void add_toshapi_local_bus_model (const string type, const string instance);
 
   void add_cop (const string name, int cbus_if);
+  void set_ivc2_decode (bool enabled);
   void allocate_dmac ();
   void add_dmac (int channel_bitw, int data_width, bool rectangle);
   void configure_dmac ();

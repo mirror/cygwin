@@ -1,3 +1,53 @@
+2009-04-30  DJ Delorie  <dj@redhat.com>
+
+	* Makefile.am: Regenerate.
+	* Makefile.in: Regenerate.
+	* common_model.cxx: Regenerate.
+	* mep-core1-decode.cxx: Regenerate.
+	* mep-core1-sem: Regenerate.
+	* mep-cpu.h: Regenerate.
+	* mep-decode.cxx: Regenerate.
+	* mep-desc.h: Regenerate.
+	* mep-sem.cxx: Regenerate.
+	* mep_ext1.h: Regenerate.
+	* ivc2-cop.cxx: New.
+	* ivc2-cpu.h: New.
+	* ivc2.h: New.
+	* mep-cop1-16-decode.cxx: New.
+	* mep-cop1-16-decode.h: New.
+	* mep-cop1-16-defs.h: New.
+	* mep-cop1-16-model.cxx: New.
+	* mep-cop1-16-model.h: New.
+	* mep-cop1-16-sem.cxx: New.
+	* mep-cop1-32-decode.cxx: New.
+	* mep-cop1-32-decode.h: New.
+	* mep-cop1-32-defs.h: New.
+	* mep-cop1-32-model.cxx: New.
+	* mep-cop1-32-model.h: New.
+	* mep-cop1-32-sem.cxx: New.
+	* mep-cop1-48-decode.cxx: New.
+	* mep-cop1-48-decode.h: New.
+	* mep-cop1-48-defs.h: New.
+	* mep-cop1-48-model.cxx: New.
+	* mep-cop1-48-model.h: New.
+	* mep-cop1-48-sem.cxx: New.
+	* mep-cop1-64-decode.cxx: New.
+	* mep-cop1-64-decode.h: New.
+	* mep-cop1-64-defs.h: New.
+	* mep-cop1-64-model.cxx: New.
+	* mep-cop1-64-model.h: New.
+	* mep-cop1-64-sem.cxx: New.
+
+	* mep.cxx (mep_cpu::mep_cpu): Add ivc2-decode? pin.
+	(mep_cpu::step_insns): Flush register write queu before looping,
+	and after each insn bundle.
+
+	* mep.h: Regenerate.
+	(mep_print_insn_set_ivc2_mode): Declare.
+	(mep_cpu): Add register write queues.  Add IVC2 support.
+	(decode_bundling): Likewise.
+	(step_one_insn): Likewise.
+
 2009-04-17  DJ Delorie  <dj@redhat.com>
 	
 	* mep-core1-decode.cxx: Regenerate.

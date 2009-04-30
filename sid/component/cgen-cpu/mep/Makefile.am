@@ -11,7 +11,7 @@ CXXFLAGS = $(TOP_CXXFLAGS) -DHAVE_CONFIG_H
 
 pkgdata_DATA = hw-cpu-mep.txt
 
-CPU_SOURCES = mep-core1-decode.cxx mep-core1-sem.cxx mep-core1-model.cxx
+CPU_SOURCES = mep-core1-decode.cxx mep-core1-sem.cxx mep-core1-model.cxx mep-cop1-16-decode.cxx mep-cop1-16-sem.cxx mep-cop1-16-model.cxx mep-cop1-32-decode.cxx mep-cop1-32-sem.cxx mep-cop1-32-model.cxx mep-cop1-48-decode.cxx mep-cop1-48-sem.cxx mep-cop1-48-model.cxx mep-cop1-64-decode.cxx mep-cop1-64-sem.cxx mep-cop1-64-model.cxx mep-ivc2.cxx
 
 libmep_la_SOURCES = mep.cxx common_model.cxx mep-decode.cxx mep-sem.cxx mep-model.cxx $(CPU_SOURCES)
 libmep_la_LDFLAGS =
@@ -57,9 +57,9 @@ CGENDEPS = ../../../../cgen/stamp-cgen \
         $(cgendir)/sim-test.scm  $(cgendir)/sim-cpu.scm \
         $(cgendir)/sim-model.scm $(cgendir)/sim.scm
 
-CPU_TARGETS = mep-core1
+CPU_TARGETS = mep-core1 mep-cop1-16 mep-cop1-32 mep-cop1-48 mep-cop1-64
 
-CPU_LIST = mep,ext_core1
+CPU_LIST = mep,ext_core1,ext_cop1_16,ext_cop1_32,ext_cop1_48,ext_cop1_64
 
 CGEN_TARGETS = mep-cpudesc mep-decsemdefs $(CPU_TARGETS)
 .PHONY: $(CGEN_TARGETS)
@@ -71,6 +71,26 @@ cgen-all: $(CGEN_TARGETS)
 mep-core1:
 	$(SHELL) ../CGEN.sh cpu-decode $(srcdir) $(cgendir) "$(CGENFLAGS)" \
 	mep "with-multiple-isa with-scache with-profile=fn" mep_ext1 ext_core1 $(CGEN_MACH) mepcore1 "mep-core1-" \
+	$(cgendir)/cpu/mep.cpu \
+	"decode.h decode.cxx model.h model.cxx semantics.cxx defs.h"
+mep-cop1-16:
+	$(SHELL) ../CGEN.sh cpu-decode $(srcdir) $(cgendir) "$(CGENFLAGS)" \
+	mep "with-multiple-isa with-scache with-profile=fn" mep_ext1 ext_cop1_16 $(CGEN_MACH) mepcop1_16 "mep-cop1-16-" \
+	$(cgendir)/cpu/mep.cpu \
+	"decode.h decode.cxx model.h model.cxx semantics.cxx defs.h"
+mep-cop1-32:
+	$(SHELL) ../CGEN.sh cpu-decode $(srcdir) $(cgendir) "$(CGENFLAGS)" \
+	mep "with-multiple-isa with-scache with-profile=fn" mep_ext1 ext_cop1_32 $(CGEN_MACH) mepcop1_32 "mep-cop1-32-" \
+	$(cgendir)/cpu/mep.cpu \
+	"decode.h decode.cxx model.h model.cxx semantics.cxx defs.h"
+mep-cop1-48:
+	$(SHELL) ../CGEN.sh cpu-decode $(srcdir) $(cgendir) "$(CGENFLAGS)" \
+	mep "with-multiple-isa with-scache with-profile=fn" mep_ext1 ext_cop1_48 $(CGEN_MACH) mepcop1_48 "mep-cop1-48-" \
+	$(cgendir)/cpu/mep.cpu \
+	"decode.h decode.cxx model.h model.cxx semantics.cxx defs.h"
+mep-cop1-64:
+	$(SHELL) ../CGEN.sh cpu-decode $(srcdir) $(cgendir) "$(CGENFLAGS)" \
+	mep "with-multiple-isa with-scache with-profile=fn" mep_ext1 ext_cop1_64 $(CGEN_MACH) mepcop1_64 "mep-cop1-64-" \
 	$(cgendir)/cpu/mep.cpu \
 	"decode.h decode.cxx model.h model.cxx semantics.cxx defs.h"
 # end-cpus

@@ -25,8 +25,12 @@ public:
   SI h_csr[32];
   /* 64-bit coprocessor registers */
   DI h_cr64[32];
+  /* 64-bit coprocessor registers, pending writes */
+  DI h_cr64_w[32];
   /* Coprocessor control registers */
   SI h_ccr[64];
+  /* Coprocessor control registers, pending writes */
+  SI h_ccr_w[64];
   } hardware;
 
   void stream_cgen_hardware (std::ostream &ost) const 
@@ -38,8 +42,12 @@ public:
       ost << hardware.h_csr[i] << ' ';
     for (int i = 0; i < 32; i++)
       ost << hardware.h_cr64[i] << ' ';
+    for (int i = 0; i < 32; i++)
+      ost << hardware.h_cr64_w[i] << ' ';
     for (int i = 0; i < 64; i++)
       ost << hardware.h_ccr[i] << ' ';
+    for (int i = 0; i < 64; i++)
+      ost << hardware.h_ccr_w[i] << ' ';
   }
   void destream_cgen_hardware (std::istream &ist) 
   {
@@ -50,8 +58,12 @@ public:
       ist >> hardware.h_csr[i];
     for (int i = 0; i < 32; i++)
       ist >> hardware.h_cr64[i];
+    for (int i = 0; i < 32; i++)
+      ist >> hardware.h_cr64_w[i];
     for (int i = 0; i < 64; i++)
       ist >> hardware.h_ccr[i];
+    for (int i = 0; i < 64; i++)
+      ist >> hardware.h_ccr_w[i];
   }
   // C++ register access function templates
 #define current_cpu this
@@ -67,14 +79,29 @@ public:
  }
 
   inline DI h_cr64_get (UINT regno) const { return this->hardware.h_cr64[regno]; }
-  inline void h_cr64_set (UINT regno, DI newval) { this->hardware.h_cr64[regno] = newval; }
+  inline void h_cr64_set (UINT regno, DI newval) { current_cpu->h_cr64_queue_set (regno, newval);
+ }
+
+  inline DI h_cr64_w_get (UINT regno) const { return this->hardware.h_cr64_w[regno]; }
+  inline void h_cr64_w_set (UINT regno, DI newval) { this->hardware.h_cr64_w[regno] = newval; }
 
   inline SI h_cr_get (UINT regno) const { return TRUNCDISI (current_cpu->h_cr64_get (regno)); }
   inline void h_cr_set (UINT regno, SI newval) { current_cpu->h_cr64_set (regno, EXTSIDI (newval));
  }
 
   inline SI h_ccr_get (UINT regno) const { return this->hardware.h_ccr[regno]; }
-  inline void h_ccr_set (UINT regno, SI newval) { current_cpu->cgen_set_ccr_value (regno, newval);
+  inline void h_ccr_set (UINT regno, SI newval) { current_cpu->h_ccr_queue_set (regno, newval);
+ }
+
+  inline SI h_ccr_w_get (UINT regno) const { return this->hardware.h_ccr_w[regno]; }
+  inline void h_ccr_w_set (UINT regno, SI newval) { this->hardware.h_ccr_w[regno] = newval; }
+
+  inline DI h_cr_ivc2_get (UINT regno) const { return current_cpu->h_cr64_get (regno); }
+  inline void h_cr_ivc2_set (UINT regno, DI newval) { current_cpu->h_cr64_set (regno, newval);
+ }
+
+  inline DI h_ccr_ivc2_get (UINT regno) const { return current_cpu->h_ccr_get (regno); }
+  inline void h_ccr_ivc2_set (UINT regno, DI newval) { current_cpu->h_ccr_set (regno, newval);
  }
 
 #undef current_cpu

@@ -1,3 +1,9 @@
+2009-04-30  DJ Delorie  <dj@redhat.com>
+
+	* mainDynamic: Regenerate.
+	* mepCfg.cxx (MepBoardCfg::set_ivc2_decode): New.
+	* mepCfg.h (MepBoardCfg::set_ivc2_decode): Add.
+
 2009-04-08  DJ Delorie  <dj@redhat.com>
 
 	* mainDynamic.cxx: Add C5 support.

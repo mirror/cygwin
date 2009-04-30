@@ -5278,7 +5278,7 @@ current_cpu->check_option_cp64 (pc);
     DI opval = current_cpu->do_lmcp (* FLD (i_rma), pc);
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cr64" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
-    current_cpu->hardware.h_cr64[FLD (f_crn)] = opval;
+    current_cpu->h_cr64_set (FLD (f_crn), opval);
   }
 }
 
@@ -5403,7 +5403,7 @@ current_cpu->check_option_cp64 (pc);
     DI opval = current_cpu->do_lmcpi (FLD (f_rm), pc);
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cr64" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
-    current_cpu->hardware.h_cr64[FLD (f_crn)] = opval;
+    current_cpu->h_cr64_set (FLD (f_crn), opval);
   }
   {
     SI opval = * FLD (i_rma);
@@ -5514,7 +5514,7 @@ current_cpu->check_option_cp64 (pc);
     DI opval = current_cpu->do_lmcp16 (* FLD (i_rma), FLD (f_16s16), pc);
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cr64" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
-    current_cpu->hardware.h_cr64[FLD (f_crn)] = opval;
+    current_cpu->h_cr64_set (FLD (f_crn), opval);
   }
 }
 
@@ -5773,7 +5773,7 @@ current_cpu->check_option_cp64 (pc);
     DI opval = current_cpu->do_lmcpa (FLD (f_rm), FLD (f_cdisp10), pc);
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cr64" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
-    current_cpu->hardware.h_cr64[FLD (f_crn)] = opval;
+    current_cpu->h_cr64_set (FLD (f_crn), opval);
   }
   {
     SI opval = * FLD (i_rma);
@@ -6066,7 +6066,7 @@ current_cpu->check_option_cp64 (pc);
     DI opval = current_cpu->do_lmcp (* FLD (i_rma), pc);
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cr64" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
-    current_cpu->hardware.h_cr64[FLD (f_crn)] = opval;
+    current_cpu->h_cr64_set (FLD (f_crn), opval);
   }
   {
     SI opval = ({   SI tmp_modulo_mask;
@@ -6363,7 +6363,7 @@ current_cpu->check_option_cp64 (pc);
     DI opval = current_cpu->do_lmcp (* FLD (i_rma), pc);
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cr64" << '[' << FLD (f_crn) << ']' << ":=0x" << hex << opval << dec << "  ";
-    current_cpu->hardware.h_cr64[FLD (f_crn)] = opval;
+    current_cpu->h_cr64_set (FLD (f_crn), opval);
   }
   {
     SI opval = ({   SI tmp_modulo_mask;
@@ -6788,7 +6788,7 @@ current_cpu->hardware.h_csr[((UINT) 16)] = ORSI (ANDSI (current_cpu->hardware.h_
 #undef FLD
 }
 
-// ********** sim-syscall: --unused--
+// ********** sim-syscall: --syscall--
 
 sem_status
 mep_sem_sim_syscall (mep_basic_cpu* current_cpu, mep_scache* sem)

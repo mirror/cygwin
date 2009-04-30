@@ -941,6 +941,17 @@ process_cop_ip (Node *top, Node *ip)
       default_string (top, "IP", "FMAX", N_QSTR);
       check_string (top, 0, "IP", 0);
    }
+  else if (strcmp (ip->val, "IVC2") == 0)
+    {
+      clear_cop (top);
+      default_string (top, "VLIW_TYPE", "YES", N_WORD);
+      default_int (top, "VLIW_BITW", 64);
+      default_int (top, "DATA_BUS_WIDTH", 64);
+      default_string (top, "CBUS_IF", "OFF", N_WORD);
+      /* Restore and check the IP specification.  */
+      default_string (top, "IP", "IVC2", N_QSTR);
+      check_string (top, 0, "IP", 0);
+   }
   else
     errorn (top, "IP has unexpected value \"%s\"", ip->val);
 }

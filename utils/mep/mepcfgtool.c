@@ -1642,7 +1642,20 @@ do_cpu_config ()
     {
       for (modules = find_sub (cfgs, "me_module", 0); modules; modules = find_next (modules, "me_module"))
 	{
+	  Node *cop_ip;
+
 	  fprintf (dst_file, ",ext_core%d", i);
+
+	  cop_ip = find_sub (modules, "cop", "ip", 0);
+	  if (cop_ip && cop_ip->val)
+	    {
+	      char *ipname = downcase (cop_ip->val);
+
+	      /* IVC2 uses cop32 for the 32-bit core-mode coprocessor
+		 insns.  */
+	      if (strcmp (ipname, "ivc2") == 0)
+		fprintf (dst_file, ",ext_cop%d_32", i);
+	    }
 	  ++i;
 	}
     }
@@ -2384,8 +2397,50 @@ do_user_cop_ip ()
 	}
       fputs ("))\n", dst_file);
 
+      if (strcmp (ip->ip, "ivc2") == 0)
+	{
+	  static const char *slots[] = { "p0s", "p0", "p1", "c3" };
+	  static const char *widths[] = { 16, 48, 64, 32 };
+	  int i, s;
+
+	  for (i=1; i<16; i++)
+	    {
+	      char *comma = "";
+
+	      if ((i & 7) && (i & 8))
+		continue;
+
+	      fprintf (dst_file, "(define-pmacro ivc2");
+	      for (s=0; s<4; s++)
+		if (i & (1<<s))
+		  fprintf (dst_file, "-%s", slots[s]);
+	      fprintf (dst_file, "-isa  () (ISA ");
+	      for (s=0; s<4; s++)
+		if (i & (1<<s))
+		  {
+		    for (module = ip->modules; *module; module = modend)
+		      {
+			char tmp;
+			int i;
+
+			++module; /* get past initial comma */
+			for (modend = module; *modend && *modend != ','; ++modend)
+			  ;
+			tmp = *modend;
+			*modend = '\0';
+			fprintf (dst_file, "%sext_cop%s_%d", comma, module, widths[s]);
+			comma = ",";
+			*modend = tmp;
+		      }
+		  }
+
+	      fprintf (dst_file, "))\n");
+	    }
+
+	}
+
       /* Find the terminating comment.  */
-      find_line ("isa", 0, 1, 1);
+      find_line ("end-isas", 0, 1, 1);
       end_file ();
     }
 }
@@ -3898,12 +3953,27 @@ do_cgen_config_opc ()
   int i;
   struct cop_ip *ip;
 
-  find_line ("begin-cop-ip-parse-handlers", 1, 1, 1);
-
   scan_cop_ip ();
+
+  find_line ("begin-cop-ip-supported-defines", 1, 1, 1);
   for (ip = cop_ips; ip; ip = ip->next)
     {
       fprintf (dst_file,
+	       "#define MEP_%s_SUPPORTED 1\n",
+	       upcase (ip->ip));
+    }
+  find_line ("end-cop-ip-supported-defines", 0, 1, 1);
+
+  find_line ("begin-cop-ip-parse-handlers", 1, 1, 1);
+
+  for (ip = cop_ips; ip; ip = ip->next)
+    {
+      fprintf (dst_file,
+	       "static const char *\n"
+	       "parse_%s_cr (CGEN_CPU_DESC,\n"
+	       "\tconst char **,\n"
+	       "\tCGEN_KEYWORD *,\n"
+	       "\tlong *) ATTRIBUTE_UNUSED;\n"
 	       "static const char *\n"
 	       "parse_%s_cr (CGEN_CPU_DESC cd,\n"
 	       "\tconst char **strp,\n"
@@ -3912,8 +3982,13 @@ do_cgen_config_opc ()
 	       "{\n"
 	       "  return cgen_parse_keyword (cd, strp, & mep_cgen_opval_h_cr_%s, field);\n"
 	       "}\n",
-	       ip->ip, ip->ip);
+	       ip->ip, ip->ip, ip->ip);
       fprintf (dst_file,
+	       "static const char *\n"
+	       "parse_%s_ccr (CGEN_CPU_DESC,\n"
+	       "\tconst char **,\n"
+	       "\tCGEN_KEYWORD *,\n"
+	       "\tlong *) ATTRIBUTE_UNUSED;\n"
 	       "static const char *\n"
 	       "parse_%s_ccr (CGEN_CPU_DESC cd,\n"
 	       "\tconst char **strp,\n"
@@ -3922,7 +3997,7 @@ do_cgen_config_opc ()
 	       "{\n"
 	       "  return cgen_parse_keyword (cd, strp, & mep_cgen_opval_h_ccr_%s, field);\n"
 	       "}\n",
-	       ip->ip, ip->ip);
+	       ip->ip, ip->ip, ip->ip);
     }
 
   find_line ("end-cop-ip-parse-handlers", 0, 1, 1);
@@ -3933,6 +4008,12 @@ do_cgen_config_opc ()
     {
       fprintf (dst_file,
 	       "static void\n"
+	       "print_%s_cr (CGEN_CPU_DESC,\n"
+	       "\tvoid *,\n"
+	       "\tCGEN_KEYWORD *,\n"
+	       "\tlong,\n"
+	       "\tunsigned int) ATTRIBUTE_UNUSED;\n"
+	       "static void\n"
 	       "print_%s_cr (CGEN_CPU_DESC cd,\n"
 	       "\tvoid *dis_info,\n"
 	       "\tCGEN_KEYWORD *keyword_table ATTRIBUTE_UNUSED,\n"
@@ -3941,8 +4022,14 @@ do_cgen_config_opc ()
 	       "{\n"
 	       "  print_keyword (cd, dis_info, & mep_cgen_opval_h_cr_%s, value, attrs);\n"
 	       "}\n",
-	       ip->ip, ip->ip);
+	       ip->ip, ip->ip, ip->ip);
       fprintf (dst_file,
+	       "static void\n"
+	       "print_%s_ccr (CGEN_CPU_DESC,\n"
+	       "\tvoid *,\n"
+	       "\tCGEN_KEYWORD *,\n"
+	       "\tlong,\n"
+	       "\tunsigned int) ATTRIBUTE_UNUSED;\n"
 	       "static void\n"
 	       "print_%s_ccr (CGEN_CPU_DESC cd,\n"
 	       "\tvoid *dis_info,\n"
@@ -3952,7 +4039,7 @@ do_cgen_config_opc ()
 	       "{\n"
 	       "  print_keyword (cd, dis_info, & mep_cgen_opval_h_ccr_%s, value, attrs);\n"
 	       "}\n",
-	       ip->ip, ip->ip);
+	       ip->ip, ip->ip, ip->ip);
     }
 
   find_line ("end-cop-ip-print-handlers", 0, 1, 1);
@@ -4007,7 +4094,23 @@ do_cgen_config_opc ()
 	  
 	  fprintf (dst_file, "  { \"%s\",", modules->val);
 	  fprintf (dst_file, " CONFIG_%s,", upcase (modules->val));
+
+	  cop_ip = find_sub (modules, "cop", "ip", 0);
+	  if (cop_ip && cop_ip->val)
+	    {
+	      char *ipname = downcase (cop_ip->val);
+
+	      if (strcmp (ipname, "avc") == 0)
+		fprintf (dst_file, " EF_MEP_COP_AVC |");
+	      if (strcmp (ipname, "avc2") == 0)
+		fprintf (dst_file, " EF_MEP_COP_AVC2 |");
+	      if (strcmp (ipname, "fmax") == 0)
+		fprintf (dst_file, " EF_MEP_COP_FMAX |");
+	      if (strcmp (ipname, "ivc2") == 0)
+		fprintf (dst_file, " EF_MEP_COP_IVC2 |");
+	    }
 	  fprintf (dst_file, " EF_MEP_CPU_%s,", upcase (mep_core_names[mep_core_type]));
+
 	  fprintf (dst_file, " %d,", mep_endian_type == MEP_ENDIAN_LITTLE ? 0 : 1);
 	  fprintf (dst_file, " %d,", vliw_bits);
 	  ext_isa = gen_isa_masks (modules, ext_isa);
@@ -5341,11 +5444,15 @@ if (item) fprintf (fd, "  b->set_" #name1 "_" #name2 " (%lu);\n", item->ival);\
 		fprintf (stderr, "warning: COP %d has no name, skipping.\n", i);
 	      else
 		{
+		  Node *ip;
 		  Node *cbus_if;
 		  cbus_if = find_sub (item, "cbus_if", 0);
 		  if (cbus_if && (! cbus_if->val || strcmp (cbus_if->val, "ON") != 0))
 		    cbus_if = NULL;
 		  fprintf (fd, "  b->add_cop (\"%s\", %d);\n", item->val, cbus_if ? 1 : 0);
+		  ip = find_sub (item, "ip", 0);
+		  if (ip && ip->val && strcmp (downcase (ip->val), "ivc2") == 0)
+		    fprintf (fd, "  b->set_ivc2_decode (1);\n");
 		  item2 = find_sub (item, "vliw_type", 0);
 		  if (item2 && item2->val && (strcmp (item2->val, "YES") == 0))
 		    {
@@ -5745,6 +5852,8 @@ gen_cpu_Makefile_in_only_config1 (enum automake_version automake_version)
     {
       if (strcmp (cop_ip->ip, "fmax") == 0)
 	fprintf (dst_file, " \\\n%s-fp.lo %s-fpu.lo", cop_ip->ip, cop_ip->ip);
+      if (strcmp (cop_ip->ip, "ivc2") == 0)
+	fprintf (dst_file, " \\\n%s-cop.lo", cop_ip->ip);
     }
   fputc ('\n', dst_file);
   find_line ("am_libmep_la_OBJECTS", 0, 1, 1);
@@ -5785,6 +5894,8 @@ gen_cpu_Makefile_in_only_config2 (enum automake_version automake_version)
 	{
 	  if (strcmp (cop_ip->ip, "fmax") == 0)
 	    fprintf (dst_file, " \\\n%s-fp.lo %s-fpu.lo", cop_ip->ip, cop_ip->ip);
+	  if (strcmp (cop_ip->ip, "ivc2") == 0)
+	    fprintf (dst_file, " \\\n%s-cop.lo", cop_ip->ip);
 	}
       fputc ('\n', dst_file);
       find_line ("CXXCOMPILE", 0, 1, 1);
@@ -5848,6 +5959,15 @@ gen_cpu_Makefile_in_only_config2 (enum automake_version automake_version)
 	      fprintf (dst_file, "@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/%s-fpu.Plo@am__quote@\n", cop_ip->ip);
 	    }
 	}
+      if (strcmp (cop_ip->ip, "ivc2") == 0)
+	{
+	  if (automake_version == AM_1_4)
+	    fprintf (dst_file, " \\\n.deps/%s-cop.P", cop_ip->ip);
+	  else /* if (automake_version == AM_1_9_5) */
+	    {
+	      fprintf (dst_file, "@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/%s-cop.Plo@am__quote@\n", cop_ip->ip);
+	    }
+	}
     }
   if (automake_version == AM_1_4)
     {
@@ -5896,6 +6016,8 @@ do_cpu_Makefile_config (char *makefile)
     {
       if (strcmp (cop_ip->ip, "fmax") == 0)
 	fprintf (dst_file, " %s-fp.cxx %s-fpu.cxx", cop_ip->ip, cop_ip->ip);
+      if (strcmp (cop_ip->ip, "ivc2") == 0)
+	fprintf (dst_file, " mep-ivc2.cxx", cop_ip->ip, cop_ip->ip);
     }
   fputc ('\n', dst_file);
 

@@ -1,3 +1,17 @@
+2009-04-30  DJ Delorie  <dj@redhat.com>
+
+	* default.cfg: Add IVC2 coprocessor.
+	* current.cfg: Regenerate.
+	* lex.cfg.c: Regenerate.
+	* lex.cmodel.c: Regenerate.
+	* lex.gmap.c: Regenerate.
+	* mepcfgtool.c (do_cpu_config): Add IVC2 support.
+	(do_cgen_config_opc): Likewise.
+	(gen_cpu_Makefile_in_only_config1): Likewise.
+	(gen_cpu_Makefile_in_only_config2): Likewise.
+	(gen_cpu_Makefile_config): Likewise.
+	* verify-cfg.c (process_cop_ip): Add IVC2 support.
+	
 2009-04-07  DJ Delorie  <dj@redhat.com>
 
 	* default.cfg: Update to C5.

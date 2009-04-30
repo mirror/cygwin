@@ -4,4 +4,5 @@
 ; See file COPYING.CGEN for details.
 
 ;; begin-user-isa-includes
+(include "mep-ivc2.cpu")
 ;; end-user-isa-includes

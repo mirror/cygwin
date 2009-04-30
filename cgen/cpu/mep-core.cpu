@@ -8,7 +8,7 @@
 (define-pmacro isa-enum ()
   (isas mep 
 ; begin-isa-enum
-	ext_core1
+	ext_core1 ext_cop1_16 ext_cop1_32 ext_cop1_48 ext_cop1_64
 ; end-isa-enum
   )
 )
@@ -38,9 +38,41 @@
   (base-insn-bitsize 32)
 )
 
-(define-pmacro all-mep-isas () (ISA mep,ext_core1))
+(define-isa
+  (name ext_cop1_16)
+  (comment "MeP coprocessor instruction set")
+  (default-insn-word-bitsize 32)
+  (default-insn-bitsize 32)
+  (base-insn-bitsize 32)
+)
 
-(define-pmacro all-mep-core-isas () (ISA mep,ext_core1))
+(define-isa
+  (name ext_cop1_32)
+  (comment "MeP coprocessor instruction set")
+  (default-insn-word-bitsize 32)
+  (default-insn-bitsize 32)
+  (base-insn-bitsize 32)
+)
+
+(define-isa
+  (name ext_cop1_48)
+  (comment "MeP coprocessor instruction set")
+  (default-insn-word-bitsize 32)
+  (default-insn-bitsize 32)
+  (base-insn-bitsize 32)
+)
+
+(define-isa
+  (name ext_cop1_64)
+  (comment "MeP coprocessor instruction set")
+  (default-insn-word-bitsize 32)
+  (default-insn-bitsize 32)
+  (base-insn-bitsize 32)
+)
+
+(define-pmacro all-mep-isas () (ISA mep,ext_core1,ext_cop1_16,ext_cop1_32,ext_cop1_48,ext_cop1_64))
+
+(define-pmacro all-mep-core-isas () (ISA mep,ext_core1,ext_cop1_32))
 
 (define-pmacro all-core-isa-list () mep,ext_core1)
 ; end-isas
@@ -226,6 +258,14 @@
   ; This assumes that the data path of the co-pro is 64 bits.
   (type register DI (32))
   (indices keyword "$c" (.map -reg-pair (.iota 32)))
+  (set (index newval) (c-call VOID "h_cr64_queue_set" index newval))
+)
+(define-hardware
+  (name h-cr64-w)
+  (comment "64-bit coprocessor registers, pending writes")
+  (attrs all-mep-isas)
+  ; This assumes that the data path of the co-pro is 64 bits.
+  (type register DI (32))
 )
 
 (define-hardware
@@ -248,7 +288,13 @@
   (attrs all-mep-isas)
   (type register SI (64))
   (indices keyword "" (.map -ccr-reg-pair (.iota 64)))
-  (set (index newval) (c-call VOID "cgen_set_ccr_value" index newval))
+  (set (index newval) (c-call VOID "h_ccr_queue_set" index newval))
+)
+(define-hardware
+  (name h-ccr-w)
+  (comment "Coprocessor control registers, pending writes")
+  (attrs all-mep-isas)
+  (type register SI (64))
 )
 
 
@@ -816,7 +862,7 @@
   (type enum)
   (name SLOT)
   (attrs META)
-  (values NONE C3 V1 V3)
+  (values NONE C3 V1 V3 P0S P0 P1)
   (default NONE)
   (comment "coprocessor slot type"))
 
@@ -2902,7 +2948,7 @@
 ; Using a reserved opcode.
 
 (dnci sim-syscall "simulator system call" ()
-     "--unused--"
+     "--syscall--"
      (+ MAJ_7 (f-4 1) callnum (f-8 0) (f-9 0) (f-10 0) (f-sub4 0))
      (c-call "do_syscall" pc callnum)
      ())

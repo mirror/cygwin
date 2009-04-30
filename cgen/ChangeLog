@@ -1,3 +1,17 @@
+2009-04-29  DJ Delorie  <dj@redhat.com>
+
+	* mep-ivc2.cpu: New.
+	* mep-core.cpu: Regenerated.  Add support for deferred register
+	writes.
+	(SLOT): Add IVC2 slot types.
+	(sim-syscall): Rename to something more appropriate.
+	* mep-ext-cop.cpu: Regenerate.
+	* mep.opc: Regenerate.  Add "coprocessor supported" define area.
+	(print_slot_insn): New.
+	(mep_examine_ivc2_insns): New.
+	(mep_print_insn_set_ivc2_mode): New.
+	(mep_print_insn): Support IVC2 slotting.
+	
 2009-04-20  DJ Delorie  <dj@redhat.com>
 
 	* intrinsics.scm (intrinsics-analyze!): Include aliases.

@@ -1,6 +1,6 @@
-#line 2 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.gmap.c"
+#line 2 "../../../src/utils/mep/lex.gmap.c"
 
-#line 4 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.gmap.c"
+#line 4 "../../../src/utils/mep/lex.gmap.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -502,8 +502,8 @@ int gmap_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *gmaptext;
-#line 1 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/gmap.l"
-#line 2 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/gmap.l"
+#line 1 "../../../src/utils/mep/gmap.l"
+#line 2 "../../../src/utils/mep/gmap.l"
 #include "mepcfgtool.h"
 #include "parse.gmap.h"
 #include "string.h"
@@ -536,7 +536,7 @@ num (char *in, int base)
  return res;
 }
 
-#line 540 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.gmap.c"
+#line 540 "../../../src/utils/mep/lex.gmap.c"
 
 #define INITIAL 0
 
@@ -718,10 +718,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 52 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/gmap.l"
+#line 52 "../../../src/utils/mep/gmap.l"
 
 
-#line 725 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.gmap.c"
+#line 725 "../../../src/utils/mep/lex.gmap.c"
 
 	if ( !(yy_init) )
 		{
@@ -817,51 +817,51 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 54 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/gmap.l"
+#line 54 "../../../src/utils/mep/gmap.l"
 ;
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 55 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/gmap.l"
+#line 55 "../../../src/utils/mep/gmap.l"
 ;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 57 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/gmap.l"
+#line 57 "../../../src/utils/mep/gmap.l"
 { gmaplval.num = num (gmaptext, 16); return NUM; } 
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 58 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/gmap.l"
+#line 58 "../../../src/utils/mep/gmap.l"
 { gmaplval.num = num (gmaptext, 8);  return NUM; } 
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 59 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/gmap.l"
+#line 59 "../../../src/utils/mep/gmap.l"
 { gmaplval.num = num (gmaptext, 10); return NUM; } 
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 61 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/gmap.l"
+#line 61 "../../../src/utils/mep/gmap.l"
 { return gmaptext[0]; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 62 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/gmap.l"
+#line 62 "../../../src/utils/mep/gmap.l"
 { gmaplval.str = strdup (gmaptext); return STR; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 64 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/gmap.l"
+#line 64 "../../../src/utils/mep/gmap.l"
 { printf( "%s:%d: bad token %s\n", gmapfilename, gmaplineno, gmaptext ); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 66 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/gmap.l"
+#line 66 "../../../src/utils/mep/gmap.l"
 ECHO;
 	YY_BREAK
-#line 865 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.gmap.c"
+#line 865 "../../../src/utils/mep/lex.gmap.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1871,7 +1871,7 @@ void gmapfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 66 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/gmap.l"
+#line 66 "../../../src/utils/mep/gmap.l"
 
 
 

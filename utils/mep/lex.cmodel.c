@@ -1,6 +1,6 @@
-#line 2 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.cmodel.c"
+#line 2 "../../../src/utils/mep/lex.cmodel.c"
 
-#line 4 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.cmodel.c"
+#line 4 "../../../src/utils/mep/lex.cmodel.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -600,8 +600,8 @@ int cmodel_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *cmodeltext;
-#line 1 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
-#line 2 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 1 "../../../src/utils/mep/cmodel.l"
+#line 2 "../../../src/utils/mep/cmodel.l"
 #include "mepcfgtool.h"
 #include "parse.cmodel.h"
 #include <string.h>
@@ -659,7 +659,7 @@ extend (char *base, char *ext)
 
 
 
-#line 663 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.cmodel.c"
+#line 663 "../../../src/utils/mep/lex.cmodel.c"
 
 #define INITIAL 0
 #define STRING 1
@@ -843,10 +843,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 80 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 80 "../../../src/utils/mep/cmodel.l"
 
 
-#line 850 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.cmodel.c"
+#line 850 "../../../src/utils/mep/lex.cmodel.c"
 
 	if ( !(yy_init) )
 		{
@@ -942,128 +942,128 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 82 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 82 "../../../src/utils/mep/cmodel.l"
 { return NEWLINE; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 83 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 83 "../../../src/utils/mep/cmodel.l"
 ;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 84 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 84 "../../../src/utils/mep/cmodel.l"
 ;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 86 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 86 "../../../src/utils/mep/cmodel.l"
 { cmodellval.num = num (cmodeltext, 10); return NUM; } 
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 87 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 87 "../../../src/utils/mep/cmodel.l"
 { return cmodeltext[0]; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 88 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 88 "../../../src/utils/mep/cmodel.l"
 { return KWD_CLASS_NAME; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 89 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 89 "../../../src/utils/mep/cmodel.l"
 { return KWD_ARGC; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 90 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 90 "../../../src/utils/mep/cmodel.l"
 { return KWD_LIB_FILE; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 91 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 91 "../../../src/utils/mep/cmodel.l"
 { return KWD_BASE_DIR; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 92 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 92 "../../../src/utils/mep/cmodel.l"
 { return KWD_INCLUDE_FILE; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 93 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 93 "../../../src/utils/mep/cmodel.l"
 { return KWD_FILES; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 94 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 94 "../../../src/utils/mep/cmodel.l"
 { return KWD_CPPFLAGS; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 95 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 95 "../../../src/utils/mep/cmodel.l"
 { return KWD_END; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 96 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 96 "../../../src/utils/mep/cmodel.l"
 { return KWD_INT_CHANNEL; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 97 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 97 "../../../src/utils/mep/cmodel.l"
 { return KWD_MAPPED_REGION_NAME; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 98 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 98 "../../../src/utils/mep/cmodel.l"
 { return KWD_MAPSTO; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 99 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 99 "../../../src/utils/mep/cmodel.l"
 { return KWD_RTL_MODEL_TYPE; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 100 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 100 "../../../src/utils/mep/cmodel.l"
 { return KWD_RTL_MODULE_NAME; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 101 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 101 "../../../src/utils/mep/cmodel.l"
 { return KWD_RTL_FILES; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 102 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 102 "../../../src/utils/mep/cmodel.l"
 { return KWD_RTL_BASE_DIR; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 103 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 103 "../../../src/utils/mep/cmodel.l"
 { return KWD_RTL_INCLUDE_FILE; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 104 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 104 "../../../src/utils/mep/cmodel.l"
 { cmodellval.str = strdup (cmodeltext); return STR; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 105 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 105 "../../../src/utils/mep/cmodel.l"
 { cmodellval.str = var (cmodeltext + 1); BEGIN (NM); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 106 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 106 "../../../src/utils/mep/cmodel.l"
 { cmodellval.str = extend ( cmodellval.str, cmodeltext ); BEGIN(INITIAL); return STR; }
 	YY_BREAK
 case 25:
 /* rule 25 can match eol */
 YY_RULE_SETUP
-#line 107 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 107 "../../../src/utils/mep/cmodel.l"
 { cmodellval.str = strdup (cmodeltext);
                * (char *) strrchr (cmodellval.str, '\"') = '\0'; 
                cmodellval.str ++; 
@@ -1071,13 +1071,13 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 111 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 111 "../../../src/utils/mep/cmodel.l"
 { fprintf (stderr, "%s:%d: bad token %s\n", cmodelfilename, cmodellineno, cmodeltext ); }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(STRING):
 case YY_STATE_EOF(NM):
-#line 113 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 113 "../../../src/utils/mep/cmodel.l"
 {
   if (! eof_seen) {
      eof_seen = 1;
@@ -1092,10 +1092,10 @@ case YY_STATE_EOF(NM):
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 125 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 125 "../../../src/utils/mep/cmodel.l"
 ECHO;
 	YY_BREAK
-#line 1099 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.cmodel.c"
+#line 1099 "../../../src/utils/mep/lex.cmodel.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2103,7 +2103,7 @@ void cmodelfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 125 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cmodel.l"
+#line 125 "../../../src/utils/mep/cmodel.l"
 
 
 

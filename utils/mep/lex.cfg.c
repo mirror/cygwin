@@ -1,6 +1,6 @@
-#line 2 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.cfg.c"
+#line 2 "../../../src/utils/mep/lex.cfg.c"
 
-#line 4 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.cfg.c"
+#line 4 "../../../src/utils/mep/lex.cfg.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -523,8 +523,8 @@ int cfg_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *cfgtext;
-#line 1 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
-#line 2 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 1 "../../../src/utils/mep/cfg.l"
+#line 2 "../../../src/utils/mep/cfg.l"
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -606,7 +606,7 @@ note_punct (int punct)
 }
 
 
-#line 610 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.cfg.c"
+#line 610 "../../../src/utils/mep/lex.cfg.c"
 
 #define INITIAL 0
 #define STRING 1
@@ -789,10 +789,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 110 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 110 "../../../src/utils/mep/cfg.l"
 
 
-#line 796 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.cfg.c"
+#line 796 "../../../src/utils/mep/lex.cfg.c"
 
 	if ( !(yy_init) )
 		{
@@ -887,83 +887,83 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 112 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 112 "../../../src/utils/mep/cfg.l"
 { cfglval.str = xstrdup (""); BEGIN(STRING);     }
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 113 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 113 "../../../src/utils/mep/cfg.l"
 { error ("Unterminated string");
 		   BEGIN(INITIAL); return STR; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 115 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 115 "../../../src/utils/mep/cfg.l"
 { cfglval.str = extend ( cfglval.str, var (cfgtext + 1) ); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 116 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 116 "../../../src/utils/mep/cfg.l"
 { cfglval.str = extend ( cfglval.str, cfgtext );           }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 117 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 117 "../../../src/utils/mep/cfg.l"
 { cfglval.str = extend ( cfglval.str, cfgtext+1 );         }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 118 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 118 "../../../src/utils/mep/cfg.l"
 { BEGIN(INITIAL); return STR;                           }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 120 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 120 "../../../src/utils/mep/cfg.l"
 { cfglval.str = var (cfgtext + 1);   return WORD;  }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 121 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 121 "../../../src/utils/mep/cfg.l"
 { cfglval.str = strdup (cfgtext);    return WORD;  }
 	YY_BREAK
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 122 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 122 "../../../src/utils/mep/cfg.l"
 ;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 123 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 123 "../../../src/utils/mep/cfg.l"
 ;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 125 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 125 "../../../src/utils/mep/cfg.l"
 { cfglval.num = num (cfgtext, 16);   return NUM; } 
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 126 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 126 "../../../src/utils/mep/cfg.l"
 { cfglval.num = num (cfgtext, 8);    return NUM; } 
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 127 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 127 "../../../src/utils/mep/cfg.l"
 { cfglval.num = num (cfgtext, 10);   return NUM; } 
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 129 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 129 "../../../src/utils/mep/cfg.l"
 { note_punct (cfgtext[0]); return cfgtext[0]; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 131 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 131 "../../../src/utils/mep/cfg.l"
 ECHO;
 	YY_BREAK
-#line 967 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/lex.cfg.c"
+#line 967 "../../../src/utils/mep/lex.cfg.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(STRING):
 	yyterminate();
@@ -1974,7 +1974,7 @@ void cfgfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 131 "/greed/dj/ges/toshmep/fsf-regen/src/utils/mep/cfg.l"
+#line 131 "../../../src/utils/mep/cfg.l"
 
 
 

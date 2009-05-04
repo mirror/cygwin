@@ -59,7 +59,7 @@ void package_list (int, char **);
 void dump_dodgy_apps (int verbose);
 
 
-static const char version[] = "$Revision: 1.115 $";
+static const char version[] = "$Revision: 1.116 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -839,6 +839,9 @@ static const char *
 find_app_on_path (const char *app, bool showall = false)
 {
   const char *papp = find_on_path (app, ".exe", showall, false, true);
+
+  if (!papp)
+    return NULL;
 
   wide_path wpath (papp);
   HANDLE fh =

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2000, 2001, 2002 Red Hat, Inc.
+ * Copyright (c) 2000, 2001, 2002, 2009 Red Hat, Inc.
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include <windows.h>
 #include <getopt.h>
 
-static const char version[] = "$Revision: 1.11 $";
+static const char version[] = "$Revision: 1.12 $";
 static char *prog_name;
 
 static struct option longopts[] =
@@ -596,7 +596,7 @@ run_program (char *cmdline)
 			{
 			  dll_ptr = cp+1;
 			}
-		      *cp = tolower (*cp);
+		      *cp = tolower ((unsigned char) *cp);
 		    }
 		}
 	    }

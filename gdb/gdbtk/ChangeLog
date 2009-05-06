@@ -1,3 +1,9 @@
+2009-05-06  Pierre Muller  <muller@ics.u-strasbg.fr>
+
+	* Adapt to read_pc function removal.
+	* generic/gdbtk-cmds.c: Add "cache.h" include.
+	(gdb_loc): Use regcache_read_pc instead of read_pc.
+
 2009-04-23  Keith Seitz  <keiths@redhat.com>
 
 	* library/vartree.itb (constructor): Remove the borderwidth 0

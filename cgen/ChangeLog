@@ -1,3 +1,8 @@
+2009-05-13  DJ Delorie  <dj@redhat.com>
+
+	* intrinsics.scm (insns.md): Add RTL predicates.
+	(intrinsics.h): Remove old C intrinsics.
+
 2009-04-29  DJ Delorie  <dj@redhat.com>
 
 	* mep-ivc2.cpu: New.

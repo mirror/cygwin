@@ -1245,6 +1245,25 @@
    "\n\n")
   (analyze-intrinsics!)
   (message "Generating .md file...\n")
+
+  (init-immediate-predicate!)
+  (for-each-argument note-immediates)
+
+  ;; Define the immediate predicates.
+  (for-each
+   (lambda (entry)
+     (let* ((op (cdr entry))
+	    (align-mask (- (md-operand:alignment op) 1)))
+       (string-write
+	"(define_predicate \""
+	(car entry) "\"\n"
+	"  (and (match_code \"const_int\")\n"
+	"        (match_test \"(INTVAL (op) & " (st align-mask) ") == 0\n"
+	"                   && INTVAL (op) >= " (st (md-operand:lower-bound op)) "\n"
+	"                   && INTVAL (op) < " (st (md-operand:upper-bound op)) "\")))\n"
+	"\n")))
+   immediate-predicate-table)
+
   (for-each-md-insn write-insn)
   (string-write "\n")
   "")
@@ -1365,13 +1384,6 @@
 		(string-write "\"$shadow" (st (car entry)) "\"")))
   (string-write "\n\n")
 
-  ;; Declare the immediate predicates in a form suitable for PREDICATE_CODES.
-  (string-write "#define IMMEDIATE_PREDICATE_CODES")
-  (for-each
-   (lambda (entry)
-     (string-write "  \\\n  {\"" (car entry) "\", {CONST_INT}},"))
-   immediate-predicate-table)
-
   ;; Declare the index values for well-known intrinsics.
   (string-write "\n\n#ifndef __MEP__\n")
   (string-write "enum {\n")
@@ -1461,22 +1473,6 @@
   (string-write "#endif\n")
 
   (string-write "#ifdef WANT_GCC_DEFINITIONS\n")
-
-  ;; Define the immediate predicates.
-  (for-each
-   (lambda (entry)
-     (let* ((op (cdr entry))
-	    (align-mask (- (md-operand:alignment op) 1)))
-       (string-write
-	"int\n"
-	(car entry) " (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)\n"
-	"{\n"
-	"  return (GET_CODE (op) == CONST_INT\n"
-	"          && (INTVAL (op) & " (st align-mask) ") == 0\n"
-	"          && INTVAL (op) >= " (st (md-operand:lower-bound op)) "\n"
-	"          && INTVAL (op) < " (st (md-operand:upper-bound op)) ");\n"
-	"}\n\n")))
-   immediate-predicate-table)
 
   ;; Create an array describing the range and alignment of immediate
   ;; predicates.

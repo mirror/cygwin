@@ -1,3 +1,7 @@
+2009-05-18  Kevin Buettner  <kevinb@redhat.com>
+
+	* mep.cxx (mep_cpu::reset): Call `h_regs_flush_write_queue'.
+
 2009-04-30  DJ Delorie  <dj@redhat.com>
 
 	* Makefile.am: Regenerate.

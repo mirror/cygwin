@@ -413,6 +413,8 @@ mep_cpu::reset ()
   repeat_delayed_branch = false;
   bit_insn_p = false;
 
+  h_regs_flush_write_queue ();
+
   // Clear general purpose registers.
   for (int i = 0; i < 16; i++)
     h_gpr_set (i, 0);

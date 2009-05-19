@@ -1,3 +1,9 @@
+2009-05-19  DJ Delorie  <dj@redhat.com>
+
+	* cpu/mep.opc: Regenerate configuration.
+	(parse_cdisp10): Only check CPU flags, not COP flags.
+	(check_configured_mach): Likewise.
+
 2009-05-13  DJ Delorie  <dj@redhat.com>
 
 	* intrinsics.scm (insns.md): Add RTL predicates.

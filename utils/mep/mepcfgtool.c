@@ -2400,7 +2400,7 @@ do_user_cop_ip ()
       if (strcmp (ip->ip, "ivc2") == 0)
 	{
 	  static const char *slots[] = { "p0s", "p0", "p1", "c3" };
-	  static const char *widths[] = { 16, 48, 64, 32 };
+	  static int widths[] = { 16, 48, 64, 32 };
 	  int i, s;
 
 	  for (i=1; i<16; i++)
@@ -3945,6 +3945,31 @@ gen_isa_masks (Node *module, int isa_start)
   return isa_start + 1 + copro_isas;
 }
 
+/* Generate CGEN bitmasks representing the isas supported by the
+   given me_module beginning at the given isa_num.  */
+static int
+gen_cpu_flags (Node *module)
+{
+  if (module)
+    {
+      Node *cop_ip = find_sub (module, "cop", "ip", 0);
+      if (cop_ip && cop_ip->val)
+	{
+	  char *ipname = downcase (cop_ip->val);
+
+	  if (strcmp (ipname, "avc") == 0)
+	    fprintf (dst_file, " EF_MEP_COP_AVC |");
+	  if (strcmp (ipname, "avc2") == 0)
+	    fprintf (dst_file, " EF_MEP_COP_AVC2 |");
+	  if (strcmp (ipname, "fmax") == 0)
+	    fprintf (dst_file, " EF_MEP_COP_FMAX |");
+	  if (strcmp (ipname, "ivc2") == 0)
+	    fprintf (dst_file, " EF_MEP_COP_IVC2 |");
+	}
+    }
+  fprintf (dst_file, " EF_MEP_CPU_%s,", upcase (mep_core_names[mep_core_type]));
+}
+
 static void
 do_cgen_config_opc ()
 {
@@ -4080,10 +4105,18 @@ do_cgen_config_opc ()
 
   find_line ("end-all-cop-isas", 0, 1, 1);
 
+  Node *default_module = currentcfg ? find_sub (currentcfg, "me_module", 0) : NULL;
+
   find_line ("config-map-start", 1, 1, 1);
-  fputs ("  /* Default entry: mep core only, all options enabled. */\n", dst_file);
-  fprintf (dst_file, "  { \"\", 0, EF_MEP_CPU_%s, 1, 0, {1,\"\\x0\"}, {1,\"\\x0\"}, {1,\"\\x0\"}, {1,\"\\x0\"}, {1,\"\\x0\"}, {1,\"\\x80\"}, OPTION_MASK },\n",
-	   upcase (mep_core_names[mep_core_type]));
+  fputs ("  /* Default entry: first module, with all options enabled. */\n", dst_file);
+  fprintf (dst_file, "  { \"\", 0, ");
+  gen_cpu_flags (default_module);
+  fprintf (dst_file, "1, 0,");
+  if (default_module)
+    gen_isa_masks (default_module, 1);
+  else
+    fprintf (dst_file, " {1,\"\\x0\"}, {1,\"\\x0\"}, {1,\"\\x0\"}, {1,\"\\x0\"}, {1,\"\\x0\"}, {1,\"\\x80\"},");
+  fprintf (dst_file, " OPTION_MASK | (1 << CGEN_INSN_OPTIONAL_DSP_INSN) | (1 << CGEN_INSN_OPTIONAL_UCI_INSN) },\n");
 
   for (cfgs = currentcfg; cfgs; cfgs = cfgs->next)
     {
@@ -4095,21 +4128,7 @@ do_cgen_config_opc ()
 	  fprintf (dst_file, "  { \"%s\",", modules->val);
 	  fprintf (dst_file, " CONFIG_%s,", upcase (modules->val));
 
-	  cop_ip = find_sub (modules, "cop", "ip", 0);
-	  if (cop_ip && cop_ip->val)
-	    {
-	      char *ipname = downcase (cop_ip->val);
-
-	      if (strcmp (ipname, "avc") == 0)
-		fprintf (dst_file, " EF_MEP_COP_AVC |");
-	      if (strcmp (ipname, "avc2") == 0)
-		fprintf (dst_file, " EF_MEP_COP_AVC2 |");
-	      if (strcmp (ipname, "fmax") == 0)
-		fprintf (dst_file, " EF_MEP_COP_FMAX |");
-	      if (strcmp (ipname, "ivc2") == 0)
-		fprintf (dst_file, " EF_MEP_COP_IVC2 |");
-	    }
-	  fprintf (dst_file, " EF_MEP_CPU_%s,", upcase (mep_core_names[mep_core_type]));
+	  gen_cpu_flags (modules);
 
 	  fprintf (dst_file, " %d,", mep_endian_type == MEP_ENDIAN_LITTLE ? 0 : 1);
 	  fprintf (dst_file, " %d,", vliw_bits);

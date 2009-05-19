@@ -1,3 +1,10 @@
+2009-05-19  DJ Delorie  <dj@redhat.com>
+
+	* mepcfgtool.c (do_user_cop_ip): Fix type of "width".
+	(gen_cpu_flags): New.
+	(do_cgen_config_opc): Call it.  Change default config to be first
+	real config, with all options enabled.
+
 2009-04-30  DJ Delorie  <dj@redhat.com>
 
 	* default.cfg: Add IVC2 coprocessor.

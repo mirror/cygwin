@@ -1530,8 +1530,7 @@ do_extra_headers ()
 
   find_line ("start-extra-headers", 1, 1, 1);
 
-  fprintf (dst_file, "EXTRA_HEADERS = $(srcdir)/config/mep/intrinsics.h \\\n");
-  fprintf (dst_file, "\t$(srcdir)/config/mep/stdint.h");
+  fprintf (dst_file, "EXTRA_HEADERS = $(srcdir)/config/mep/intrinsics.h");
 
   for (h=the_headers; h; h=h->next)
     fprintf (dst_file, " \\\n\t$(srcdir)/config/mep/%s.h", h->header);

@@ -1,5 +1,7 @@
 2009-05-19  DJ Delorie  <dj@redhat.com>
 
+	* mepcfgtool.c (do_extra_headers): Remove stdint.h from EXTRA_HEADERS.
+
 	* mepcfgtool.c (do_user_cop_ip): Fix type of "width".
 	(gen_cpu_flags): New.
 	(do_cgen_config_opc): Call it.  Change default config to be first

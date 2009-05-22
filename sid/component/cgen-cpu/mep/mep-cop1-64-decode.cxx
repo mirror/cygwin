@@ -215,6 +215,7 @@ mepcop1_64_idesc mepcop1_64_idesc::idesc_table[MEPCOP1_64_INSN_CPSMSBSLLA1_W_P1 
   { mepcop1_64_sem_cdmoviu_P0_P1, "CDMOVIU_P0_P1", MEPCOP1_64_INSN_CDMOVIU_P0_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\xc" }, 0, CONFIG_NONE, (1<<SLOTS_P0)|(1<<SLOTS_P1) } },
   { mepcop1_64_sem_cdmovi_P0_P1, "CDMOVI_P0_P1", MEPCOP1_64_INSN_CDMOVI_P0_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\xc" }, 0, CONFIG_NONE, (1<<SLOTS_P0)|(1<<SLOTS_P1) } },
   { mepcop1_64_sem_c1nop_P1, "C1NOP_P1", MEPCOP1_64_INSN_C1NOP_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x4" }, 0, CONFIG_NONE, (1<<SLOTS_P1) } },
+  { mepcop1_64_sem_cpmovi_b_P0S_P1, "CPMOVI_B_P0S_P1", MEPCOP1_64_INSN_CPMOVI_B_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_64_sem_cpadda1u_b_P1, "CPADDA1U_B_P1", MEPCOP1_64_INSN_CPADDA1U_B_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x4" }, 0, CONFIG_NONE, (1<<SLOTS_P1) } },
   { mepcop1_64_sem_cpadda1_b_P1, "CPADDA1_B_P1", MEPCOP1_64_INSN_CPADDA1_B_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x4" }, 0, CONFIG_NONE, (1<<SLOTS_P1) } },
   { mepcop1_64_sem_cpaddua1_h_P1, "CPADDUA1_H_P1", MEPCOP1_64_INSN_CPADDUA1_H_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x4" }, 0, CONFIG_NONE, (1<<SLOTS_P1) } },
@@ -393,6 +394,8 @@ static void
 mepcop1_64_extract_sfmt_cpmoviu_w_P0_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_64_insn_word base_insn, mepcop1_64_insn_word entire_insn);
 static void
 mepcop1_64_extract_sfmt_c1nop_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_64_insn_word base_insn, mepcop1_64_insn_word entire_insn);
+static void
+mepcop1_64_extract_sfmt_cpmovi_b_P0S_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_64_insn_word base_insn, mepcop1_64_insn_word entire_insn);
 static void
 mepcop1_64_extract_sfmt_cpsrlia1_1_p1 (mepcop1_64_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_64_insn_word base_insn, mepcop1_64_insn_word entire_insn);
 static void
@@ -1222,14 +1225,19 @@ mepcop1_64_scache::decode (mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_64_insn
       case 26 : /* fall through */
       case 27 :
         {
-          unsigned int val = (((insn >> 23) & (1 << 0)));
+          unsigned int val = (((insn >> 22) & (1 << 1)) | ((insn >> 12) & (1 << 0)));
           switch (val)
           {
-          case 0 :
+          case 0 : /* fall through */
+          case 1 :
             if ((entire_insn & 0xfff8000f) == 0x300000)
               { itype = MEPCOP1_64_INSN_CPUNPACKU_H_P0S_P1; mepcop1_64_extract_sfmt_cpadd3_b_P0S_P1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCOP1_64_INSN_X_INVALID; mepcop1_64_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 :
+          case 2 :
+            if ((entire_insn & 0xfff8300f) == 0xb00000)
+              { itype = MEPCOP1_64_INSN_CPMOVI_B_P0S_P1; mepcop1_64_extract_sfmt_cpmovi_b_P0S_P1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = MEPCOP1_64_INSN_X_INVALID; mepcop1_64_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 3 :
             if ((entire_insn & 0xf8300f) == 0xb01000)
               { itype = MEPCOP1_64_INSN_CPMOVI_H_P0_P1; mepcop1_64_extract_sfmt_cpmovi_h_P0_P1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCOP1_64_INSN_X_INVALID; mepcop1_64_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
@@ -3956,7 +3964,7 @@ mepcop1_64_extract_sfmt_cpmov_P0S_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* cur
 void
 mepcop1_64_extract_sfmt_cpccadd_b_P0S_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_64_insn_word base_insn, mepcop1_64_insn_word entire_insn){
     mepcop1_64_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_cpmoviu_w_P0_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
     UINT f_ivc2_5u13;
 
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
@@ -4006,7 +4014,7 @@ mepcop1_64_extract_sfmt_cpmovfrcsar0_P0S_P1 (mepcop1_64_scache* abuf, mep_ext1_c
 void
 mepcop1_64_extract_sfmt_cpmovtocsar0_P0S_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_64_insn_word base_insn, mepcop1_64_insn_word entire_insn){
     mepcop1_64_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_cpmoviu_w_P0_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
     UINT f_ivc2_5u13;
 
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
@@ -4307,6 +4315,35 @@ mepcop1_64_extract_sfmt_c1nop_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* current
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_c1nop_P1)\t"
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+    }
+#undef FLD
+}
+
+void
+mepcop1_64_extract_sfmt_cpmovi_b_P0S_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_64_insn_word base_insn, mepcop1_64_insn_word entire_insn){
+    mepcop1_64_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
+    UINT f_ivc2_5u13;
+    INT f_ivc2_8s20;
+
+    f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
+    f_ivc2_8s20 = EXTRACT_MSB0_INT (insn, 32, 20, 8);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_ivc2_8s20) = f_ivc2_8s20;
+  FLD (f_ivc2_5u13) = f_ivc2_5u13;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_cpmovi_b_P0S_P1)\t"
+        << " f_ivc2_8s20:0x" << hex << f_ivc2_8s20 << dec
+        << " f_ivc2_5u13:0x" << hex << f_ivc2_5u13 << dec
         << endl;
     }
 

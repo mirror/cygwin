@@ -717,7 +717,7 @@ current_cpu->check_option_cp (pc);
 sem_status
 mepcop1_16_sem_cpccadd_b_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcop1_16_scache* abuf = sem;
   unsigned long long written = 0;
@@ -1333,7 +1333,7 @@ current_cpu->check_option_cp (pc);
 sem_status
 mepcop1_16_sem_cpmovtocsar0_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcop1_16_scache* abuf = sem;
   unsigned long long written = 0;
@@ -1355,7 +1355,7 @@ current_cpu->ivc2_cpmovtocsar0 (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u1
 sem_status
 mepcop1_16_sem_cpmovtocsar1_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcop1_16_scache* abuf = sem;
   unsigned long long written = 0;
@@ -1377,7 +1377,7 @@ current_cpu->ivc2_cpmovtocsar1 (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u1
 sem_status
 mepcop1_16_sem_cpmovtocc_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcop1_16_scache* abuf = sem;
   unsigned long long written = 0;
@@ -2816,7 +2816,7 @@ current_cpu->ivc2_cpaccpa0 (pc);
 sem_status
 mepcop1_16_sem_cpsrla0_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcop1_16_scache* abuf = sem;
   unsigned long long written = 0;
@@ -2838,7 +2838,7 @@ current_cpu->ivc2_cpsrla0 (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)]);
 sem_status
 mepcop1_16_sem_cpsraa0_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcop1_16_scache* abuf = sem;
   unsigned long long written = 0;
@@ -2860,7 +2860,7 @@ current_cpu->ivc2_cpsraa0 (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)]);
 sem_status
 mepcop1_16_sem_cpslla0_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcop1_16_scache* abuf = sem;
   unsigned long long written = 0;
@@ -3288,6 +3288,33 @@ mepcop1_16_sem_cpfacla0s1_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 {
 current_cpu->check_option_cp (pc);
 current_cpu->ivc2_cpfacla0s1_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** cpmovi_b_P0S_P1: cpmovi.b $crqp,$simm8p20
+
+sem_status
+mepcop1_16_sem_cpmovi_b_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
+{
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
+  sem_status status = SEM_STATUS_NORMAL;
+  mepcop1_16_scache* abuf = sem;
+  unsigned long long written = 0;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 4;
+
+{
+current_cpu->check_option_cp (pc);
+  {
+    DI opval = current_cpu->ivc2_cpmovi_b (pc, FLD (f_ivc2_8s20));
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "cr64" << '[' << FLD (f_ivc2_5u13) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_cr64_set (FLD (f_ivc2_5u13), opval);
+  }
 }
 
   current_cpu->done_insn (npc, status);

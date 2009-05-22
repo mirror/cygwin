@@ -1,3 +1,16 @@
+2009-05-22  DJ Delorie  <dj@redhat.com>
+
+	* mep-cop1-16-decode.cxx: Regenerate.
+	* mep-cop1-16-decode.h: Regenerate.
+	* mep-cop1-16-model.cxx: Regenerate.
+	* mep-cop1-16-model.h: Regenerate.
+	* mep-cop1-16-sem.cxx: Regenerate.
+	* mep-cop1-64-decode.cxx: Regenerate.
+	* mep-cop1-64-decode.h: Regenerate.
+	* mep-cop1-64-model.cxx: Regenerate.
+	* mep-cop1-64-model.h: Regenerate.
+	* mep-cop1-64-sem.cxx: Regenerate.
+
 2009-05-18  Kevin Buettner  <kevinb@redhat.com>
 
 	* mep.cxx (mep_cpu::reset): Call `h_regs_flush_write_queue'.

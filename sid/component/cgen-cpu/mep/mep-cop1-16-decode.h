@@ -54,7 +54,7 @@ typedef enum mepcop1_16_insn_type {
  , MEPCOP1_16_INSN_CPFSFTBA0S0_B_P0S, MEPCOP1_16_INSN_CPFSFTBUA0S0_H_P0S, MEPCOP1_16_INSN_CPFSFTBLA0S0_H_P0S, MEPCOP1_16_INSN_CPFACA0S0U_B_P0S
  , MEPCOP1_16_INSN_CPFACA0S0_B_P0S, MEPCOP1_16_INSN_CPFACUA0S0_H_P0S, MEPCOP1_16_INSN_CPFACLA0S0_H_P0S, MEPCOP1_16_INSN_CPFSFTBA0S1U_B_P0S
  , MEPCOP1_16_INSN_CPFSFTBA0S1_B_P0S, MEPCOP1_16_INSN_CPFSFTBUA0S1_H_P0S, MEPCOP1_16_INSN_CPFSFTBLA0S1_H_P0S, MEPCOP1_16_INSN_CPFACA0S1U_B_P0S
- , MEPCOP1_16_INSN_CPFACA0S1_B_P0S, MEPCOP1_16_INSN_CPFACUA0S1_H_P0S, MEPCOP1_16_INSN_CPFACLA0S1_H_P0S
+ , MEPCOP1_16_INSN_CPFACA0S1_B_P0S, MEPCOP1_16_INSN_CPFACUA0S1_H_P0S, MEPCOP1_16_INSN_CPFACLA0S1_H_P0S, MEPCOP1_16_INSN_CPMOVI_B_P0S_P1
 } MEPCOP1_16_INSN_TYPE;
 
 
@@ -87,6 +87,10 @@ union mepcop1_16_sem_fields {
   struct { /* no operands */
     int empty;
   } fmt_empty;
+  struct { /*  */
+    INT f_ivc2_8s20;
+    UINT f_ivc2_5u13;
+  } sfmt_cpmovi_b_P0S_P1;
   struct { /*  */
     UINT f_ivc2_5u13;
     UINT f_ivc2_5u18;
@@ -276,5 +280,6 @@ extern mepcop1_16_sem_fn mepcop1_16_sem_cpfaca0s1u_b_P0S;
 extern mepcop1_16_sem_fn mepcop1_16_sem_cpfaca0s1_b_P0S;
 extern mepcop1_16_sem_fn mepcop1_16_sem_cpfacua0s1_h_P0S;
 extern mepcop1_16_sem_fn mepcop1_16_sem_cpfacla0s1_h_P0S;
+extern mepcop1_16_sem_fn mepcop1_16_sem_cpmovi_b_P0S_P1;
 
 #endif /* MEPCOP1_16_DECODE_H */

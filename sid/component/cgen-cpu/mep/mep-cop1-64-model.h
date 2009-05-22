@@ -519,6 +519,8 @@ protected:
   UINT model_cdmovi_P0_P1_after (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem);
   UINT model_c1nop_P1_before (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem);
   UINT model_c1nop_P1_after (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem);
+  UINT model_cpmovi_b_P0S_P1_before (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem);
+  UINT model_cpmovi_b_P0S_P1_after (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem);
   UINT model_cpadda1u_b_P1_before (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem);
   UINT model_cpadda1u_b_P1_after (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem);
   UINT model_cpadda1_b_P1_before (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem);

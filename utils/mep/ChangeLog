@@ -1,3 +1,8 @@
+2009-05-22  DJ Delorie  <dj@redhat.com>
+
+	* mepcfgtool.c (do_cgen_config_opc): Propagate endianness and VLIW
+	size to default configuration.
+
 2009-05-19  DJ Delorie  <dj@redhat.com>
 
 	* mepcfgtool.c (do_extra_headers): Remove stdint.h from EXTRA_HEADERS.

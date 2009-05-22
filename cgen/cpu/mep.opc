@@ -1303,7 +1303,7 @@ mep_examine_ivc2_insns (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED, bfd_vma pc ATTRIBUTE_
   else
     e = 0;
 
-  if ((buf[0^e] & 0xf0) != 0xf0)
+  if (((unsigned char)buf[0^e] & 0xf0) < 0xc0)
     {
       /*      <--00--><--11--><--22--><--33--><--44--><--55--><--66--><--77--> */
       /* V1   [-----core-----][--------p0s-------][------------p1------------] */
@@ -1528,7 +1528,7 @@ mep_config_map_struct mep_config_map[] =
 {
   /* config-map-start */
   /* Default entry: first module, with all options enabled. */
-  { "", 0,  EF_MEP_COP_IVC2 | EF_MEP_CPU_C5,1, 0, { 1, "\x20" }, { 1, "\x10" }, { 1, "\x8" }, { 1, "\x4" }, { 1, "\x3c" }, { 1, "\xc0" }, OPTION_MASK | (1 << CGEN_INSN_OPTIONAL_DSP_INSN) | (1 << CGEN_INSN_OPTIONAL_UCI_INSN) },
+  { "", 0,  EF_MEP_COP_IVC2 | EF_MEP_CPU_C5,0, 64, { 1, "\x20" }, { 1, "\x10" }, { 1, "\x8" }, { 1, "\x4" }, { 1, "\x3c" }, { 1, "\xc0" }, OPTION_MASK | (1 << CGEN_INSN_OPTIONAL_DSP_INSN) | (1 << CGEN_INSN_OPTIONAL_UCI_INSN) },
   { "default", CONFIG_DEFAULT, EF_MEP_COP_IVC2 | EF_MEP_CPU_C5, 0, 64, { 1, "\x20" }, { 1, "\x10" }, { 1, "\x8" }, { 1, "\x4" }, { 1, "\x3c" }, { 1, "\xc0" },
 	  0
 	| (1 << CGEN_INSN_OPTIONAL_CP_INSN)

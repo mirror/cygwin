@@ -780,7 +780,7 @@ mepcop1_16_mep_model::model_cphadd_w_P0S_P1_after (mep_ext1_cpu *current_cpu, me
 UINT
 mepcop1_16_mep_model::model_cpccadd_b_P0S_P1_before (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -794,7 +794,7 @@ mepcop1_16_mep_model::model_cpccadd_b_P0S_P1_before (mep_ext1_cpu *current_cpu, 
 UINT
 mepcop1_16_mep_model::model_cpccadd_b_P0S_P1_after (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -1470,7 +1470,7 @@ mepcop1_16_mep_model::model_cpmovfrcc_P0S_P1_after (mep_ext1_cpu *current_cpu, m
 UINT
 mepcop1_16_mep_model::model_cpmovtocsar0_P0S_P1_before (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -1484,7 +1484,7 @@ mepcop1_16_mep_model::model_cpmovtocsar0_P0S_P1_before (mep_ext1_cpu *current_cp
 UINT
 mepcop1_16_mep_model::model_cpmovtocsar0_P0S_P1_after (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -1500,7 +1500,7 @@ mepcop1_16_mep_model::model_cpmovtocsar0_P0S_P1_after (mep_ext1_cpu *current_cpu
 UINT
 mepcop1_16_mep_model::model_cpmovtocsar1_P0S_P1_before (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -1514,7 +1514,7 @@ mepcop1_16_mep_model::model_cpmovtocsar1_P0S_P1_before (mep_ext1_cpu *current_cp
 UINT
 mepcop1_16_mep_model::model_cpmovtocsar1_P0S_P1_after (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -1530,7 +1530,7 @@ mepcop1_16_mep_model::model_cpmovtocsar1_P0S_P1_after (mep_ext1_cpu *current_cpu
 UINT
 mepcop1_16_mep_model::model_cpmovtocc_P0S_P1_before (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -1544,7 +1544,7 @@ mepcop1_16_mep_model::model_cpmovtocc_P0S_P1_before (mep_ext1_cpu *current_cpu, 
 UINT
 mepcop1_16_mep_model::model_cpmovtocc_P0S_P1_after (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3390,7 +3390,7 @@ mepcop1_16_mep_model::model_cpaccpa0_P0S_after (mep_ext1_cpu *current_cpu, mepco
 UINT
 mepcop1_16_mep_model::model_cpsrla0_P0S_before (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3404,7 +3404,7 @@ mepcop1_16_mep_model::model_cpsrla0_P0S_before (mep_ext1_cpu *current_cpu, mepco
 UINT
 mepcop1_16_mep_model::model_cpsrla0_P0S_after (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3420,7 +3420,7 @@ mepcop1_16_mep_model::model_cpsrla0_P0S_after (mep_ext1_cpu *current_cpu, mepcop
 UINT
 mepcop1_16_mep_model::model_cpsraa0_P0S_before (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3434,7 +3434,7 @@ mepcop1_16_mep_model::model_cpsraa0_P0S_before (mep_ext1_cpu *current_cpu, mepco
 UINT
 mepcop1_16_mep_model::model_cpsraa0_P0S_after (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3450,7 +3450,7 @@ mepcop1_16_mep_model::model_cpsraa0_P0S_after (mep_ext1_cpu *current_cpu, mepcop
 UINT
 mepcop1_16_mep_model::model_cpslla0_P0S_before (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3464,7 +3464,7 @@ mepcop1_16_mep_model::model_cpslla0_P0S_before (mep_ext1_cpu *current_cpu, mepco
 UINT
 mepcop1_16_mep_model::model_cpslla0_P0S_after (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.sfmt_cpadd3_b_P0S_P1.f
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -4047,6 +4047,36 @@ mepcop1_16_mep_model::model_cpfacla0s1_h_P0S_after (mep_ext1_cpu *current_cpu, m
 #undef FLD
 }
 
+UINT
+mepcop1_16_mep_model::model_cpmovi_b_P0S_P1_before (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
+{
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
+  const mepcop1_16_scache* abuf = sem;
+  const mepcop1_16_idesc* idesc = abuf->idesc;
+  int cycles = 0;
+  {
+    cycles += model_u_exec_before (current_cpu, idesc, 0);
+  }
+  return cycles;
+#undef FLD
+}
+
+UINT
+mepcop1_16_mep_model::model_cpmovi_b_P0S_P1_after (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
+{
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
+  const mepcop1_16_scache* abuf = sem;
+  const mepcop1_16_idesc* idesc = abuf->idesc;
+  int cycles = 0;
+  {
+    int referenced = 0;
+    unsigned long long insn_referenced = abuf->written;
+    cycles += model_u_exec_after (current_cpu, idesc, 0, referenced);
+  }
+  return cycles;
+#undef FLD
+}
+
 /* We assume UNIT_NONE == 0 because the tables don't always terminate
    entries with it.  */
 
@@ -4188,5 +4218,6 @@ const mepcop1_16_mep_model::insn_timing mepcop1_16_mep_model::timing[] = {
   { MEPCOP1_16_INSN_CPFACA0S1_B_P0S, & mepcop1_16_mep_model::model_cpfaca0s1_b_P0S_before, & mepcop1_16_mep_model::model_cpfaca0s1_b_P0S_after, { { mepcop1_16_mep_model::UNIT_U_EXEC, 1, 1 } } },
   { MEPCOP1_16_INSN_CPFACUA0S1_H_P0S, & mepcop1_16_mep_model::model_cpfacua0s1_h_P0S_before, & mepcop1_16_mep_model::model_cpfacua0s1_h_P0S_after, { { mepcop1_16_mep_model::UNIT_U_EXEC, 1, 1 } } },
   { MEPCOP1_16_INSN_CPFACLA0S1_H_P0S, & mepcop1_16_mep_model::model_cpfacla0s1_h_P0S_before, & mepcop1_16_mep_model::model_cpfacla0s1_h_P0S_after, { { mepcop1_16_mep_model::UNIT_U_EXEC, 1, 1 } } },
+  { MEPCOP1_16_INSN_CPMOVI_B_P0S_P1, & mepcop1_16_mep_model::model_cpmovi_b_P0S_P1_before, & mepcop1_16_mep_model::model_cpmovi_b_P0S_P1_after, { { mepcop1_16_mep_model::UNIT_U_EXEC, 1, 1 } } },
 };
 

@@ -403,6 +403,8 @@ protected:
   UINT model_cpfacua0s1_h_P0S_after (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem);
   UINT model_cpfacla0s1_h_P0S_before (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem);
   UINT model_cpfacla0s1_h_P0S_after (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem);
+  UINT model_cpmovi_b_P0S_P1_before (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem);
+  UINT model_cpmovi_b_P0S_P1_after (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem);
 
   /* Enum declaration for unit types.  */
 typedef enum unit_number {

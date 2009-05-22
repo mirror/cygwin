@@ -4110,7 +4110,9 @@ do_cgen_config_opc ()
   fputs ("  /* Default entry: first module, with all options enabled. */\n", dst_file);
   fprintf (dst_file, "  { \"\", 0, ");
   gen_cpu_flags (default_module);
-  fprintf (dst_file, "1, 0,");
+  fprintf (dst_file, "%d, %d,",
+	   mep_endian_type == MEP_ENDIAN_LITTLE ? 0 : 1,
+	   default_module ? cop_vliw_bits (default_module) : 0);
   if (default_module)
     gen_isa_masks (default_module, 1);
   else

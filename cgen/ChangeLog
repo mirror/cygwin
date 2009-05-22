@@ -1,3 +1,15 @@
+2009-05-22  DJ Delorie  <dj@redhat.com>
+
+	* cpu/mep.opc (mep_examine_ivc2_insns): Fix bug in ivc2 decoder.
+	(mep_config_map): Regenerate.
+
+	* cpu/mep-ivc2.cpu (h-ccr-ivc2): Add generic names as well as
+	ivc2-specific names.
+	(simm8p20): New.
+	(cmovc): move to after field definitions, use ivc2-specific
+	register names.
+	(cpmovi_b_P0S_P1): New.
+	
 2009-05-19  DJ Delorie  <dj@redhat.com>
 
 	* cpu/mep.opc: Regenerate configuration.

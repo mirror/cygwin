@@ -83,7 +83,7 @@ static void gdbtk_detach (void);
 static void gdbtk_file_changed (char *);
 static void gdbtk_exec_file_display (char *);
 static void gdbtk_call_command (struct cmd_list_element *, char *, int);
-static ptid_t gdbtk_wait (ptid_t, struct target_waitstatus *);
+static ptid_t gdbtk_wait (ptid_t, struct target_waitstatus *, int);
 int x_event (int);
 static int gdbtk_query (const char *, va_list);
 static void gdbtk_warning (const char *, va_list);
@@ -658,11 +658,11 @@ gdbtk_post_add_symbol ()
    target.  */
 
 static ptid_t
-gdbtk_wait (ptid_t ptid, struct target_waitstatus *ourstatus)
+gdbtk_wait (ptid_t ptid, struct target_waitstatus *ourstatus, int options)
 {
   gdbtk_force_detach = 0;
   gdbtk_start_timer ();
-  ptid = target_wait (ptid, ourstatus);
+  ptid = target_wait (ptid, ourstatus, options);
   gdbtk_stop_timer ();
   gdbtk_ptid = ptid;
 

@@ -2454,26 +2454,26 @@ void
 mepcop1_32_extract_sfmt_cmovc_ccrn_rm (mepcop1_32_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_32_insn_word base_insn, mepcop1_32_insn_word entire_insn){
     mepcop1_32_insn_word insn = entire_insn;
 #define FLD(f) abuf->fields.sfmt_cmovc_ccrn_rm.f
-    UINT f_ccrn_lo;
+    UINT f_ivc2_ccrn_c3lo;
     UINT f_rm;
-    UINT f_ccrn_hi;
-    UINT f_ccrn;
+    UINT f_ivc2_ccrn_c3hi;
+    UINT f_ivc2_ccrn_c3;
 
-    f_ccrn_lo = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_ivc2_ccrn_c3lo = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_ccrn_hi = EXTRACT_MSB0_UINT (insn, 32, 28, 2);
-  f_ccrn = ((((f_ccrn_hi) << (4))) | (f_ccrn_lo));
+    f_ivc2_ccrn_c3hi = EXTRACT_MSB0_UINT (insn, 32, 28, 2);
+  f_ivc2_ccrn_c3 = ((((f_ivc2_ccrn_c3hi) << (4))) | (f_ivc2_ccrn_c3lo));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rm) = f_rm;
-  FLD (f_ccrn) = f_ccrn;
+  FLD (f_ivc2_ccrn_c3) = f_ivc2_ccrn_c3;
   FLD (i_rm) = & current_cpu->hardware.h_gpr[f_rm];
   if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_cmovc_ccrn_rm)\t"
         << " f_rm:0x" << hex << f_rm << dec
-        << " f_ccrn:0x" << hex << f_ccrn << dec
+        << " f_ivc2_ccrn_c3:0x" << hex << f_ivc2_ccrn_c3 << dec
         << endl;
     }
 
@@ -2489,25 +2489,25 @@ void
 mepcop1_32_extract_sfmt_cmovc_rn_ccrm (mepcop1_32_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_32_insn_word base_insn, mepcop1_32_insn_word entire_insn){
     mepcop1_32_insn_word insn = entire_insn;
 #define FLD(f) abuf->fields.sfmt_cmovc_rn_ccrm.f
-    UINT f_ccrn_lo;
+    UINT f_ivc2_ccrn_c3lo;
     UINT f_rm;
-    UINT f_ccrn_hi;
-    UINT f_ccrn;
+    UINT f_ivc2_ccrn_c3hi;
+    UINT f_ivc2_ccrn_c3;
 
-    f_ccrn_lo = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_ivc2_ccrn_c3lo = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_ccrn_hi = EXTRACT_MSB0_UINT (insn, 32, 28, 2);
-  f_ccrn = ((((f_ccrn_hi) << (4))) | (f_ccrn_lo));
+    f_ivc2_ccrn_c3hi = EXTRACT_MSB0_UINT (insn, 32, 28, 2);
+  f_ivc2_ccrn_c3 = ((((f_ivc2_ccrn_c3hi) << (4))) | (f_ivc2_ccrn_c3lo));
 
   /* Record the fields for the semantic handler.  */
-  FLD (f_ccrn) = f_ccrn;
+  FLD (f_ivc2_ccrn_c3) = f_ivc2_ccrn_c3;
   FLD (f_rm) = f_rm;
   FLD (i_rm) = & current_cpu->hardware.h_gpr[f_rm];
   if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_cmovc_rn_ccrm)\t"
-        << " f_ccrn:0x" << hex << f_ccrn << dec
+        << " f_ivc2_ccrn_c3:0x" << hex << f_ivc2_ccrn_c3 << dec
         << " f_rm:0x" << hex << f_rm << dec
         << endl;
     }

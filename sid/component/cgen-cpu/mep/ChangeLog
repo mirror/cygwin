@@ -1,3 +1,10 @@
+2009-05-26  DJ Delorie  <dj@redhat.com>
+
+	* mep-cop1-32-decode.cxx: Regenerate.
+	* mep-cop1-32-decode.h: Regenerate.
+	* mep-cop1-32-sem.cxx: Regenerate.
+	* mep-cop1-48-sem.cxx: Regenerate.
+
 2009-05-22  DJ Delorie  <dj@redhat.com>
 
 	* mep-cop1-16-decode.cxx: Regenerate.

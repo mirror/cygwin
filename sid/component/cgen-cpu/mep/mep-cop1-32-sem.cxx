@@ -90,7 +90,7 @@ mepcop1_32_sem_cmov_rn_crm (mep_ext1_cpu* current_cpu, mepcop1_32_scache* sem)
 #undef FLD
 }
 
-// ********** cmovc-ccrn-rm: cmovc $ccrn,$rm
+// ********** cmovc-ccrn-rm: cmovc $ivc2c3ccrn,$rm
 
 sem_status
 mepcop1_32_sem_cmovc_ccrn_rm (mep_ext1_cpu* current_cpu, mepcop1_32_scache* sem)
@@ -103,10 +103,10 @@ mepcop1_32_sem_cmovc_ccrn_rm (mep_ext1_cpu* current_cpu, mepcop1_32_scache* sem)
   PCADDR npc = pc + 4;
 
   {
-    SI opval = * FLD (i_rm);
+    DI opval = * FLD (i_rm);
     if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "ccr" << '[' << FLD (f_ccrn) << ']' << ":=0x" << hex << opval << dec << "  ";
-    current_cpu->h_ccr_set (FLD (f_ccrn), opval);
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << FLD (f_ivc2_ccrn_c3) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (FLD (f_ivc2_ccrn_c3), opval);
   }
 
   current_cpu->done_insn (npc, status);
@@ -114,7 +114,7 @@ mepcop1_32_sem_cmovc_ccrn_rm (mep_ext1_cpu* current_cpu, mepcop1_32_scache* sem)
 #undef FLD
 }
 
-// ********** cmovc-rn-ccrm: cmovc $rm,$ccrn
+// ********** cmovc-rn-ccrm: cmovc $rm,$ivc2c3ccrn
 
 sem_status
 mepcop1_32_sem_cmovc_rn_ccrm (mep_ext1_cpu* current_cpu, mepcop1_32_scache* sem)
@@ -127,7 +127,7 @@ mepcop1_32_sem_cmovc_rn_ccrm (mep_ext1_cpu* current_cpu, mepcop1_32_scache* sem)
   PCADDR npc = pc + 4;
 
   {
-    SI opval = current_cpu->hardware.h_ccr[FLD (f_ccrn)];
+    SI opval = current_cpu->h_ccr_ivc2_get (FLD (f_ivc2_ccrn_c3));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_rm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_rm) = opval;

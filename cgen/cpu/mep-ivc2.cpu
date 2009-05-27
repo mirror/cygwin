@@ -55,7 +55,7 @@
 (define-hardware
   (name h-ccr-ivc2)
   (comment "Coprocessor control registers for ivc2 coprocessor")
-  (attrs VIRTUAL all-mep-core-isas)
+  (attrs VIRTUAL all-mep-isas)
   (type register DI (64))
   (set (index newval) (c-call VOID "h_ccr_set" index newval))
   (get (index) (c-call DI "h_ccr_get" index))
@@ -71,23 +71,23 @@
 
 	 ($csar1 15)
 
-	 ($acc00 16)
-	 ($acc01 17)
-	 ($acc02 18)
-	 ($acc03 19)
-	 ($acc04 20)
-	 ($acc05 21)
-	 ($acc06 22)
-	 ($acc07 23)
+	 ($acc0_0 16)
+	 ($acc0_1 17)
+	 ($acc0_2 18)
+	 ($acc0_3 19)
+	 ($acc0_4 20)
+	 ($acc0_5 21)
+	 ($acc0_6 22)
+	 ($acc0_7 23)
 
-	 ($acc10 24)
-	 ($acc11 25)
-	 ($acc12 26)
-	 ($acc13 27)
-	 ($acc14 28)
-	 ($acc15 29)
-	 ($acc16 30)
-	 ($acc17 31)
+	 ($acc1_0 24)
+	 ($acc1_1 25)
+	 ($acc1_2 26)
+	 ($acc1_3 27)
+	 ($acc1_4 28)
+	 ($acc1_5 29)
+	 ($acc1_6 30)
+	 ($acc1_7 31)
 	 (.unsplice (.map -ccr-reg-pair (.iota 32)))
         )
   )
@@ -217,6 +217,8 @@
 (dnop simm16p0 "sImm16p0" (all-mep-isas) h-sint f-ivc2-simm16p0)
 
 
+(df f-ivc2-ccrn-c3hi "ccrn hi  2u28" (all-mep-isas) 28 2 UINT #f #f)
+(df f-ivc2-ccrn-c3lo "ccrn lo  4u4"  (all-mep-isas)  4 4 UINT #f #f)
 
 (df f-ivc2-crn     "ivc2 crn"      (all-mep-isas)  0 4 UINT #f #f)
 (df f-ivc2-crm     "ivc2 crm"      (all-mep-isas)  4 4 UINT #f #f)
@@ -226,6 +228,20 @@
 (df f-ivc2-cmov1   "ivc2 cmov op1" (all-mep-isas) 8 12 UINT #f #f)
 (df f-ivc2-cmov2   "ivc2 cmov op2" (all-mep-isas) 22 6 UINT #f #f)
 (df f-ivc2-cmov3   "ivc2 cmov op2" (all-mep-isas) 28 4 UINT #f #f)
+
+(define-multi-ifield
+  (name f-ivc2-ccrn-c3)
+  (comment "Coprocessor register number field")
+  (attrs all-mep-isas)
+  (mode UINT)
+  (subfields f-ivc2-ccrn-c3hi f-ivc2-ccrn-c3lo)
+  (insert (sequence ()
+		    (set (ifield f-ivc2-ccrn-c3hi)  (and (srl (ifield f-ivc2-ccrn-c3) 4) #x3))
+		    (set (ifield f-ivc2-ccrn-c3lo)  (and (ifield f-ivc2-ccrn-c3) #xf))))
+  (extract (set (ifield f-ivc2-ccrn-c3)
+		(or (sll (ifield f-ivc2-ccrn-c3hi) 4)
+		    (ifield f-ivc2-ccrn-c3lo))))
+  )
 
 (define-multi-ifield
   (name f-ivc2-ccrn)
@@ -258,7 +274,7 @@
 (dnop ivc2rm   "reg Rm"                  (all-mep-isas (CDATA REGNUM)) h-gpr  f-ivc2-crm)
 (dnop ivc2crn  "copro Rn (0-31, 64-bit"  (all-mep-isas (CDATA REGNUM)) h-cr64 f-ivc2-crnx)
 (dnop ivc2ccrn "copro control reg CCRn"  (all-mep-isas (CDATA REGNUM)) h-ccr-ivc2  f-ivc2-ccrn)
-(dnop ivc2c3ccrn "copro control reg CCRn"  (all-mep-isas (CDATA REGNUM)) h-ccr-ivc2  f-ccrn)
+(dnop ivc2c3ccrn "copro control reg CCRn"  (all-mep-isas (CDATA REGNUM)) h-ccr-ivc2  f-ivc2-ccrn-c3)
 
 ; [--][--] [--][--] [--][--] [--]
 ; 0----+-- --1----+ ----2--- -+--

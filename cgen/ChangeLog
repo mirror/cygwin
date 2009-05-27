@@ -1,3 +1,12 @@
+2009-05-26  DJ Delorie  <dj@redhat.com>
+
+	* cpu/mep-ivc2.cpu (h-ccr-ivc2): Enable for C3 slots, fix
+	accumulator names.
+	(f-ivc2-ccrn-c3hi): New.
+	(f-ivc2-ccrn-c3lo): New.
+	(f-ivc2-ccrn-c3): New.
+	(ivc2c3ccrn): Use it.
+
 2009-05-22  DJ Delorie  <dj@redhat.com>
 
 	* cpu/mep.opc (mep_examine_ivc2_insns): Fix bug in ivc2 decoder.

@@ -103,10 +103,10 @@ mepcop1_48_sem_cmovc_ccrn_rm_p0 (mep_ext1_cpu* current_cpu, mepcop1_48_scache* s
   PCADDR npc = pc + 4;
 
   {
-    SI opval = * FLD (i_ivc2rm);
+    DI opval = * FLD (i_ivc2rm);
     if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "ccr" << '[' << FLD (f_ivc2_ccrn) << ']' << ":=0x" << hex << opval << dec << "  ";
-    current_cpu->h_ccr_set (FLD (f_ivc2_ccrn), opval);
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << FLD (f_ivc2_ccrn) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (FLD (f_ivc2_ccrn), opval);
   }
 
   current_cpu->done_insn (npc, status);
@@ -127,7 +127,7 @@ mepcop1_48_sem_cmovc_rn_ccrm_p0 (mep_ext1_cpu* current_cpu, mepcop1_48_scache* s
   PCADDR npc = pc + 4;
 
   {
-    SI opval = current_cpu->hardware.h_ccr[FLD (f_ivc2_ccrn)];
+    SI opval = current_cpu->h_ccr_ivc2_get (FLD (f_ivc2_ccrn));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << FLD (f_ivc2_crm) << ']' << ":=0x" << hex << opval << dec << "  ";
     * FLD (i_ivc2rm) = opval;

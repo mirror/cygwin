@@ -158,13 +158,13 @@ union mepcop1_32_sem_fields {
   } sfmt_cpfsftbi_C3;
   struct { /*  */
     SI* i_rm;
-    UINT f_ccrn;
+    UINT f_ivc2_ccrn_c3;
     UINT f_rm;
     unsigned char out_rm;
   } sfmt_cmovc_rn_ccrm;
   struct { /*  */
     SI* i_rm;
-    UINT f_ccrn;
+    UINT f_ivc2_ccrn_c3;
     UINT f_rm;
     unsigned char in_rm;
   } sfmt_cmovc_ccrn_rm;

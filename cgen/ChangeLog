@@ -1,3 +1,9 @@
+2009-05-28  DJ Delorie  <dj@redhat.com>
+
+	* cpu/mep.opc (parse_signed16_range): New.
+	(parse_unsigned16_range): New.
+	* cpu/mep-ivc2.cpu (imm16p0, simm16p0): Use them.
+
 2009-05-26  DJ Delorie  <dj@redhat.com>
 
 	* cpu/mep-ivc2.cpu (h-ccr-ivc2): Enable for C3 slots, fix

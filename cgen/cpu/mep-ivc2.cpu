@@ -213,8 +213,8 @@
 (dnop ivc-x-0-4 "filler" (all-mep-isas) h-uint f-ivc2-4u0)
 (dnop ivc-x-0-5 "filler" (all-mep-isas) h-uint f-ivc2-5u0)
 
-(dnop imm16p0 "Imm16p0" (all-mep-isas) h-uint f-ivc2-imm16p0)
-(dnop simm16p0 "sImm16p0" (all-mep-isas) h-sint f-ivc2-simm16p0)
+(dpop imm16p0 "Imm16p0" (all-mep-isas) h-uint f-ivc2-imm16p0 "unsigned16_range")
+(dpop simm16p0 "sImm16p0" (all-mep-isas) h-sint f-ivc2-simm16p0 "signed16_range")
 
 
 (df f-ivc2-ccrn-c3hi "ccrn hi  2u28" (all-mep-isas) 28 2 UINT #f #f)

@@ -1353,6 +1353,8 @@ do_config_cc_spec ()
 	  ip = find_sub (modules, "cop", "ip", 0);
 	  if (ip && ip->val && strcmp (downcase (ip->val), "fmax") == 0)
 	    fprintf (dst_file, " -mfmax");
+	  if (ip && ip->val && strcmp (downcase (ip->val), "ivc2") == 0)
+	    fprintf (dst_file, " -mivc2");
 	  fprintf (dst_file, "}\\\n");
 	}
     }

@@ -1,3 +1,8 @@
+2009-06-04  DJ Delorie  <dj@redhat.com>
+
+	* mepcfgtool.c (do_config_cc_spec): Pass -mivc2 to gcc when
+	appropriate.
+
 2009-05-22  DJ Delorie  <dj@redhat.com>
 
 	* mepcfgtool.c (do_cgen_config_opc): Propagate endianness and VLIW

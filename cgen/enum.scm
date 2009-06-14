@@ -19,7 +19,8 @@
 	      nil)
 )
 
-; FIXME: this make! method is required by <insn-enum> for some reason. 
+; FIXME: this make! method is required by <insn-enum> for some reason.
+
 (method-make!
  <enum> 'make!
  (lambda (self name comment attrs prefix vals)
@@ -370,8 +371,7 @@
 	(begin
 	  (if (not fld-obj)
 	      (parse-error errtxt "unknown insn field" fld))
-	  
-					; Create enum object and add it to the list of enums.
+	  ; Create enum object and add it to the list of enums.
 	  (let ((e (make <insn-enum>
 		     (parse-name name errtxt)
 		     (parse-comment comment errtxt)

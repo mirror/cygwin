@@ -1030,7 +1030,7 @@
 (method-make!
  <integer-attribute> 'gen-value-for-defn
  (lambda (self value)
-   (string-append 
+   (string-append
     "{ { "
     (send self 'gen-value-for-defn-raw value)
     ", 0 } }")

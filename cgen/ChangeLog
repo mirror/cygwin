@@ -1,3 +1,13 @@
+2009-06-11  Doug Evans  <dje@sebabeach.org>
+
+	* attr.scm: Removing trailing whitespace.
+	* cgen-intrinsics.scm: Ditto.
+	* cgen-sim.scm: Ditto.
+	* cos.scm: Ditto.
+	* enum.scm: Ditto.
+	* guile.scm: Ditto.
+	* sim.scm: Ditto.
+
 2009-05-28  DJ Delorie  <dj@redhat.com>
 
 	* cpu/mep.opc (parse_signed16_range): New.

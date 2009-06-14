@@ -64,7 +64,6 @@
        objs)
   (newline (current-error-port)))
 
-
 
 ;;; Enabling and disabling debugging features of the host Scheme.
 
@@ -91,7 +90,7 @@
 (define (cgen-call-with-debugging flag thunk)
   (if (memq 'debug-extensions *features*)
       ((if flag debug-enable debug-disable) 'debug))
-  
+
   ;; Now, make that debugging / no-debugging setting actually take
   ;; effect.
   ;;
@@ -127,7 +126,7 @@
 		(if (= (length args) 5)
 		    (begin
 		      (apply display-error #f (current-error-port) (cdr args))
-		      ;; Grab a copy of the current stack, 
+		      ;; Grab a copy of the current stack,
 		      (save-stack handler 0)
 		      (backtrace)))
 		(quit 1))
@@ -136,7 +135,7 @@
   ;; handler WITHOUT UNWINDING THE STACK (that's the 'lazy' part).  We
   ;; need the stack left alone so we can produce a backtrace.
   (lazy-catch #t
-	      (lambda () 
+	      (lambda ()
 		;; I have no idea why the 'load-stack' stack mark is
 		;; not still present on the stack; we're still loading
 		;; cgen-APP.scm, aren't we?  But stack-id returns #f

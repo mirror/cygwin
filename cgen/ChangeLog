@@ -1,5 +1,21 @@
 2009-06-14  Doug Evans  <dje@sebabeach.org>
 
+	* Makefile.am (AUTOMAKE_OPTIONS): Add 1.9
+	(GUILE): Fix definition.
+	* Makefile.in: Regenerate with automake 1.9.6.
+	* aclocal.m4: Regenerate with aclocal 1.9.6.
+	* configure.in (AC_PREREQ): Set to 2.59.
+	(AM_INIT_AUTOMAKE): Change version to 1.1.
+	(GENINSRC_NEVER): Define.
+	* configure: Regenerate with autoconf 2.59.
+	* doc/Makefile.am (info_TEXINFOS): Add cgenint.texi.
+	(cgen.info,cgen.dvi): Delete.
+	(cgen_TEXINFOS,cgenint_TEXINFOS): Define.
+	(noinst_TEXINFOS): Add cgenint.texi.
+	(DOCFILES): Add missing files.
+	(MAINTAINERCLEANFILES,DISTCLEANFILES): Define.
+	* doc/Makefile.in: Regenerate with automake 1.9.6.
+
 	* guile.scm: Add "." to %load-path if >= guile version 1.8.
 
 	* attr.scm: Removing trailing whitespace.

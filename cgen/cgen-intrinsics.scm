@@ -26,7 +26,7 @@
   (list
    (list "-K" "isa" "keep isa <isa> in intrinsics" #f
 	 (lambda (args)
-	   (for-each 
+	   (for-each
 	    (lambda (arg) (set! intrinsics-isas (cons (string->symbol arg) intrinsics-isas)))
 	    (string-cut args #\,))))
    (list "-M" "file" "generate insns.md in <file>" #f

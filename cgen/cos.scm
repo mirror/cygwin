@@ -163,7 +163,7 @@
 ;
 ; Add METHODS to CLASS that pass the "message" onto the object in element
 ; ELM-NAME.
-;                                 
+;
 ; (method-make-virtual-forward! class elm-name methods) -> unspecified
 ;
 ; Add virtual METHODS to CLASS that pass the "message" onto the object in

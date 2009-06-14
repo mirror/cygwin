@@ -1987,7 +1987,7 @@ struct scache {
     vpc = sim_engine_invalid_insn (current_cpu, pc, vpc);
   }
 ")) nil))
-  
+
   *UNSPECIFIED*
 )
 

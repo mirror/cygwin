@@ -101,7 +101,7 @@
 	  (if (null? (cdr argv))
 	      (error "missing srcdir arg to `-s'"))
 	  (cadr argv))
-	(loop (cdr argv))))	
+	(loop (cdr argv))))
 )
 
 ; Main routine, parses options and calls generators.

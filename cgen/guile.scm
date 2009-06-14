@@ -64,6 +64,14 @@
        objs)
   (newline (current-error-port)))
 
+;; Guile 1.8 no longer has "." in %load-path so relative path loads
+;; no longer work.
+
+(if (or (> *guile-major-version* 1)
+	(>= *guile-minor-version* 8))
+    (set! %load-path (append %load-path (list ".")))
+)
+
 
 ;;; Enabling and disabling debugging features of the host Scheme.
 

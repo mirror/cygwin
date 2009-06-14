@@ -1,5 +1,19 @@
 2009-06-14  Doug Evans  <dje@sebabeach.org>
 
+	* doc/cgenint.texi: Renamed from internals.texi.  Several cleanups.
+	* doc/app.texi: Cleanup pass.
+	* doc/cgen.texi: Cleanup pass.
+	* doc/glossary.texi: Add entries for ifield, iformat, sformat, insn.
+	* doc/intro.texi: Cleanup pass.
+	* doc/mdate-sh: New file.
+	* doc/opcodes.texi: Cleanup pass.
+	* doc/pmacros.texi: Cleanup pass.
+	* doc/porting.texi: Cleanup pass.
+	* doc/rtl.texi: Cleanup pass.
+	* doc/running.texi: Cleanup pass.  Document more runtime options.
+	* doc/stamp-vti: Update.
+	* doc/version.texi: Update.
+
 	* Makefile.am (AUTOMAKE_OPTIONS): Add 1.9
 	(GUILE): Fix definition.
 	* Makefile.in: Regenerate with automake 1.9.6.

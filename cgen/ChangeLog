@@ -22,6 +22,7 @@
 	(AM_INIT_AUTOMAKE): Change version to 1.1.
 	(GENINSRC_NEVER): Define.
 	* configure: Regenerate with autoconf 2.59.
+	* read.scm (-CGEN-VERSION): Set version number to 1.1.0.
 	* doc/Makefile.am (info_TEXINFOS): Add cgenint.texi.
 	(cgen.info,cgen.dvi): Delete.
 	(cgen_TEXINFOS,cgenint_TEXINFOS): Define.

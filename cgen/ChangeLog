@@ -1,4 +1,6 @@
-2009-06-11  Doug Evans  <dje@sebabeach.org>
+2009-06-14  Doug Evans  <dje@sebabeach.org>
+
+	* guile.scm: Add "." to %load-path if >= guile version 1.8.
 
 	* attr.scm: Removing trailing whitespace.
 	* cgen-intrinsics.scm: Ditto.

@@ -1,10 +1,10 @@
 # Process this file with "automake --cygnus Makefile" to generate Makefile.in
 
-AUTOMAKE_OPTIONS = cygnus
+AUTOMAKE_OPTIONS = 1.9 cygnus
 
 SUBDIRS = doc
 
-GUILE = "`if test -f ../guile/libguile/guile ; then echo ../guile/libguile/guile; else echo guile ; fi` -l guile -s"
+GUILE = "`if test -f ../guile/libguile/guile ; then echo ../guile/libguile/guile; else echo guile ; fi`" -l $(srcdir)/guile.scm -s
 CGENFLAGS = -v
 ARCH = @arch@
 ARCHFILE = $(srcroot)/../cpu/$(ARCH).cpu

@@ -1,4 +1,4 @@
-@c Copyright (C) 2000 Red Hat, Inc.
+@c Copyright (C) 2000, 2009 Red Hat, Inc.
 @c This file is part of the CGEN manual.
 @c For copying conditions, see the file cgen.texi.
 
@@ -12,7 +12,6 @@
 * Opcodes support::
 * Simulator support::
 * Testing support::
-* Implementation language::
 @end menu
 
 @node Overview
@@ -25,7 +24,7 @@ CGEN is a project to provide a framework and toolkit for writing cpu tools.
 * Why do it?::
 * Maybe it should not be done?::
 * How ambitious is CGEN?::
-* What is missing that should be there soon?::
+* What is missing that should be there someday?::
 @end menu
 
 @node Goal
@@ -48,6 +47,8 @@ The description language itself is thus also left to evolve over time!
 Achieving the goal also involves having a toolkit, libcgen, that contains
 a compiled form of the cpu description plus a suite of routines for working
 with the data.
+@footnote{@file{libcgen} currently doesn't exist, but that was the
+original plan.}
 
 CGEN is not a new idea.  Some GNU ports have done something like this --
 for example, the SH port in its early days.  However, the idea never really
@@ -240,19 +241,22 @@ Related to profiling tools are static program analysis tools.
 By this I mean taking machine code as input and analyzing it in some way.
 Except for symbolic information (which could come from BFD or elsewhere),
 CGEN provides enough information to analyze machine code, both the
-the raw instructions *and* their semantics.  Libcgen should contain
+raw instructions *and* their semantics.  Libcgen should contain
 all the basic tools for doing this.
+@footnote{Today this is libopcodes to some degree.}
 
 @node ABI description
 @subsubsection ABI description
 
 Several tools need knowledge of not only a cpu's ISA but also of the ABI
-in use.  I believe it makes sense to apply the same goals that went into
+in use.  I think(!) it makes sense to apply the same goals that went into
 CGEN's architecture description language to an ABI description language:
 specify the ABI in an application independent way and then have a basic
-toolkit/library that uses that data and allow the writing of program
-generators for applications that want more than what the toolkit/library
-provides.
+toolkit/library that provides ways of using that data.
+It might be useful to also allow the writing of program generators
+for applications that want more than what the toolkit/library provides.
+Perhaps not, but the basic toolkit/library should, again I think,
+be useful.
 
 Part of what an ABI defines is the file format and relocations.
 This is something that BFD is built for.  I think a BFD rewrite
@@ -323,13 +327,15 @@ essence most of what is contained in the System V ABI documentation.
 
 That leaves the "miscellaneous" part.  Essentially this is a catchall
 for whatever else is needed.  This would include things like
-include file directory locations, ???.  There's probably no need to
-add these to the CGEN description language.
+include file directory locations, port-specific language features, ???.
+There's not much need to include this info in CGEN, it's pretty
+esoteric and generally useful to only a few applications.
 
 One can even envision a day when GCC emits object files directly.
 The instruction description contains enough information to build
 the instructions and the ABI support would provide enough
 information on relocations and object file formats.
+
 Debugging information should be treated as an orthogonal concept.
 At present it is outside the scope of CGEN, though clearly the same
 reasoning behind CGEN applies to debugging support as well.
@@ -344,17 +350,13 @@ be created that would assist hw/sw codesign.
 Another related application is to have a feedback mechanism from the
 compilation system that helps improve the architecture description
 (both CGEN and HDL).
-For example, the compiler could determine what instructions would have
-made a significant benefit for a particular application.  CGEN descriptions
-for these instructions could be generated, resulting in a new set of
-compilation tools from which the hypothesis of adding the new instructions
-could then be validated.  Note that adding these new instructions only
-required writing CGEN descriptions of them (setting aside HDL concerns).
-Once done, all relevant tools would be automagically updated to support
-the new instructions.
+CGEN descriptions for experimental instructions could be added,
+and a new set of compilation tools quickly regenerated.
+Then experiments could be run analyzing the effectiveness of the
+new instructions.
 
-@node What is missing that should be there soon?
-@subsection What's missing that should be there soon?
+@node What is missing that should be there someday?
+@subsection What's missing that should be there someday?
 
 @itemize @bullet
 @item Support for complex ISA's (i386, m68k).
@@ -386,10 +388,11 @@ libbfd would be a user of this library.
 
 Instruction semantics should also be recorded in libcgen, probably
 in bytecode form.  Operand usage tables, needed for example by the
-m32r assembler, can be lazily computed at runtime.
+m32r assembler, could be lazily computed at runtime.
+Operand usage tables are also useful to gdb's reverse-execution support.
 
 Applications can either make use of libcgen or given the application
-independence of the description language they can write their won code
+independence of the description language they can write their own code
 generators to tailor the output as needed.
 
 @end itemize
@@ -414,8 +417,9 @@ this is using RTL to describe instruction semantics rather than, say, C.
 The assembler can also make use of the instruction semantics.  It doesn't
 make use of the semantics, per se, but what it does use is the input and
 output operand information that is machine generated from the semantics.
-Grokking operand usage from C is possible I guess, but a lot harder.
-So by writing the semantics in RTL multiple applications can make use if it.
+Grokking operand usage from C is possible, but harder.
+@footnote{By this I mean analyzing the C and understanding what it's doing.}
+So by writing the semantics in RTL multiple applications can make use of it.
 One can also generate from the RTL code in languages other than C.
 
 @menu
@@ -436,7 +440,7 @@ The CPU description file needs to provide at least the following:
 @item semantic specification in a way that is amenable to being
 understood and manipulated
 @item performance measurement parameters
-@item support for multiple ISA variants
+@item support for multiple architecture and implementation variants
 @item assembler syntax of the instruction set
 @item how that syntax maps to the bits of the instruction word, and back
 @item support for generating test files
@@ -451,7 +455,8 @@ for obvious reasons.
 @item file format
 @item relocations
 @item function calling conventions
-@item ???
+@item structure layout
+@item ... and all the other usual stuff
 @end itemize
 
 Some architectures require knowledge of the pipeline in order to do
@@ -460,7 +465,8 @@ interlocks) so that will be required as well, as opposed to being solely
 for performance measurement.  Pipeline knowledge is also needed in order
 to achieve accurate profiling information.  However, I haven't spent
 much time on this yet.  The current design/implementation is a first
-pass in order to get something working, and will be revisited.
+pass in order to get something reasonable, and will be revisited
+as necessary.
 
 Support for generating test files is not complete.  Currently the GAS
 test suite generator gets by (barely) without them.  The simulator test
@@ -491,7 +497,7 @@ language used by CGEN.
 Extensibility is achieved by specifying everything as name/value pairs.
 This allows new elements to be added and even CPU specific elements to
 be added without complicating the language or requiring a new element in
-a @code{define_insn} type entry to be added to each existing port.
+a @code{define_insn}-like entry to be added to each existing port.
 Macros can be used to eliminate the verbosity of repetitively specifying
 the ``name'' part, so one can have it both ways.  Imagine GCC's
 @file{.md} file elements specified as name/value pairs with macro's
@@ -548,7 +554,7 @@ Each of these elements is explained in more detail in @ref{RTL}.
 There are at least two potential problem areas in the language's design.
 
 The first problem is variation in assembly language syntax.  Examples of
-this are Intel vs AT&T i386 syntax, and Motorola vs MIT M68k syntax.
+this are Intel vs AT&T i386 syntax, and Motorola vs MIT m68k syntax.
 I think there isn't a sufficient number of important cases to warrant
 handling this efficiently.  One could either ignore the issue for
 situations where divergence is sufficient to dissuade one from handling
@@ -571,7 +577,7 @@ should it prove reasonable to do so.  The CPU description file won't
 change, which is the important thing.}, so if one wanted to implement
 the disassembler/assembler via other means one can.
 
-The other potential problem area is relocations.  Clearly part of
+The second problem area is relocations.  Clearly part of
 processing assembly code is dealing with the relocations involved
 (e.g. GOT table specification).  Relocation support necessarily requires
 BFD and GAS support, both of which need cleanup in this area.  Rewriting
@@ -634,7 +640,7 @@ data was being used to generate both the program and the test cases.  An
 error might be propagated to both and thus nullify the test.  For
 example if an opcode field was supposed to have the value 1 and the
 description file had the value 2, then this error wouldn't be caught.
-However, this assumes test cases are generated during the testing run!
+However, this assumes test cases are always generated during the testing run!
 And it ignores the profound amount of typing that is saved by machine
 generating test cases!  (I discount the argument that this kind of
 exhaustive testing is unnecessary).
@@ -643,10 +649,11 @@ One solution to the above problem is to not generate the test cases
 during the testing run (which was implicit in the proposal, but perhaps
 should have been explicit).  Another solution is to generate the
 test cases during the test run but first verify them by some external
-means before actually using them in any test.  The latter solution is
-only mentioned for completeness sake; its implementation is problematic
-as any external means would necessarily be computer driven and the level
-of confidence in the result isn't 100%.
+means before actually using them in any test.  Another solution is
+to have some trust in the generated tests.  Yes, some bugs may be missed,
+but given the quantity of testing that can be done, some bugs may still
+be caught that would otherwise have been missed.  Plus it's all
+machine-driven, minimal human interaction is required.
 
 So how are machine generated test cases verified?  By machine, by hand,
 and by time.  The test cases are checked into CVS and are not regenerated
@@ -673,8 +680,8 @@ This is no different than the non-machine generated case again except in
 the perceived difference in quantity of test cases.
 
 Note that no claim is made that manually generated test cases aren't
-needed.  Clearly there will be some cases that the description file
-doesn't describe and thus can't machine generate.
+useful or needed.  The goal here is to enhance existing forms of testing,
+not replace them.
 
 @node Simulator testing
 @subsection Simulator testing
@@ -690,8 +697,7 @@ there will still be a large percentage of instructions amenable to
 having test cases machine generated for them.  Such test cases can
 certainly be hand generated, but it is believed that this is a large
 amount of unnecessary typing that typically won't be done due to the
-amount.  Again, I discount the argument that this kind of exhaustive
-testing isn't necessary.
+amount.
 
 An example is the simple arithmetic instructions.  These take zero, one,
 or more arguments and produce a result.  The description file contains
@@ -704,56 +710,5 @@ Certainly at the very least all the administrivia for each test case can
 be machine generated (i.e. a template file can be generated for each
 instruction, leaving the programmer to fill in the details).
 
-The strategy used for assembler/disassembler test cases is also used here.
-Test cases are kept in CVS and are not regenerated without care.
-
-@node Implementation language
-@section Implementation language
-
-The chosen implementation language is Scheme.  The reasons for this are:
-
-@itemize @bullet
-@item Parsing RTL in Scheme is real easy, though I did make some albeit
-minor changes to make it easier.  While it doesn't take more than a few
-dozen lines of C to parse RTL, it doesn't take any lines of Scheme -
-the parser is built into the interpreter.
-
-@item An interactive environment is a better environment to work in,
-especially in the early stages of an ambitious project like this.
-
-@item Guile is developing as an embeddable interpreter.
-I wanted room for growth in many dimensions, and having the implementation
-language be an embeddable interpreter supports this.
-
-@item I wanted to learn Scheme (Yes, not a technical reason, blah blah blah).
-
-@item Numbers in Scheme can have arbitrary precision so representing 64
-bit (or higher) numbers on a 32 bit host is well defined.
-
-@item It seemed useful to have an implementation language similar to the 
-CPU description language.  The Scheme implementation seems simpler
-than a C implementation would be.
-@end itemize
-
-One issue that arises with the use of Scheme as the implementation
-language is whether to generate files in the source tree, with the
-issues that involves, or generate the files in the build tree (and thus
-require Guile to build Binutils and the issues that involves).  Trying
-to develop something like this is easier in an interactive environment,
-so Scheme as the first implementation language is, to me, a better
-choice than C or C++.  In such a big project it also helps to have a
-more expressive language so relatively complex code and be written with
-fewer lines of code.
-
-One consequence is maintenance is more difficult in that the
-generated files (e.g. @file{opcodes/m32r-*.[ch]}) are checked into CVS
-at Red Hat, and a change to a CPU description requires rebuilding the
-generated files and checking them in as well.  And a change that affects
-each port requires each port to be regenerated and checked in.
-This is more palatable for maintainer tools such as @code{bison},
-@code{flex}, @code{autoconf} and @code{automake}, as their input files
-don't change as often.
-
-
-Whether to continue with Scheme, convert the code to a compiled
-language, or have both is an important, open issue.
+The strategies mentioned for assembler/disassembler machine-generated
+test cases also apply here.

@@ -1,4 +1,4 @@
-@c Copyright (C) 2000 Red Hat, Inc.
+@c Copyright (C) 2000, 2009 Red Hat, Inc.
 @c This file is part of the CGEN manual.
 @c For copying conditions, see the file cgen.texi.
 
@@ -12,7 +12,7 @@ well as supporting routines.
 @menu
 * Generated files::                 List of generated files
 * The .opc file::                   Target specific C code
-* Special assembler parsing needs::
+* Special assembler parsing needs:: Support for unusual syntax
 @end menu
 
 @node Generated files

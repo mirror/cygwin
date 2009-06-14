@@ -12,7 +12,7 @@ END-INFO-DIR-ENTRY
 @end ifinfo
 
 @copying
-Copyright @copyright{} 2000, 2007 Red Hat, Inc.
+Copyright @copyright{} 2000, 2007, 2009 Red Hat, Inc.
 
 Permission is granted to make and distribute verbatim copies of
 this manual provided the copyright notice and this permission notice
@@ -31,7 +31,7 @@ into another language, under the above conditions for modified versions.
 @c
 @c This file documents the Cpu tools GENerator, CGEN.
 @c
-@c Copyright (C) 2000 Red Hat, Inc.
+@c Copyright (C) 2000, 2009 Red Hat, Inc.
 @c
 
 @setchapternewpage odd
@@ -43,7 +43,6 @@ into another language, under the above conditions for modified versions.
 @sp 1
 @subtitle @value{UPDATED}
 @author Douglas J. Evans
-@author Red Hat, Inc.
 @page
 
 @tex
@@ -52,7 +51,7 @@ into another language, under the above conditions for modified versions.
 @end tex
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2000 Red Hat, Inc.
+Copyright @copyright{} 2000, 2009 Red Hat, Inc.
 
 Permission is granted to make and distribute verbatim copies of
 this manual provided the copyright notice and this permission notice
@@ -71,7 +70,7 @@ into another language, under the above conditions for modified versions.
 @top Introduction
 
 @cindex version
-This brief manual contains preliminary documentation for the CGEN program,
+This manual documents the CGEN program,
 version @value{VERSION}.
 
 @menu

@@ -1,4 +1,4 @@
-@c Copyright (C) 2000 Red Hat, Inc.
+@c Copyright (C) 2000, 2009 Red Hat, Inc.
 @c This file is part of the CGEN manual.
 @c For copying conditions, see the file cgen.texi.
 
@@ -12,7 +12,7 @@ Preprocessor macros provide a way of simplifying the writing of
 
 @menu
 * Defining a preprocessor macro:: @code{define-pmacro}
-* Using preprocessor macros::
+* Using preprocessor macros::     Using preprocessor macros
 * Macro expansion::               The @code{pmacro-expand} procedure
 * Default argument values::       Specifying default values of arguments
 * Multiple output expressions::   Using @code{begin}
@@ -77,7 +77,7 @@ and arguments by name.
 @node Macro expansion
 @section Macro expansion
 
-At the implementation level, pmacros are expand with the
+At the implementation level, pmacros are expanded with the
 @code{pmacro-expand} Scheme procedure.
 
 The following is executed from a Guile shell, as opposed to 
@@ -420,17 +420,14 @@ This is only supported when passing macros as arguments to other macros.
 (load-op uh OP2_11 HI (.pmacro (mode expr) (zext: mode expr)))
 @end smallexample
 
-Currently, .pmacro's don't bind the way Scheme lambda expressions do.
-For example, arg2 in the second pmacro is not bound to the arg2 argument
-of the first pmacro.
+.pmacro's don't bind the way Scheme lambda expressions do.
+In the following example, arg2 in the second pmacro is not bound
+to the arg2 argument of the first pmacro.
 
 @smallexample
 (define-pmacro (foo arg1 arg2) ((.pmacro (bar) (+ arg2 bar)) arg1))
 (foo 3 4) ==> (+ arg2 3)
 @end smallexample
-
-One can make an argument either way.  I'm not sure what the right thing
-to do here is (leave things as is, or have lexical binding like Scheme).
 
 @node Passing macros as arguments
 @section Passing macros as arguments

@@ -1,4 +1,4 @@
-@c Copyright (C) 2000, 2003 Red Hat, Inc.
+@c Copyright (C) 2000, 2003, 2009 Red Hat, Inc.
 @c This file is part of the CGEN manual.
 @c For copying conditions, see the file cgen.texi.
 
@@ -21,13 +21,13 @@ its CPU description language.
 * Hardware elements::           Elements of a CPU
 * Instruction fields::          Fields of an instruction
 * Enumerated constants::        Assigning useful names to important numbers
-* Instruction operands::
+* Instruction operands::        Operands of instructions
 * Derived operands::            Operands for CISC-like architectures
-* Instructions::
-* Macro-instructions::
-* Modes::
-* Expressions::
-* Macro-expressions::
+* Instructions::                Instructions
+* Macro-instructions::          Macro instructions
+* Modes::                       Operand types in expressions
+* Expressions::                 Expressions in the language
+* Macro-expressions::           A simplification of arithmetic expressions
 @end menu
 
 @node RTL Introduction
@@ -116,28 +116,26 @@ treated as optional so a shorthand form of @code{(add dr sr)} works.
 A few basic guidelines for all entries:
 
 @itemize @bullet
-@item names must be valid Scheme symbols.
-@item comments are used, for example, to comment the generated C code
+@item Names must be valid Scheme symbols.
+@item Comments are used, for example, to comment the generated C code
 @footnote{It is possible to produce a reference manual from
 @file{.cpu} files and such an application wouldn't be a bad idea.}.
-@item comments may be any number of lines, though generally succinct comments
+@item Comments may be any number of lines, though generally succinct comments
 are preferable@footnote{It would be reasonable to have a short form
 and a long form of comment. Either as two entries are as one entry with
 the short form separated from the long form via some delimiter (say the
 first newline).}.
-@item everything is case sensitive.@footnote{??? This is true in RTL,
+@item Everything is case sensitive.@footnote{??? This is true in RTL,
 though some apps add symbols and convert case that can cause collisions.}
-@item while "_" is a valid character to use in symbols, "-" is preferred
-@item except for the @samp{comment} and @samp{attrs} fields and unless
+@item While "_" is a valid character to use in symbols, "-" is preferred
+@item Except for the @samp{comment} and @samp{attrs} fields and unless
 otherwise specified all fields must be present.
-@end itemize
-
-Symbols and strings
-
-Symbols in CGEN are the same as in Scheme.
-Symbols can be used anywhere a string can be used.
-The reverse is not true, and in general strings can't be used in place
+@item Symbols used to be allowed anywhere a string can be used.
+This is what earlier versions of Guile supported.
+Guile is more strict now, so this relaxation is gone.
+The reverse has always not been allowed, strings can't be used in place
 of symbols.
+@end itemize
 
 @node Definitions
 @section Definitions
@@ -147,7 +145,7 @@ Each entry has the same format: @code{(define-foo arg1 arg2 ...)}, where
 @samp{foo} designates the type of entry (e.g. @code{define-insn}).  In
 the general case each argument is a name/value pair expressed as
 @code{(name value)}.
-(*note: Another style in common use is `:name value' and doesn't require
+(*Note: Another style in common use is `:name value' and doesn't require
 parentheses.  Maybe that would be a better way to go here.  The current
 style is easier to construct from macros though.)
 
@@ -156,7 +154,7 @@ the normal case.  To reduce this verbosity, a second version of most
 define-foo's exists that takes positional arguments.  To further reduce
 this verbosity, preprocessor macros can be written to simplify things
 further for the normal case.  See sections titled ``Simplification
-macros'' below.
+macros'' later in this manual.
 
 @node Attributes
 @section Attributes
@@ -179,19 +177,20 @@ Another useful addition might be functional attributes (the attribute
 is computed at run-time - currently all attributes are computed at
 compile time).  One way to implement functional attributes would be to
 record the attributes as byte-code and lazily evaluate them, caching the
-results as appropriate.  The syntax has been carefully done to not
+results as appropriate.  The syntax has been done to not
 preclude either as an upward compatible extension.
 
 Attributes must be defined before they can be used.
 There are several predefined attributes for entry types that need them
 (instruction field, hardware, operand, and instruction).  Predefined
-attributes are documented in each relevant section below.
+attributes are documented in each relevant section.
 
 In C applications an enum is created that defines all the attributes.
 Applications that wish to be architecture independent need the attribute
 to have the same value across all architectures.  This is achieved by
-giving the attribute the INDEX attribute, which specifies the enum value
-must be fixed across all architectures.
+giving the attribute the INDEX attribute
+@footnote{Yes, attributes can have attributes.},
+which specifies the enum value must be fixed across all architectures.
 @c FIXME: Give an example here.
 @c FIXME: Need a better name than `INDEX'.
 
@@ -216,9 +215,11 @@ Boolean attributes are defined with:
 
 The default value of boolean attributes is always false.  This can be
 relaxed, but it's one extra complication that is currently unnecessary.
-Boolean attributes are specified in either of two forms: (NAME expr),
-and NAME, !NAME.  The first form is the canonical form.  The latter two
-are shorthand versions.  `NAME' means "true" and `!NAME' means "false".
+Boolean attributes are specified in either of two forms:
+@code{(NAME expr)}, @code{NAME}, and @code{!NAME}.
+The first form is the canonical form.  The latter two
+are shorthand versions.
+@code{NAME} means "true" and @code{!NAME} means "false".
 @samp{expr} is an expression that evaluates to 0 for false and non-zero
 for true @footnote{The details of @code{expr} is still undecided.}.
 
@@ -246,10 +247,10 @@ Integer attributes are defined with:
 
 If omitted, the default is 0.
 
-(*note: The details of `expr' is still undecided.  For now it must be
-an integer.)
+(*Note: The details of @code{expr} is still undecided.
+For now it must be an integer.)
 
-Integer attributes are specified with (NAME expr).
+Integer attributes are specified with @code{(NAME expr)}.
 
 @subsection Enumerated Attributes
 @cindex Attributes, enumerated
@@ -272,10 +273,10 @@ Enumerated attributes are defined with
 
 If omitted, the default is the first specified value.
 
-(*note: The details of `expr' is still undecided.  For now it must be the
-name of one of the specified values.)
+(*Note: The details of @code{expr} is still undecided.
+For now it must be the name of one of the specified values.)
 
-Enum attributes are specified with (NAME expr).
+Enum attributes are specified with @code{(NAME expr)}.
 
 @subsection Bitset Attributes
 @cindex Attributes, bitset
@@ -284,7 +285,7 @@ Bitset attributes are for situations where you want to indicate something
 is a subset of a small set of possibilities.  The MACH attribute uses this
 for example to allow specifying which of the various machines support a
 particular insn.
-(*note: At present the maximum number of possibilities is 32.
+(*Note: At present the maximum number of possibilities is 32.
 This is an implementation restriction which can be relaxed, but there's
 currently no rush.)
 
@@ -309,12 +310,12 @@ Bitset attributes are specified with @code{(NAME val1,val2,...)}.  There
 must be no spaces in ``@code{val1,val2,...}'' and each value must be a
 valid Scheme symbol.
 
-(*note: it's not clear whether allowing arbitrary expressions will be
+(*Note: It's not clear whether allowing arbitrary expressions will be
 useful here, but doing so is not precluded.  For now each value must be
 the name of one of the specified values.)
 
 @node Architecture variants
-@section Architecture Variants
+@section Architecture variants
 @cindex Architecture variants
 
 The base architecture and its variants are described in four parts:
@@ -354,6 +355,7 @@ The syntax of @code{define-arch} is:
 Specify the default alignment to use when fetching data (and
 instructions) from memory.  At present this can't be overridden, but
 support can be added if necessary.  The default is @code{aligned}.
+@c Definately need to say more here.
 
 @subsubsection insn-lsb0?
 @cindex insn-lsb0?
@@ -648,11 +650,11 @@ mach is used.
 List of names of ISA's the machine supports.
 
 @node Model variants
-@section Model Variants
+@section Model variants
 
 For each `machine', as defined here, there is one or more `models'.
 There must be at least one model for each machine.
-(*note: There could be a default, but requiring one doesn't involve that much
+(*Note: There could be a default, but requiring one doesn't involve that much
 extra typing and forces the programmer to at least think about such things.)
 
 @example
@@ -760,7 +762,7 @@ behind the operands must be marked with the attribute @code{PROFILE} and
 the hardware item must not be scalar.
 
 @node Hardware elements
-@section Hardware Elements
+@section Hardware elements
 
 The elements of hardware that make up a CPU are defined with
 @code{define-hardware}.  Examples of hardware elements include
@@ -991,6 +993,7 @@ How @samp{function_name} is used is application specific, but in
 general it is the name of a function to call.  The only application
 that uses this at present is Opcodes.  See the Opcodes documentation for
 a description of each function's expected prototype.
+@c FIXME: Need ref here.
 
 @subsection get
 
@@ -1135,7 +1138,7 @@ or @code{handlers} specs.
 @end example
 
 @node Instruction fields
-@section Instruction Fields
+@section Instruction fields
 @cindex Fields, instruction
 
 Instruction fields define the raw bitfields of each instruction.
@@ -1161,7 +1164,7 @@ The syntax for defining instruction fields is:
 )
 @end example
 
-(*note: Whether to also provide a way to specify instruction formats is not yet
+(*Note: Whether to also provide a way to specify instruction formats is not yet
 clear.  Currently they are computed from the instructions, so there's no
 current *need* to provided them.  However, providing the ability as an
 option may simplify other tools CGEN is used to generate.  This
@@ -1171,7 +1174,7 @@ may also simplify expression of more complicated instruction sets.
 Providing instruction formats may also simplify the support of really
 complex ISAs like i386 and m68k).
 
-(*note: Positional specification simplifies instruction description somewhat
+(*Note: Positional specification simplifies instruction description somewhat
 in that there is no required order of fields, and a disjunct set of fields can
 be referred to as one.  On the other hand it can require knowledge of the length
 of the instruction which is inappropriate in cases like the M32R where
@@ -1205,7 +1208,7 @@ to validate programs, either statically or dynamically.
 
 @item VIRTUAL
 The field does not directly contribute to the instruction's value.  This
-is used to simplify semantic or assembler descriptions where a fields
+is used to simplify semantic or assembler descriptions where a field's
 value is based on other values.  Multi-ifields are always virtual.
 @end table
 
@@ -1213,7 +1216,7 @@ value is based on other values.  Multi-ifields are always virtual.
 The offset in bits from the start of the instruction to the word containing
 the field.
 
-NOTE: Either both of @samp{word-offset} and @samp{word-length} must be
+Either both of @samp{word-offset} and @samp{word-length} must be
 specified or neither of them must be specified.  The presence of
 @samp{word-offset} means the long form of specifying the field's position is
 being used.  If absent then the short form is being used and the value for
@@ -1227,7 +1230,7 @@ The bit number of the field's most significant bit in the instruction.
 Bit numbering is determined by the @code{insn-lsb0?} field of
 @code{define-arch}.
 
-NOTE: If using the long form of specifying the field's position
+If using the long form of specifying the field's position
 (@samp{word-offset} is present) then this value is the value within
 the containing word.  If using the short form then this value includes
 the word offset.  See the Porting document for more info
@@ -1262,7 +1265,7 @@ rather than, say, char if the specified mode was @code{QI}).
 An expression to apply to convert from usable values to raw field
 values.  The syntax is @code{(encode (value pc) expression)} or more
 specifically @code{(encode ((<mode1> value) (IAI pc)) <expression>)},
-where @code{<mode1>} is the mode of the the ``incoming'' value, and
+where @code{<mode1>} is the mode of the ``incoming'' value, and
 @code{<expression>} is an rtx to convert @code{value} to something that
 can be stored in the field.
 
@@ -1324,7 +1327,7 @@ such fields is:
 )
 @end example
 
-(*note: insert/extract are analogous to encode/decode so maybe these
+(*Note: insert/extract are analogous to encode/decode so maybe these
 fields are misnamed.  The operations are subtly different though.)
 
 Example:
@@ -1431,7 +1434,7 @@ in an instruction's @code{format} entry.
 )
 @end example
 
-(*note: @code{define-insn-enum} isn't implemented yet: use
+(*Note: @code{define-insn-enum} isn't implemented yet: use
 @code{define-normal-insn-enum})
 
 Example:
@@ -1484,14 +1487,15 @@ Example:
 @code{(define-normal-insn-enum name comment attrs prefix ifield vals)}
 
 @node Instruction operands
-@section Instruction Operands
+@section Instruction operands
 @cindex Operands, instruction
 
 Instruction operands provide:
 
 @itemize @bullet
 @item a layer between the assembler and the raw hardware description
-@item the main means of manipulating instruction fields in the semantic code
+@item the main means of making an instruction's fields useful to
+the semantic code
 @c More?
 @end itemize
 
@@ -1540,6 +1544,7 @@ a relaxable/relaxed instruction.
 Use the SEM-ONLY attribute for cases where the operand will only be used
 in semantic specification, and not assembly code specification.  A
 typical example is condition codes.
+@c Does this attribute need to exist?
 @end table
 
 To refer to a hardware element in semantic code one must either use an
@@ -1565,7 +1570,7 @@ hardware element.
 @subsection index
 The index of the hardware element. This is used to mate the hardware
 element with the instruction field that selects it, and must be the name
-of an ifield entry. (*note: The index may be other things besides
+of an ifield entry. (*Note: The index may be other things besides
 ifields in the future.)  It must not be a multi-ifield, currently.
 
 @subsection asm
@@ -1585,7 +1590,7 @@ where @code{asm-spec} is one or more of:
 
 These functions are intended to be provided in a separate @file{.opc}
 file.  The prototype of a parse function depends on the hardware type.
-See @file{cgen/*.opc} for examples.
+See @file{cgen/cpu/*.opc} for examples.
 
 @c FIXME: The following needs review.
 
@@ -1612,7 +1617,7 @@ relocations are processed after the instruction has been parsed.
 The result is an error message or NULL if successful.
 
 The prototype of a print function depends on the hardware type.  See
-@file{cgen/*.opc} for examples. For integers it is:
+@file{cgen/cpu/*.opc} for examples. For integers it is:
 
 @example
 void print_foo (CGEN_CPU_DESC cd,
@@ -1746,7 +1751,7 @@ amount of information that must be expressed, how succinct can one express
 it and still be clean and usable?  I'm open to opinions on how to improve
 this, but such improvements must take everything CGEN wishes to be into
 account.
-(*note: Of course no claim is made that the current design is the
+(*Note: Of course no claim is made that the current design is the
 be-all and end-all or that there is one be-all and end-all.)
 
 The syntax for defining an instruction is:
@@ -1791,14 +1796,14 @@ There must be no spaces in ``@code{mach1,mach2,...}''.
 @item UNCOND-CTI
 The instruction is an unconditional ``control transfer instruction''.
 
-(*note: This attribute is derived from the semantic code. However if the
+(*Note: This attribute is derived from the semantic code. However if the
 computed value is wrong (dunno if it ever will be) the value can be
 overridden by explicitly mentioning it.)
 
 @item COND-CTI
 The instruction is an conditional "control transfer instruction".
 
-(*note: This attribute is derived from the semantic code. However if the
+(*Note: This attribute is derived from the semantic code. However if the
 computed value is wrong (dunno if it ever will be) the value can be
 overridden by explicitly mentioning it.)
 
@@ -2001,8 +2006,10 @@ of it that uses the stack pointer.
 
 Modes provide a simple and succinct way of specifying data types.
 
-(*note: Should more complex types will be needed (e.g. structs? unions?),
+(*Note: Should more complex types will be needed (e.g. structs? unions?),
 these can be handled by extending the definition of a mode to encompass them.)
+@c Also, have registers as just bits and have the operand / semantic operation
+@c provide the mode.
 
 Modes are similar to their usage in GCC, but there are some differences:
 
@@ -2050,12 +2057,12 @@ specified in the operation, _not_ in the data.
 Ergo from this perspective Umodes don't belong in .cpu files.
 This is the perspective to use when writing .cpu files.
 
-??? I'm not entirely sure these unsigned modes are needed.
-They are useful in removing any ambiguity in how to sign extend constants
-which has been a source of problems in GCC.
-OTOH, maybe adding uconst akin to const is the way to go?
-
-??? Some existing ports use these modes.
+@c I'm not entirely sure these unsigned modes are needed.
+@c They are useful in removing any ambiguity in how to sign extend constants
+@c which has been a source of problems in GCC.
+@c OTOH, maybe adding uconst akin to const is the way to go?
+@c
+@c ?? Some existing ports use these modes.
 
 @item WI,UWI
 word int, unsigned word int (word_mode in gcc).
@@ -2067,9 +2074,9 @@ Same as GCC.
 SF is a 32 bit IEEE float ("single float").
 DF is a 64 bit IEEE float ("double float").
 XF is either an 80 or 96 bit IEEE float ("extended float").
-(*note: XF values on m68k and i386 are different so may
+(*Note: XF values on m68k and i386 are different so may
 wish to give them different names).
-TF is a 128 bit IEEE float ("??? float").
+TF is a 128 bit IEEE float.
 
 @item AI
 Address integer
@@ -2144,6 +2151,8 @@ The value must be from a previously defined enum.
 @item (subword mode value word-num)
 Return part of @samp{value}.  Which part is determined by @samp{mode} and
 @samp{word-num}.  There are three cases.
+@c Blech.  ``subword'' is a source of confusion in GCC.
+@c Maybe have three separate rtxs.
 
 If @samp{mode} is the same size as the mode of @samp{value}, @samp{word-num}
 must be @samp{0} and the result is @samp{value} recast in the new mode.
@@ -2171,7 +2180,8 @@ Concatenate @samp{arg1[,arg2[,...]]} to create a value of mode @samp{out-mode}.
 @samp{arg1} becomes the most significant part of the result.
 Each argument is interpreted in mode @samp{in-mode}.
 @samp{in-mode} must evenly divide @samp{out-mode}.
-??? Endianness issues have yet to be decided.
+@c ??? Endianness issues have yet to be decided.
+@c Blech.  Time to decide them.
 
 @item (sequence mode ((mode1 local1) ...) expr1 expr2 ...)
 Execute @samp{expr1}, @samp{expr2}, etc. sequentially. @samp{mode} is the
@@ -2206,11 +2216,13 @@ always a single bit. @samp{binop-with-bit} is one of @code{addc},
 @item (shiftop mode operand1 operand2)
 Perform a shift operation. @samp{shiftop} is one of @code{sll},
 @code{srl}, @code{sra}, @code{ror}, @code{rol}.
+@c Need to be precise about the semantics, and not leave it to C.
 
 @item (boolifop mode operand1 operand2)
 Perform a sequential boolean operation. @samp{operand2} is not processed
 if @samp{operand1} ``fails''. @samp{boolifop} is one of @code{andif},
 @code{orif}.
+@c Extend to handle more than two operands?
 
 @item (convop mode operand)
 Perform a mode->mode conversion operation. @samp{convop} is one of
@@ -2221,6 +2233,7 @@ Perform a mode->mode conversion operation. @samp{convop} is one of
 Perform a comparison. @samp{cmpop} is one of @code{eq}, @code{ne},
 @code{lt}, @code{le}, @code{gt}, @code{ge}, @code{ltu}, @code{leu},
 @code{gtu}, @code{geu}.
+@c floating point compare-unordered?
 
 @item (mathop mode operand)
 Perform a mathematical operation. @samp{mathop} is one of @code{sqrt},
@@ -2254,7 +2267,7 @@ An escape hook to emit a subroutine call to function named @samp{symbol}
 passing operands @samp{operand1}, @samp{operand2}, etc.  An implicit
 first argument of @code{current_cpu} is passed to @samp{symbol}.
 @samp{mode} is the mode of the result.  Be aware that @samp{symbol} will
-be restricted by reserved words in the C programming language any by
+be restricted by reserved words in the C programming language and by
 existing symbols in the generated code.
 
 @item (c-raw-call mode symbol operand1 operand2 ...)
@@ -2333,7 +2346,7 @@ Return non-zero if the value of attribute @samp{attr-name} is
 Return the index of @samp{operand}. For registers this is the register number.
 
 @item (regno operand)
-Same as @code{index-of}, but improves readability for registers
+Same as @code{index-of}, but improves readability for registers.
 
 @item (error mode message)
 Emit an error message from CGEN RTL. Error message is specified by @samp{message}.
@@ -2343,8 +2356,11 @@ A no-op.
 
 @item (ifield field-name)
 Return the value of field @samp{field-name}. @samp{field-name} must be a
-field in the instruction. Operands can be any of:
-@c ???
+field in the instruction.
+
+@end table
+
+Operands can be any of:
 
 @itemize @bullet
 @item an operand defined in the description file
@@ -2358,18 +2374,18 @@ field in the instruction. Operands can be any of:
 The @samp{symbol} in a @code{c-call} or @code{c-raw-call} function is
 currently the name of a C function or macro that is invoked by the
 generated semantic code.
-@end table
 
 @node Macro-expressions
 @section Macro-expressions
 @cindex Macro-expressions
 
-Macro RTL expressions started out by wanting to not have to always
+Macro RTL expressions are a way to not have to always
 specify a mode for every expression (and sub-expression
-thereof).  Whereas the formal way to specify, say, an add is @code{(add
-SI arg1 arg2)} if SI is the default mode of `arg1' then this can be
-simply written as @code{(add arg1 arg2)}.  This gets expanded to
-@code{(add DFLT arg1 arg2)} where @code{DFLT} means ``default mode''.
+thereof).  Whereas the formal way to specify, say, an add is
+@code{(add SI arg1 arg2)} if SI is the default mode of `arg1' then
+this can be simply written as @code{(add arg1 arg2)}.
+This gets expanded to @code{(add DFLT arg1 arg2)} where
+@code{DFLT} means ``default mode''.
 
 It might be possible to replace macro expressions with preprocessor macros,
 however for the nonce there is no plan to do this.

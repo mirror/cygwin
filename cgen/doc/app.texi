@@ -1,4 +1,4 @@
-@c Copyright (C) 2000 Red Hat, Inc.
+@c Copyright (C) 2000, 2009 Red Hat, Inc.
 @c This file is part of the CGEN manual.
 @c For copying conditions, see the file cgen.texi.
 
@@ -14,7 +14,7 @@ CGEN application.
 * File Generation Process::     Workflow in cgen
 * Coding Conventions::          Coding conventions
 * Accessing Loaded Data::       Reading data from loaded .cpu files
-* Name References::             Architecture names in generated code
+* Arch Name References::        Architecture names in generated code
 * String Building::             Building long strings and writing them out
 * COS::                         Cgen's Object System
 @end menu
@@ -27,12 +27,18 @@ number of source files grows the entire layout may be changed, but until then
 this is how things are.}  It makes it easy to find things.
 
 @itemize @bullet
+
 @item top level file is cgen-<app>.scm
+
 The best way to create this file is to copy an existing application's file
 (e.g. cgen-opc.scm) and modify to suit.
+
 @item file <app>.scm contains general app-specific utilities
+
 @item other files are <app>-foo.scm
+
 @item add entry to dev.scm (load-<app>)
+
 @end itemize
 
 @node File Generation Process
@@ -48,10 +54,15 @@ options
 @item source code is loaded
 
 @itemize @minus
+
 @item application independent code is loaded if not compiled in
+
 @item application specific code is loaded
 
 Currently app-specific code is never compiled in.
+@footnote{This dates from a time when CGEN supported being compiled with
+Hobbit.  That support is gone, though something else may take its place.}
+
 @itemize @minus
 @item doesn't affect speed as much as application independent stuff
 @item subject to more frequent changes
@@ -126,7 +137,7 @@ a line by itself beginning in column one
 @item definitions internal to a source file begin with '-'
 @item global state variables are named *foo-bar*
 [FIXME: current code needs updating]
-@item avoid uppercase (except for ???)
+@item avoid uppercase, except for constants (e.g. @code{*UNSPECIFIED*})
 @item procedures that return a boolean result end in '?'
 @item procedures that modify something end in '!'
 @item classes are named <name>
@@ -138,7 +149,7 @@ a line by itself beginning in column one
 Each kind of description file entry (defined with `define-foo') is recorded
 in an object of class <foo>.@footnote{not true for <arch> but will be RSN}
 All the data is collected together in an object of class
-<system>.@footnote{got a better name?}
+<arch>.
 @footnote{modes aren't recorded here, should they be?}
 
 Data for the currently selected architecture is obtained with several
@@ -169,8 +180,8 @@ access functions.
   (current-arch-isa-name-list)
   - return a list of names (as symbols) of all isas in the architecture
 
-  - for most of the remaining elements, there are three main accessors
-    [foo is sometimes abbreviated]
+  For most of the remaining elements, there are three main accessors:
+  [foo is sometimes abbreviated]
     - current-foo-list - returns list of <foo> objects in the architecture
     - current-foo-add! - add a <foo> object to the architecture
     - current-foo-lookup - lookup the <foo> object based on its name
@@ -244,8 +255,8 @@ access functions.
   [there are a few more to be documented, not sure they'll remain as is]
 @end smallexample
 
-@node Name References
-@section Name References
+@node Arch Name References
+@section Arch Name References
 
 To simplify writing code generators, system names can be
 specified with fixed strings rather than having to compute them.
@@ -305,20 +316,23 @@ as arguments.
 For small arguments it's just as well to use @code{string-append}.
 This is a standard Scheme procedure.  The output is also easier to read
 when developing interactively.  And some subroutines are used in multiple
-contexts including some where strings are required.
+contexts including some where strings are required, so sometimes you
+have to use @code{string-append}.
 
 @end itemize
 
 @node COS
 @section COS
 
-COS is Cgen's Object System.  It's a simple OO system for Guile that
+COS is CGEN's Object System.  It's a simple OO system for Guile that
 was written to provide something useful until Guile had its own.
-COS will be replaced with GOOPs if the Scheme implementation of cgen is kept.
+COS will be replaced with GOOPs if the Scheme implementation of CGEN is kept.
 
 The pure Scheme implementation of COS uses vectors to record objects and
-classes.  The C implementation uses smobs (though classes are still
-implemented with vectors).
+classes.
+@c There no longer is a C implementation, but keep this for awhile.
+@c The C implementation uses smobs (though classes are still
+@c implemented with vectors).
 
 A complete list of user-visible functions is at the top of @file{cos.scm}.
 

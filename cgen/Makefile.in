@@ -140,7 +140,7 @@ SUBDIRS = doc
 GUILE = "`if test -f ../guile/libguile/guile ; then echo ../guile/libguile/guile; else echo guile ; fi`" -l $(srcdir)/guile.scm -s
 CGENFLAGS = -v
 ARCH = @arch@
-ARCHFILE = $(srcroot)/../cpu/$(ARCH).cpu
+ARCHFILE = $(srcroot)/cpu/$(ARCH).cpu
 
 # for various utility rules
 MACHS = all

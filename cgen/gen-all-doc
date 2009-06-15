@@ -10,7 +10,21 @@ set -e
 set -x
 
 # ??? Some are missing, need to add them after some research.
-archs="arm frv i960 m32r openrisc xstormy16"
+#cpu/fr30.cpu
+#cpu/ip2k.cpu
+#../cpu/iq2000.cpu
+#../cpu/lm32.cpu
+#cpu/mep.cpu
+#../cpu/mt.cpu
+#../cpu/xc16x.cpu
+archs="
+cpu/arm.cpu
+../cpu/frv.cpu
+cpu/i960.cpu
+../cpu/m32r.cpu
+cpu/openrisc.cpu
+cpu/xstormy16.cpu
+"
 
 if [ ! -f sim.scm ]
 then
@@ -33,28 +47,31 @@ export cgendir=`pwd`
 
   for a in $archs
   do
-    case $a in
+    archfile=../$a
+    arch=$(basename $archfile .cpu)
+
+    case $arch in
     arm)
-      make html ARCH=$a ISAS=arm INSN_FILE_NAME=arm-arm-insn.html
+      make html ARCH=$arch ARCHFILE=$archfile ISAS=arm INSN_FILE_NAME=arm-arm-insn.html
       mv arm.html arm-arm.html
       mv arm-insn.html arm-arm-insn.html
-      make html ARCH=$a ISAS=thumb INSN_FILE_NAME=arm-thumb-insn.html
+      make html ARCH=$arch ARCHFILE=$archfile ISAS=thumb INSN_FILE_NAME=arm-thumb-insn.html
       mv arm.html arm-thumb.html
       mv arm-insn.html arm-thumb-insn.html
       ;;
     frv)
-      make html ARCH=$a MACHS="frv,simple,tomcat,fr400" INSN_FILE_NAME=frv-1-insn.html
+      make html ARCH=$arch ARCHFILE=$archfile MACHS="frv,simple,tomcat,fr400" INSN_FILE_NAME=frv-1-insn.html
       mv frv.html frv-1.html
       mv frv-insn.html frv-1-insn.html
-      make html ARCH=$a MACHS="fr500" INSN_FILE_NAME=frv-2-insn.html
+      make html ARCH=$arch ARCHFILE=$archfile MACHS="fr500" INSN_FILE_NAME=frv-2-insn.html
       mv frv.html frv-2.html
       mv frv-insn.html frv-2-insn.html
-      make html ARCH=$a MACHS="fr550" INSN_FILE_NAME=frv-3-insn.html
+      make html ARCH=$arch ARCHFILE=$archfile MACHS="fr550" INSN_FILE_NAME=frv-3-insn.html
       mv frv.html frv-3.html
       mv frv-insn.html frv-3-insn.html
       ;;
     *)
-      make html ARCH=$a
+      make html ARCH=$arch ARCHFILE=$archfile
       ;;
     esac
   done

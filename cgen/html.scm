@@ -289,22 +289,22 @@ See the input .cpu file(s) for copyright information.
 		      "<br>\n"
 		      "<li>condition:\n"
 		      "<font size=+2>\n"
-		      "<plaintext>" ; no trailing newline here on purpose
+		      "<pre>" ; no trailing newline here on purpose
 		      (with-output-to-string
 			(lambda ()
 			  (pretty-print (cadr (isa-condition isa)))))
-		      "</plaintext></font>\n"
+		      "</pre></font>\n"
 		      "</li>\n"
 		      "<br>\n")
        "")
    (if (isa-setup-semantics isa)
        (string-append "<li>setup-semantics:\n"
 		      "<font size=+2>\n"
-		      "<plaintext>" ; no trailing newline here on purpose
+		      "<pre>" ; no trailing newline here on purpose
 		      (with-output-to-string
 			(lambda ()
 			  (pretty-print (cdr (isa-setup-semantics isa)))))
-		      "</plaintext></font>\n"
+		      "</pre></font>\n"
 		      "</li>\n"
 		      "<br>\n")
        "")
@@ -595,23 +595,23 @@ See the input .cpu file(s) for copyright information.
        (string-append "<li>\n"
 		      "instruction field constraint:\n"
 		      "<font size=+2>\n"
-		      "<plaintext>" ; no trailing newline here on purpose
+		      "<pre>" ; no trailing newline here on purpose
 		      (with-output-to-string
 			(lambda ()
 			  (pretty-print (insn-ifield-assertion insn))))
-		      "</plaintext></font>\n"
+		      "</pre></font>\n"
 		      "</li>\n"
 		      "<br>\n")
        "")
    "<li>\n"
    "semantics:\n"
    "<font size=+2>\n"
-   "<plaintext>" ; no trailing newline here on purpose
+   "<pre>" ; no trailing newline here on purpose
    (with-output-to-string
      (lambda ()
        ; Print the const-folded semantics, computed in `tmp'.
        (pretty-print (rtx-trim-for-doc (insn-tmp insn)))))
-   "</plaintext></font>\n"
+   "</pre></font>\n"
    "</li>\n"
    ; "<br>\n" ; not present on purpose
    (if (not (null? (insn-timing insn)))
@@ -896,11 +896,11 @@ See the input .cpu file(s) for copyright information.
    "<li>\n"
    "transformation:\n"
    "<font size=+2>\n"
-   "<plaintext>" ; no trailing newline here on purpose
+   "<pre>" ; no trailing newline here on purpose
    (with-output-to-string
      (lambda ()
        (pretty-print (minsn-expansions minsn))))
-   "</plaintext></font>\n"
+   "</pre></font>\n"
    "</li>\n"
    "</ul>\n"
    )

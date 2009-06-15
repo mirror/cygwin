@@ -1,5 +1,9 @@
 2009-06-14  Doug Evans  <dje@sebabeach.org>
 
+	* Makefile.am (ARCHFILE): Fix path.
+	* Makefile.in: Regenerate.
+	* html.scm: Use "pre" instead of "plaintext".
+
 	* doc/cgenint.texi: Renamed from internals.texi.  Several cleanups.
 	* doc/app.texi: Cleanup pass.
 	* doc/cgen.texi: Cleanup pass.

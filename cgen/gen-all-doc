@@ -10,18 +10,19 @@ set -e
 set -x
 
 # ??? Some are missing, need to add them after some research.
-#cpu/fr30.cpu
-#cpu/ip2k.cpu
-#../cpu/iq2000.cpu
-#../cpu/lm32.cpu
-#cpu/mep.cpu
-#../cpu/mt.cpu
+#../cpu/m32c.cpu
 #../cpu/xc16x.cpu
 archs="
+cpu/fr30.cpu
 cpu/arm.cpu
 ../cpu/frv.cpu
 cpu/i960.cpu
+cpu/ip2k.cpu
+../cpu/iq2000.cpu
+../cpu/lm32.cpu
 ../cpu/m32r.cpu
+cpu/mep.cpu
+../cpu/mt.cpu
 cpu/openrisc.cpu
 cpu/xstormy16.cpu
 "

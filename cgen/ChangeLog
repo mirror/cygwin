@@ -1,6 +1,6 @@
 2009-06-18  Doug Evans  <dje@sebabeach.org>
 
-	* html.scm (doc-analyze!): Provide defualt IDOC attribute if missing.
+	* html.scm (doc-analyze!): Provide default IDOC attribute if missing.
 
 	* dev.scm (cload): Change #:arch argument to take the path to the
 	.cpu file instead of just the name of the architecture.

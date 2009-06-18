@@ -1,5 +1,5 @@
 ; Top level file for reading and recording .cpu file contents.
-; Copyright (C) 2000, 2001, 2006 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2006, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -695,7 +695,6 @@
   (reader-add-command! 'if
 		       "(if test then . else)\n"
 		       nil '(test then . else) cmd-if
-
   )
 
   ; Rather than add cgen specific stuff to pmacros.scm, we create
@@ -728,7 +727,7 @@ Define a preprocessor-style macro.
 )
 
 ; Install any builtin objects.
-; This is defered until define-arch is read.
+; This is deferred until define-arch is read.
 ; One reason is that attributes MACH and ISA don't exist until then.
 
 (define (reader-install-builtin!)
@@ -781,8 +780,8 @@ Define a preprocessor-style macro.
 ; .cpu file include mechanism
 
 (define (include file)
-  (logit 1 "Including file " (string-append arch-path file) " ...\n")
-  (reader-read-file! (string-append arch-path file))
+  (logit 1 "Including file " (string-append arch-path "/" file) " ...\n")
+  (reader-read-file! (string-append arch-path "/" file))
   (logit 2 "Resuming previous file ...\n")
 )
 
@@ -832,12 +831,15 @@ Define a preprocessor-style macro.
 ; ANALYZER! is a zero argument proc to call after loading the .cpu file.
 ; It is expected to set up various tables and things useful for the application
 ; in question.
+;
+; This function isn't local because it's used by dev.scm.
 
 (define (cpu-load file keep-mach keep-isa options
 		  app-initer! app-finisher! analyzer!)
   (-init-parse-cpu! keep-mach keep-isa options)
   (app-initer!)
   (logit 1 "Loading cpu description " file "\n")
+  (set! arch-path (dirname file))
   (reader-read-file! file)
   (logit 2 "Processing cpu description " file "\n")
   (-finish-parse-cpu!)
@@ -1000,7 +1002,10 @@ Define a preprocessor-style macro.
     )
 )
 
-(define arch-path (string-append srcdir "/cpu/"))
+; Default place to look.
+; This gets overridden to point to the directory of the loaded .cpu file.
+; ??? Ideally this would be local to this file.
+(define arch-path (string-append srcdir "/cpu"))
 
 ; Accessors for application option specs
 (define (opt-get-first-pass opt)
@@ -1080,7 +1085,6 @@ Define a preprocessor-style macro.
 	      (else
 	       (cond ((str=? "-a" (car opt))
 		      (set! arch-file arg)
-		      (set! arch-path (string-append (dirname arg) "/"))
 		      )
 		     ((str=? "-b" (car opt))
 		      (set! debugging #t)
@@ -1181,6 +1185,7 @@ Define a preprocessor-style macro.
 )
 
 ; Main entry point called by application file generators.
+
 (define cgen
   (lambda args
     (cgen-debugging-stack-start -cgen args))

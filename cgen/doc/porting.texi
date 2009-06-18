@@ -771,7 +771,7 @@ and developing the .CPU file interactively.  The basic steps are:
 @item Run @code{guile}.
 @item @code{(load "dev.scm")}
 @item Load application, e.g. @code{(load-opc)} or @code{(load-sim)}
-@item Load CPU description file, e.g. @code{(cload #:arch "m32r")}
+@item Load CPU description file, e.g. @code{(cload #:arch "cpu/m32r")}
 @item Run generators until output looks reasonable, e.g. @code{(cgen-opc.c)}
 @end enumerate
 
@@ -785,19 +785,19 @@ Example:
 @example
 (define (m32r-opc)
   (load-opc)
-  (cload #:arch "m32r")
+  (cload #:arch "cpu/m32r.cpu")
 )
 (define (m32r-sim)
   (load-sim)
-  (cload #:arch "m32r" #:options "with-scache with-profile=fn")
+  (cload #:arch "cpu/m32r.cpu" #:options "with-scache with-profile=fn")
 )
 (define (m32rbf-sim)
   (load-sim)
-  (cload #:arch "m32r" #:machs "m32r" #:options "with-scache with-profile=fn")
+  (cload #:arch "cpu/m32r.cpu" #:machs "m32r" #:options "with-scache with-profile=fn")
 )
 (define (m32rxf-sim)
   (load-sim)
-  (cload #:arch "m32r" #:machs "m32rx" #:options "with-scache with-profile=fn")
+  (cload #:arch "cpu/m32r.cpu" #:machs "m32rx" #:options "with-scache with-profile=fn")
 )
 @end example
 
@@ -805,13 +805,15 @@ CPU description files are loaded into an interactive guile session with
 @code{cload}.  The syntax is:
 
 @example
-(cload #:arch arch
+(cload #:arch "cpu-file-path"
        [#:machs "mach-list"]
        [#:isas "isa-list"]
        [#:options "option-list"])
 @end example
 
 Only the @code{#:arch} argument is mandatory.
+
+@samp{cpu-file} is the path to the @file{.cpu} file.
 
 @samp{mach-list} is a comma separated string of machines to keep.
 
@@ -835,7 +837,7 @@ development routines.
         @item The @file{.cpu} file is the main description file.
 	@item The @file{.opc} file provides additional C support code.
         @end itemize
-@item @code{(cload #:arch "cpu/<arch>")}
+@item @code{(cload #:arch "cpu/<arch>.cpu")}
 @item Run each of:
         @itemize @bullet
         @item @code{(cgen-desc.h)}
@@ -1005,7 +1007,7 @@ The same basic procedure for opcodes porting applies here.
 @item @code{(load "dev.scm")}
 @item @code{(load-sim)}
 @item Edit your @file{cpu/<arch>.cpu} file.
-@item @code{(cload #:arch "cpu/<arch>")}
+@item @code{(cload #:arch "cpu/<arch>.cpu")}
 @item Run each of:
         @itemize @bullet
 	@item @code{(cgen-arch.h)}
@@ -1014,7 +1016,7 @@ The same basic procedure for opcodes porting applies here.
         @end itemize
 @item Repeat steps 4,5,6 until the output looks reasonable.
 @item Edit your cpu/<arch>.cpu file.
-@item @code{(cload #:arch "cpu/<arch>" #:machs "mach1[,mach2[,...]]")}
+@item @code{(cload #:arch "cpu/<arch>.cpu" #:machs "mach1[,mach2[,...]]")}
 @item Run each of:
         @itemize @bullet
 	@item @code{(cgen-cpu.h)}

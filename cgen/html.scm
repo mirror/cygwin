@@ -955,7 +955,7 @@ See the input .cpu file(s) for copyright information.
 
 ; Documentation init,finish,analyzer support.
 
-; Initialize any opcodes specific things before loading the .cpu file.
+; Initialize any doc specific things before loading the .cpu file.
 
 (define (doc-init!)
   (desc-init!)
@@ -963,7 +963,7 @@ See the input .cpu file(s) for copyright information.
   *UNSPECIFIED*
 )
 
-; Finish any opcodes specific things after loading the .cpu file.
+; Finish any doc specific things after loading the .cpu file.
 ; This is separate from analyze-data! as cpu-load performs some
 ; consistency checks in between.
 
@@ -978,6 +978,21 @@ See the input .cpu file(s) for copyright information.
 
 (define (doc-analyze!)
   (desc-analyze!)
+
+  ; If the IDOC attribute isn't defined, provide a default one.
+  (if (not (current-attr-lookup 'IDOC))
+      (define-attr
+	'(for insn)
+	'(type enum)
+	'(name IDOC)
+	'(comment "insn kind for documentation")
+	'(attrs META)
+	'(values
+	  (MEM - () "Memory")
+	  (ALU - () "ALU")
+	  (FPU - () "FPU")
+	  (BR - () "Branch")
+	  (MISC - () "Miscellaneous"))))
 
   ; Initialize the rtl->c translator.
   (rtl-c-config!)

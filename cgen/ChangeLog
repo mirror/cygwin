@@ -1,3 +1,13 @@
+2009-06-18  Doug Evans  <dje@sebabeach.org>
+
+	* dev.scm (cload): Change #:arch argument to take the path to the
+	.cpu file instead of just the name of the architecture.
+	* read.scm (arch-path): Remove trailing '/'.
+	(cpu-load): Set `arch-path' to directory of .cpu file.
+	(-cgen): Don't set `arch-path' here.
+	(include): Update.
+	* doc/porting.texi: Update.
+
 2009-06-14  Doug Evans  <dje@sebabeach.org>
 
 	* gen-all-doc: Use files in ../cpu where possible.

@@ -1,5 +1,7 @@
 2009-06-18  Doug Evans  <dje@sebabeach.org>
 
+	* gen-all-doc: Add fr30, ip2k, iq2000, lm32, mep, mt.
+
 	* html.scm (doc-analyze!): Provide default IDOC attribute if missing.
 
 	* dev.scm (cload): Change #:arch argument to take the path to the

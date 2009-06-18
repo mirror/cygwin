@@ -10,7 +10,7 @@
 ; (load-opc)
 ; (load-sim)
 ; (load-sid)
-; (cload #:arch arch #:machs "mach-list" #:isas "isa-list" #:options "options")
+; (cload #:arch path-to-cpu-file #:machs "mach-list" #:isas "isa-list" #:options "options")
 
 ; First load guile.scm to coerce guile into something we've been using.
 ; Guile is always in flux.
@@ -30,7 +30,7 @@
 ; Supply the path name and suffic for the .cpu file and delete the analyzer
 ; arg from cpu-load to lessen the typing.
 (define (cload . args)
-  (let ((arch #f)
+  (let ((cpu-file #f)
 	(keep-mach "all")
 	(keep-isa "all")
 	(options ""))
@@ -42,7 +42,7 @@
 	  #f ; done
 	  (begin
 	    (case (car args)
-	      ((#:arch) (set! arch (cadr args)))
+	      ((#:arch) (set! cpu-file (cadr args)))
 	      ((#:machs) (set! keep-mach (cadr args)))
 	      ((#:isas) (set! keep-isa (cadr args)))
 	      ((#:options) (set! options (cadr args)))
@@ -51,37 +51,37 @@
 
     (case APPLICATION
       ((UNKNOWN) (error "application not loaded"))
-      ((DESC) (cpu-load (string-append "./cpu/" arch ".cpu")
+      ((DESC) (cpu-load cpu-file
 			keep-mach keep-isa options
 			desc-init!
 			desc-finish!
 			desc-analyze!))
-      ((DOC) (cpu-load (string-append "./cpu/" arch ".cpu")
+      ((DOC) (cpu-load cpu-file
 			keep-mach keep-isa options
 			doc-init!
 			doc-finish!
 			doc-analyze!))
-      ((OPCODES) (cpu-load (string-append "./cpu/" arch ".cpu")
+      ((OPCODES) (cpu-load cpu-file
 			   keep-mach keep-isa options
 			   opcodes-init!
 			   opcodes-finish!
 			   opcodes-analyze!))
-      ((GAS-TEST) (cpu-load (string-append "./cpu/" arch ".cpu")
+      ((GAS-TEST) (cpu-load cpu-file
 			    keep-mach keep-isa options
 			    gas-test-init!
 			    gas-test-finish!
 			    gas-test-analyze!))
-      ((SIMULATOR) (cpu-load (string-append "./cpu/" arch ".cpu")
+      ((SIMULATOR) (cpu-load cpu-file
 			     keep-mach keep-isa options
 			     sim-init!
 			     sim-finish!
 			     sim-analyze!))
-      ((SID-SIMULATOR) (cpu-load (string-append "./cpu/" arch ".cpu")
+      ((SID-SIMULATOR) (cpu-load cpu-file
 			     keep-mach keep-isa options
 			     sim-init!
 			     sim-finish!
 			     sim-analyze!))
-      ((SIM-TEST) (cpu-load (string-append "./cpu/" arch ".cpu")
+      ((SIM-TEST) (cpu-load cpu-file
 			    keep-mach keep-isa options
 			    sim-test-init!
 			    sim-test-finish!
@@ -105,7 +105,7 @@
   ; ??? Necessary for the following case, dunno why.
   ; bash$ guile -l dev.scm
   ; guile> (load-doc)
-  ; guile> (cload #:arch "m32r")
+  ; guile> (cload #:arch "./cpu/m32r.cpu")
   (set! APPLICATION 'DOC)
 )
 
@@ -181,7 +181,7 @@ Then choose the application via one of:
 
 Then load the .cpu file with:
 
-(cload #:arch \"arch\" #:machs \"keep-mach\" #:isas \"keep-isa\" #:options \"options\")
+(cload #:arch \"path-to-cpu-file\" #:machs \"keep-mach\" #:isas \"keep-isa\" #:options \"options\")
 
 keep-mach:
 comma separated list of machs to keep or `all'

@@ -487,7 +487,7 @@ const MACH " (gen-sym mach) "_mach =
 ; Generate model.cxx
 
 (define (cgen-model.cxx)
-  (logit 1 "Generating " (gen-cpu-name) " model.cxx ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "-model.cxx ...\n")
   (assert-keep-one)
 
   ; Turn parallel execution support on if cpu needs it.
@@ -520,7 +520,7 @@ using namespace @cpu@; // FIXME: namespace organization still wip
 )
 
 (define (cgen-model.h)
-  (logit 1 "Generating " (gen-cpu-name) " model.h ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "-model.h ...\n")
   (assert-keep-one)
 
   (string-write

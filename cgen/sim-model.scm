@@ -367,7 +367,7 @@ const MACH " (gen-sym mach) "_mach =
 ; Generate model.c
 
 (define (cgen-model.c)
-  (logit 1 "Generating " (gen-cpu-name) " model.c ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "'s model.c ...\n")
 
   (sim-analyze-insns!)
 

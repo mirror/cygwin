@@ -667,7 +667,7 @@ void
 ; Entry point.  Generate decode.h.
 
 (define (cgen-decode.h)
-  (logit 1 "Generating " (gen-cpu-name) " decode.h ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "-decode.h ...\n")
 
   (sim-analyze-insns!)
 
@@ -723,7 +723,7 @@ typedef UINT @prefix@_insn_word;
 ; Entry point.  Generate decode.cxx.
 
 (define (cgen-decode.cxx)
-  (logit 1 "Generating " (gen-cpu-name) " decode.cxx ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "-decode.cxx ...\n")
 
   (sim-analyze-insns!)
 

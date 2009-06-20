@@ -800,7 +800,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 ; Generate cpu-<cpu>.h
 
 (define (cgen-cpu.h)
-  (logit 1 "Generating " (gen-cpu-name) " cpu.h ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "'s cpu.h ...\n")
 
   (sim-analyze-insns!)
 
@@ -843,7 +843,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 ; Generate defs-<isa>.h.
 
 (define (cgen-defs.h)
-  (logit 1 "Generating " (obj:name (current-isa)) " defs.h ...\n")
+  (logit 1 "Generating " (obj:name (current-isa)) "'s defs.h ...\n")
 
   (sim-analyze-insns!)
 
@@ -874,7 +874,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 ; Generate cpu-<cpu>.c
 
 (define (cgen-cpu.c)
-  (logit 1 "Generating " (gen-cpu-name) " cpu.c ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "'s cpu.c ...\n")
 
   (sim-analyze-insns!)
 
@@ -903,7 +903,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 ; Generate read.c
 
 (define (cgen-read.c)
-  (logit 1 "Generating " (gen-cpu-name) " read.c ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "'s read.c ...\n")
 
   (sim-analyze-insns!)
 
@@ -981,7 +981,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 ; Generate write.c
 
 (define (cgen-write.c)
-  (logit 1 "Generating " (gen-cpu-name) " write.c ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "'s write.c ...\n")
 
   (sim-analyze-insns!)
 
@@ -1033,7 +1033,7 @@ void
 ; Each instruction is implemented in its own function.
 
 (define (cgen-semantics.c)
-  (logit 1 "Generating " (gen-cpu-name) " semantics.c ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "'s semantics.c ...\n")
 
   (sim-analyze-insns!)
 
@@ -1082,7 +1082,7 @@ CGEN_ATTR_VALUE (NULL, abuf->idesc->attrs, CGEN_INSN_" "attr)")
 ; This file consists of just the switch().  It is included by mainloop.c.
 
 (define (cgen-sem-switch.c)
-  (logit 1 "Generating " (gen-cpu-name) " sem-switch.c ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "'s sem-switch.c ...\n")
 
   (sim-analyze-insns!)
 

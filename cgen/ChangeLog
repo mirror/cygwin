@@ -1,3 +1,20 @@
+2009-06-20  Masaki Muranaka  <monaka@monami-software.com>
+	    Doug Evans  <dje@sebabeach.org>
+
+	* desc-cpu.scm (cgen-desc.h): Tweak logit message for consistency.
+	(cgen-desc.c): Ditto.
+	* sid-cpu.scm (cgen-desc.h, cgen-cpu.h, cgen-defs.h): Ditto.
+	(cgen-write.cxx, cgen-semantics.cxx, cgen-sem-switch.cxx): Ditto.
+	* sid-decode.scm (cgen-decode.h, cgen-decode.cxx): Ditto.
+	* sid-model.scm (cgen-model.cxx, cgen-model.h): Ditto.
+	* sim-arch.scm (cgen-arch.h, cgen-arch.c): Ditto.
+	(cgen-cpuall.h, cgen-ops.c): Ditto.
+	* sim-cpu.scm (cgen-cpu.h, cgen-defs.h, cgen-cpu.c): Ditto.
+	(cgen-read.c, cgen-write.c, cgen-semantics.c): Ditto.
+	(cgen-sem-switch.c): Ditto.
+	* sim-decode.scm (cgen-decode.h, cgen-decode.c): Ditto.
+	* sim-model.c (cgen-model.c): Ditto.
+
 2009-06-18  Doug Evans  <dje@sebabeach.org>
 
 	* gen-all-doc: Add fr30, ip2k, iq2000, lm32, mep, mt.

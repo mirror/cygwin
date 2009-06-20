@@ -63,7 +63,7 @@
 ; Variables representing misc. global constants.
 
 ; A list of three numbers designating the cgen version: major minor fixlevel.
-(define -CGEN-VERSION '(0 7 2))
+(define -CGEN-VERSION '(1 1 0))
 (define (cgen-major) (car -CGEN-VERSION))
 (define (cgen-minor) (cadr -CGEN-VERSION))
 (define (cgen-fixlevel) (caddr -CGEN-VERSION))

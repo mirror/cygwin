@@ -1,3 +1,9 @@
+2009-06-20  Doug Evans  <dje@sebabeach.org>
+
+	* configure.in: Update version to 1.1.
+	* configure: Regenerate.
+	* read.scm (-CGEN-VERSION): Update to 1.1.0.
+
 2009-06-20  Masaki Muranaka  <monaka@monami-software.com>
 	    Doug Evans  <dje@sebabeach.org>
 

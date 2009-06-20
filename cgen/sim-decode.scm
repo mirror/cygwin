@@ -537,7 +537,7 @@ const IDESC *
 ; Entry point.  Generate decode.h.
 
 (define (cgen-decode.h)
-  (logit 1 "Generating " (gen-cpu-name) " decode.h ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "'s decode.h ...\n")
 
   (sim-analyze-insns!)
 
@@ -564,7 +564,7 @@ const IDESC *
 ; Entry point.  Generate decode.c.
 
 (define (cgen-decode.c)
-  (logit 1 "Generating " (gen-cpu-name) " decode.c ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "'s decode.c ...\n")
 
   (sim-analyze-insns!)
 

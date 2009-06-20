@@ -71,7 +71,7 @@
 ; Generate <cpu>-desc.h.
 
 (define (cgen-desc.h)
-  (logit 1 "Generating " (gen-cpu-name) " desc.h ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "-desc.h ...\n")
 
   (string-write
    (gen-c-copyright "Misc. entries in the @arch@ description file."
@@ -287,7 +287,7 @@ namespace @arch@ {
 ; Generate <cpu>-cpu.h
 
 (define (cgen-cpu.h)
-  (logit 1 "Generating " (gen-cpu-name) " cpu.h ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "-cpu.h ...\n")
   (assert-keep-one)
 
   ; Turn parallel execution support on if cpu needs it.
@@ -545,7 +545,7 @@ typedef struct @prefix@_trace_record {
 ; Generate <cpu>-defs.h
 
 (define (cgen-defs.h)
-  (logit 1 "Generating " (gen-cpu-name) " defs.h ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "-defs.h ...\n")
   (assert-keep-one)
 
   ; Turn parallel execution support on if cpu needs it.
@@ -672,7 +672,7 @@ using namespace cgen;
 ")))
 
 (define (cgen-write.cxx)
-  (logit 1 "Generating " (gen-cpu-name) " write.cxx ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "-write.cxx ...\n")
   (assert-keep-one)
 
   (sim-analyze-insns!)
@@ -784,7 +784,7 @@ using namespace cgen;
 ; Each instruction is implemented in its own function.
 
 (define (cgen-semantics.cxx)
-  (logit 1 "Generating " (gen-cpu-name) " semantics.cxx ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "-semantics.cxx ...\n")
   (assert-keep-one)
 
   (sim-analyze-insns!)
@@ -1408,7 +1408,7 @@ restart:
 ; Generate sem-switch.cxx.
 
 (define (cgen-sem-switch.cxx)
-  (logit 1 "Generating " (gen-cpu-name) " sem-switch.cxx ...\n")
+  (logit 1 "Generating " (gen-cpu-name) "-sem-switch.cxx ...\n")
 
   (sim-analyze-insns!)
   (if (with-sem-frags?)

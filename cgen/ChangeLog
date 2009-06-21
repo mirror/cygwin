@@ -1,3 +1,7 @@
+2009-06-21  Doug Evans  <dje@sebabeach.org>
+
+	* rtl-c.scm (delay): Add FIXME, tweak formatting.
+
 2009-06-20  Doug Evans  <dje@sebabeach.org>
 
 	* doc/rtl.texi (Expressions): Enhance docs of shift ops.

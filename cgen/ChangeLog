@@ -1,6 +1,8 @@
 2009-06-21  Doug Evans  <dje@sebabeach.org>
 
 	* rtl-c.scm (delay): Add FIXME, tweak formatting.
+	* rtl-traverse.scm (-rtx-traverse-expr): Tweak comments.
+	(-rtx-traverse, rtx-traverse): Ditto.
 
 2009-06-20  Doug Evans  <dje@sebabeach.org>
 

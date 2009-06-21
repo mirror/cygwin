@@ -1,5 +1,7 @@
 2009-06-20  Doug Evans  <dje@sebabeach.org>
 
+	* doc/rtl.texi (Expressions): Enhance docs of shift ops.
+
 	* configure.in: Update version to 1.1.
 	* configure: Regenerate.
 	* read.scm (-CGEN-VERSION): Update to 1.1.0.

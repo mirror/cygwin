@@ -619,14 +619,33 @@
 )
 
 ; Traverse an expression.
+;
+; RTX-OBJ is the <rtx-func> object of the (outer) expression being traversed.
+;
+; EXPR is the expression to be traversed.
+;
+; MODE is the name of the mode of EXPR.
+;
+; PARENT-EXPR is the expression EXPR is contained in.  The top-level
+; caller must pass #f for it.
+;
+; OP-POS is the position EXPR appears in PARENT-EXPR.  The
+; top-level caller must pass 0 for it.
+;
+; TSTATE is the current traversal state.
+;
+; APPSTUFF is for application specific use.
+;
 ; For syntax expressions arguments are not pre-evaluated before calling the
 ; user's expression handler.  Otherwise they are.
-; If EXPR-FN wants to just scan the operands, rather than evaluating them,
-; one thing it can do is call back to rtx-traverse-operands.
-; If EXPR-FN returns #f, traverse the operands normally and return
-; (rtx's-name traversed-operand1 ...).
+;
+; If (tstate-expr-fn TSTATE) wants to just scan the operands, rather than
+; evaluating them, one thing it can do is call back to rtx-traverse-operands.
+; If (tstate-expr-fn TSTATE) returns #f, traverse the operands normally and
+; return (rtx's-name ([options]) mode traversed-operand1 ...),
+; i.e., the canonicalized form.
 ; This is for semantic-compile's sake and all traversal handlers are
-; required to do this if EXPR-FN returns #f.
+; required to do this if the expr-fn returns #f.
 
 (define (-rtx-traverse-expr rtx-obj expr mode parent-expr op-pos tstate appstuff)
   (let* ((expr2 (cons (car expr)
@@ -648,8 +667,9 @@
 ; Main entry point for expression traversal.
 ; (Actually rtx-traverse is, but it's just a cover function for this.)
 ;
-; The result is the result of the lambda EXPR-FN looks up in the case of
-; expressions or an operand object (usually <operand>) in the case of operands.
+; The result is the result of the lambda (tstate-expr-fn TSTATE) looks up
+; in the case of expressions, or an operand object (usually <operand>)
+; in the case of operands.
 ;
 ; EXPR is the expression to be traversed.
 ;
@@ -748,7 +768,7 @@
 
 ; User visible procedures to traverse an rtl expression.
 ; These calls -rtx-traverse to do most of the work.
-; See tstate-make for an explanation of EXPR-FN.
+; See tstate-make for explanations of OWNER, EXPR-FN.
 ; CONTEXT is a <context> object or #f if there is none.
 ; LOCALS is a list of (mode . name) elements (the locals arg to `sequence').
 ; APPSTUFF is for application specific use.

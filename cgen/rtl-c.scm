@@ -1380,8 +1380,8 @@
   (cx:make VOID "; /*clobber*/\n")
 )
 
-
 (define-fn delay (estate options mode num-node rtx)
+  ;; FIXME: Try to move SID stuff into sid-foo.scm.
   (case APPLICATION
     ((SID-SIMULATOR)
      (let* ((n (cadddr num-node))
@@ -1410,8 +1410,8 @@
 	 (rtx-eval-with-estate rtx mode (estate-with-modifiers estate `((#:delay ,new-delay)))))))
 
     ;; not in sid-land
-    (else (s-sequence (estate-with-modifiers estate '((#:delay))) VOID '() rtx))))
-
+    (else (s-sequence (estate-with-modifiers estate '((#:delay))) VOID '() rtx)))
+)
 
 ; Gets expanded as a macro.
 ;(define-fn annul (estate yes?)

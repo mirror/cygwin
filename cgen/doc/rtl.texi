@@ -2214,9 +2214,20 @@ always a single bit. @samp{binop-with-bit} is one of @code{addc},
 @code{sub-oflag}.
 
 @item (shiftop mode operand1 operand2)
-Perform a shift operation. @samp{shiftop} is one of @code{sll},
-@code{srl}, @code{sra}, @code{ror}, @code{rol}.
-@c Need to be precise about the semantics, and not leave it to C.
+Perform a shift operation.
+@samp{operand1} is shifted (or rotated) by the amount specified
+in @samp{operand2}.
+@samp{shiftop} is one of @code{sll}, @code{srl}, @code{sra},
+@code{ror}, @code{rol}.
+@samp{mode} must match the mode of @samp{operand1}.
+The mode of @samp{operand1} may be any integral mode.
+The mode of @samp{operand2} may be any integral mode, and need not match
+the mode of @samp{operand1}.
+
+It is an error if @samp{operand2} is negative or greater than
+or equal to the size of @samp{operand1}.
+If the architecture handles negative or large shift amounts,
+that needs to be handled in the surrounding RTL.
 
 @item (boolifop mode operand1 operand2)
 Perform a sequential boolean operation. @samp{operand2} is not processed

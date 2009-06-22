@@ -975,9 +975,7 @@
    (begin
      (logit 2 "Simplifying/canonicalizing rtl ...\n")
      (map (lambda (insn)
-	    ; Must pass canonicalized and macro-expanded rtl.
-	    (rtx-simplify #f insn (insn-semantics insn)
-			  (insn-build-known-values insn)))
+	    (rtx-simplify-insn #f insn))
 	  insn-list))
    insn-list)
 )
@@ -1208,9 +1206,7 @@
 (define (-frag-test-data)
   (cons
    (map (lambda (insn)
-	  ; Must pass canonicalized and macro-expanded rtl.
-	  (rtx-simplify #f insn (insn-semantics insn)
-			(insn-build-known-values insn)))
+	  (rtx-simplify-insn #f insn))
 	(non-multi-insns (non-alias-insns (current-insn-list))))
    (non-multi-insns (non-alias-insns (current-insn-list))))
 )

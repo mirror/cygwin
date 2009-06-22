@@ -268,10 +268,11 @@
 )
 
 ; Simplify an rtl expression.
+;
 ; EXPR must be in source form.
 ; The result is a possibly simplified EXPR, still in source form.
 ;
-; CONTEXT is a <context> object, used for error messages.
+; CONTEXT is a <context> object or #f, used for error messages.
 ; OWNER is the owner of the expression (e.g. <insn>) or #f if there is none.
 ;
 ; KNOWN is an alist of known values.  Each element is (name . value) where
@@ -295,6 +296,14 @@
 			      (rtx-env-empty-stack)
 			      #f #f known 0)
 		 #f)
+)
+
+;; Return an insn's semantics simplified.
+;; CONTEXT is a <context> object or #f, used for error messages.
+
+(define (rtx-simplify-insn context insn)
+  (rtx-simplify context insn (insn-semantics insn)
+		(insn-build-known-values insn))
 )
 
 ;; rtx-solve (and supporting cast)

@@ -831,9 +831,7 @@ See the input .cpu file(s) for copyright information.
   ; First simplify the semantics, e.g. do constant folding.
   ; For insns built up from macros, often this will remove a lot of clutter.
   (for-each (lambda (insn)
-	      (insn-set-tmp! insn (rtx-simplify #f insn
-						(insn-semantics insn)
-						(insn-build-known-values insn))))
+	      (insn-set-tmp! insn (rtx-simplify-insn #f insn)))
 	    (current-insn-list))
 
   (let ((machs (current-mach-list))

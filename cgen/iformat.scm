@@ -422,14 +422,13 @@
 	(list #f #f atlist-empty)
 
 	; FIXME: error checking (e.g. missing or overlapping bits)
-	(let* (; A list of the various bits of semantic code.
-	       (sem (insn-semantics insn))
+	(let* ((sem (insn-semantics insn))
 	       ; Compute list of input and output operands if asked for.
 	       (sem-ops (if compute-sformat?
 			    (semantic-compile #f ; FIXME: context
 					      insn sem)
 			    (csem-make #f #f #f
-				       (if (insn-semantics insn)
+				       (if sem
 					   (semantic-attrs #f ; FIXME: context
 							   insn sem)
 					   atlist-empty))))

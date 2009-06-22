@@ -1,5 +1,10 @@
 2009-06-21  Doug Evans  <dje@sebabeach.org>
 
+	* rtl-xform.scm (rtx-simplify-insn): New function.
+	* html.scm (gen-insn-docs): Call it.
+	* sem-frags.scm (sem-find-common-frags, -frag-test-data): Ditto.
+	* iformat.scm (ifmt-analyze): Minor simplification.
+
 	* semantics.scm (semantic-compile): Change arg sem-code-list to
 	sem-code.
 	(semantic-attrs): Ditto.

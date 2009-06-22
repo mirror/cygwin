@@ -244,7 +244,7 @@
 )
 
 ; Build the tstate known value list for INSN.
-; This built from the ifield-assertion list.
+; This is built from the ifield-assertion list.
 
 (define (insn-build-known-values insn)
   (let ((expr (insn-ifield-assertion insn)))

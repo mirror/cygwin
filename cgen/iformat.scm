@@ -423,18 +423,18 @@
 
 	; FIXME: error checking (e.g. missing or overlapping bits)
 	(let* (; A list of the various bits of semantic code.
-	       (sems (list (insn-semantics insn)))
+	       (sem (insn-semantics insn))
 	       ; Compute list of input and output operands if asked for.
 	       (sem-ops (if compute-sformat?
 			    (semantic-compile #f ; FIXME: context
-					      insn sems)
+					      insn sem)
 			    (csem-make #f #f #f
 				       (if (insn-semantics insn)
 					   (semantic-attrs #f ; FIXME: context
-							   insn sems)
+							   insn sem)
 					   atlist-empty))))
 	       )
-	  (let ((compiled-sems (csem-code sem-ops))
+	  (let ((compiled-sem (csem-code sem-ops))
 		(in-ops (csem-inputs sem-ops))
 		(out-ops (csem-outputs sem-ops))
 		(attrs (csem-attrs sem-ops))
@@ -446,7 +446,7 @@
 			(-sfmt-used-iflds in-ops out-ops)
 			#f)
 		    attrs)
-		  compiled-sems
+		  compiled-sem
 		  attrs)))))
 )
 
@@ -559,8 +559,8 @@
 	      (let ((sem-ops (ifmt-analyze insn compute-sformat?)))
 		(insn-set-fmt-desc! insn (car sem-ops))
 		(if (and compute-sformat? (cadr sem-ops))
-		    (let ((compiled-sems (cadr sem-ops)))
-		      (insn-set-compiled-semantics! insn (car compiled-sems))))
+		    (let ((compiled-sem (cadr sem-ops)))
+		      (insn-set-compiled-semantics! insn compiled-sem)))
 		(obj-set-atlist! insn
 				 (atlist-append (obj-atlist insn)
 						(caddr sem-ops)))

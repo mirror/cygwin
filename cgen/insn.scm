@@ -64,7 +64,7 @@
 		(semantics . #f)
 
 		; The processed form of the above.
-		; Each element of rtl is replaced with the associated object.
+		; This remains #f for virtual insns (FIXME: keep?).
 		(compiled-semantics . #f)
 
 		; The mapping of the semantics onto the host.

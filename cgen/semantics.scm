@@ -1,4 +1,4 @@
-; Routines for instruction semantic analysis (including rtx-simplify).
+; Routines for instruction semantic analysis.
 ; Copyright (C) 2000 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.

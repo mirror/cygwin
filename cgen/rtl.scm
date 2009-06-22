@@ -380,51 +380,6 @@
 
 (define rtx-macro-expand -rtx-macro-expand)
 
-; RTX canonicalization.
-; ??? wip
-
-; Subroutine of rtx-canonicalize.
-; Return canonical form of rtx expression EXPR.
-; CONTEXT is a <context> object or #f if there is none.
-; It is used for error message.
-; RTX-OBJ is the <rtx-func> object of (car expr).
-
-(define (-rtx-canonicalize-expr context rtx-obj expr)
-  #f
-)
-
-; Return canonical form of EXPR.
-; CONTEXT is a <context> object or #f if there is none.
-; It is used for error message.
-;
-; Does:
-; - operand shortcuts expanded
-;   - numbers -> (const number)
-;   - operand-name -> (operand operand-name)
-;   - ifield-name -> (ifield ifield-name)
-; - no options -> null option list
-; - absent result mode of those that require a mode -> DFLT
-; - rtx macros are expanded
-;
-; EXPR is returned in source form.  We could speed up future processing by
-; transforming it into a more compiled form, but that makes debugging more
-; difficult, so for now we don't.
-
-(define (rtx-canonicalize context expr)
-  ; FIXME: wip
-  (cond ((integer? expr)
-	 (rtx-make-const 'INT expr))
-	((symbol? expr)
-	 (let ((op (current-op-lookup expr)))
-	   (if op
-	       (rtx-make-operand expr)
-	       (context-error context "can't canonicalize" expr))))
-	((pair? expr)
-	 expr)
-	(else
-	 (context-error context "can't canonicalize" expr)))
-)
-
 ; RTX mode support.
 
 ; Get implied mode of X, either an operand expression, sequence temp, or

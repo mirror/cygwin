@@ -171,6 +171,7 @@
 (maybe-load "decode" #f 'decode-build-table)
 (maybe-load "rtl" "rtl" '<rtx-func>)
 (maybe-load "rtl-traverse" "rtl_traverse" 'rtx-traverse)
+(maybe-load "rtl-xform" "rtx_simplify" 'rtx-simplify)
 (maybe-load "rtx-funcs" "rtx_funcs" 'def-rtx-funcs)
 (maybe-load "rtl-c" "rtl_c" '<c-expr>)
 (maybe-load "semantics" #f 'semantic-compile)

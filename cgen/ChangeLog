@@ -1,5 +1,22 @@
 2009-06-21  Doug Evans  <dje@sebabeach.org>
 
+	* semantics.scm (semantic-compile): Change arg sem-code-list to
+	sem-code.
+	(semantic-attrs): Ditto.
+	* iformat.scm (ifmt-analyze): Update.
+	(ifmt-compute!): Update.
+	* rtl-traverse.scm (-compile-expr-fn, rtx-compile): Move to
+	rtl-xform.scm.
+	(-rtx-trim-args, -rtx-trim-for-doc, rtx-trim-for-doc): Ditto.
+	* rtl.scm (-rtx-canonicalize-expr, rtx-canonicalize): Ditto.
+	* semantics.scm (rtx-simplify): Ditto.
+	(rtx-const-equal, rtx-const-list-equal): Ditto, and make local.
+	(rtx-simplify-eq-attr-mach, rtx-simplify-eq-attr-insn): Ditto.
+	(-simplify-expr-fn): Move to rtl-xform.scm.
+	(-solve-expr-fn, rtx-solve): Ditto.
+	* rtl-xform.c: New file.
+	* read.scm: Load it.
+
 	* rtl-c.scm (delay): Add FIXME, tweak formatting.
 	* rtl-traverse.scm (-rtx-traverse-expr): Tweak comments.
 	(-rtx-traverse, rtx-traverse): Ditto.

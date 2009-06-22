@@ -468,6 +468,7 @@
 ; Here "canonicalized" means that -rtx-munge-mode&options has been called to
 ; insert an option list and mode if they were absent in the original
 ; expression.
+; Note that this means that, yes, the options and mode are "traversed" too.
 
 (define (-rtx-traverse-operands rtx-obj expr tstate appstuff)
   (if -rtx-traverse-debug?
@@ -586,6 +587,7 @@
 
 ; Subroutine of -rtx-traverse-expr to fill in the mode if absent and to
 ; collect the options into one list.
+;
 ; ARGS is the list of arguments to the rtx function
 ; (e.g. (1 2) in (add 1 2)).
 ; ??? "munge" is an awkward name to use here, but I like it for now because
@@ -618,7 +620,7 @@
     (cons options (cons mode-name args)))
 )
 
-; Traverse an expression.
+; Subroutine of -rtx-traverse to traverse an expression.
 ;
 ; RTX-OBJ is the <rtx-func> object of the (outer) expression being traversed.
 ;
@@ -673,6 +675,9 @@
 ;
 ; EXPR is the expression to be traversed.
 ;
+; EXPECTED is one of `-rtx-valid-types' and indicates the expected rtx type
+; or #f if it doesn't matter.
+;
 ; MODE is the name of the mode of EXPR.
 ;
 ; PARENT-EXPR is the expression EXPR is contained in.  The top-level
@@ -680,9 +685,6 @@
 ;
 ; OP-POS is the position EXPR appears in PARENT-EXPR.  The
 ; top-level caller must pass 0 for it.
-;
-; EXPECTED is one of `-rtx-valid-types' and indicates the expected rtx type
-; or #f if it doesn't matter.
 ;
 ; TSTATE is the current traversal state.
 ;
@@ -811,39 +813,6 @@
      #f)
    #f
    )
-)
-
-; Convert rtl expression EXPR from source form to compiled form.
-; The expression is validated and rtx macros are expanded as well.
-; CONTEXT is a <context> object or #f if there is none.
-; It is used in error messages.
-; EXTRA-VARS-ALIST is an association list of extra (symbol <mode> value)
-; elements to be used during value lookup.
-;
-; This does the same operation that rtx-traverse does, except that it provides
-; a standard value for EXPR-FN.
-;
-; ??? In the future the compiled form may be the same as the source form
-; except that all elements would be converted to their respective objects.
-
-(define (-compile-expr-fn rtx-obj expr mode parent-expr op-pos tstate appstuff)
-; (cond 
-; The intent of this is to handle sequences/closures, but is it needed?
-;  ((rtx-style-syntax? rtx-obj)
-;   ((rtx-evaluator rtx-obj) rtx-obj expr mode
-;			     parent-expr op-pos tstate))
-;  (else
-  (cons (car expr) ; rtx-obj
-	(-rtx-traverse-operands rtx-obj expr tstate appstuff))
-)
-
-(define (rtx-compile context expr extra-vars-alist)
-  (-rtx-traverse expr #f 'DFLT #f 0
-		 (tstate-make context #f
-			      (/fastcall-make -compile-expr-fn)
-			      (rtx-env-init-stack1 extra-vars-alist)
-			      #f #f nil 0)
-		 #f)
 )
 
 ; RTL evaluation state.
@@ -1062,135 +1031,4 @@
 
 (define (rtx-value expr owner)
   (rtx-eval-with-estate expr 'DFLT (estate-make-for-eval #f owner))
-)
-
-; RTX trimming (removing fluff not normally needed for the human viewer).
-
-; Subroutine of -rtx-trim-for-doc to simplify it.
-; Trim all the arguments of rtx NAME.
-
-(define (-rtx-trim-args name args)
-  (let* ((rtx-obj (rtx-lookup name))
-	 (arg-types (rtx-arg-types rtx-obj)))
-
-    (let loop ((args args)
-	       (types (cddr arg-types)) ; skip options, mode
-	       (result nil))
-
-      (if (null? args)
-
-	  (reverse! result)
-
-	  (let ((arg (car args))
-		; Remember, types may be an improper list.
-		(type (if (pair? types) (car types) types))
-		(new-arg (car args)))
-
-	    ;(display arg (current-error-port)) (newline (current-error-port))
-	    ;(display type (current-error-port)) (newline (current-error-port))
-
-	    (case type
-	      ((OPTIONS)
-	       (assert #f)) ; shouldn't get here
-
-	      ((ANYMODE INTMODE FLOATMODE NUMMODE EXPLNUMMODE NONVOIDMODE VOIDMODE DFLTMODE)
-	       #f) ; leave arg untouched
-
-	      ((RTX SETRTX TESTRTX)
-	       (set! new-arg (-rtx-trim-for-doc arg)))
-
-	      ((CONDRTX)
-	       (assert (= (length arg) 2))
-	       (if (eq? (car arg) 'else)
-		   (set! new-arg (cons 'else (-rtx-trim-for-doc (cadr arg))))
-		   (set! new-arg (list (-rtx-trim-for-doc (car arg))
-				       (-rtx-trim-for-doc (cadr arg)))))
-	       )
-
-	      ((CASERTX)
-	       (assert (= (length arg) 2))
-	       (set! new-arg (list (car arg) (-rtx-trim-for-doc (cadr arg))))
-	       )
-
-	      ((LOCALS)
-	       #f) ; leave arg untouched
-
-	      ((ENV)
-	       #f) ; leave arg untouched for now
-
-	      ((ATTRS)
-	       #f) ; leave arg untouched for now
-
-	      ((SYMBOL STRING NUMBER SYMORNUM)
-	       #f) ; leave arg untouched
-
-	      ((OBJECT)
-	       (assert #f)) ; hopefully(wip!) shouldn't get here
-
-	      (else
-	       (assert #f))) ; unknown arg type
-
-	    (loop (cdr args)
-		  (if (pair? types) (cdr types) types)
-		  (cons new-arg result))))))
-)
-
-; Given a fully specified rtx expression, usually the result of rtx-simplify,
-; remove bits unnecessary for documentation purposes.
-; rtx-simplify adds a lot of verbosity because in the process of
-; simplifying the rtl it produces fully-specified rtl.
-; Examples of things to remove: empty options list, DFLT mode.
-;
-; NOTE: While having to trim the result of rtx-simplify may seem ironical,
-; it isn't.  You need to keep separate the notions of simplifying "1+1" to "2"
-; and trimming the clutter from "(const () BI 0)" yielding "0".
-
-(define (-rtx-trim-for-doc rtx)
-  (if (pair? rtx) ; ??? cheap rtx?
-      (let ((name (car rtx))
-	    (options (cadr rtx))
-	    (mode (caddr rtx))
-	    (rest (cdddr rtx)))
-
-	(case name
-
-	  ((const) (car rest))
-
-	  ((ifield operand local)
-	   (if (null? options)
-	       (if (eq? mode 'DFLT)
-		   (car rest)
-		   (cons name (cons mode rest)))
-	       rtx))
-
-	  ((sequence parallel)
-	   ; No special support is needed, except it's nice to remove nop
-	   ; statements.  These can be created when an `if' get simplified.
-	   (let ((trimmed-args (-rtx-trim-args name rest))
-		 (result nil))
-	     (for-each (lambda (rtx)
-			 (if (equal? rtx '(nop))
-			     #f ; ignore
-			     (set! result (cons rtx result))))
-		       trimmed-args)
-	     (if (null? options)
-		 (if (eq? mode 'DFLT)
-		     (cons name (reverse result))
-		     (cons name (cons mode (reverse result))))
-		 (cons name (cons options (cons mode (reverse result)))))))
-
-	  (else
-	   (let ((trimmed-args (-rtx-trim-args name rest)))
-	     (if (null? options)
-		 (if (eq? mode 'DFLT)
-		     (cons name trimmed-args)
-		     (cons name (cons mode trimmed-args)))
-		 (cons name (cons options (cons mode trimmed-args))))))))
-
-      ; Not an rtx expression, must be number, symbol, string.
-      rtx)
-)
-
-(define (rtx-trim-for-doc rtx)
-  (-rtx-trim-for-doc rtx)
 )

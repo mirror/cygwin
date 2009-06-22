@@ -1,3 +1,7 @@
+2009-06-22  Doug Evans  <dje@sebabeach.org>
+
+	* semantics.scm (insn-build-known-values): Fix typo in comment.
+
 2009-06-21  Doug Evans  <dje@sebabeach.org>
 
 	* rtl-xform.scm (rtx-simplify-insn): New function.

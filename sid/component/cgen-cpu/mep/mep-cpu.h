@@ -100,8 +100,8 @@ public:
   inline void h_cr_ivc2_set (UINT regno, DI newval) { current_cpu->h_cr64_set (regno, newval);
  }
 
-  inline DI h_ccr_ivc2_get (UINT regno) const { return current_cpu->h_ccr_get (regno); }
-  inline void h_ccr_ivc2_set (UINT regno, DI newval) { current_cpu->h_ccr_set (regno, newval);
+  inline SI h_ccr_ivc2_get (UINT regno) const { return current_cpu->h_ccr_get (regno); }
+  inline void h_ccr_ivc2_set (UINT regno, SI newval) { current_cpu->h_ccr_set (regno, newval);
  }
 
 #undef current_cpu

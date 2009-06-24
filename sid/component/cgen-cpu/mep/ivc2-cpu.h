@@ -50,6 +50,7 @@ public:
       DI ivc2_cpcastub_h (PCADDR &pc, DI crqc);
       DI ivc2_cpcastub_w (PCADDR &pc, DI crqc);
       DI ivc2_cpcastuh_w (PCADDR &pc, DI crqc);
+      DI ivc2_cpccadd_b (PCADDR &pc, DI crqc);
       DI ivc2_cpclipi3_w (PCADDR &pc, DI crpc, SI imm5_7);
       DI ivc2_cpclipiu3_w (PCADDR &pc, DI crpc, SI imm5_7);
       DI ivc2_cpextl_b (PCADDR &pc, DI crqc);
@@ -237,7 +238,6 @@ public:
       void ivc2_cpamulia1u_b (PCADDR &pc, DI crqp, DI crpp, SI imm8_0);
       void ivc2_cpamulila1_h (PCADDR &pc, DI crqp, DI crpp, SI imm8_0);
       void ivc2_cpamuliua1_h (PCADDR &pc, DI crqp, DI crpp, SI imm8_0);
-      void ivc2_cpccadd_b (PCADDR &pc, SI crqc);
       void ivc2_cpcmpeq_b (PCADDR &pc, DI crqc, DI crpc);
       void ivc2_cpcmpeq_h (PCADDR &pc, DI crqc, DI crpc);
       void ivc2_cpcmpeq_w (PCADDR &pc, DI crqc, DI crpc);

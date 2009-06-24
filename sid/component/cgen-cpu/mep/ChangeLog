@@ -1,3 +1,21 @@
+2009-06-23  DJ Delorie  <dj@redhat.com>
+
+	* ivc2-cop.cxx (ivc2_cphadd_w): Change to return value.
+	(ivc2_cpsubaca0u_b): Remove debug line.
+	* ivc2-cpu.h (ivc2_cpccadd_b): Change to return value.
+	* mep-cop1-16-decode.cxx: Regenerate.
+	* mep-cop1-16-sem.cxx: Regenerate.
+	* mep-cop1-32-decode.cxx: Regenerate.
+	* mep-cop1-32-sem.cxx: Regenerate.
+	* mep-cop1-48-decode.cxx: Regenerate.
+	* mep-cop1-48-sem.cxx: Regenerate.
+	* mep-cop1-64-decode.cxx: Regenerate.
+	* mep-cop1-64-sem.cxx: Regenerate.
+	* mep-core1-decode.cxx: Regenerate.
+	* mep-cpu.h: Regenerate.
+	* mep-decode.cxx: Regenerate.
+	* mep-desc.h: Regenerate.
+
 2009-05-26  DJ Delorie  <dj@redhat.com>
 
 	* mep-cop1-32-decode.cxx: Regenerate.

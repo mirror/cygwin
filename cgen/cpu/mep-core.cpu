@@ -615,6 +615,25 @@
   (default LONG))
 
 (define-attr
+  (type enum)
+  (for insn)
+  (name CPTYPE)
+  (comment "datatype to use for coprocessor values")
+  (values CP_DATA_BUS_INT VECT V2SI V4HI V8QI V2USI V4UHI V8UQI)
+  (default CP_DATA_BUS_INT))
+
+(define-attr
+  (type enum)
+  (for insn)
+  (name CRET)
+  ;; VOID - all arguments are passed as parameters; if any are written, pointers to them are passed.
+  ;; FIRST - the first argument is the return value.
+  ;; FIRSTCOPY - the first argument is the return value, but a copy is also the first parameter.
+  (values VOID FIRST FIRSTCOPY)
+  (default VOID)
+  (comment "Insn's intrinsic returns void, or the first argument rather than (or in addition to) passing it."))
+
+(define-attr
   (type integer)
   (for operand)
   (name ALIGN)

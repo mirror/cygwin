@@ -1604,17 +1604,16 @@ DI mep::mep_cpu_cgen::ivc2_cphadd_w (PCADDR &pc, DI crqc)
 }
 
 // 1111 000 ooooo 0111 10001 qqqqq 01100 0   cpccadd.b +crqc (c3_1)
-void mep::mep_cpu_cgen::ivc2_cpccadd_b (PCADDR &pc, SI crqc)
+DI mep::mep_cpu_cgen::ivc2_cpccadd_b (PCADDR &pc, DI crqc)
 {
   int i;
   int cc = ccr (IVC2_CC);
-  int q = cr (crqc);
 
   for (i=0; i<8; i++)
     if ((cc >> (i*2)) & 3)
-      q ++;
+      crqc ++;
 
-  cw (crqc, q);
+  return crqc;
 }
 
 // 1111 000 ooooo 0111 10001 qqqqq 01101 0   cpbcast.b =croc,crqc (c3_1)
@@ -4936,8 +4935,6 @@ void mep::mep_cpu_cgen::ivc2_cpsubaca0u_b (PCADDR &pc, DI crqp, DI crpp)
   int i;
   UQI q[8], p[8];
   USI cc;
-
-  cout << "[35m cpsubaca1u_b [0m\n";
 
   unpack (crqp, q);
   unpack (crpp, p);

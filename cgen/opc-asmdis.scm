@@ -1,5 +1,5 @@
 ; Assembler/disassembler support generator.
-; Copyright (C) 2000, 2001, 2005 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2005, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Assembler support.

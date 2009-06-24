@@ -1,5 +1,5 @@
 ;;;; cos-pprint.scm --- pretty-print definitions for COS
-;;;; Copyright (C) 2005 Red Hat, Inc.
+;;;; Copyright (C) 2005, 2009 Red Hat, Inc.
 ;;;; This file is part of CGEN.
 ;;;; See file COPYING.CGEN for details.
 

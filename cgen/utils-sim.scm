@@ -1,5 +1,5 @@
 ; Generic simulator application utilities.
-; Copyright (C) 2000, 2005, 2006 Red Hat, Inc.
+; Copyright (C) 2000, 2005, 2006, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 

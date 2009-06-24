@@ -1,5 +1,5 @@
 ; Application independent decoder support.
-; Copyright (C) 2000, 2004 Red Hat, Inc.
+; Copyright (C) 2000, 2004, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 ;
 ; This file provides utilities for building instruction set decoders.

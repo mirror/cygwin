@@ -1,5 +1,5 @@
 ; CPU description file generator for the GAS testsuite.
-; Copyright (C) 2000, 2001 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; This is invoked to build several .s files and a "build script",

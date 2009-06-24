@@ -4,7 +4,7 @@
 ;
 ; memops.h, semops.h, ops.c, mainloop.in are either deprecated or wip.
 ;
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 ;
 ; This is a standalone script, we don't load anything until we parse the

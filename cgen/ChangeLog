@@ -1,3 +1,8 @@
+2009-06-24  Doug Evans  <dje@sebabeach.org>
+
+	* All *.scm files: Update copyright year.
+	* utils.scm (copyright-fsf, copyright-redhat): Ditto.
+
 2009-06-23  DJ Delorie  <dj@redhat.com>
 
 	* intrinsics.scm: Updates to support IVC2.

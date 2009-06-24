@@ -1,5 +1,5 @@
 ; CPU documentation generator, html output
-; Copyright (C) 2003, Doug Evans
+; Copyright (C) 2003, 2009 Doug Evans
 ; This file is part of CGEN.  See file COPYING.CGEN for details.
 ;
 ; TODO:

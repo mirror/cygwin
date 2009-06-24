@@ -1,5 +1,5 @@
 ; CPU description file generator for the GNU assembler testsuite.
-; Copyright (C) 2000, 2001 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 

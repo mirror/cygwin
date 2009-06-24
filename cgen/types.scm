@@ -1,7 +1,7 @@
 ; Type system.
 ; This provides the low level classes for describing data, except for
 ; the actual type (confusingly enough) which is described in mode.scm.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 

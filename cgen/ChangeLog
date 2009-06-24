@@ -1,3 +1,8 @@
+2009-06-24  Doug Evans  <dje@sebabeach.org>
+
+	* All *.scm files: Update copyright year.
+	* utils.scm (copyright-fsf, copyright-redhat): Ditto.
+
 2009-06-20  Doug Evans  <dje@sebabeach.org>
 
 	* configure.in: Update version to 1.1.

@@ -1,7 +1,7 @@
 ; CPU description file generator for the GNU Binutils.
 ; This is invoked to build: $arch-desc.[ch], $arch-opinst.c,
 ; $arch-opc.h, $arch-opc.c, $arch-asm.in, $arch-dis.in, and $arch-ibld.[ch].
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 ;
 ; This is a standalone script, we don't load anything until we parse the

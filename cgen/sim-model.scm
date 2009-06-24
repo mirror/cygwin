@@ -1,5 +1,5 @@
 ; Simulator model support, plus misc. things associated with a cpu family.
-; Copyright (C) 2000, 2003 Red Hat, Inc.
+; Copyright (C) 2000, 2003, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Return C code to define cpu implementation properties.

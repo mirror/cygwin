@@ -1,6 +1,6 @@
 ; CPU description file generator for CGEN cpu documentation
 ; This is invoked to build: $arch.html.
-; Copyright (C) 2003 Doug Evans
+; Copyright (C) 2003, 2009 Doug Evans
 ; This file is part of CGEN.
 ;
 ; This is a standalone script, we don't load anything until we parse the

@@ -3,7 +3,7 @@
 ; This entire file is deeply littered with mep-specific logic. You have
 ; been warned.
 ;
-; Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2002, 2003, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Specify which application.

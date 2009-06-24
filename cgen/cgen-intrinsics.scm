@@ -4,7 +4,7 @@
 ; functions within gcc. this code has a fair bit of target-specific
 ; code in it. it's not a general-purpose module yet.
 ;
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 ;
 ; This is a standalone script, we don't load anything until we parse the

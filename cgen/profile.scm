@@ -1,4 +1,7 @@
 ;;; {Profile}
+;;; Copyright (C) 2009 Red Hat, Inc.
+;;; This file is part of CGEN.
+;;; See file COPYING.CGEN for details.
 ;;;
 ;;; This code is just an experimental prototype (e. g., it is not
 ;;; thread safe), but since it's at the same time useful, it's

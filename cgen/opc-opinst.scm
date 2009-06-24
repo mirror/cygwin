@@ -1,5 +1,5 @@
 ; Operand instance support.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Return C code to define one instance of operand object OP.

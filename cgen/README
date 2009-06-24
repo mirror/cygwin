@@ -1,4 +1,4 @@
-This is the README for CGEN 1.0.
+This is the README for CGEN 1.1.
 
 If you just want to read up on cgen, I suggest going directly to the
 doc directory, and in particular doc/intro.texi.
@@ -20,14 +20,12 @@ CGEN is not a new idea.  Other GNU ports have done this (e.g. `sh' in its
 early days).  However, the idea never really "caught on".  CGEN was started
 because I think it should be.
 
-CGEN is short for "Cpu tools GENerator".  It's not a very good name.
-I'm not very good at picking names.  An early version of the name was
-"GENCPU"!  So give me a better one.
+CGEN is short for "Cpu tools GENerator".
 
 Copyright
 --------
 
-CGEN is Copyright 2000 Red Hat, Inc.
+CGEN is Copyright 2000, 2009 Red Hat, Inc.
 
 The full text of the copyright for CGEN is contained in the file
 COPYING.CGEN.  The copyright of CGEN uses the Autoconf copyright
@@ -37,18 +35,16 @@ place no restrictions on the output of CGEN.
 Installation
 ------------
 
-CGEN 0.7.1 can be used with GNU Binutils snapshots as of ??????
-and GNU GDB snapshots as of ??????.
-GNU Binutils/GDB users will never "use" CGEN.  The generated sources
+CGEN has been in use since 2000 with all releases of GNU Binutils and GDB.
+GNU Binutils/GDB users will never "use" CGEN though.  The generated sources
 are shipped with GNU Binutils/GDB releases.
 Binutils/GDB developers wishing to use CGEN must configure Binutils/GDB with
 --enable-cgen-maint.  This will add the necessary dependencies to
-opcodes/Makefile and sim/<arch>/Makefile for the supported processors, which
-at this point is M32R and FR30.
+opcodes/Makefile and sim/<arch>/Makefile for the supported processors.
 
 CGEN uses Guile so Guile must be installed.
-Guile 1.2 and 1.3 are supported.
-2) 
+CGEN has been tested with Guile 1.4.1, 1.6.8, and 1.8.5.
+Support for older versions of Guile will be removed in time.
 
 Source Layout
 -------------
@@ -57,9 +53,14 @@ CGEN sources are divided into several categories:
 
 - documentation
 - code to read .cpu files
-- opcode table generator
-- gas testsuite generator
-- simulator generator
+- application source generators
+  - opcodes
+  - gas testsuite
+  - sim
+  - sim testsuite
+  - sid
+  - intrinsics
+  - html
 - misc support scripts
 - cpu specific files
 - C support code
@@ -74,27 +75,21 @@ File naming rules:
    abbreviation thereof.
 
 3. CPU description files shall be named <arch>.cpu and placed in the
-   `cpu' sub-directory.
+   `cpu' sub-directory (either src/cpu or src/cgen/cpu).
 
 4. CPU opcode support files shall be named <arch>.opc and similarly
    placed in the `cpu' sub-directory.
 
-??? May wish to change (1) to <appl>-cgen.scm so that each application's
-files will be collected together in `ls' output by the <appl>- prefix.
-
-
 Documentation
 -------------
 
-doc/cgen.texi - top level .texi file, includes the others
-doc/rtl.texi - cpu description language (based on GCC's RTL)
-doc/intro.texi - global overview of cgen
-doc/opcodes.texi - opcode table usage of cgen
-doc/porting.texi - porting guide for new ports
-doc/sim.texi - simulator usage of cgen
-doc/credits.texi - inspiration and contributors
+Documentation uses texinfo.
+See doc/*.texi.
 
-code to read .cpu files
+doc/cgen.texi - top level .texi file, includes the others
+doc/cgenint.texi - top level .texi file for cgen internals
+
+Code to read .cpu files
 -----------------------
 
 These files provide the basic support for reading in .cpu files.  They contain
@@ -104,7 +99,6 @@ possible too), they are intended to be application independent.  Applications
 built on top of these files.
 
 attr.scm - attribute support
-read.scm - top level script for .cpu file reading
 enum.scm - enum support
 hardware.scm - hardware description reader
 ifield.scm - instruction field reader
@@ -115,15 +109,21 @@ minsn.scm - macro-instruction description reader
 mode.scm - mode support
 model.scm - model reader
 operand.scm - instruction operand reader
+read.scm - top level script for .cpu file reading
 rtl.scm - basic rtl support
+rtl-traverse.scm - support for processing rtl
 rtx-funcs.scm - defines all standard rtx functions
-types.scm - type system
+semantics.scm - routines for semantic analysis
+types.scm - misc utilities related to types
+
+Applications
+------------
 
 opcode table generator
----------------------
+----------------------
 
 cgen-opc.scm - top level script to generate the opcode table + support
-opcodes.scm - opcode table generator
+opcodes.scm
 opc-asmdis.scm
 opc-ibld.scm
 opc-itab.scm
@@ -162,7 +162,34 @@ sim.scm - interface between simulator generator and cpu database
 Additional support lives in sim/common/cgen-*.[ch].
 Architectures specific files live in sim/<arch>.
 
-misc. support scripts
+sim testsuite generator
+-----------------------
+
+cgen-stest.scm - top level script to generate simulator testcases
+sim-test.scm - generate simulator testcases
+
+sid (another architectural simulator)
+-------------------------------------
+
+cgen-sid.scm - top level script to generate sid files
+sid-cpu.scm
+sid-decode.scm
+sid-model.scm
+sid.scm
+
+html
+----
+
+cgen-doc.scm - top level script to generate html files
+html.scm
+
+intrinsics
+----------
+
+cgen-intrinsics.scm - top level script to generate intrinsics files
+intrinsics.scm
+
+Misc. support scripts
 ---------------------
 
 dev.scm - top level script for doing interactive development
@@ -172,11 +199,15 @@ cos.scm - OOP implementation
 pmacros.scm - preprocessor-style macro package
 profile.scm - Guile profiling tool [eventually wish to move this to
 	Guile distribution when finished]
-sort.scm - sort routine, from slib
 utils-cgen.scm - various utilities specific to cgen
 utils.scm - generic Scheme utilities [non cgen specific]
+slib/genwrite.scm - generic-write routine
+slib/logical.scm - utilities for boolean operations
+slib/pp.scm - pretty printer
+slib/random.scm - random number generator
+slib/sort.scm - sort routine, from slib
 
-cpu specific files
+CPU specific files
 ------------------
 
 <arch>.cpu - <arch> description file

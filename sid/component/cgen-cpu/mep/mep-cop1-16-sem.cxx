@@ -726,7 +726,12 @@ mepcop1_16_sem_cpccadd_b_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
-current_cpu->ivc2_cpccadd_b (pc, FLD (f_ivc2_5u13));
+  {
+    DI opval = current_cpu->ivc2_cpccadd_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)]);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "cr64" << '[' << FLD (f_ivc2_5u13) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_cr64_set (FLD (f_ivc2_5u13), opval);
+  }
 }
 
   current_cpu->done_insn (npc, status);
@@ -1408,6 +1413,12 @@ mepcop1_16_sem_cpcmpeqz_b_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* 
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpeqz_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1430,6 +1441,12 @@ mepcop1_16_sem_cpcmpeq_b_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpeq_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1452,6 +1469,12 @@ mepcop1_16_sem_cpcmpeq_h_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpeq_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1474,6 +1497,12 @@ mepcop1_16_sem_cpcmpeq_w_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpeq_w (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1496,6 +1525,12 @@ mepcop1_16_sem_cpcmpne_b_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpne_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1518,6 +1553,12 @@ mepcop1_16_sem_cpcmpne_h_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpne_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1540,6 +1581,12 @@ mepcop1_16_sem_cpcmpne_w_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpne_w (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1562,6 +1609,12 @@ mepcop1_16_sem_cpcmpgtu_b_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* 
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpgtu_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1584,6 +1637,12 @@ mepcop1_16_sem_cpcmpgt_b_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpgt_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1606,6 +1665,12 @@ mepcop1_16_sem_cpcmpgt_h_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpgt_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1628,6 +1693,12 @@ mepcop1_16_sem_cpcmpgtu_w_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* 
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpgtu_w (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1650,6 +1721,12 @@ mepcop1_16_sem_cpcmpgt_w_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpgt_w (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1672,6 +1749,12 @@ mepcop1_16_sem_cpcmpgeu_b_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* 
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpgeu_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1694,6 +1777,12 @@ mepcop1_16_sem_cpcmpge_b_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpge_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1716,6 +1805,12 @@ mepcop1_16_sem_cpcmpge_h_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpge_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1738,6 +1833,12 @@ mepcop1_16_sem_cpcmpgeu_w_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* 
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpgeu_w (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1760,6 +1861,12 @@ mepcop1_16_sem_cpcmpge_w_P0S_P1 (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpcmpge_w (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1782,6 +1889,54 @@ mepcop1_16_sem_cpadda0u_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpadda0u_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1804,6 +1959,54 @@ mepcop1_16_sem_cpadda0_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpadda0_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1826,6 +2029,30 @@ mepcop1_16_sem_cpaddua0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpaddua0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1848,6 +2075,30 @@ mepcop1_16_sem_cpaddla0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
 current_cpu->ivc2_cpaddla0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1870,6 +2121,60 @@ mepcop1_16_sem_cpaddaca0u_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpaddaca0u_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1892,6 +2197,60 @@ mepcop1_16_sem_cpaddaca0_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* se
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpaddaca0_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1914,6 +2273,36 @@ mepcop1_16_sem_cpaddacua0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpaddacua0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1936,6 +2325,36 @@ mepcop1_16_sem_cpaddacla0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpaddacla0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1958,6 +2377,54 @@ mepcop1_16_sem_cpsuba0u_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpsuba0u_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -1980,6 +2447,54 @@ mepcop1_16_sem_cpsuba0_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpsuba0_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2002,6 +2517,30 @@ mepcop1_16_sem_cpsubua0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpsubua0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2024,6 +2563,30 @@ mepcop1_16_sem_cpsubla0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
 current_cpu->ivc2_cpsubla0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2046,6 +2609,60 @@ mepcop1_16_sem_cpsubaca0u_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpsubaca0u_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2068,6 +2685,60 @@ mepcop1_16_sem_cpsubaca0_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* se
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpsubaca0_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2090,6 +2761,36 @@ mepcop1_16_sem_cpsubacua0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpsubacua0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2112,6 +2813,36 @@ mepcop1_16_sem_cpsubacla0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpsubacla0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2134,6 +2865,54 @@ mepcop1_16_sem_cpabsa0u_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpabsa0u_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2156,6 +2935,54 @@ mepcop1_16_sem_cpabsa0_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpabsa0_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2178,6 +3005,30 @@ mepcop1_16_sem_cpabsua0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpabsua0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2200,6 +3051,30 @@ mepcop1_16_sem_cpabsla0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
 current_cpu->ivc2_cpabsla0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2222,6 +3097,60 @@ mepcop1_16_sem_cpsada0u_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpsada0u_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2244,6 +3173,60 @@ mepcop1_16_sem_cpsada0_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpsada0_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2266,6 +3249,36 @@ mepcop1_16_sem_cpsadua0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpsadua0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2288,6 +3301,36 @@ mepcop1_16_sem_cpsadla0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpsadla0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2310,6 +3353,54 @@ mepcop1_16_sem_cpseta0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpseta0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2332,6 +3423,30 @@ mepcop1_16_sem_cpsetua0_w_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpsetua0_w (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2354,6 +3469,30 @@ mepcop1_16_sem_cpsetla0_w_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
 current_cpu->ivc2_cpsetla0_w (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2781,6 +3920,60 @@ mepcop1_16_sem_cpacsuma0_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpacsuma0 (pc);
 }
 
@@ -2803,6 +3996,54 @@ mepcop1_16_sem_cpaccpa0_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpaccpa0 (pc);
 }
 
@@ -2825,6 +4066,54 @@ mepcop1_16_sem_cpsrla0_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpsrla0 (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)]);
 }
 
@@ -2847,6 +4136,54 @@ mepcop1_16_sem_cpsraa0_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpsraa0 (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)]);
 }
 
@@ -2869,6 +4206,54 @@ mepcop1_16_sem_cpslla0_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpslla0 (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)]);
 }
 
@@ -2891,6 +4276,54 @@ mepcop1_16_sem_cpsrlia0_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpsrlia0 (pc, FLD (f_ivc2_5u23));
 }
 
@@ -2913,6 +4346,54 @@ mepcop1_16_sem_cpsraia0_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpsraia0 (pc, FLD (f_ivc2_5u23));
 }
 
@@ -2935,6 +4416,54 @@ mepcop1_16_sem_cpsllia0_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpsllia0 (pc, FLD (f_ivc2_5u23));
 }
 
@@ -2957,6 +4486,54 @@ mepcop1_16_sem_cpfsftba0s0u_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache*
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpfsftba0s0u_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -2979,6 +4556,54 @@ mepcop1_16_sem_cpfsftba0s0_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* 
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpfsftba0s0_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -3001,6 +4626,30 @@ mepcop1_16_sem_cpfsftbua0s0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache*
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpfsftbua0s0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -3023,6 +4672,30 @@ mepcop1_16_sem_cpfsftbla0s0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache*
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
 current_cpu->ivc2_cpfsftbla0s0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -3045,6 +4718,60 @@ mepcop1_16_sem_cpfaca0s0u_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpfaca0s0u_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -3067,6 +4794,60 @@ mepcop1_16_sem_cpfaca0s0_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* se
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpfaca0s0_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -3089,6 +4870,36 @@ mepcop1_16_sem_cpfacua0s0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpfacua0s0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -3111,6 +4922,36 @@ mepcop1_16_sem_cpfacla0s0_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpfacla0s0_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -3133,6 +4974,54 @@ mepcop1_16_sem_cpfsftba0s1u_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache*
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpfsftba0s1u_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -3155,6 +5044,54 @@ mepcop1_16_sem_cpfsftba0s1_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* 
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpfsftba0s1_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -3177,6 +5114,30 @@ mepcop1_16_sem_cpfsftbua0s1_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache*
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
 current_cpu->ivc2_cpfsftbua0s1_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -3199,6 +5160,30 @@ mepcop1_16_sem_cpfsftbla0s1_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache*
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
 current_cpu->ivc2_cpfsftbla0s1_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -3221,6 +5206,60 @@ mepcop1_16_sem_cpfaca0s1u_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpfaca0s1u_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -3243,6 +5282,60 @@ mepcop1_16_sem_cpfaca0s1_b_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* se
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpfaca0s1_b (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -3265,6 +5358,36 @@ mepcop1_16_sem_cpfacua0s1_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 20) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 20), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 21) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 21), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 22) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 22), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 23) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 23), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpfacua0s1_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 
@@ -3287,6 +5410,36 @@ mepcop1_16_sem_cpfacla0s1_h_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* s
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 16) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 16), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 17) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 17), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 18) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 18), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 19) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 19), opval);
+  }
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 6), opval);
+  }
 current_cpu->ivc2_cpfacla0s1_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
 }
 

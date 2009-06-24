@@ -1,5 +1,27 @@
 2009-06-23  DJ Delorie  <dj@redhat.com>
 
+	* intrinsics.scm: Updates to support IVC2.
+	(belongs-to-group?): Check IVC2 slots.
+	(-slots-attribute): New.
+	(targets::attributes): Add SLOTS.
+	(target:add-well-known-intrinsics): Add CPMOV.
+	(md-insn): Add CPTYPE and CRET?.
+	(add-md-insn): Likewise.
+	(add-intrinsic-for-isa): Disable the duplicate tests, as IVC2 has
+	duplicate insns with different bit patterns.
+	(write-cgen-insn?): Add cret? support.
+	(intrinsics.h): Add vector types.
+	(runtime-op): Add vector support.
+	(intrinsic-protos.h): Let GCC define its types.  Add cret? support.
+
+	* cpu/mep-core.cpu: Add CPTYPE and CRET attributes.
+	* cpu/mep-ivc2.cpu: Update all insns to include type information.
+	(h-cr-ivc2): Default to typeless.
+	(h-ccr-ivc2): Fix register width.
+	(SLOTS): Fix values and default.
+	(ivc2_*): Add control register names.
+	(crop, crqp, crpp, croc, crqc, crpc): Default to typeless.
+
 	* cpu/mep.opc (mep_cgen_insn_supported_asm): New, skip the short
 	version of BSR when assembling VLIW bundles.  Use it in mep-asm.c
 

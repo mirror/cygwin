@@ -103,7 +103,7 @@ mepcop1_48_sem_cmovc_ccrn_rm_p0 (mep_ext1_cpu* current_cpu, mepcop1_48_scache* s
   PCADDR npc = pc + 4;
 
   {
-    DI opval = * FLD (i_ivc2rm);
+    SI opval = * FLD (i_ivc2rm);
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "ccr-ivc2" << '[' << FLD (f_ivc2_ccrn) << ']' << ":=0x" << hex << opval << dec << "  ";
     current_cpu->h_ccr_ivc2_set (FLD (f_ivc2_ccrn), opval);
@@ -1143,6 +1143,12 @@ mepcop1_48_sem_cpssub3_h_P0_P1 (mep_ext1_cpu* current_cpu, mepcop1_48_scache* se
 {
 current_cpu->check_option_cp (pc);
   {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 4), opval);
+  }
+  {
     DI opval = current_cpu->ivc2_cpssub3_h (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cr64" << '[' << FLD (f_ivc2_5u23) << ']' << ":=0x" << hex << opval << dec << "  ";
@@ -1169,6 +1175,12 @@ mepcop1_48_sem_cpssub3_w_P0_P1 (mep_ext1_cpu* current_cpu, mepcop1_48_scache* se
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 4), opval);
+  }
   {
     DI opval = current_cpu->ivc2_cpssub3_w (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u13)], current_cpu->hardware.h_cr64[FLD (f_ivc2_5u18)]);
     if (UNLIKELY(current_cpu->trace_result_p))

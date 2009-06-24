@@ -39,7 +39,8 @@ typedef enum cgen_insn_attr {
  , CGEN_INSN_OPTIONAL_VLIW64, CGEN_INSN_MAY_TRAP, CGEN_INSN_VLIW_ALONE, CGEN_INSN_VLIW_NO_CORE_NOP
  , CGEN_INSN_VLIW_NO_COP_NOP, CGEN_INSN_VLIW64_NO_MATCHING_NOP, CGEN_INSN_VLIW32_NO_MATCHING_NOP, CGEN_INSN_VOLATILE
  , CGEN_INSN_END_BOOLS, CGEN_INSN_START_NBOOLS = 31, CGEN_INSN_MACH, CGEN_INSN_ISA
- , CGEN_INSN_LATENCY, CGEN_INSN_CONFIG, CGEN_INSN_SLOTS, CGEN_INSN_END_NBOOLS
+ , CGEN_INSN_CPTYPE, CGEN_INSN_CRET, CGEN_INSN_LATENCY, CGEN_INSN_CONFIG
+ , CGEN_INSN_SLOTS, CGEN_INSN_END_NBOOLS
 } CGEN_INSN_ATTR;
 
 /* Number of non-boolean elements in cgen_insn_attr.  */
@@ -66,6 +67,17 @@ typedef enum cdata_attr {
  , CDATA_USHORT, CDATA_CHAR, CDATA_UCHAR, CDATA_CP_DATA_BUS_INT
 } CDATA_ATTR;
 
+/* Enum declaration for datatype to use for coprocessor values.  */
+typedef enum cptype_attr {
+  CPTYPE_CP_DATA_BUS_INT, CPTYPE_VECT, CPTYPE_V2SI, CPTYPE_V4HI
+ , CPTYPE_V8QI, CPTYPE_V2USI, CPTYPE_V4UHI, CPTYPE_V8UQI
+} CPTYPE_ATTR;
+
+/* Enum declaration for Insn's intrinsic returns void, or the first argument rather than (or in addition to) passing it..  */
+typedef enum cret_attr {
+  CRET_VOID, CRET_FIRST, CRET_FIRSTCOPY
+} CRET_ATTR;
+
 /* Enum declaration for .  */
 typedef enum config_attr {
   CONFIG_NONE, CONFIG_DEFAULT
@@ -83,11 +95,15 @@ struct mep_insn_attr {
   unsigned int bools;
   unsigned int mach;
   CGEN_BITSET isa;
+  enum cptype_attr cptype;
+  enum cret_attr cret;
   int latency;
   enum config_attr config;
   unsigned int slots;
   inline unsigned int get_mach_attr () { return mach; }
   inline CGEN_BITSET get_isa_attr () { return isa; }
+  inline enum cptype_attr get_cptype_attr () { return cptype; }
+  inline enum cret_attr get_cret_attr () { return cret; }
   inline int get_latency_attr () { return latency; }
   inline enum config_attr get_config_attr () { return config; }
   inline unsigned int get_slots_attr () { return slots; }

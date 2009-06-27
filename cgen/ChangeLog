@@ -1,3 +1,7 @@
+2009-06-27  Doug Evans  <dje@sebabeach.org>
+
+	* gen-all-intrinsics: New file.
+
 2009-06-24  Doug Evans  <dje@sebabeach.org>
 
 	* All *.scm files: Update copyright year.

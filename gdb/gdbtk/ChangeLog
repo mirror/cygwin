@@ -1,3 +1,33 @@
+2009-07-07  Pierre Muller  <muller@ics.u-strasbg.fr>
+
+	* generic/gdbtk-bp.c: Include "arch-utils.h".
+	(set_raw_breakpoint): Update external definition.
+	(gdb_set_bp): Adapt to set_raw_breakpoint change.
+	(gdb_set_bp_addr): Likewise.
+
+	* generic/gdbtk-cmds.c: Include "arch-utils.h.
+	(gdbtk_load_asm): Adapt to paddress and gdb_print_insn changes.
+	(hex2bin): Replace current_gdbarch by get_current_arch call.
+	(gdb_update_mem): Adapt to builtin_type changes.
+	(gdb_CA_to_TAS): Use paddress to replace removed function paddr_nz.
+
+	* generic/gdbtk-register.c: Include "arch-utils.h".
+	(get_register_size): Replace current_gdbarch by get_current_arch call.
+	(get_register_types): Likewise.
+	(get_register): Likewise.
+	(get_register_name): Likewise.
+	(map_arg_registers): Likewise.
+	(register_changed_p): Likewise.
+	(setup_architecture_data): Likewise.
+	(gdb_regformat): Likewise.
+	(gdb_reggrouplist): Likewise.
+	(gdb_reggroup): Likewise.
+
+	* generic/gdbtk-stack.c: Inlcude "arch-utils.h".
+	(gdb_get_blocks): Use paddress instead of removed paddr_nz function.
+	(gdb_selected_block): Likewise.
+	(gdb_selected_frame): Likewise.
+
 2009-06-19  Pedro Alves  <pedro@codesourcery.com>
 
 	* generic/gdbtk-cmds.c (gdb_update_mem): Dispatch

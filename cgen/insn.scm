@@ -546,9 +546,15 @@
     ; ??? This use to allow (ifield-name operand-name).  That's how
     ; `operand-name' elements are handled, but there's no current need
     ; to handle (ifield-name operand-name).
-    (if (not (integer? value))
-	(parse-error errtxt "ifield value not an integer" ifld-spec))
-    (ifld-new-value ifld value))
+    (cond ((integer? value)
+	   (ifld-new-value ifld value))
+	  ((symbol? value)
+	   (let ((e (enum-lookup-val value)))
+	     (if (not e)
+		 (parse-error errtxt "symbolic ifield value not an enum" ifld-spec))
+	     (ifld-new-value ifld (car e))))
+	  (else
+	   (parse-error errtxt "ifield value not an integer" ifld-spec))))
 )
 
 ; Subroutine of -parse-insn-format to parse an

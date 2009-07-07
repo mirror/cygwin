@@ -1,5 +1,12 @@
 2009-07-07  Doug Evans  <dje@sebabeach.org>
 
+	* cpu/play.cpu (add): Use (ifield enum) for one format element.
+	* cpu/play.opc: New file.
+
+	Allow arbitrary enums in instruction formats, e.g. (f-op1 OP1_4).
+	* insn.scm (-parse-insn-format-ifield-spec): Recognize (ifield enum).
+	* doc/rtl.texi (Instructions): Update.
+
 	* cgen-opc.scm (-opc-file-path,opc-file-path): Move to opcodes.scm
 	(opc-arguments, -OPC): Call set-opc-file-path!.
 	* opcodes.scm (-opc-file-path,opc-file-path): Moved here.

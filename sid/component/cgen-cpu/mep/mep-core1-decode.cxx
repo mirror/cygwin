@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2007 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -76,7 +76,7 @@ mepcore1_idesc mepcore1_idesc::idesc_table[MEPCORE1_INSN_RI_26 + 1] =
   { mepcore1_sem_exth, "EXTH", MEPCORE1_INSN_EXTH, { 0, (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
   { mepcore1_sem_extub, "EXTUB", MEPCORE1_INSN_EXTUB, { 0, (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
   { mepcore1_sem_extuh, "EXTUH", MEPCORE1_INSN_EXTUH, { 0, (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
-  { mepcore1_sem_ssarb, "SSARB", MEPCORE1_INSN_SSARB, { 0, (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
+  { mepcore1_sem_ssarb, "SSARB", MEPCORE1_INSN_SSARB, { 0|(1<<CGEN_INSN_VOLATILE), (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
   { mepcore1_sem_mov, "MOV", MEPCORE1_INSN_MOV, { 0, (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
   { mepcore1_sem_movi8, "MOVI8", MEPCORE1_INSN_MOVI8, { 0, (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
   { mepcore1_sem_movi16, "MOVI16", MEPCORE1_INSN_MOVI16, { 0, (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
@@ -113,7 +113,7 @@ mepcore1_idesc mepcore1_idesc::idesc_table[MEPCORE1_INSN_RI_26 + 1] =
   { mepcore1_sem_srli, "SRLI", MEPCORE1_INSN_SRLI, { 0, (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
   { mepcore1_sem_slli, "SLLI", MEPCORE1_INSN_SLLI, { 0, (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
   { mepcore1_sem_sll3, "SLL3", MEPCORE1_INSN_SLL3, { 0, (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
-  { mepcore1_sem_fsft, "FSFT", MEPCORE1_INSN_FSFT, { 0, (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
+  { mepcore1_sem_fsft, "FSFT", MEPCORE1_INSN_FSFT, { 0|(1<<CGEN_INSN_VOLATILE), (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
   { mepcore1_sem_bra, "BRA", MEPCORE1_INSN_BRA, { 0|(1<<CGEN_INSN_RELAXABLE)|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
   { mepcore1_sem_beqz, "BEQZ", MEPCORE1_INSN_BEQZ, { 0|(1<<CGEN_INSN_RELAXABLE)|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },
   { mepcore1_sem_bnez, "BNEZ", MEPCORE1_INSN_BNEZ, { 0|(1<<CGEN_INSN_RELAXABLE)|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\xc0" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_CORE) } },

@@ -1,3 +1,44 @@
+2009-07-06  DJ Delorie  <dj@redhat.com>
+
+	* mep-cop1-16-decode.cxx: Regenerate.
+	* mep-cop1-16-decode.h: Regenerate.
+	* mep-cop1-16-defs.h: Regenerate.
+	* mep-cop1-16-model.cxx: Regenerate.
+	* mep-cop1-16-model.h: Regenerate.
+	* mep-cop1-16-sem.cxx: Regenerate.
+	* mep-cop1-32-decode.cxx: Regenerate.
+	* mep-cop1-32-decode.h: Regenerate.
+	* mep-cop1-32-defs.h: Regenerate.
+	* mep-cop1-32-model.cxx: Regenerate.
+	* mep-cop1-32-model.h: Regenerate.
+	* mep-cop1-32-sem.cxx: Regenerate.
+	* mep-cop1-48-decode.cxx: Regenerate.
+	* mep-cop1-48-decode.h: Regenerate.
+	* mep-cop1-48-defs.h: Regenerate.
+	* mep-cop1-48-model.cxx: Regenerate.
+	* mep-cop1-48-model.h: Regenerate.
+	* mep-cop1-48-sem.cxx: Regenerate.
+	* mep-cop1-64-decode.cxx: Regenerate.
+	* mep-cop1-64-decode.h: Regenerate.
+	* mep-cop1-64-defs.h: Regenerate.
+	* mep-cop1-64-model.cxx: Regenerate.
+	* mep-cop1-64-model.h: Regenerate.
+	* mep-cop1-64-sem.cxx: Regenerate.
+	* mep-core1-decode.cxx: Regenerate.
+	* mep-core1-decode.h: Regenerate.
+	* mep-core1-defs.h: Regenerate.
+	* mep-core1-model.cxx: Regenerate.
+	* mep-core1-model.h: Regenerate.
+	* mep-core1-sem.cxx: Regenerate.
+	* mep-cpu.h: Regenerate.
+	* mep-decode.cxx: Regenerate.
+	* mep-decode.h: Regenerate.
+	* mep-defs.h: Regenerate.
+	* mep-desc.h: Regenerate.
+	* mep-model.cxx: Regenerate.
+	* mep-model.h: Regenerate.
+	* mep-sem.cxx: Regenerate.
+
 2009-06-23  DJ Delorie  <dj@redhat.com>
 
 	* ivc2-cop.cxx (ivc2_cphadd_w): Change to return value.

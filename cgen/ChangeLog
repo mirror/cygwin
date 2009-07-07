@@ -1,3 +1,8 @@
+2009-07-07  Doug Evans  <dje@sebabeach.org>
+
+	* opc-ibld.scm (gen-insn-builder): Convert symbols to strings
+	before passing to gen-c-args.
+
 2009-07-06  DJ Delorie  <dj@redhat.com>
 
 	* cpu/mep-core.cpu (fsft, ssarb): Mark as VOLATILE.

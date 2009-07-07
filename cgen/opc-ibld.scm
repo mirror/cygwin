@@ -138,7 +138,7 @@ void
       "#define @ARCH@_IBLD_"
       (string-upcase (gen-sym insn))
       "(endian, buf, lenp"
-      (gen-c-args (map obj:name operands))
+      (gen-c-args (map gen-sym operands))
       ")\n"
       "\n")))
 )

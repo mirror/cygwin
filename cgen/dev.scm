@@ -189,8 +189,12 @@ comma separated list of machs to keep or `all'
 keep-isa:
 comma separated list of isas to keep or `all'
 
+doc options:
+[none yet]
+
 opcode options:
 [none yet]
+Remember to call (set-opc-file-path! \"/path/to/cpu.opc\").
 
 gas test options:
 [none yet]

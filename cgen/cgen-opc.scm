@@ -20,18 +20,10 @@
   (load (string-append srcdir "/opc-opinst.scm"))
 )
 
-; Records the -OPC arg which specifies the path to the .opc file.
-(define -opc-file-path #f)
-(define (opc-file-path)
-  (if -opc-file-path
-      -opc-file-path
-      (error ".opc file unspecified, missing -OPC argument"))
-)
-
 (define opc-arguments
   (list
    (list "-OPC" "file" "specify path to .opc file"
-	 (lambda (arg) (set! -opc-file-path arg))
+	 (lambda (arg) (set-opc-file-path! arg))
 	 #f)
    (list "-H" "file" "generate $arch-desc.h in <file>"
 	 #f

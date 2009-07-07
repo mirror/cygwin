@@ -7,6 +7,17 @@
 ; Specify which application.
 (set! APPLICATION 'OPCODES)
 
+; Records the -OPC arg which specifies the path to the .opc file.
+(define -opc-file-path #f)
+(define (opc-file-path)
+  (if -opc-file-path
+      -opc-file-path
+      (error ".opc file unspecified, missing -OPC argument"))
+)
+(define (set-opc-file-path! path)
+  (set! -opc-file-path path)
+)
+
 ; Boolean indicating if we're to build the operand instance table.
 ; The default is no, since only the m32r uses it at present.
 ; ??? Simulator tracing support could use it.

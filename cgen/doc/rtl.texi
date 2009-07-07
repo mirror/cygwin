@@ -1867,9 +1867,10 @@ The ordering of the fields is not important.
 Format elements can be any of:
 
 @itemize @bullet
-@item instruction field specifiers with a value (e.g. @code{(f-r1 14)})
-@item an instruction field enum, as in @code{OP1_4}
-@item an operand
+@item an instruction field name with an integer, e.g. @code{(f-op1 4)}
+@item an instruction field name with an enum, e.g. @code{(f-op1 OP1_4)}
+@item an instruction field enum, e.g. @code{OP1_4}
+@item an operand name, e.g. @code{dr}
 @end itemize
 
 @subsection semantics

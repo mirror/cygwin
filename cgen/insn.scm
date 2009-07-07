@@ -554,7 +554,7 @@
 		 (parse-error errtxt "symbolic ifield value not an enum" ifld-spec))
 	     (ifld-new-value ifld (car e))))
 	  (else
-	   (parse-error errtxt "ifield value not an integer" ifld-spec))))
+	   (parse-error errtxt "ifield value not an integer or enum" ifld-spec))))
 )
 
 ; Subroutine of -parse-insn-format to parse an

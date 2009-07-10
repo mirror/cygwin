@@ -58,10 +58,12 @@
   (lambda args
     (for-each (lambda (str)
 		(if (pair? str)
-		    (begin 
-		      (message "(")
-		      (for-each (lambda (s) (message s " ")) str)
-		      (message ")"))
+		    (if (list? str)
+			(begin
+			  (message "(")
+			  (for-each (lambda (s) (message s " ")) str)
+			  (message ")"))
+			(message "(" (car str) " . " (cdr str) ")"))
 		    (display str (current-error-port))))
 	      args))
 )

@@ -1,5 +1,9 @@
 2009-07-09  Doug Evans  <dje@sebabeach.org>
 
+	* utils-sim.scm (-gen-decode-bits): New argument `entire-val'.
+	All callers updated.  Work around -ve shifts by referencing the
+	entire value.
+
 	* utils.scm (message): Handle pairs.
 
 2009-06-24  Doug Evans  <dje@sebabeach.org>

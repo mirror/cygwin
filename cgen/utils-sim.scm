@@ -521,11 +521,14 @@
 ; LSB0? is non-#f if bit number 0 is the least significant bit.
 ; FIXME: START may not be handled right in words beyond first.
 ;
+; ENTIRE-VAL is passed as a hack for cgen 1.1 which would previously generate
+; negative shifts.  FIXME: Revisit for 1.2.
+;
 ; e.g. (-gen-decode-bits '(0 1 2 3 8 9 10 11) 0 16 "insn" #f)
 ; --> "(((insn >> 8) & 0xf0) | ((insn >> 4) & 0xf))"
 ; FIXME: The generated code has some inefficiencies in edge cases.  Later.
 
-(define (-gen-decode-bits bitnums start size val lsb0?)
+(define (-gen-decode-bits bitnums start size val entire-val lsb0?)
 
   ; Compute a list of lists of three numbers:
   ; (first bitnum in group, position in result (0=LSB), bits in result)
@@ -563,16 +566,23 @@
 			    (bits (caddr group))
 			    ; Difference between where value is and where
 			    ; it needs to be.
-			    ; FIXME: Need to handle left (-ve) shift.
 			    (shift (- (if lsb0?
 					  (- first bits -1)
 					  (- (+ start size) (+ first bits)))
 				      pos)))
-		     (string-append
-		      " | ((" val " >> " (number->string shift)
-		      ") & ("
-		      (number->string (- (integer-expt 2 bits) 1))
-		      " << " (number->string pos) "))")))
+		       ; FIXME: There should never be a -ve shift here,
+		       ; but it can occur on the m32r.  Compensate here
+		       ; with hack and fix in 1.2.
+		       (if (< shift 0)
+			   (begin
+			     (set! val entire-val)
+			     (set! shift (+ shift size))))
+		       ; END-FIXME
+		       (string-append
+			" | ((" val " >> " (number->string shift)
+			") & ("
+			(number->string (- (integer-expt 2 bits) 1))
+			" << " (number->string pos) "))")))
 		   groups))
      ")"))
 )
@@ -945,7 +955,8 @@
 ; else {}
 ; may well be less stressful on the compiler to optimize than small switch() stmts.
 
-(define (-gen-decoder-switch switch-num startbit decode-bitsize table-guts indent lsb0? invalid-insn fn?)
+(define (-gen-decoder-switch switch-num startbit decode-bitsize table-guts
+			     indent lsb0? invalid-insn fn?)
   ; For entries that are a single insn, we're done, otherwise recurse.
 
   (string-list
@@ -965,7 +976,8 @@
        (string-append indent "  unsigned int val = "))
    (-gen-decode-bits (dtable-guts-bitnums table-guts)
 		     (dtable-guts-startbit table-guts)
-		     (dtable-guts-bitsize table-guts) "insn" lsb0?)
+		     (dtable-guts-bitsize table-guts)
+		     "insn" "entire_insn" lsb0?)
    ";\n"
    indent "  switch (val)\n"
    indent "  {\n"

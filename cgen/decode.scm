@@ -219,6 +219,12 @@
 ; be used to distinguish.  Raw mask popularity is not enough -- popular masks
 ; may include useless "reserved" fields whose values don't change, and thus are
 ; useless in distinguishing.
+;
+; NOTE: mask-lens are not necessarily all the same value.
+; E.g. for the m32r it can consist of both 16 and 32.
+; But all masks must exist in the window specified by STARTBIT,DECODE-BITSIZE,
+; and all bits in the result must live in that window.
+; If no distinguishing bit fits in the window, return an empty vector.
 
 (define (-distinguishing-bit-population masks mask-lens values lsb0?)
   (let* ((max-length (apply max mask-lens))
@@ -234,8 +240,8 @@
 			      (if (bit-set? mask lsb-bitno)
 				(let ((chosen-pop-vector (if (bit-set? value lsb-bitno)
 							     1-population 0-population)))
-				  (vector-set! chosen-pop-vector bitno 
-					     (+ 1 (vector-ref chosen-pop-vector bitno)))))))
+				  (vector-set! chosen-pop-vector bitno
+					       (+ 1 (vector-ref chosen-pop-vector bitno)))))))
 			  (-range len)))
 	      masks mask-lens values)
     ; Compute an aggregate "distinguishing value" for each bit.
@@ -264,24 +270,28 @@
 	  (vector->list 0-population) (vector->list 1-population))))
 )
 
-; Return a list (0 ... limit-1)
+; Return a list (0 ... LIMIT-1).
 
 (define (-range limit)
   (let loop ((i 0)
 	     (indices (list)))
-    (if (= i limit) (reverse indices) (loop (+ i 1) (cons i indices))))
+    (if (= i limit)
+	(reverse! indices)
+	(loop (+ i 1) (cons i indices))))
 )
 
-; Return a list (base ... base+size-1)
+; Return a list (BASE ... BASE+SIZE-1).
 
 (define (-range2 base size)
   (let loop ((i base)
 	     (indices (list)))
-    (if (= i (+ base size)) (reverse indices) (loop (+ i 1) (cons i indices))))
+    (if (= i (+ base size))
+	(reverse! indices)
+	(loop (+ i 1) (cons i indices))))
 )
 
-; Return a copy of given vector, with all entries with given indices set
-; to `value'
+; Return a copy of VECTOR, with all entries with given INDICES set
+; to VALUE.
 
 (define (-vector-copy-set-all vector indices value)
   (let ((new-vector (make-vector (vector-length vector))))
@@ -295,11 +305,11 @@
 
 ; Return a list of indices whose counts in the given vector exceed the given
 ; threshold.
-; Sort them in decreasing order of populatority.
+; Sort them in decreasing order of popularity.
 
 (define (-population-above-threshold population threshold)
   (let* ((unsorted
-	  (find (lambda (index) (if (vector-ref population index) 
+	  (find (lambda (index) (if (vector-ref population index)
 				    (>= (vector-ref population index) threshold)
 				    #f))
 		(-range (vector-length population))))
@@ -316,14 +326,14 @@
 (define (-population-top-few population size)
   (let loop ((old-picks (list))
 	     (remaining-population population)
-	     (count-threshold (apply max (map (lambda (value) (if value value 0))
+	     (count-threshold (apply max (map (lambda (value) (or value 0))
 					      (vector->list population)))))
       (let* ((new-picks (-population-above-threshold remaining-population count-threshold)))
 	(logit 4 "-population-top-few"
 	       " desired=" size
 	       " picks=(" old-picks ") pop=(" remaining-population ")"
 	       " threshold=" count-threshold " new-picks=(" new-picks ")\n")
-	(cond 
+	(cond
 	 ; No point picking bits with population count of zero.  This leads to
 	 ; the generation of layers of subtables which resolve nothing.  Generating
 	 ; these tables can slow the build by several orders of magnitude.
@@ -359,9 +369,10 @@
 ; LSB0? is non-#f if bit number 0 is the least significant bit.
 ;
 ; Nil is returned if there are none, meaning that there is an ambiguity in
-; the specification up to the current word.
+; the specification up to the current word as defined by startbit,
+; decode-bitsize, and more bytes need to be fetched.
 ;
-; We assume INSN-LIST matches all opcode bits before STARTBIT.
+; We assume INSN-LIST matches all opcode bits before STARTBIT (if any).
 ; FIXME: Revisit, as a more optimal decoder is sometimes achieved by doing
 ; a cluster of opcode bits that appear later in the insn, and then coming
 ; back to earlier ones.
@@ -377,22 +388,24 @@
 ; that an opcode bit is skipped over because it doesn't contribute much
 ; information to the decoding process (see -usable-decode-bit?).  As the
 ; possible insn list gets wittled down, the bit will become significant.  Thus
-; the optimization is left for later.  Also, see preceding FIXME.
+; the optimization is left for later.
+; Also, see preceding FIXME: We can't proceed past startbit + decode-bitsize
+; until we've processed all bits up to startbit + decode-bitsize.
 
 (define (decode-get-best-bits insn-list already-used startbit max decode-bitsize lsb0?)
   (let* ((raw-population (-distinguishing-bit-population (map insn-base-mask insn-list)
 							 (map insn-base-mask-length insn-list)
 							 (map insn-value insn-list)
 							 lsb0?))
-	 ; (undecoded (if lsb0?
-	; 		(-range2 startbit (+ startbit decode-bitsize))
-		;	(-range2 (- startbit decode-bitsize) startbit)))
+	 ;; (undecoded (if lsb0?
+	 ;; 		(-range2 startbit (+ startbit decode-bitsize))
+	 ;;		(-range2 (- startbit decode-bitsize) startbit)))
 	 (used+undecoded already-used) ; (append already-used undecoded))
 	 (filtered-population (-vector-copy-set-all raw-population used+undecoded #f))
 	 (favorite-indices (-population-top-few filtered-population max))
 	 (sorted-indices (sort favorite-indices (lambda (a b) 
 						  (if lsb0? (> a b) (< a b))))))
-    (logit 3 
+    (logit 3
 	   "Best decode bits (prev=" already-used " start=" startbit " decode=" decode-bitsize ")"
 	   "=>"
 	   "(" sorted-indices ")\n")
@@ -572,9 +585,12 @@
 	      ; We might be able to resolve the ambiguity by reading more bits.
 	      ; We know from the < test that there are, indeed, more bits to
 	      ; be read.
-	      (set! startbit (+ startbit decode-bitsize))
-	      ; FIXME: The calculation of the new decode-bitsize will
+	      ; FIXME: It's technically possible that the next
+	      ; startbit+decode-bitsize chunk has no usable bits and we have to
+	      ; iterate, but rather unlikely.
+	      ; The calculation of the new startbit, decode-bitsize will
 	      ; undoubtedly need refinement.
+	      (set! startbit (+ startbit decode-bitsize))
 	      (set! decode-bitsize
 		    (min decode-bitsize
 			 (- (apply min (map insn-length slot))
@@ -623,7 +639,9 @@
 			; to the programmer to get it right).  This can be made more
 			; clever later.
 			; FIXME: May need to back up startbit if we've tried to read
-			; more of the instruction.
+			; more of the instruction.  We currently require that
+			; all bits get used before advancing startbit, so this
+			; shouldn't be necessary.  Verify.
 			(let ((assertions (map insn-ifield-assertion slot)))
 			  (if (not (all-true? assertions))
 			      (begin
@@ -678,6 +696,9 @@
 (define (-build-decode-table-guts insn-vec bitnums startbit decode-bitsize index-list lsb0? invalid-insn)
   (logit 2 "Processing decoder for bits"
 	 (numbers->string bitnums " ")
+	 ", startbit " startbit
+	 ", decode-bitsize " decode-bitsize
+	 ", index-list " index-list
 	 " ...\n")
 
   (dtable-guts-make

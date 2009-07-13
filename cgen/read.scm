@@ -323,18 +323,21 @@
   *UNSPECIFIED*
 )
 
-; Process 1 or more macro-expanded entries.
+;; Process 1 or more macro-expanded entries.
 
-(define (-reader-process-expanded entry)
-  ; `begin' is used to group a collection of entries into one, since pmacro
-  ; can only return one expression (borrowed from Scheme of course).
-  ; ??? Maybe someday (begin ...) will be equivalent to (sequence () ...)
-  ; but not yet.
-  ; Recurse in case there are nested begins.
-  (if (eq? (car entry) 'begin)
-      (for-each -reader-process-expanded
-		(cdr entry))
-      (-reader-process-expanded-1 entry))
+(define (reader-process-expanded entry)
+  ;; () is used to indicate a no-op
+  (cond ((null? entry)
+	 #f) ;; nothing to do
+	;; `begin' is used to group a collection of entries into one,
+	;; since pmacro can only return one expression (borrowed from
+	;; Scheme of course).
+	;; Recurse in case there are nested begins.
+	((eq? (car entry) 'begin)
+	 (for-each reader-process-expanded
+		   (cdr entry)))
+	(else
+	 (-reader-process-expanded-1 entry)))
 )
 
 ; Process file entry ENTRY.
@@ -347,7 +350,7 @@
   (let ((expansion (if (eq? (car entry) 'define-pmacro)
 		       entry
 		       (pmacro-expand entry))))
-    (-reader-process-expanded expansion))
+    (reader-process-expanded expansion))
 )
 
 ; Read in and process FILE.
@@ -698,8 +701,8 @@
 		       nil '(test then . else) cmd-if
   )
 
-  ; Rather than add cgen specific stuff to pmacros.scm, we create
-  ; a define-pmacro command here.
+  ; Rather than add cgen-internal specific stuff to pmacros.scm, we create
+  ; the pmacro commands here.
   (pmacros-init!)
   (reader-add-command! 'define-pmacro
 		       "\
@@ -839,10 +842,10 @@ Define a preprocessor-style macro.
 		  app-initer! app-finisher! analyzer!)
   (-init-parse-cpu! keep-mach keep-isa options)
   (app-initer!)
-  (logit 1 "Loading cpu description " file "\n")
+  (logit 1 "Loading cpu description " file " ...\n")
   (set! arch-path (dirname file))
   (reader-read-file! file)
-  (logit 2 "Processing cpu description " file "\n")
+  (logit 2 "Processing cpu description " file " ...\n")
   (-finish-parse-cpu!)
   (app-finisher!)
   (-global-error-checks)

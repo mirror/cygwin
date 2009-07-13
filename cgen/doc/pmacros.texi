@@ -8,85 +8,228 @@
 @cindex pmacros
 
 Preprocessor macros provide a way of simplifying the writing of
-@file{.cpu} files and serve the same purpose that macros do in C.
+@file{.cpu} files.
 
 @menu
-* Defining a preprocessor macro:: @code{define-pmacro}
-* Using preprocessor macros::     Using preprocessor macros
-* Macro expansion::               The @code{pmacro-expand} procedure
-* Default argument values::       Specifying default values of arguments
-* Multiple output expressions::   Using @code{begin}
-* Symbol concatenation::          The @code{.sym} builtin
-* String concatenation::          The @code{.str} builtin
-* Convert a number to a hex::     The @code{.hex} builtin
-* Convert a string to uppercase:: The @code{.upcase} builtin
-* Convert a string to lowercase:: The @code{.downcase} builtin
-* Getting part of a string::      The @code{.substring} builtin
-* List splicing::                 The @code{.splice} builtin
-* Number generation::             The @code{.iota} builtin
-* Mapping a macro over a list::   The @code{.map} builtin
-* Applying a macro to a list::    The @code{.apply} builtin
-* Defining a macro inline::       The @code{.pmacro} builtin
-* Passing macros as arguments::   Passing a macro to another macro
+* Pmacros introduction::   Introduction to pmacros
+* Defining pmacros::       @code{define-pmacro}
+* Using pmacros::          Using preprocessor macros
+* Pmacro expansion::       How pmacros are expanded
+* Default argument values::  Specifying default values of arguments
+* Multiple result statements::  Using @code{begin}
+* Symbols and strings::    Macros for symbols and strings
+* Number utilities::       Macros for manipulating numbers
+* List utilities::         Macros for manipulating lists
+* Iteration utilities::    Macros for iterating over lists
+* Conditional macros::     Macros for conditional execution
+* Pmacro utilities::       Macros for using macros
+* Debugging utilities::    Macros for debugging
+* Comparisons::            Macros for comparing things
+* Arithmetic functions::   Macros for doing math
+* Logical functions::      Shifts, bitwise logical functions
 @end menu
 
-@node Defining a preprocessor macro
-@section Defining a preprocessor macro
+@node Pmacros introduction
+@section Pmacros introduction
+
+The macro facility provided by CGEN is quite extensive.
+This is to give @file{.cpu} file writers the freedom to
+write the file in ways that work for the architecture in question.
+Not all architectures are best described in the same way.
+
+The macros are called @samp{pmacros} because the word @samp{macro}
+has become overloaded.  For clarity, we give them a unique name:
+@samp{pmacros}.
+
+One important point to keep in mind regarding pmacros is that
+when loading @file{.cpu} files all pmacros are expanded and discarded,
+their only purpose is to simplify writing the @code{dni}s and other
+elements of the architecture description.
+
+Therefore, do not try to write RTL as pmacros.
+You can of course use pmacros to assist in the writing of RTL,
+but remember that the resulting RTL @emph{cannot} use pmacros.
+By the time the RTL is processed all pmacros have been expanded
+and discarded.
+
+A simple picture may help.
+Here is a basic diagram of the steps in processing cpu descriptions.
+
+@example
+         (1) .cpu file
+                |
+      (2) pmacro expansion
+                |
+(3) define-@{insn,operand,etc.@} processing
+                |
+   (4) instruction set analysis
+                |
+ (5) application source file generation
+@end example
+
+Once CGEN gets to step (3) pmacros no longer exist.
+
+@node Defining pmacros
+@section Defining pmacros
 @cindex define-pmacro
 
-Preprocessor macros are defined with:
+There are two kinds of macros:
+
+@itemize @bullet
+@item function macros
+@item variable macros
+@end itemize
+
+Preprocessor function macros are defined with:
 
 @smallexample
-(define-pmacro (name parm1 parm2 ... parmN)
+(define-pmacro (name [parm1 parm2 ... parmN])
+  ["optional comment"]
   expansion
 )
 @end smallexample
 
-The result is @samp{expansion} with parameters replaced with the actual
-arguments of the macro invocation.  Free variables are left unchanged.
-[A "free variable", as defined here, is one that doesn't appear in the
-parameter list.]
-
-@c ??? This used to be true, but currently isn't.
-@c If the result is another macro invocation, it is expanded in turn.  
-
 @samp{expansion} must be exactly one expression.
 
-@node Using preprocessor macros
-@section Using preprocessor macros
+Preprocessor variable macros are just global variables, nothing special.
+When invoked their value is used in place of their name.
 
-Preprocessor macros are invoked in either of two ways: positional arguments
-and arguments by name.
-@c Rather lame wording.
+Variable macros are defined with:
+
+@smallexample
+(define-pmacro name
+  ["optional comment"]
+  expansion
+)
+@end smallexample
+
+@node Using pmacros
+@section Using pmacros
+
+Functional macros are invoked in either of two ways: positional arguments
+or specifying arguments by name.
 
 @smallexample
 (define-pmacro (foo arg1 arg2) (bar arg1 arg2))
 
-; Invoke by positional arguments.
+;; Invoke by positional arguments.
 
 (foo abc def) ==> (bar abc def)
 
-; Invoke by naming arguments.
+;; Invoke by naming arguments.
 
 (foo #:arg1 ghi #:arg2 jkl) ==> (bar ghi jkl)
 @end smallexample
 
-@c If you think more should be said here, I agree.
-@c Please think of something.
-
-@node Macro expansion
-@section Macro expansion
-
-At the implementation level, pmacros are expanded with the
-@code{pmacro-expand} Scheme procedure.
-
-The following is executed from a Guile shell, as opposed to 
-appearing in a cpu description file, hence the extra quoting.
+Variable macros are invoked simply by specifying their name.
 
 @smallexample
-guile> (define-pmacro '(foo a b) '(+ a b))
-guile> (pmacro-expand '(foo 3 4))
-(+ 3 4)
+(define-pmacro foo "abc")
+
+(.str foo "def") ==> "abcdef"
+@end smallexample
+
+@node Pmacro expansion
+@section Pmacro expansion
+
+Most function pmacros are expanded by processing any macros in th invocation,
+binding the resulting expressions to the pmacro's parameters,
+processing the pmacro according to its definition, and returning the result.
+Free variables are left unchanged.@footnote{A "free variable",
+as defined here, is one that is not already bound, be it to
+parameter, macro, or local variable within a macro.
+Note that to pmacros, cpu description file elements like
+@code{reg}, @code{sequence}, @code{VOID}, etc. are just symbols;
+they have no special meaning.}
+
+Some function pmacros are called @samp{syntactic forms}.
+These pmacros are processed differently in that parameters are
+@emph{not} evaluated first.  Instead it is up to the pmacro
+to decide when, and if, the parameters are evaluated.
+The syntactic forms are: @code{.pmacro}, @code{.let}, @code{.if},
+@code{.case}, @code{.cond}, @code{.begin}, @code{.and}, and @code{.or}.
+
+If the result of the pmacro is another pmacro invocation,
+it is in turn processed.
+@c Need to document whether this happens just once, or repeatedly.
+
+Variable macros are expanded simply by replacing their name with their value.
+
+Here is a simple example that uses pmacros to simplify the
+definition of several instructions.
+
+@smallexample
+;; OP1_*,OP2_* are previously defined enums
+(define-pmacro arithmetic-insns
+  ((add OP2_0) (sub OP2_1) (mul OP2_2) (div OP2_3))
+)
+(define-pmacro (make-arith-reg/reg-format opcode)
+  (+ OP1_0 opcode dr sr)
+)
+(define-pmacro (make-arith-reg/imm-format opcode)
+  (+ OP1_1 opcode dr sr)
+)
+(define-pmacro (define-arith-insn ispec)
+  (begin
+    (dni (.ref ispec 0)
+         (.str (.ref ispec 0) " reg/reg")
+         ()
+         (.str (.ref ispec 0) " $dr,$sr")
+         (make-arith-reg/reg-format (.ref ispec 1))
+         (set dr ((.ref ispec 0) dr sr))
+         ()
+         )
+    (dni (.ref ispec 0)
+         (.str (.ref ispec 0) " reg/imm")
+         ()
+         (.str (.ref ispec 0) " $dr,$imm")
+         (make-arith-reg/imm-format (.ref ispec 1))
+         (set dr ((.ref ispec 0) dr imm))
+         ()
+         )
+  )
+)
+
+;; Create dnis for each kind of instruction.
+;; The result of this is:
+;; (begin (begin (dni ...) ...) (begin (dni ...) ...) ...)
+(.splice begin (.unsplice (.map define-arith-insn arithmetic-insns)))
+@end smallexample
+
+The @code{.splice}, @code{.unsplice} are necessary to pass properly
+formed expressions to the @file{.cpu} file reader.
+If we just used @samp{(.map define-arith-insn arithmetic-insns)}
+the reader would see @samp{((begin (dni ...) ...) (begin (dni ...) ...))}.
+Note how the first @code{begin} is nested within a list, and does not
+appear in the ``top level'' list.
+
+Another way to accomplish the same thing that doesn't require
+@code{.splice}, @code{.unsplice} is to use @code{.for-each}, @code{.eval}.
+@code{.for-each} is only used for its side-effects, it does not
+return a result.  Therefore, in order to actually cause the
+@file{.cpu} file reader to see any definitions we need to use
+@code{.eval} to pass the dnis to the reader.
+
+@smallexample
+(define-pmacro (define-arith-insn ispec)
+  (.eval (dni (.ref ispec 0)
+           (.str (.ref ispec 0) " reg/reg")
+           ()
+           (.str (.ref ispec 0) " $dr,$sr")
+           (make-arith-reg/reg-format (.ref ispec 1))
+           (set dr ((.ref ispec 0) dr sr))
+           ()
+           ))
+  (.eval (dni (.ref ispec 0)
+           (.str (.ref ispec 0) " reg/imm")
+           ()
+           (.str (.ref ispec 0) " $dr,$imm")
+           (make-arith-reg/imm-format (.ref ispec 1))
+           (set dr ((.ref ispec 0) dr imm))
+           ()
+           ))
+)
+(.for-each define-arith-insn arithmetic-insns)
 @end smallexample
 
 @node Default argument values
@@ -114,8 +257,8 @@ Example:
 (foo #:arg2 33) ==> (bar 1 33)
 @end smallexample
 
-@node Multiple output expressions
-@section Multiple output expressions
+@node Multiple result statements
+@section Multiple result statements
 @cindex begin
 
 The result of a preprocessor macro is exactly one expression.
@@ -125,14 +268,27 @@ example when you want one macro to define several instructions.
 The way to do this is to enclose all the expressions with @code{begin}.
 @code{begin} is only valid at the top [definition] level.
 
-??? It's moderately clumsy to restrict @code{begin} like this.
-Using @code{sequence} for this purpose might be cleaner except that
-sequence locals don't make sense in this context (though perhaps that's
-a lesser evil).  In the end, @code{begin} can be shorthand for a void-mode
-sequence with no locals so I haven't been in a rush to resolve this.
+Note that this is @emph{not} the @code{.begin} builtin pmacro.
+We want to pass a list of statements to the @file{.cpu} file reader,
+and pmacros have all been evaluated and discarded by this point.
+
+@node Symbols and strings
+@section Symbols and strings
+
+There are several builtin macros for symbol and string manipulation.
+
+@menu
+* Symbol concatenation::          The @code{.sym} builtin
+* String concatenation::          The @code{.str} builtin
+* Convert a number to a hex::     The @code{.hex} builtin
+* Convert a string to uppercase:: The @code{.upcase} builtin
+* Convert a string to lowercase:: The @code{.downcase} builtin
+* Getting part of a string::      The @code{.substring} builtin
+* Symbol or string length::       The @code{.length} builtin
+@end menu
 
 @node Symbol concatenation
-@section Symbol concatenation
+@subsection Symbol concatenation
 @cindex .sym
 
 Symbol and string concatenation are supported. Symbol concatenation is
@@ -148,7 +304,7 @@ that the first character must be a letter.  The resulting symbol
 is recursively macro-expanded.
 
 @node String concatenation
-@section String concatenation
+@subsection String concatenation
 @cindex .str
 
 String concatenation is done with
@@ -177,7 +333,7 @@ Example:
 @end smallexample
 
 @node Convert a number to a hex
-@section Convert a number to a hex
+@subsection Convert a number to a hex
 @cindex .hex
 
 Convert a number to a lowercase hex string with @code{.hex}.  If
@@ -195,7 +351,7 @@ Examples:
 @end smallexample
 
 @node Convert a string to uppercase
-@section Convert a string to uppercase
+@subsection Convert a string to uppercase
 @cindex .upcase
 
 Convert a string to uppercase with @code{.upcase}.
@@ -209,7 +365,8 @@ Example:
 @end smallexample
 
 @node Convert a string to lowercase
-@section Convert a string to lowercase
+@subsection Convert a string to lowercase
+@cindex .downcase
 
 Convert a string to lowercase with @code{.downcase}.
 
@@ -222,12 +379,12 @@ Example:
 @end smallexample
 
 @node Getting part of a string
-@section Getting part of a string
+@subsection Getting part of a string
 @cindex .substring
 
 Extract a part of a string with @code{.substring}.
 
-Syntax: @code{(.substring string start end)}
+Syntax: @samp{(.substring string start end)}
 
 where @samp{start} is the starting character, and @samp{end} is one past
 the ending character.  Character numbering begins at position 0.
@@ -240,8 +397,76 @@ Example:
 (.substring "howzitgoineh?" 2 6) --> "wzit"
 @end smallexample
 
+@node Symbol or string length
+@subsection Symbol or string length
+@c @cindex .length - the @cindex for this is in the list section
+
+Compute the length, in characters, of a symbol or string.
+
+Syntax: @samp{(.length symbol-or-string)}
+
+Examples:
+
+@smallexample
+(.length abc) --> 3
+(.length "def") --> 3
+(.length "") --> 0
+@end smallexample
+
+@node Number utilities
+@section Number utilities
+
+Builtin macros for manipulating numbers.
+
+@menu
+* Number generation::             The @code{.iota} builtin
+@end menu
+
+@node Number generation
+@subsection Number generation
+@cindex .iota
+@cindex Number generation
+
+Machine descriptions often require a list of sequential numbers.
+Generate a list of numbers with the @code{.iota} builtin macro.
+
+Syntax: @samp{(.iota count [start [incr]])}.
+
+Examples:
+
+@smallexample
+(.iota 5)      --> 0 1 2 3 4
+(.iota 5 4)    --> 4 5 6 7 8
+(.iota 5 5 -1) --> 5 4 3 2 1
+@end smallexample
+
+@node List utilities
+@section List utilities
+
+Builtin macros for maninpulating lists.
+
+@menu
+* Creating lists::
+* List splicing::                 The @code{.splice} builtin
+* Referencing a list element::
+* List length::
+* Lists of repeated elements::
+* car/cdr::                       car, cdr, etc. from Scheme/Lisp
+@end menu
+
+@node Creating lists
+@subsection Creating lists
+@cindex .list
+
+Lists can be created with the @code{.list} builtin.
+
+Syntax: @samp{(.list elm1 elm2 ...)}
+
+It's somewhat redundant as lists can also be created simply writing
+@samp{(elm1 elm2 ...)}.
+
 @node List splicing
-@section List splicing
+@subsection List splicing
 @cindex .splice
 
 It is often useful to splice a list into a "parent" list.
@@ -250,7 +475,7 @@ This is best explained with an example.
 @smallexample
 (define-pmacro (splice-test a b c)
                (.splice a (.unsplice b) c))
-(pmacro-expand (splice-test (1 (2) 3)))
+(pmacro-expand (splice-test 1 (2) 3))
 
 --> (1 2 3)
 @end smallexample
@@ -322,35 +547,153 @@ respectively, which is what @code{.splice} achieves.
 @code{.unsplice} is a special reserved symbol that is only recognized inside
 @code{.splice}.
 
-@node Number generation
-@section Number generation
-@cindex .iota
-@cindex Number generation
+@node Referencing a list element
+@subsection Referencing a list element
+@cindex .ref
 
-Machine descriptions often require a list of sequential numbers.
-Generate a list of numbers with the @code{.iota} builtin macro.
+Reference elements of a list with @code{.ref}.
 
-The syntax is @samp{(.iota count [start [incr]])}.
+Syntax: @samp{(.ref list element-number)}
 
-Examples:
+Example:
 
 @smallexample
-(.iota 5)      --> 0 1 2 3 4
-(.iota 5 4)    --> 4 5 6 7 8
-(.iota 5 5 -1) --> 5 4 3 2 1
+(.ref (1 2 3) 1) --> 2
 @end smallexample
 
+@node List length
+@subsection List length
+@cindex .length
+
+The length of a list is computed with @code{.length}.
+
+Syntax: @samp{(.length list)}.
+
+Example:
+
+@smallexample
+(.length (1 2 3)) --> 3
+@end smallexample
+
+@node Lists of repeated elements
+@subsection Lists of repeated elements
+@cindex .replicate
+
+Create a list of repeated elements with @code{.replicate}.
+
+Syntax: @samp{(.replicate n expr)}
+
+Example:
+
+@smallexample
+(.replicate 4 5) --> (5 5 5 5)
+@end smallexample
+
+@node car/cdr
+@subsection car/cdr
+@cindex .car
+@cindex .cdr
+@cindex .caar
+@cindex .cadr
+@cindex .cdar
+@cindex .cddr
+
+CGEN provides a small set of pmacros for those familiar with
+Scheme/Lisp lists.
+
+@itemize @bullet
+@item car
+
+Equivalent to @samp{(.ref list 0)}.
+
+Example:
+
+@smallexample
+(.car (1 2 3)) --> 1
+@end smallexample
+
+@item cdr
+
+Return all elements of the list after the first one.
+
+Example:
+
+@smallexample
+(.cdr (1 2 3)) --> (2 3)
+@end smallexample
+
+@item caar
+
+Return the first element of the first element of the list.
+
+I.e., the @code{car} of the @code{car} of the list.
+
+Example:
+
+@smallexample
+(.caar ((1 2 3) (4 5 6))) --> 1
+@end smallexample
+
+@item cadr
+
+Return the second element of the list.
+
+I.e., the @code{car} of the @code{cdr} of the list.
+
+Example:
+
+@smallexample
+(.cadr (1 2 3)) --> 2
+@end smallexample
+
+@item cdar
+
+Return all elements of the first element of the list after the first one.
+
+I.e., the @code{cdr} of the @code{car} of the list.
+
+Example:
+
+@smallexample
+(.cadr ((1 2 3) (4 5 6))) --> (2 3)
+@end smallexample
+
+@item cddr
+
+I.e., the @code{cdr} of the @code{cdr} of the list.
+
+Return all elements of the list after the first two.
+
+Example:
+
+@smallexample
+(.cddr (1 2 3)) --> (3)
+@end smallexample
+
+@end itemize
+
+@node Iteration utilities
+@section Iteration utilities
+
+Macros for iterating over lists
+
+@menu
+* Mapping a macro over a list::   The @code{.map} builtin
+* Iterating over a list::         The @code{.for-each} builtin
+@end menu
+
 @node Mapping a macro over a list
-@section Mapping a macro over a list
+@subsection Mapping a macro over a list
 @cindex .map
 
 Apply a macro to each element of a list, or set of lists, with @code{.map}.
+The order in which each element of the list is processed is unspecified.
 
 The syntax is @samp{(.map macro-name list1 [list2 ...])}.
+@samp{macro} must take as many arguments as there are lists.
 
-The result is a list with @samp{macro-name} applied to each element of
-@samp{listN}.  @samp{macro-name} should take as many arguments as there
-are lists.  This is often useful in constructing enum and register name lists.
+The result is a list with @samp{macro} applied to each element of
+@samp{listN}.  This is often useful in constructing enum and register name lists.
 
 Example:
 
@@ -363,8 +706,103 @@ Example:
 ((XA 0) (XB 1) (XC 2) (XD 3) (XE 4))
 @end smallexample
 
+@node Iterating over a list
+@subsection Iterating over a list
+@cindex .for-each
+
+Apply a macro to each element of a list, or set of lists,
+with @code{.for-each}.
+Each element of the list is guaranteed to be processed in order.
+
+The syntax is @samp{(.for-each macro list1 [list2 ...])}.
+@samp{macro} must take as many arguments as there are lists.
+
+There is no result, or rather the result is always the empty list ().
+Note that this macro is therefore useless for macro expansion.
+It's purpose is to process @code{macro} for its side-effects.
+The @code{.eval} builtin pmacro is useful here.
+
+@node Conditional macros
+@section Conditional macros
+
+Macros for conditional execution.
+
+@menu
+* Traditional @code{if}::         The @code{.if} builtin
+* Traditional @code{case}::       The @code{.case} builtin
+* Extended if/elseif/else::       The @code{.cond} builtin
+@end menu
+
+@node Traditional @code{if}
+@subsection Traditional @code{if}
+@cindex .if
+
+Syntax: @samp{(.if condition then-expr [else-expr])}.
+
+The @code{condition} is evaluated, and if it is non-#f then
+@code{then-expr} is evaluated and returned.
+Otherwise, if @code{else-expr} is present it is evaluated and returned.
+Otherwise, the empty list @code{()} is returned.
+
+@node Traditional @code{case}
+@subsection Traditional @code{case}
+@cindex .case
+
+Syntax: @samp{(.case expr ((case1-list) expr-list) [case-list] [(else expr-list)])}
+
+The expression @code{expr} is evaluated, and then
+each case list is examined in turn to look for a match.
+The first case list with an element that matches @code{expr} wins,
+its @code{expr-list} is evaluated and the result of the last expression
+in the expression list is returned.
+
+If there is no successful match and no @code{else} part,
+then the empty list @code{()} is returned.
+
+@node Extended if/elseif/else
+@subsection Extended if/elseif/else
+@cindex .cond
+
+Syntax: @samp{(.cond (expr1 expr-list) [cond-list] [(else expr-list)])}
+
+Each condition's expression is evaluated in turn.
+The first condition to evaluate to non-#f wins,
+its @code{expr-list} is evaluated and the result of the last expression
+in the expression list is returned.
+
+If there is no successful condition and no @code{else} part,
+then the empty list @code{()} is returned.
+
+@node Pmacro utilities
+@section Pmacro utilities
+
+Macros for working with pmacros.
+
+@menu
+* Immediate evaluation of a macro:: The @code{.eval} builtin
+* Applying a macro to a list::      The @code{.apply} builtin
+* Defining a macro inline::         The @code{.pmacro} builtin
+* Passing macros as arguments::     Passing a macro to another macro
+* Defining a block of locals::      The @code{.let} builtin
+* A block of statements::           The @code{.begin} builtin
+@end menu
+
+@node Immediate evaluation of a macro
+@subsection Immediate evaluation of a macro
+@cindex .eval
+
+Syntax: @samp{(.eval expr)}
+
+Sometimes one wishes to pass an expression to the @file{.cpu} file reader
+immediately, rather than waiting for it to process the expression
+that is the result of a pmacro.  This typically happens with the
+@code{.for-each} builtin pmacro.
+Use the @code{.eval} builtin pmacro for this purpose.
+It immediately passes @samp{expr} to the @file{.cpu} file reader
+and returns @code{()} as a result.
+
 @node Applying a macro to a list
-@section Applying a macro to a list
+@subsection Applying a macro to a list
 @cindex .apply
 
 Invoke a macro with each argument coming from an element of a list,
@@ -382,12 +820,10 @@ fixed arguments.
 Example:
 @c need a more useful example
 
+Example:
+
 @smallexample
-(.apply .str (.iota 5))
-
--->
-
-"01234"
+(.apply .str (.iota 5)) --> "01234"
 @end smallexample
 
 Note that @code{(.str (.iota 5))} is an error.  Here the list
@@ -395,11 +831,14 @@ Note that @code{(.str (.iota 5))} is an error.  Here the list
 which is wrong.
 
 @node Defining a macro inline
-@section Defining a macro inline
+@subsection Defining a macro inline
 @cindex .pmacro
 
 Define a macro inline with @code{.pmacro}.
-This is only supported when passing macros as arguments to other macros.
+This is only supported when passing macros as arguments to other macros,
+and as values for local variables in @code{.let}.
+
+Example:
 
 @smallexample
 (define-pmacro (load-op suffix op2-op mode ext-op)
@@ -408,21 +847,22 @@ This is only supported when passing macros as arguments to other macros.
 	 ()
 	 (.str "ld" suffix " $dr,@@$sr")
 	 (+ OP1_2 op2-op dr sr)
-	 (set dr (ext-op WI (mem: mode sr)))
+	 (set dr (ext-op WI (mem mode sr)))
 	 ())
   )
 )
 
 (load-op "" OP2_12 WI (.pmacro (mode expr) expr))
-(load-op b OP2_8 QI (.pmacro (mode expr) (ext: mode expr)))
-(load-op h OP2_10 HI (.pmacro (mode expr) (ext: mode expr)))
-(load-op ub OP2_9 QI (.pmacro (mode expr) (zext: mode expr)))
-(load-op uh OP2_11 HI (.pmacro (mode expr) (zext: mode expr)))
+(load-op b OP2_8 QI (.pmacro (mode expr) (ext mode expr)))
+(load-op h OP2_10 HI (.pmacro (mode expr) (ext mode expr)))
+(load-op ub OP2_9 QI (.pmacro (mode expr) (zext mode expr)))
+(load-op uh OP2_11 HI (.pmacro (mode expr) (zext mode expr)))
 @end smallexample
 
 .pmacro's don't bind the way Scheme lambda expressions do.
 In the following example, arg2 in the second pmacro is not bound
 to the arg2 argument of the first pmacro.
+@c FIXME: Feels like a bug rather than a feechure.
 
 @smallexample
 (define-pmacro (foo arg1 arg2) ((.pmacro (bar) (+ arg2 bar)) arg1))
@@ -430,7 +870,7 @@ to the arg2 argument of the first pmacro.
 @end smallexample
 
 @node Passing macros as arguments
-@section Passing macros as arguments
+@subsection Passing macros as arguments
 
 Macros may be passed to other macros.
 
@@ -438,8 +878,8 @@ Example:
 
 @smallexample
 (define-pmacro (no-ext-expr mode expr) expr)
-(define-pmacro (ext-expr mode expr) (ext: mode expr))
-(define-pmacro (zext-expr mode expr) (zext: mode expr))
+(define-pmacro (ext-expr mode expr) (ext mode expr))
+(define-pmacro (zext-expr mode expr) (zext mode expr))
 
 (define-pmacro (load-op suffix op2-op mode ext-op)
   (begin
@@ -447,7 +887,7 @@ Example:
 	 ()
 	 (.str "ld" suffix " $dr,@@$sr")
 	 (+ OP1_2 op2-op dr sr)
-	 (set dr (ext-op WI (mem: mode sr)))
+	 (set dr (ext-op WI (mem mode sr)))
 	 ())
   )
 )
@@ -458,3 +898,438 @@ Example:
 (load-op ub OP2_9 QI zext-expr)
 (load-op uh OP2_11 HI zext-expr)
 @end smallexample
+
+@node Defining a block of locals
+@subsection Defining a block of locals
+@cindex .let
+
+It is often handy to assign expressions to local variables,
+if only to improve readability.
+This is accomplished with the @code{.let} builtin pmacro.
+
+Note that one can also assign pmacros to local variables.
+
+Syntax: @samp{(.let local-list expr1 [expr2 ...])}
+
+where @samp{local-list} is a list of local variable assignments,
+with the syntax @samp{(name expr)}.
+
+Example:
+
+@smallexample
+(define-pmacro (load-op suffix op2-op mode ext-op)
+  (.let (
+         (no-ext-expr (.pmacro (mode expr) expr))
+         (ext-expr (.pmacro (mode expr) (ext mode expr)))
+         (zext-expr (.pmacro (mode expr) (zext mode expr)))
+        )
+    (begin
+      (dni (.sym ld suffix) (.str "ld" suffix)
+	   ()
+           (.str "ld" suffix " $dr,@@$sr")
+           (+ OP1_2 op2-op dr sr)
+           (set dr (ext-op WI (mem mode sr)))
+           ())
+    )
+  )
+)
+
+(load-op "" OP2_12 WI no-ext-expr)
+(load-op b OP2_8 QI ext-expr)
+(load-op h OP2_10 HI ext-expr)
+(load-op ub OP2_9 QI zext-expr)
+(load-op uh OP2_11 HI zext-expr)
+@end smallexample
+
+@node A block of statements
+@subsection A block of statements
+@cindex .begin
+
+Sometimes one wishes to have a list of expressions (or statements)
+and the context only allows one expression.
+This can happen, for example, in the @samp{then} and @samp{else}
+clauses of the @code{.if} builtin pmacro.
+Use the @code{.begin} builtin pmacro for these situations.
+
+Syntax: @samp{(.begin [expr1 [expr2 ...]])}
+
+@node Debugging utilities
+@section Debugging utilities
+
+@menu
+* .print::     Printing a diagnostic message
+* .dump::      Printing arbitrarily complex objects
+* .error::     Signalling an error has occurred
+@end menu
+
+@node .print
+@subsection .print
+@cindex .print
+
+Syntax: @samp{(.print expr1 [...])}
+
+Evaluate and print the supplied expressions.
+This is useful for debugging and logging messages.
+
+NOTE: Strings are printed without enclosing quotes.
+Use @code{dump} if you want to print strings with enclosing quotes.
+
+The result is the empty list @code{()}.
+
+@node .dump
+@subsection .dump
+@cindex .dump
+
+Syntax: @samp{(.dump expr1 [...])}
+
+Evaluate and print the supplied expressions.
+This is useful for debugging and logging messages.
+
+NOTE: Strings are printed with enclosing quotes.
+Use @code{dump} if you want to print strings without enclosing quotes.
+
+The result is the empty list @code{()}.
+
+@node .error
+@subsection .error
+@cindex .error
+
+Syntax: @samp{(.error expr1 [...])}
+
+Evaluate the supplied expressions and signal an error.
+The expressions are typically error messages, often with the
+object that caused the error.
+
+@node Comparisons
+@section Comparisons
+
+Builtin macros for comparing objects.
+
+In CGEN ``true'' is represented by @code{#t}
+and ``false'' is represented by @code{#f}.
+
+@menu
+* .equals::      Deep comparison
+* .and::         && in C
+* .or::          || in C
+* .not::         ! in C
+* .eq::          Shallow comparison
+* .ne::          Shallow comparison
+* .lt::          Less than
+* .gt::          Greater than
+* .le::          Less than or equal to
+* .ge::          Greater than or equal to
+@end menu
+
+@node .equals
+@subsection .equals
+@cindex .equals
+
+Syntax: @samp{(.equals x y)}
+
+Return #t if @code{x} is equal to @code{y}, otherwise #f.
+
+A ``deep'' comparison is used.
+I.e., if @code{x} and @code{y} are lists, list elements
+are recursively compared
+
+Examples:
+
+@smallexample
+(.equals "abc" "abc") --> #t
+(.equals symbol1 symbol1) --> #t
+(.equals ((1 2 3) (4 5 6)) ((1 2 3) (4 5 6))) --> #t
+@end smallexample
+
+@node .and
+@subsection .and
+@cindex .and
+
+Syntax: @samp{(.and [expr1 [expr2 ...]])}
+
+Each expression is evaluated in turn.
+If an expression evaluates to false (@code{#f}) then
+evaluation stops and the result is @code{#f}.
+If all expressions evaluate to non-@code{#f}, then
+the value of the last expression is returned.
+
+Note that this is a special form.
+Just like @code{&&} in C, evaluation of subsequent
+expressions is not done once an expression is found
+that evaluates to ``false''.
+
+Examples:
+
+@smallexample
+(.and 1 #f 2) --> #f
+(.and 1 2 3) --> 3
+(.and) --> #t
+@end smallexample
+
+@node .or
+@subsection .or
+@cindex .or
+
+Syntax: @samp{(.or [expr1 [expr2 ...]])}
+
+Each expression is evaluated in turn.
+If an expression evaluates to non-false (@code{#f}) then
+evaluation stops and the result is the value of the first
+non-@code{#f} expression.
+If all expressions evaluate to @code{#f}, then
+the result is @code{#f}.
+
+Note that this is a special form.
+Just like @code{||} in C, evaluation of subsequent
+expressions is not done once an expression is found
+that evaluates to non-``false''.
+
+Examples:
+
+@smallexample
+(.or 1 2 3) --> 1
+(.or #f #f #f) --> #f
+(.or) --> #f
+@end smallexample
+
+@node .not
+@subsection .not
+@cindex .not
+
+Syntax: @samp{(.not expr)}
+
+If @code{expr} is @code{#f} return @code{#t}.
+If @code{expr} is non-@code{#f} return @code{#f}.
+
+@node .eq
+@subsection .eq
+@cindex .eq
+
+Syntax: @samp{(.eq x y)}
+
+Return ``true'' if @code{x} equals @code{y}, otherwise ``false''.
+
+Note that this does @emph{not} do a deep comparison,
+and can only be used with symbols, strings, and numbers.
+Both @code{x} and @code{y} must be the same type.
+
+Examples:
+
+@smallexample
+(.eq 1 1) -> #t
+(.eq 0 1) -> #f
+(.eq 0 one) -> error
+(.eq one one) -> #t
+(.eq zero one) -> #f
+(.eq "abc" "abc") -> #t
+(.eq "abc" "def") -> #f
+@end smallexample
+
+@node .ne
+@subsection .ne
+@cindex .ne
+
+Syntax: @samp{(.ne x y)}
+
+Return ``true'' if @code{x} does not equal @code{y}, otherwise ``false''.
+
+Note that this does @emph{not} do a deep comparison,
+and can only be used with symbols, strings, and numbers.
+Both @code{x} and @code{y} must be the same type.
+
+Examples:
+
+@smallexample
+(.ne 1 1) -> #f
+(.ne 0 1) -> #t
+(.ne 0 one) -> error
+(.ne one one) -> #f
+(.ne zero one) -> #t
+(.ne "abc" "abc") -> #f
+(.ne "abc" "def") -> #t
+@end smallexample
+
+@node .lt
+@subsection .lt
+@cindex .lt
+
+Syntax: @samp{(.lt x y)}
+
+Return ``true'' if @code{x} is less than @code{y}, otherwise ``false''.
+
+Both @code{x} and @code{y} must be numbers.
+
+@node .gt
+@subsection .gt
+@cindex .gt
+
+Syntax: @samp{(.gt x y)}
+
+Return ``true'' if @code{x} is greater than @code{y}, otherwise ``false''.
+
+Both @code{x} and @code{y} must be numbers.
+
+@node .le
+@subsection .le
+@cindex .le
+
+Syntax: @samp{(.le x y)}
+
+Return ``true'' if @code{x} is less than or equal to @code{y},
+otherwise ``false''.
+
+Both @code{x} and @code{y} must be numbers.
+
+@node .ge
+@subsection .ge
+@cindex .ge
+
+Syntax: @samp{(.ge x y)}
+
+Return ``true'' if @code{x} is greater than or equal to @code{y},
+otherwise ``false''.
+
+Both @code{x} and @code{y} must be numbers.
+
+@node Arithmetic functions
+@section Arithmetic functions
+
+@menu
+* .add::      Addition
+* .sub::      Subtraction
+* .mul::      Multiplication
+* .div::      Integer division
+* .rem::      Integer remainder
+@end menu
+
+@node .add
+@subsection .add
+@cindex .add
+
+Syntax: @samp{(.add x y)}
+
+Return @code{x} + @code{y}.
+
+@node .sub
+@subsection .sub
+@cindex .sub
+
+Syntax: @samp{(.sub x y)}
+
+Return @code{x} - @code{y}.
+
+@node .mul
+@subsection .mul
+@cindex .mul
+
+Syntax: @samp{(.mul x y)}
+
+Return @code{x} * @code{y}.
+
+@node .div
+@subsection .div
+@cindex .div
+
+Syntax: @samp{(.div x y)}
+
+Return the quotient of @code{x} divided by @code{y}.
+
+Only integer division is supported,
+both @code{x} and @code{y} must be integers.
+
+@node .rem
+@subsection .rem
+@cindex .rem
+
+Syntax: @samp{(.rem x y)}
+
+Return the remainder of @code{x} divided by @code{y}.
+
+Only integer division is supported,
+both @code{x} and @code{y} must be integers.
+
+@c Need to define and document behaviour for negative numbers.
+
+@node Logical functions
+@section Logical functions
+
+Builtin macros for shifts and bitwise functions.
+
+@menu
+* .sll::       Shift left logical
+* .srl::       Shift right logical
+* .sra::       Shift right arithmetic
+* .bitand::    Bitwise and
+* .bitor::     Bitwise or
+* .bitxor::    Bitwise exclusive-or
+* .bitinv::    Bitwise inversion
+@end menu
+
+@node .sll
+@subsection .sll
+@cindex .sll
+
+Syntax: @samp{(.sll x n)}
+
+Shift @code{x} left by @code{n} bits.
+Zeroes are shifted into the low-order bits.
+
+@code{n} must be a non-negative integer.
+
+@node .srl
+@subsection .srl
+@cindex .srl
+
+Syntax: @samp{(.srl x n)}
+
+Shift @code{x} right by @code{n} bits.
+
+@code{x} @emph{must} be a non-negative integer.
+Numbers at the pmacro level have ``infinite precision'',
+and shifting zeroes into the high-order bits of
+infinite-precision negative numbers is undefined.
+
+@code{n} must be a non-negative integer.
+
+@node .sra
+@subsection .sra
+@cindex .sra
+
+Syntax: @samp{(.sra x n)}
+
+Shift @code{x} right arithmetically by @code{n} bits.
+The sign bit of @code{x} is shifted into the high-order bits.
+
+@code{n} must be a non-negative integer.
+
+@node .bitand
+@subsection .bitand
+@cindex .bitand
+
+Syntax: @samp{(.bitand x y)}
+
+Return the bitwise @code{and} of @code{x} and @code{y}.
+
+@node .bitor
+@subsection .bitor
+@cindex .bitor
+
+Syntax: @samp{(.bitor x y)}
+
+Return the bitwise @code{or} of @code{x} and @code{y}.
+
+@node .bitxor
+@subsection .bitxor
+@cindex .bitxor
+
+Syntax: @samp{(.bitxor x y)}
+
+Return the bitwise @code{exclusive-or} of @code{x} and @code{y}.
+
+@node .bitinv
+@subsection .bitinv
+@cindex .bitinv
+
+Syntax: @samp{(.bitinv x)}
+
+Return the bitwise @code{inversion} of @code{x}.

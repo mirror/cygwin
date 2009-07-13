@@ -10,6 +10,7 @@
 ; (load-opc)
 ; (load-sim)
 ; (load-sid)
+; (load-testsuite)
 ; (cload #:arch path-to-cpu-file #:machs "mach-list" #:isas "isa-list" #:options "options")
 
 ; First load guile.scm to coerce guile into something we've been using.
@@ -86,6 +87,11 @@
 			    sim-test-init!
 			    sim-test-finish!
 			    sim-test-analyze!))
+      ((TESTSUITE) (cpu-load cpu-file
+			     keep-mach keep-isa options
+			     testsuite-init!
+			     testsuite-finish!
+			     testsuite-analyze!))
       (else (error "unknown application:" APPLICATION))))
 )
 
@@ -161,6 +167,15 @@
   (set! APPLICATION 'SIM-TEST)
 )
 
+(define (load-testsuite)
+  (load "read")
+  (load "desc")
+  (load "desc-cpu")
+  (load "testsuite.scm")
+  (set! verbose-level 3)
+  (set! APPLICATION 'TESTSUITE)
+)
+
 (display "
 First enable compiled in C code if desired.
 
@@ -173,6 +188,7 @@ Then choose the application via one of:
 (load-gtest)
 (load-sim)
 (load-stest)
+(load-testsuite)
 ")
 
 (display "(load-sid)\n")

@@ -17,4 +17,4 @@ AM_MAINTAINER_MODE
 # See doc/Makefile.am.
 AM_CONDITIONAL(GENINSRC_NEVER, false)
 
-AC_OUTPUT([Makefile doc/Makefile])
+AC_OUTPUT([Makefile doc/Makefile testsuite/Makefile testsuite/test-utils.sh])

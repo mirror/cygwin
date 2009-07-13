@@ -316,3 +316,30 @@
 	       )
      ()
 )
+
+;;(define-pmacro (no-ext-expr mode expr) expr)
+;;(define-pmacro (ext-expr mode expr) (ext mode expr))
+;;(define-pmacro (zext-expr mode expr) (zext mode expr))
+
+(define-pmacro (load-op suffix op2-op mode ext-op)
+ (.let (
+	(no-ext-expr (.pmacro (mode expr) expr))
+	(ext-expr (.pmacro (mode expr) (ext mode expr)))
+	(zext-expr (.pmacro (mode expr) (zext mode expr)))
+	 )
+  (begin
+    (dni (.sym ld suffix) (.str "ld" suffix)
+	 ()
+	 (.str "ld" suffix " $dr,@@$sr")
+	 (+ OP1_2 op2-op dr sr)
+	 (set dr (ext-op WI (mem mode sr)))
+	 ())
+  )
+ )
+)
+
+(load-op "" OP2_12 WI no-ext-expr)
+(load-op b OP2_8 QI ext-expr)
+(load-op h OP2_10 HI ext-expr)
+(load-op ub OP2_9 QI zext-expr)
+(load-op uh OP2_11 HI zext-expr)

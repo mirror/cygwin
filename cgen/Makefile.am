@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = 1.9 cygnus
 
-SUBDIRS = doc
+SUBDIRS = doc testsuite
 
 GUILE = "`if test -f ../guile/libguile/guile ; then echo ../guile/libguile/guile; else echo guile ; fi`" -l $(srcdir)/guile.scm -s
 CGENFLAGS = -v

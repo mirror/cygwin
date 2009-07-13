@@ -53,6 +53,7 @@
 (define (verbose? level) (>= verbose-level level))
 
 ; Print to stderr, takes an arbitrary number of strings, possibly nested.
+; ??? Audit callers, can we maybe just use "display" here.
 
 (define message
   (lambda args

@@ -1,5 +1,56 @@
 2009-07-13  Doug Evans  <dje@sebabeach.org>
 
+	Extend pmacro language, add testsuite.
+	* Makefile.am (SUBDIRS): Add testsuite.
+	* Makefile.in: Regenerate.
+	* configure.in (AC_OUTPUT): Create testsuite/Makefile,
+	testsuite/test-utils.sh.
+	* configure: Regenerate.
+	* dev.scm (cload): Handle testsuite app.
+	(load-testsuite): New function.
+	* pmacros.scm: (-pmacro-debug?): New global.
+	(-smacro-table): New global.
+	(-smacro-lookup, -smacro-set!): New functions.
+	(-pmacro-make): New argument `syntactic-form?', all callers updated.
+	(-pmacro-syntactic-form?): New function.
+	(-pmacro-expected-number, -pmacro-verify-number): New functions.
+	(-pmacro-expected-integer, -pmacro-verify-integer): New functions.
+	(-pmacro-expected-non-negative-integer): New function.
+	(-pmacro-verify-non-negative-integer): New function.
+	(-pmacro-expand-expr-list): New function.
+	(-pmacro-process-args-1): Renamed from -pmacro-process-args.
+	(-pmacro-process-args): Renamed from -pmacro-invoke.
+	(-pmacro-apply, -smacro-apply): New functions.
+	(-pmacro-expand): Rewrite syntactic form processing.
+	(-pmacro-build-lambda): Reformat.
+	(define-pmacro): Watch for more errors in definition.
+	(pmacro-debug): New function.
+	(pmacro-trace): Set/reset -pmacro-debug?.
+	(all existing builtin pmacro helpers): Rename to -pmacro-builtin-foo.
+	(-pmacro-builtin-substring): Fix.  Add support for `end' marker.
+	(-pmacro-builtin-for-each, et.al.): New helpers for .for-each, .let,
+	.if, .case, .cond, .begin, .print, .dump, .error, .list, .ref,
+	.length, .replicate, .equals, .and, .or, .not, .eq, .ne, .lt, .gt,
+	.le, .ge, .add, .sub, .mul, .div, .rem, .sll, .srl, .sra, .bitand,
+	.bitor, .bitxor, bitinv, .car, .cdr, .caar, .cadr, .cdar, .cddr.
+	(pmacros-init!): Initialize -smacro-table.
+	Rewrite pmacro initialization.
+	* read.scm (reader-process-expanded): Renamed from
+	-reader-process-expanded.  All callers updated.
+	Recognize () as a no-op.
+	(cpu-load): Tweak logging messages.
+	* utils.scm (message): Add comment.
+	* cpu/play.cpu: Add some instructions to play with .let.
+	* doc/cgenint.texi: Move some debugging related docs to here from
+	cgen.texi.
+	* doc/pmacros.texi: Reorganize.  Add docs for new builtin pmacros.
+	* testsuite/Makefile.am: New file.
+	* testsuite/Makefile.in: New file.
+	* testsuite/test-utils.sh.in: New file.
+	* testsuite/run-tests.sh: New file.
+	* testsuite/testsuite.cpu: New file.
+	* testsuite/pmacros-1.test: New file.
+
 	* decode.scm: Comment and formatting tweaks.
 	(-build-decode-table-guts): Add more data to logging message.
 

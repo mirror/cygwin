@@ -26,8 +26,8 @@
 ;
 ; define-pmacro - define a symbolic or procedural macro
 ;
-;	(define-pmacro symbol "comment" expansion)
-;	(define-pmacro (symbol [args]) "comment" (expansion))
+;	(define-pmacro symbol ["comment"] expansion)
+;	(define-pmacro (symbol [args]) ["comment"] (expansion))
 ;
 ; ARGS is a list of `symbol' or `(symbol default-value)' elements.
 ;
@@ -43,16 +43,59 @@
 ;
 ; (.sym symbol1 symbol2 ...)          - symbolstr-append
 ; (.str string1 string2 ...)          - stringsym-append
-; (.hex number)                       - convert to hex string
-; (.upcase string)                    - convert to uppercase
-; (.downcase string)                  - convert to lowercase
+; (.hex number [width])               - convert to hex string
+; (.upcase string)
+; (.downcase string)
 ; (.substring string start end)       - get part of a string
 ; (.splice a b (.unsplice c) d e ...) - quasi-quote/unquote-splicing
 ; (.iota count [start [increment]])   - number generator
-; (.map macro-name arg1 ...)          - map
-; (.apply macro-name arg)             - apply
-; (.pmacro (arg-list) expansion)      - lambda (??? call it .lambda?)
-; (.eval (expr))                      - eval (experimental)
+; (.map pmacro arg1 . arg-rest)
+; (.for-each pmacro arg1 . arg-rest)
+; (.eval expr)                        - process expr immediately
+; (.apply macro-name arg)
+; (.pmacro (arg-list) expansion)      - akin go lambda in Scheme
+; (.let (var-list) expr1 . expr-rest) - akin to let in Scheme
+; (.if expr then [else])
+; (.case expr ((case-list1) stmt) [case-expr-stmt-list] [(else stmt)])
+; (.cond (expr stmt) [(cond-expr-stmt-list)] [(else stmt)])
+; (.begin . stmt-list)
+; (.print . exprs)                    - for debugging messages
+; (.dump expr)                        - dump expr in readable format
+; (.error . message)                  - print error message and exit
+; (.list . exprs)
+; (.ref l n)                          - extract the n'th element of list l
+; (.length x)                         - length of symbol, string, or list
+; (.replicate n expr)                 - return list of expr replicated n times
+; (.equals x y)                       - deep comparison
+; (.and expr . rest)                  - && in C
+; (.or expr . rest)                   - || in C
+; (.not expr)                         - ! in C
+; (.eq x y)
+; (.ne x y)
+; (.lt x y)
+; (.gt x y)
+; (.le x y)
+; (.ge x y)
+; (.add x y)
+; (.sub x y)
+; (.mul x y)
+; (.div x y)                          - integer division
+; (.rem x y)                          - integer remainder
+; (.sll x n)                          - shift left logical
+; (.srl x n)                          - shift right logical
+; (.sra x n)                          - shift right arithmetic
+; (.bitand x y)                       - bitwise and
+; (.bitor x y)                        - bitwise or
+; (.bitxor x y)                       - bitwise xor
+; (.bitinv x)                         - bitwise invert
+; (.car l)
+; (.cdr l)
+; (.caar l)
+; (.cadr l)
+; (.cdar l)
+; (.cddr l)
+;
+; NOTE: .cons currently absent on purpose
 ;
 ; .sym and .str convert numbers to symbols/strings as necessary (base 10).
 ;
@@ -61,31 +104,40 @@
 ; ??? Nested pmacros don't bind their arguments the way nested lambda's do.
 ; Should they?
 ;
-; .eval is an experiment.  Ports that consider themselves to be of beta
-; quality or better don't use it.
-;
 ; ??? Methinks .foo isn't a valid R5RS symbol.  May need to change 
-; to something else.  Where's Quad when you need it?! :-)
+; to something else.
 
+; True if doing macro expansion via pmacro-debug or pmacro-trace.
+(define -pmacro-debug? #f)
+; True if doing macro expansion via pmacro-trace.
 (define -pmacro-trace? #f)
 
+; The pmacro table.
 (define -pmacro-table #f)
 (define (-pmacro-lookup name) (hashq-ref -pmacro-table name))
 (define (-pmacro-set! name val) (hashq-set! -pmacro-table name val))
+
+; A copy of syntactic pmacros is kept separately.
+(define -smacro-table #f)
+(define (-smacro-lookup name) (hashq-ref -smacro-table name))
+(define (-smacro-set! name val) (hashq-set! -smacro-table name val))
 
 ; Marker to indicate a value is a pmacro.
 (define -pmacro-marker '<pmacro>)
 
 ; Utilities to create and access pmacros.
-(define (-pmacro-make name arg-spec default-values transformer comment)
-  (vector -pmacro-marker name arg-spec default-values transformer comment)
+(define (-pmacro-make name arg-spec default-values
+		      syntactic-form? transformer comment)
+  (vector -pmacro-marker name arg-spec default-values
+	  syntactic-form? transformer comment)
 )
 (define (-pmacro? x) (and (vector? x) (eq? (vector-ref x 0) -pmacro-marker)))
 (define (-pmacro-name pmac) (vector-ref pmac 1))
 (define (-pmacro-arg-spec pmac) (vector-ref pmac 2))
 (define (-pmacro-default-values pmac) (vector-ref pmac 3))
-(define (-pmacro-transformer pmac) (vector-ref pmac 4))
-(define (-pmacro-comment pmac) (vector-ref pmac 5))
+(define (-pmacro-syntactic-form? pmac) (vector-ref pmac 4))
+(define (-pmacro-transformer pmac) (vector-ref pmac 5))
+(define (-pmacro-comment pmac) (vector-ref pmac 6))
 
 ; Cover functions to manage an "environment" in case a need or desire for
 ; another method arises.
@@ -104,6 +156,64 @@
 	  msg
 	  ":")
 	 expr)
+)
+
+; Issue an error where a number was expected.
+
+(define (-pmacro-expected-number op n)
+  (-pmacro-error (string-append "invalid arg for " op ", expected number") n)
+)
+
+; Verify N is a number.
+
+(define (-pmacro-verify-number op n)
+  (if (not (number? n))
+      (-pmacro-expected-number op n))
+)
+
+; Issue an error where an integer was expected.
+
+(define (-pmacro-expected-integer op n)
+  (-pmacro-error (string-append "invalid arg for " op ", expected integer") n)
+)
+
+; Verify N is an integer.
+
+(define (-pmacro-verify-integer op n)
+  (if (not (integer? n))
+      (-pmacro-expected-integer op n))
+)
+
+; Issue an error where a non-negative integer was expected.
+
+(define (-pmacro-expected-non-negative-integer op n)
+  (-pmacro-error (string-append "invalid arg for " op ", expected non-negative integer") n)
+)
+
+; Verify N is a non-negative integer.
+
+(define (-pmacro-verify-non-negative-integer op n)
+  (if (or (not (integer? n))
+	  (< n 0))
+      (-pmacro-expected-non-negative-integer op n))
+)
+
+; Utility to evaluate pmacro args.
+; ??? Currently unused, keep for now.
+
+(define (-pmacro-eval expr)
+  (eval1 expr)
+)
+
+; Expand a list of expressions, in order
+; The result is the value of the last one.
+
+(define (-pmacro-expand-expr-list exprs env)
+  (let ((result nil))
+    (for-each (lambda (expr)
+		(set! result (-pmacro-expand expr env)))
+	      exprs)
+    result)
 )
 
 ; Process list of keyword/value specified arguments.
@@ -147,20 +257,19 @@
 ; or is a list of keyword/value pairs with missing values coming from
 ; DEFAULT-VALUES.
 
-(define (-pmacro-process-args arg-spec default-values args)
+(define (-pmacro-process-args-1 arg-spec default-values args)
   (if (and (pair? args) (keyword? (car args)))
       (-pmacro-process-keyworded-args arg-spec default-values args)
       args)
 )
 
-; Invoke a procedural macro.
-; ??? A better name might be -pmacro-apply but that is taken by the
-; .apply handler.
+; Subroutine of -pmacro-apply/-smacro-apply to simplify them.
+; Process the arguments, verify the correct number is present.
 
-(define (-pmacro-invoke macro args)
+(define (-pmacro-process-args macro args)
   (let ((arg-spec (-pmacro-arg-spec macro))
 	(default-values (-pmacro-default-values macro)))
-    (let ((processed-args (-pmacro-process-args arg-spec default-values args)))
+    (let ((processed-args (-pmacro-process-args-1 arg-spec default-values args)))
       (if (not (num-args-ok? (length processed-args) arg-spec))
 	  (-pmacro-error (string-append
 			  "wrong number of arguments to pmacro "
@@ -169,7 +278,22 @@
 			      (write (cons (-pmacro-name macro)
 					   (-pmacro-arg-spec macro))))))
 			 args))
-      (apply (-pmacro-transformer macro) processed-args)))
+      processed-args))
+)
+
+; Invoke a pmacro.
+
+(define (-pmacro-apply macro args)
+  (apply (-pmacro-transformer macro)
+	 (-pmacro-process-args macro args))
+)
+
+; Invoke a syntactic-form pmacro.
+; ENV is handed down from -pmacro-expand.
+
+(define (-smacro-apply macro args env)
+  (apply (-pmacro-transformer macro)
+	 (cons env (-pmacro-process-args macro args)))
 )
 
 ; Expand expression EXP using ENV, an alist of variable assignments.
@@ -206,22 +330,23 @@
 	  (newline cep)))
     (and (-pmacro? (car exp)) (car exp)))
 
-  ; Scan each element in EXP and see if the result is a macro invocation.
+  ;; Scan each element in EXP and see if the result is a macro invocation.
   (define (scan-list exp)
-    ; Check for syntactic forms.
-    (case (car exp)
-      ((.pmacro)
-       (if (not (= (length exp) 3))
-	   (-pmacro-error "wrong number of arguments to .pmacro" exp))
-       (-pmacro-pmacro (cadr exp) (caddr exp)))
-      (else
-       (let ((scanned-exp (map scan exp)))
-	 (let ((macro (check-macro scanned-exp)))
-	   (if macro
-	       (if (procedure? (-pmacro-transformer macro))
-		   (-pmacro-invoke macro (cdr scanned-exp))
-		   (cons (-pmacro-transformer macro) (cdr scanned-exp)))
-	       scanned-exp))))))
+    ;; Check for syntactic forms.
+    ;; They are handled differently in that we leave it to the transformer
+    ;; routine to evaluate the arguments.
+    (let ((sform (-smacro-lookup (car exp))))
+      (if sform
+	  (-smacro-apply sform (cdr exp) env)
+	  ;; Not a syntactic form.
+	  ;; Evaluate all the arguments first.
+	  (let ((scanned-exp (map scan exp)))
+	    (let ((macro (check-macro scanned-exp)))
+	      (if macro
+		  (if (procedure? (-pmacro-transformer macro))
+		      (-pmacro-apply macro (cdr scanned-exp))
+		      (cons (-pmacro-transformer macro) (cdr scanned-exp)))
+		  scanned-exp))))))
 
   ; Scan EXP, an arbitrary value.
   (define (scan exp)
@@ -314,7 +439,8 @@
 
 (define (-pmacro-build-lambda params expansion)
   (eval1 `(lambda ,params
-	    (-pmacro-expand ',expansion (-pmacro-env-make ',params (list ,@params)))))
+	    (-pmacro-expand ',expansion
+			    (-pmacro-env-make ',params (list ,@params)))))
 )
 
 ; ??? I'd prefer to use `define-macro', but boot-9.scm uses it and
@@ -323,21 +449,32 @@
 ; ??? On the other hand, calling them pmacros removes all ambiguity.
 ;
 ; The syntax is one of:
-; (define (name args ...) expansion)
-; (define (name args ...) "documentation" expansion)
+; (define-pmacro symbol expansion)
+; (define-pmacro symbol ["comment"] expansion)
+; (define-pmacro (name args ...) expansion)
+; (define-pmacro (name args ...) "documentation" expansion)
 ;
 ; If `expansion' is the name of a pmacro, its value is used (rather than its
 ; name).
 ; ??? The goal here is to follow Scheme's define/lambda, but not all variants
 ; are supported yet.  There's also the difference that we treat undefined
 ; symbols as being themselves.
+;
+; ??? We may want user-definable "syntactic" macros some day.  Later.
 
 (define (define-pmacro header arg1 . arg-rest)
+  (if (and (not (symbol? header))
+	   (not (list? header)))
+      (-pmacro-error "invalid pmacro definition" header))
   (let ((name (if (symbol? header) header (car header)))
 	(arg-spec (if (symbol? header) #f (-pmacro-get-arg-spec (cdr header))))
 	(default-values (if (symbol? header) #f (-pmacro-get-default-values (cdr header))))
 	(comment (if (null? arg-rest) "" arg1))
 	(expansion (if (null? arg-rest) arg1 (car arg-rest))))
+    ;;(if (> (length arg-rest) 1)
+	;;(-pmacro-error "extraneous arguments to define-pmacro" (cdr arg-rest)))
+    ;;(if (not (string? comment))
+	;;(-pmacro-error "invalid pmacro comment, expected string" comment))
     (if (symbol? header)
 	(if (symbol? expansion)
 	    (let ((maybe-pmacro (-pmacro-lookup expansion)))
@@ -346,12 +483,13 @@
 				(-pmacro-make name
 					      (-pmacro-arg-spec maybe-pmacro)
 					      (-pmacro-default-values maybe-pmacro)
+					      #f ; syntactic-form?
 					      (-pmacro-transformer maybe-pmacro)
 					      comment))
-		  (-pmacro-set! name (-pmacro-make name #f #f expansion comment))))
-	    (-pmacro-set! name (-pmacro-make name #f #f expansion comment)))
+		  (-pmacro-set! name (-pmacro-make name #f #f #f expansion comment))))
+	    (-pmacro-set! name (-pmacro-make name #f #f #f expansion comment)))
 	(-pmacro-set! name
-		      (-pmacro-make name arg-spec default-values
+		      (-pmacro-make name arg-spec default-values #f
 				    (-pmacro-build-lambda arg-spec expansion)
 				    comment))))
     *UNSPECIFIED*
@@ -363,22 +501,36 @@
   (-pmacro-expand expr '())
 )
 
+; Expand any pmacros in EXPR, without processing .eval.
+
+(define (pmacro-debug expr)
+  ; FIXME: Need unwind protection.
+  (let ((old-debug -pmacro-debug?))
+    (set! -pmacro-debug? #t)
+    (let ((result (-pmacro-expand expr '())))
+      (set! -pmacro-debug? old-debug)
+      result))
+)
+
 ; Debugging routine to trace macro expansion.
 
 (define (pmacro-trace expr)
-  ; ??? Need unwind protection.
-  (let ((old -pmacro-trace?))
+  ; FIXME: Need unwind protection.
+  (let ((old-debug -pmacro-debug?)
+	(old-trace -pmacro-trace?))
+    (set! -pmacro-debug? #t)
     (set! -pmacro-trace? #t)
     (let ((result (-pmacro-expand expr '())))
-      (set! -pmacro-trace? old)
+      (set! -pmacro-debug? old-debug)
+      (set! -pmacro-trace? old-trace)
       result))
 )
 
 ; Builtin macros.
 
-; .sym - symbol-append, auto-convert numbers
+; (.sym symbol1 symbol2 ...) - symbol-append, auto-convert numbers
 
-(define -pmacro-sym
+(define -pmacro-builtin-sym
   (lambda args
     (string->symbol
      (apply string-append
@@ -391,9 +543,9 @@
 		 args))))
 )
 
-; .str - string-append, auto-convert numbers
+; (.str string1 string2 ...) - string-append, auto-convert numbers
 
-(define -pmacro-str
+(define -pmacro-builtin-str
   (lambda args
     (apply string-append
 	   (map (lambda (elm)
@@ -405,11 +557,11 @@
 		args)))
 )
 
-; .hex - convert number to hex string
+; (.hex number [width]) - convert number to hex string
 ; WIDTH, if present, is the number of characters in the result, beginning
 ; from the least significant digit.
 
-(define (-pmacro-hex num . width)
+(define (-pmacro-builtin-hex num . width)
   (if (> (length width) 1)
       (-pmacro-error "wrong number of arguments to .hex"
 		     (cons '.hex (cons num width))))
@@ -421,28 +573,43 @@
 		     len (+ len (car width))))))
 )
 
-; .upcase - convert a string to uppercase
+; (.upcase string) - convert a string or symbol to uppercase
 
-(define (-pmacro-upcase str)
+(define (-pmacro-builtin-upcase str)
   (cond
    ((string? str) (string-upcase str))
    ((symbol? str) (string->symbol (string-upcase (symbol->string str))))
    (else (-pmacro-error "invalid argument to .upcase" str)))
 )
 
-; .downcase - convert a string to lowercase
+; (.downcase string) - convert a string or symbol to lowercase
 
-(define (-pmacro-downcase str)
+(define (-pmacro-builtin-downcase str)
   (cond
    ((string? str) (string-downcase str))
    ((symbol? str) (string->symbol (string-downcase (symbol->string str))))
    (else (-pmacro-error "invalid argument to .downcase" str)))
 )
 
-; .substring - get part of a string
+; (.substring string start end) - get part of a string
+; `end' can be the symbol `end'.
 
-(define (-pmacro-substring str start end)
-  (substring str start end)
+(define (-pmacro-builtin-substring str start end)
+  (if (not (integer? start)) ;; FIXME: non-negative-integer
+      (-pmacro-error "start not an integer" start))
+  (if (and (not (integer? end))
+	   (not (eq? end 'end)))
+      (-pmacro-error "end not an integer nor symbol `end'" end))
+  (cond ((string? str)
+	 (if (eq? end 'end)
+	     (substring str start)
+	     (substring str start end)))
+	((symbol? str)
+	 (if (eq? end 'end)
+	     (string->symbol (substring (symbol->string str) start))
+	     (string->symbol (substring (symbol->string str) start end))))
+	(else
+	 (-pmacro-error "invalid argument to .substring" str)))
 )
 
 ; .splice - splicing support
@@ -455,7 +622,7 @@
 ; different (??? may need to revisit).  In Scheme we have quasi-quote,
 ; unquote, unquote-splicing.  Here we have splice, unsplice.
 
-(define -pmacro-splice
+(define -pmacro-builtin-splice
   (lambda arg-list
     ; ??? Not the most efficient implementation, but will the difference
     ; ever be measureable?
@@ -479,7 +646,7 @@
 ; (.iota count start)      ; incr=1
 ; (.iota count start incr)
 
-(define (-pmacro-iota count . start-incr)
+(define (-pmacro-builtin-iota count . start-incr)
   (if (> (length start-incr) 2)
       (-pmacro-error "wrong number of arguments to .iota"
 		     (cons '.iota (cons count start-incr))))
@@ -494,9 +661,9 @@
 	  (loop (+ i incr) (- count 1) (cons i result)))))
 )
 
-; .map
+; (.map pmacro arg1 . arg-rest)
 
-(define (-pmacro-map pmacro arg1 . arg-rest)
+(define (-pmacro-builtin-map pmacro arg1 . arg-rest)
   (if (not (-pmacro? pmacro))
       (-pmacro-error "not a pmacro" pmacro))
   (let ((transformer (-pmacro-transformer pmacro)))
@@ -505,9 +672,33 @@
     (apply map (cons transformer (cons arg1 arg-rest))))
 )
 
-; .apply
+; (.for-each pmacro arg1 . arg-rest)
 
-(define (-pmacro-apply pmacro arg-list)
+(define (-pmacro-builtin-for-each pmacro arg1 . arg-rest)
+  (if (not (-pmacro? pmacro))
+      (-pmacro-error "not a pmacro" pmacro))
+  (let ((transformer (-pmacro-transformer pmacro)))
+    (if (not (procedure? transformer))
+	(-pmacro-error "not a procedural macro" pmacro))
+    (apply for-each (cons transformer (cons arg1 arg-rest)))
+    nil) ; need to return something the reader will accept
+)
+
+; (.eval expr)
+
+(define (-pmacro-builtin-eval expr)
+  ;; If we're expanding macros for debugging purposes, don't eval,
+  ;; just return unchanged.
+  (if -pmacro-debug?
+      (list '.eval expr)
+      (begin
+	(reader-process-expanded expr)
+	nil)) ;; need to return something the reader will accept
+)
+
+; (.apply macro-name arg)
+
+(define (-pmacro-builtin-apply pmacro arg-list)
   (if (not (-pmacro? pmacro))
       (-pmacro-error "not a pmacro" pmacro))
   (let ((transformer (-pmacro-transformer pmacro)))
@@ -516,57 +707,504 @@
     (apply transformer arg-list))
 )
 
-; .pmacro
+; (.pmacro (arg-list) expansion)
+; Note: syntactic form
 
-(define (-pmacro-pmacro params expansion)
+(define (-pmacro-builtin-pmacro env params expansion)
+  ;; ??? Prohibiting improper lists seems unnecessarily restrictive here.
+  ;; e.g. (define (foo bar . baz) ...)
   (if (not (list? params))
-      (-pmacro-error "bad parameter list" params))
-  (-pmacro-make '.anonymous params #f (-pmacro-build-lambda params expansion) "")
+      (-pmacro-error ".pmacro parameter-spec is not a list" params))
+  (-pmacro-make '.anonymous params #f #f (-pmacro-build-lambda params expansion) "")
+)
+
+; (.let (var-list) expr1 . expr-rest)
+; Note: syntactic form
+
+(define (-pmacro-builtin-let env locals expr1 . expr-rest)
+  (if (not (list? locals))
+      (-pmacro-error ".let locals is not a list" locals))
+  (if (not (all-true? (map (lambda (l)
+			     (and (list? l)
+				  (= (length l) 2)
+				  (symbol? (car l))))
+			   locals)))
+      (-pmacro-error "syntax error in locals list" locals))
+  (let* ((evald-locals (map (lambda (l)
+			      (cons (car l) (-pmacro-expand (cadr l) env)))
+			    locals))
+	 (new-env (append! evald-locals env)))
+    (-pmacro-expand-expr-list (cons expr1 expr-rest) new-env))
+)
+
+; (.if expr then [else])
+; Note: syntactic form
+
+(define (-pmacro-builtin-if env expr then-clause . else-clause)
+  (case (length else-clause)
+    ((0) (if (-pmacro-expand expr env)
+	     (-pmacro-expand then-clause env)
+	     nil))
+    ((1) (if (-pmacro-expand expr env)
+	     (-pmacro-expand then-clause env)
+	     (-pmacro-expand (car else-clause) env)))
+    (else (-pmacro-error "too many elements in else-clause, expecting 0 or 1" else-clause)))
+)
+
+; (.case expr ((case-list1) stmt) [case-expr-stmt-list] [(else stmt)])
+; Note: syntactic form
+; Note: this uses "member" for case comparison (Scheme uses memq I think)
+
+(define (-pmacro-builtin-case env expr case1 . rest)
+  (let ((evald-expr (-pmacro-expand expr env)))
+    (let loop ((cases (cons case1 rest)))
+      (if (null? cases)
+	  nil
+	  (begin
+	    (if (not (list? (car cases)))
+		(-pmacro-error "case statement not a list" (car cases)))
+	    (if (= (length (car cases)) 1)
+		(-pmacro-error "case statement has case but no expr" (car cases)))
+	    (if (and (not (eq? (caar cases) 'else))
+		     (not (list? (caar cases))))
+		(-pmacro-error "case must be \"else\" or list of choices" (caar cases)))
+	    (cond ((eq? (caar cases) 'else)
+		   (-pmacro-expand-expr-list (cdar cases) env))
+		  ((member evald-expr (caar cases))
+		   (-pmacro-expand-expr-list (cdar cases) env))
+		  (else
+		   (loop (cdr cases))))))))
+)
+
+; (.cond (expr stmt) [(cond-expr-stmt-list)] [(else stmt)])
+; Note: syntactic form
+
+(define (-pmacro-builtin-cond env expr1 . rest)
+  (let loop ((exprs (cons expr1 rest)))
+    (cond ((null? exprs)
+	   nil)
+	  ((eq? (car exprs) 'else)
+	   (-pmacro-expand-expr-list (cdar exprs) env))
+	  (else
+	   (let ((evald-expr (-pmacro-expand (caar exprs) env)))
+	     (if evald-expr
+		 (-pmacro-expand-expr-list (cdar exprs) env)
+		 (loop (cdr exprs)))))))
+)
+
+; (.begin . stmt-list)
+; Note: syntactic form
+
+(define (-pmacro-builtin-begin env . rest)
+  (-pmacro-expand-expr-list rest env)
+)
+
+; (.print . expr)
+; Strings have quotes removed.
+
+(define (-pmacro-builtin-print . exprs)
+  (apply message exprs)
+  nil ; need to return something the reader will accept
+)
+
+; (.dump expr)
+; Strings do not have quotes removed.
+
+(define (-pmacro-builtin-dump expr)
+  (write expr (current-error-port))
+  nil ; need to return something the reader will accept
+)
+
+; (.error . expr)
+
+(define (-pmacro-builtin-error . exprs)
+  (apply error exprs)
+)
+
+; (.list expr1 ...)
+
+(define (-pmacro-builtin-list . exprs)
+  exprs
+)
+
+; (.ref expr index)
+
+(define (-pmacro-builtin-ref l n)
+  (if (not (list? l))
+      (-pmacro-error "invalid arg for .ref, expected list" l))
+  (if (not (integer? n)) ;; FIXME: call non-negative-integer?
+      (-pmacro-error "invalid arg for .ref, expected non-negative integer" n))
+  (list-ref l n)
+)
+
+; (.length x)
+
+(define (-pmacro-builtin-length x)
+  (cond ((symbol? x) (string-length (symbol->string x)))
+	((string? x) (string-length x))
+	((list? x) (length x))
+	(else
+	 (-pmacro-error "invalid arg for .length, expected symbol, string, or list" x)))
+)
+
+; (.replicate n expr)
+
+(define (-pmacro-builtin-replicate n expr)
+  (if (not (integer? n)) ;; FIXME: call non-negative-integer?
+      (-pmacro-error "invalid arg for .replicate, expected non-negative integer" n))
+  (make-list n expr)
+)
+
+; (.equals x y)
+
+(define (-pmacro-builtin-equals x y)
+  (equal? x y)
+)
+
+; (.and . rest)
+; Note: syntactic form
+; Elements of EXPRS are evaluated one at a time.
+; Unprocessed elements are not evaluated.
+
+(define (-pmacro-builtin-and env . exprs)
+  (if (null? exprs)
+      #t
+      (let loop ((exprs exprs))
+	(let ((evald-expr (-pmacro-expand (car exprs) env)))
+	  (cond ((null? (cdr exprs)) evald-expr)
+		(evald-expr (loop (cdr exprs)))
+		(else #f)))))
+)
+
+; (.or . rest)
+; Note: syntactic form
+; Elements of EXPRS are evaluated one at a time.
+; Unprocessed elements are not evaluated.
+
+(define (-pmacro-builtin-or env . exprs)
+  (let loop ((exprs exprs))
+    (if (null? exprs)
+	#f
+	(let ((evald-expr (-pmacro-expand (car exprs) env)))
+	  (if evald-expr
+	      evald-expr
+	      (loop (cdr exprs))))))
+)
+
+; (.not expr)
+
+(define (-pmacro-builtin-not x)
+  (not x)
+)
+
+; Verify x,y are compatible for eq/ne comparisons.
+
+(define (-pmacro-compatible-for-equality x y)
+  (or (and (symbol? x) (symbol? y))
+      (and (string? x) (string? y))
+      (and (number? x) (number? y)))
+)
+
+; (.eq expr)
+
+(define (-pmacro-builtin-eq x y)
+  (cond ((symbol? x)
+	 (if (symbol? y)
+	     (eq? x y)
+	     (-pmacro-error "incompatible args for .eq, expected symbol" y)))
+	((string? x)
+	 (if (string? y)
+	     (string=? x y)
+	     (-pmacro-error "incompatible args for .eq, expected string" y)))
+	((number? x)
+	 (if (number? y)
+	     (= x y)
+	     (-pmacro-error "incompatible args for .eq, expected number" y)))
+	(else
+	 (-pmacro-error "unsupported args for .eq" (list x y))))
+)
+
+; (.ne expr)
+
+(define (-pmacro-builtin-ne x y)
+  (cond ((symbol? x)
+	 (if (symbol? y)
+	     (not (eq? x y))
+	     (-pmacro-error "incompatible args for .ne, expected symbol" y)))
+	((string? x)
+	 (if (string? y)
+	     (not (string=? x y))
+	     (-pmacro-error "incompatible args for .ne, expected string" y)))
+	((number? x)
+	 (if (number? y)
+	     (not (= x y))
+	     (-pmacro-error "incompatible args for .ne, expected number" y)))
+	(else
+	 (-pmacro-error "unsupported args for .ne" (list x y))))
+)
+
+; (.lt expr)
+
+(define (-pmacro-builtin-lt x y)
+  (-pmacro-verify-number ".lt" x)
+  (-pmacro-verify-number ".lt" y)
+  (< x y)
+)
+
+; (.gt expr)
+
+(define (-pmacro-builtin-gt x y)
+  (-pmacro-verify-number ".gt" x)
+  (-pmacro-verify-number ".gt" y)
+  (> x y)
+)
+
+; (.le expr)
+
+(define (-pmacro-builtin-le x y)
+  (-pmacro-verify-number ".le" x)
+  (-pmacro-verify-number ".le" y)
+  (<= x y)
+)
+
+; (.ge expr)
+
+(define (-pmacro-builtin-ge x y)
+  (-pmacro-verify-number ".ge" x)
+  (-pmacro-verify-number ".ge" y)
+  (>= x y)
+)
+
+; (.add x y)
+
+(define (-pmacro-builtin-add x y)
+  (-pmacro-verify-number ".add" x)
+  (-pmacro-verify-number ".add" y)
+  (+ x y)
+)
+
+; (.sub x y)
+
+(define (-pmacro-builtin-sub x y)
+  (-pmacro-verify-number ".sub" x)
+  (-pmacro-verify-number ".sub" y)
+  (- x y)
+)
+
+; (.mul x y)
+
+(define (-pmacro-builtin-mul x y)
+  (-pmacro-verify-number ".mul" x)
+  (-pmacro-verify-number ".mul" y)
+  (* x y)
+)
+
+; (.div x y) - integer division
+
+(define (-pmacro-builtin-div x y)
+  (-pmacro-verify-integer ".div" x)
+  (-pmacro-verify-integer ".div" y)
+  (quotient x y)
+)
+
+; (.rem x y) - integer remainder
+; ??? Need to decide behavior.
+
+(define (-pmacro-builtin-rem x y)
+  (-pmacro-verify-integer ".rem" x)
+  (-pmacro-verify-integer ".rem" y)
+  (remainder x y)
+)
+
+; (.sll x n) - shift left logical
+
+(define (-pmacro-builtin-sll x n)
+  (-pmacro-verify-integer ".sll" x)
+  (-pmacro-verify-non-negative-integer ".sll" n)
+  (if (= n 0)
+      x
+      (* x n 2))
+)
+
+; (.srl x n) - shift right logical
+; X must be non-negative, otherwise behavior is undefined.
+; [Unless we introduce a size argument: How do you logical shift right
+; an arbitrary precision negative number?]
+
+(define (-pmacro-builtin-srl x n)
+  (-pmacro-verify-non-negative-integer ".srl" x)
+  (-pmacro-verify-non-negative-integer ".srl" n)
+  (if (= n 0)
+      x
+      (quotient x (* n 2)))
+)
+
+; (.sra x n) - shift right arithmetic
+
+(define (-pmacro-builtin-sra x n)
+  (-pmacro-verify-integer ".sra" x)
+  (-pmacro-verify-non-negative-integer ".sra" n)
+  (cond ((= n 0) x)
+	((= x -1) -1)
+	(else (quotient x (* n 2))))
+)
+
+; (.bitand x y) - bitwise and
+
+(define (-pmacro-builtin-bitand x y)
+  (-pmacro-verify-integer ".bitand" x)
+  (-pmacro-verify-integer ".bitand" y)
+  (logand x y)
+)
+
+; (.bitor x y) - bitwise or
+
+(define (-pmacro-builtin-bitor x y)
+  (-pmacro-verify-integer ".bitor" x)
+  (-pmacro-verify-integer ".bitor" y)
+  (logior x y)
+)
+
+; (.bitxor x y) - bitwise xor
+
+(define (-pmacro-builtin-bitxor x y)
+  (-pmacro-verify-integer ".bitxor" x)
+  (-pmacro-verify-integer ".bitxor" y)
+  (logxor x y)
+)
+
+; (.bitinv x) - bitwise invert
+
+(define (-pmacro-builtin-bitinv x)
+  (-pmacro-verify-integer ".bitinv" x)
+  (lognot x)
+)
+
+; (.car expr)
+
+(define (-pmacro-builtin-car l)
+  (if (pair? l)
+      (car l)
+      (-pmacro-error "invalid arg for .car, expected pair" l))
+)
+
+; (.cdr expr)
+
+(define (-pmacro-builtin-cdr l)
+  (if (pair? l)
+      (cdr l)
+      (-pmacro-error "invalid arg for .cdr, expected pair" l))
+)
+
+; (.caar expr)
+
+(define (-pmacro-builtin-caar l)
+  (if (and (pair? l) (pair? (car l)))
+      (caar l)
+      (-pmacro-error "invalid arg for .caar" l))
+)
+
+; (.cadr expr)
+
+(define (-pmacro-builtin-cadr l)
+  (if (and (pair? l) (pair? (cdr l)))
+      (cadr l)
+      (-pmacro-error "invalid arg for .cadr" l))
+)
+
+; (.cdar expr)
+
+(define (-pmacro-builtin-cdar l)
+  (if (and (pair? l) (pair? (car l)))
+      (cdar l)
+      (-pmacro-error "invalid arg for .cdar" l))
+)
+
+; (.cddr expr)
+
+(define (-pmacro-builtin-cddr l)
+  (if (and (pair? l) (pair? (cdr l)))
+      (cddr l)
+      (-pmacro-error "invalid arg for .cddr" l))
 )
 
 ; Initialization.
 
 (define (pmacros-init!)
   (set! -pmacro-table (make-hash-table 127))
+  (set! -smacro-table (make-hash-table 41))
 
   ; Some "predefined" macros.
 
-  (-pmacro-set! '.sym
-		(-pmacro-make '.sym 'symbols #f -pmacro-sym "symbol-append"))
-  (-pmacro-set! '.str
-		(-pmacro-make '.str 'strings #f -pmacro-str "string-append"))
-  (-pmacro-set! '.hex
-		(-pmacro-make '.hex '(number . width) #f -pmacro-hex
-			      "convert to hex, with optional width"))
-  (-pmacro-set! '.upcase
-		(-pmacro-make '.upcase '(string) #f
-			      -pmacro-upcase "string-upcase"))
-  (-pmacro-set! '.downcase
-		(-pmacro-make '.downcase '(string) #f
-			      -pmacro-downcase "string-downcase"))
-  (-pmacro-set! '.substring
-		(-pmacro-make '.substring '(string start end) #f
-			      -pmacro-substring "get part of a string"))
-  (-pmacro-set! '.splice
-		(-pmacro-make '.splice 'arg-list #f -pmacro-splice
-			      "splice lists into the outer list"))
-  (-pmacro-set! '.iota
-		(-pmacro-make '.iota '(count . start-incr) #f -pmacro-iota
-			      "iota number generator"))
-  (-pmacro-set! '.map
-		(-pmacro-make '.map '(macro-name arg1 . arg-rest) #f
-			      -pmacro-map
-			      "map a macro over a list of arguments"))
-  (-pmacro-set! '.apply
-		(-pmacro-make '.apply '(macro-name arg-list) #f -pmacro-apply
-			      "apply a macro, taking arguments from a list"))
-  (-pmacro-set! '.pmacro
-		(-pmacro-make '.pmacro '(params expansion) #f -pmacro-pmacro
-			      "create a pmacro on-the-fly"))
-
-  ; doesn't work, Hobbit creates "eval" variable
-  ;(-pmacro-set! '.eval (-pmacro-make '.eval '(expr) #f eval "eval"))
-  (-pmacro-set! '.eval (-pmacro-make '.eval '(expr) #f (eval1 'eval1) "eval"))
+  (let ((macros
+	 ;; name arg-spec syntactic? function description
+	 (list
+	  (list '.sym 'symbols #f -pmacro-builtin-sym "symbol-append")
+	  (list '.str 'strings #f -pmacro-builtin-str "string-append")
+	  (list '.hex '(number . width) #f -pmacro-builtin-hex "convert to -hex, with optional width")
+	  (list '.upcase '(string) #f -pmacro-builtin-upcase "string-upcase")
+	  (list '.downcase '(string) #f -pmacro-builtin-downcase "string-downcase")
+	  (list '.substring '(string start end) #f -pmacro-builtin-substring "get start of a string")
+	  (list '.splice 'arg-list #f -pmacro-builtin-splice "splice lists into the outer list")
+	  (list '.iota '(count . start-incr) #f -pmacro-builtin-iota "iota number generator")
+	  (list '.map '(pmacro list1 . rest) #f -pmacro-builtin-map "map a macro over a list of arguments")
+	  (list '.for-each '(pmacro list1 . rest) #f -pmacro-builtin-for-each "execute a macro over a list of arguments")
+	  (list '.eval '(expr) #f -pmacro-builtin-eval "process expr immediately")
+	  (list '.apply '(macro arg-list) #f -pmacro-builtin-apply "apply a macro to a list of arguments")
+	  (list '.pmacro '(params expansion) #t -pmacro-builtin-pmacro "create a pmacro on-the-fly")
+	  (list '.let '(locals expr1 . rest) #t -pmacro-builtin-let "create a binding context")
+	  (list '.if '(expr then . else) #t -pmacro-builtin-if "if expr is true, process then, else else")
+	  (list '.case '(expr case1 . rest) #t -pmacro-builtin-case "process statement that matches expr")
+	  (list '.cond '(expr1 . rest) #t -pmacro-builtin-cond "process first statement whose expr succeeds")
+	  (list '.begin 'rest #t -pmacro-builtin-begin "process a sequence of statements")
+	  (list '.print 'exprs #f -pmacro-builtin-print "print exprs, for debugging purposes")
+	  (list '.dump '(expr)  #f-pmacro-builtin-dump "dump expr, for debugging purposes")
+	  (list '.error 'message #f -pmacro-builtin-error "print error message and exit")
+	  (list '.list 'exprs #f -pmacro-builtin-list "return a list of exprs")
+	  (list '.ref '(l n) #f -pmacro-builtin-ref "return n'th element of list l")
+	  (list '.length '(x) #f -pmacro-builtin-length "return length of symbol, string, or list")
+	  (list '.replicate '(n expr) #f -pmacro-builtin-replicate "return list of expr replicated n times")
+	  (list '.equals '(x y) #f -pmacro-builtin-equals "deep comparison of x and y")
+	  (list '.and 'rest #t -pmacro-builtin-and "return #f if any element is #f, otherwise return last element")
+	  (list '.or 'rest #t -pmacro-builtin-or "return first non-#f element, otherwise #f")
+	  (list '.not '(x) #f -pmacro-builtin-not "return !x")
+	  (list '.eq '(x y) #f -pmacro-builtin-eq "return true if x == y")
+	  (list '.ne '(x y) #f -pmacro-builtin-ne "return true if x != y")
+	  (list '.lt '(x y) #f -pmacro-builtin-lt "return true if x < y")
+	  (list '.gt '(x y) #f -pmacro-builtin-gt "return true if x > y")
+	  (list '.le '(x y) #f -pmacro-builtin-le "return true if x <= y")
+	  (list '.ge '(x y) #f -pmacro-builtin-ge "return true if x >= y")
+	  (list '.add '(x y) #f -pmacro-builtin-add "return x + y")
+	  (list '.sub '(x y) #f -pmacro-builtin-sub "return x - y")
+	  (list '.mul '(x y) #f -pmacro-builtin-mul "return x * y")
+	  (list '.div '(x y) #f -pmacro-builtin-div "return x / y")
+	  (list '.rem '(x y) #f -pmacro-builtin-rem "return x % y")
+	  (list '.sll '(x n) #f -pmacro-builtin-sll "return logical x << n")
+	  (list '.srl '(x n) #f -pmacro-builtin-srl "return logical x >> n")
+	  (list '.sra '(x n) #f -pmacro-builtin-sra "return arithmetic x >> n")
+	  (list '.bitand '(x y) #f -pmacro-builtin-bitand "return x & y")
+	  (list '.bitor '(x y) #f -pmacro-builtin-bitor "return x | y")
+	  (list '.bitxor '(x y) #f -pmacro-builtin-bitxor "return x ^ y")
+	  (list '.bitinv '(x) #f -pmacro-builtin-bitinv "return ~x")
+	  (list '.car '(x) #f -pmacro-builtin-car "return (car x)")
+	  (list '.cdr '(x) #f -pmacro-builtin-cdr "return (cdr x)")
+	  (list '.caar '(x) #f -pmacro-builtin-caar "return (caar x)")
+	  (list '.cadr '(x) #f -pmacro-builtin-cadr "return (cadr x)")
+	  (list '.cdar '(x) #f -pmacro-builtin-cdar "return (cdar x)")
+	  (list '.cddr '(x) #f -pmacro-builtin-cddr "return (cddr x)")
+	  )))
+    (for-each (lambda (x)
+		(let ((name (list-ref x 0))
+		      (arg-spec (list-ref x 1))
+		      (syntactic? (list-ref x 2))
+		      (pmacro (list-ref x 3))
+		      (comment (list-ref x 4)))
+		  (-pmacro-set! name
+				(-pmacro-make name arg-spec #f syntactic? pmacro comment))
+		  (if syntactic?
+		      (-smacro-set! name
+				    (-pmacro-make name arg-spec #f syntactic? pmacro comment)))))
+	      macros))
 )
 
 ; Initialize so we're ready to use after loading.

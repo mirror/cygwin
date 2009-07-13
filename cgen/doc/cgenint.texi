@@ -1,4 +1,4 @@
-\input texinfo       @c                    -*- Texinfo -*-
+\input texinfo       @c -*- Texinfo -*-
 @setfilename cgenint.info
 
 @c This file is work in progress.
@@ -77,7 +77,8 @@ This manual documents the internals of CGEN.
 * Applications::                Applications of CGEN
 * Source file overview::        Introduction to each source file
 * Parsing::                     Parsing of .cpu files
-* Debugging::			Debugging applications
+* Debugging applications::	Debugging applications
+* Debugging pmacros::		Debugging pmacros
 * Version numbering::           CGEN version numbering
 * Glossary::                    Glossary
 * Index::                       Index
@@ -257,8 +258,8 @@ The fixed order parser is named @code{-<object>-parse}.
 For example, see @code{-arch-parse} in @file{mach.scm}.
 It validates the parameters and then builds the requested object.
 
-@node Debugging
-@chapter Debugging
+@node Debugging applications
+@chapter Debugging applications
 
 The best way to debug your application @emph{at this point} is to
 use the @code{logit} function to get a log of what cgen is doing.
@@ -269,6 +270,25 @@ stack backtrace.  This can be useful for answering the
 
 Guile 1.8 provides better debugging facilities than previous versions.
 These need to be investigated and documented here.
+
+@node Debugging pmacros
+@chapter Debugging pmacros
+
+At the implementation level, pmacros are expanded with the
+@code{pmacro-expand} Scheme procedure.
+
+When debugging pmacros it is useful to see how they are expanded.
+When expanding them from the a Guile shell, remember that expressions
+needed to be quoted lest Scheme try to evaluate them.
+
+@smallexample
+guile> (define-pmacro '(foo a b) '(+ a b))
+guile> (pmacro-expand '(foo 3 4))
+(+ 3 4)
+@end smallexample
+
+One can also use @code{pmacro-trace} to expand a macro and trace its
+expansion.
 
 @node Index
 @unnumbered Index

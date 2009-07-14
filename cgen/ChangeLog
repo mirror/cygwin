@@ -51,6 +51,16 @@
 	* testsuite/testsuite.cpu: New file.
 	* testsuite/pmacros-1.test: New file.
 
+2009-07-12  Doug Evans  <dje@sebabeach.org>
+
+	Delete files that now live in ../cpu.
+	* cpu/iq10.cpu: Delete.
+	* cpu/iq2000.cpu: Delete.
+	* cpu/iq2000.opc: Delete.
+	* cpu/iq2000m.cpu: Delete.
+	* cpu/m32r.cpu: Delete.
+	* cpu/m32r.opc: Delete.
+
 2009-06-27  Doug Evans  <dje@sebabeach.org>
 
 	* gen-all-intrinsics: New file.

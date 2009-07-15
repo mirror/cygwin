@@ -1,3 +1,7 @@
+2009-07-15  Doug Evans  <devans@sourceware.org>
+
+	* gen-all-doc: Generate index.html.
+
 2009-07-13  Doug Evans  <dje@sebabeach.org>
 
 	Extend pmacro language, add testsuite.

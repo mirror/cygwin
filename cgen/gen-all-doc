@@ -33,7 +33,7 @@ then
     exit 1
 fi
 
-builddir=tmp-doc
+export builddir=tmp-doc
 
 rm -rf $builddir
 mkdir $builddir
@@ -76,4 +76,56 @@ export cgendir=`pwd`
       ;;
     esac
   done
+)
+
+(
+  set -e
+  set -x
+  cd $builddir
+
+  rm -f index.html
+
+  cat > index.html <<EOF
+<html>
+<head>
+<title>CGEN Machine Generated Documentation</title>
+</head>
+<body>
+
+<h1>Machine Generated Documentation</h1>
+
+<ul>
+EOF
+
+  lower="abcdefghijklmnopqrstuvwxyz"
+  upper="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+  for html in *.html
+  do
+    name=""
+
+    case $html in
+    *-insn.html) ;;
+    index.html) ;;
+    arm-arm.*) name="ARM" ;;
+    arm-thumb.*) name="ARM Thumb" ;;
+    frv-1.*) name="FRV FR400" ;;
+    frv-2.*) name="FRV FR500" ;;
+    openrisc.*) name="Openrisc" ;;
+    xstormy16.*) name="Xstormy16" ;;
+    *) name=`echo ${html/.html} | tr $lower $upper` ;;
+    esac
+
+    if [ "$name" != "" ]
+    then
+      echo "<li><a href=\"$html\">$name</a>" >> index.html
+    fi
+  done
+
+  cat >> index.html <<EOF
+</ul>
+
+</body>
+</html>
+EOF
 )

@@ -1,3 +1,7 @@
+2009-07-15  Doug Evans  <dje@sebabeach.org>
+
+	* NEWS: Add entries for 1.1 release.
+
 2009-07-12  Doug Evans  <dje@sebabeach.org>
 
 	Delete files that now live in ../cpu.

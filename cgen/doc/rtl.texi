@@ -1512,7 +1512,8 @@ Instruction enums are defined with @code{define-insn-enum}:
 @end example
 
 @emph{define-insn-enum is currently not provided,
-use define-normal-insn-enum instead.}
+use define-normal-insn-enum instead}.
+@xref{a-define-normal-insn-enum, define-normal-insn-enum}.
 
 @subsection prefix
 Convention requires each enum value to be prefixed with the same text.
@@ -1555,12 +1556,24 @@ The syntax is:
 
 @code{(define-normal-enum name comment attrs prefix vals)}
 
-The @code{define-normal-enum} pmacro takes a fixed set of
+@anchor{a-define-normal-insn-enum}
+The @code{define-normal-insn-enum} pmacro takes a fixed set of
 positional arguments for the typical instruction enum.
 The syntax is:
 
-@anchor{a-define-normal-insn-enum}
 @code{(define-normal-insn-enum name comment attrs prefix ifield vals)}
+
+Example:
+
+@example
+(dnf f-op1 "op1" () 0 4)
+(define-normal-insn-enum insn-op1 "insn format enums" () OP1_ f-op1
+  (.map .str (.iota 16))
+)
+@end example
+
+This defines an instruction enum for field @samp{f-op1} with values
+OP1_0, OP1_1, ..., OP1_15.
 
 @node Instruction operands
 @section Instruction operands

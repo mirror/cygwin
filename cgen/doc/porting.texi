@@ -102,7 +102,8 @@ following types of entries, in order.  @xref{RTL}, for detailed
 descriptions of each type of entry that appears in the description file.
 
 @menu
-* Conventions::                      Programming style conventions 
+* Conventions::                      Programming style conventions
+* simplify.inc::                     Simplifying writing @file{.cpu} files
 * Writing define-arch::              Architecture wide specs
 * Writing define-isa::               Instruction set characteristics
 * Writing define-cpu::               CPU families
@@ -162,6 +163,86 @@ values and mode names.
 @c FIXME: Seems to me there's a few others.
 This convention must be followed.
 @end enumerate
+
+@node simplify.inc
+@subsection simplify.inc
+@cindex simplify.inc
+
+The file @file{simplify.inc} provides several pmacros that help simplify
+writing @file{.cpu} files.
+
+To use it add the following to your @file{.cpu} file.
+
+@smallexample
+(include "simplify.inc")
+@end smallexample
+
+@file{simplify.inc} provides the following pmacros:
+
+@itemize @bullet
+
+@item define-normal-enum
+(@pxref{a-define-normal-enum, define-normal-enum})
+
+@item define-normal-insn-enum
+(@pxref{a-define-normal-insn-enum, define-normal-insn-enum})
+
+@c ??? Would have been nice to have called this define-simple-ifield.
+@item define-normal-ifield
+(@pxref{a-define-normal-ifield, define-normal-ifield})
+
+@item df
+(@pxref{a-df, df})
+
+@item dnf
+(@pxref{a-dnf, dnf})
+
+@item define-normal-multi-ifield
+(@pxref{a-define-normal-multi-ifield, define-normal-multi-ifield})
+
+@item dnmf
+(@pxref{a-dnmf, dnmf})
+
+@item dsmf
+(@pxref{a-dsmf, dsmf})
+
+@item define-normal-hardware
+(@pxref{a-define-normal-hardware, define-normal-hardware})
+
+@item dnh
+(@pxref{a-dnh, dnh})
+
+@item define-simple-hardware
+(@pxref{a-define-simple-hardware, define-simple-hardware})
+
+@item dsh
+(@pxref{a-dsh, dsh})
+
+@item define-normal-operand
+(@pxref{a-define-normal-operand, define-normal-operand})
+
+@item dno
+(@pxref{a-dno, dno})
+
+@item dnop
+(@pxref{a-dnop, dnop})
+
+@item dndo
+@c (@pxref{a-dndo, dndo})
+
+@item define-normal-insn
+(@pxref{a-define-normal-insn, define-normal-insn})
+
+@item dni
+(@pxref{a-dni, dni})
+
+@item define-normal-macro-insn
+(@pxref{a-define-normal-macro-insn, define-normal-macro-insn})
+
+@item dnmi
+(@pxref{a-dnmi, dnmi})
+
+@end itemize
 
 @node Writing define-arch
 @subsection Writing define-arch

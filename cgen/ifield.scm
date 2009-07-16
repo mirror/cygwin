@@ -655,8 +655,7 @@
 
 ; Define an instruction field object, all arguments specified.
 ; ??? Leave out word-offset,word-length,follows for now (RISC version).
-; Not sure whether to add another function or leave CISC cpu's to define
-; a shorthand macro if they want.
+; FIXME: Eventually this should be fixed to take *all* arguments.
 
 (define (define-full-ifield name comment attrs start length mode encode decode)
   (let ((f (-ifield-parse "define-full-ifield" name comment attrs
@@ -857,17 +856,21 @@ Define an instruction multi-field, all arguments specified.
 ; All arguments are in raw (non-evaluated) form.
 ; The result is the parsed object or #f if object isn't for selected mach(s).
 
-(define (-multi-ifield-parse errtxt name comment attrs mode subfields insert extract encode decode)
+(define (-multi-ifield-parse errtxt name comment attrs mode
+			     subfields insert extract encode decode)
   (logit 2 "Processing multi-ifield element " name " ...\n")
+
+  (if (null? subfields)
+      (parse-error errtxt "empty subfield list" subfields))
 
   (let* ((name (parse-name name errtxt))
 	 (atlist (atlist-parse attrs "cgen_ifld" errtxt))
 	 (isas (bitset-attr->list (atlist-attr-value atlist 'ISA #f))))
-    
+
     ; No longer ensure only one isa specified.
     ; (if (!= (length isas) 1) 
     ;     (parse-error errtxt "can only specify 1 isa" attrs))
-    
+
     (if (keep-isa-atlist? atlist #f)
 	(begin
 	  (let ((result (new <multi-ifield>))
@@ -877,7 +880,7 @@ Define an instruction multi-field, all arguments specified.
 					(parse-error errtxt "unknown ifield" subfld))
 				    f))
 				subfields)))
-	    
+
 	    (elm-xset! result 'name name)
 	    (elm-xset! result 'comment (parse-comment comment errtxt))
 					; multi-ifields are always VIRTUAL
@@ -933,7 +936,8 @@ Define an instruction multi-field, all arguments specified.
 	      (else (parse-error errtxt "invalid ifield arg" arg)))
 	    (loop (cdr arg-list)))))
     ; Now that we've identified the elements, build the object.
-    (-multi-ifield-parse errtxt name comment attrs mode subflds insert extract encode decode)
+    (-multi-ifield-parse errtxt name comment attrs mode subflds
+			 insert extract encode decode)
     )
 )
 
@@ -948,6 +952,7 @@ Define an instruction multi-field, all arguments specified.
 )
 
 ; Define an instruction multi-field object, all arguments specified.
+; FIXME: encode/decode arguments are missing.
 
 (define (define-full-multi-ifield name comment attrs mode subflds insert extract)
   (let ((f (-multi-ifield-parse "define-full-multi-ifield" name comment attrs
@@ -1035,8 +1040,8 @@ Define an instruction multi-field, all arguments specified.
 		   (derived-ifield-subfields self))))
 )
 
-
 ; Traverse the ifield to collect all base (non-derived) ifields used in it.
+
 (define (ifld-base-ifields ifld)
   (cond ((derived-ifield? ifld) (collect (lambda (subfield) (ifld-base-ifields subfield))
 					 (derived-ifield-subfields ifld)))
@@ -1044,8 +1049,6 @@ Define an instruction multi-field, all arguments specified.
 	; 			       (multi-ifld-subfields ifld)))
 	(else (list ifld)))
 )
-
-
 
 ; Misc. utilities.
 

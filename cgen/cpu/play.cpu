@@ -134,11 +134,17 @@
   (set (newval) (nop))
 )
 
-; These bits are actualy part of the PS register
+; These bits are actually part of the PS register
 (dsh h-nbit "negative bit" () (register BI))
 (dsh h-zbit "zero     bit" () (register BI))
 (dsh h-vbit "overflow bit" () (register BI))
 (dsh h-cbit "carry    bit" () (register BI))
+
+(define-hardware
+  (name ps)
+  (type register QI)
+  (layout h-nbit h-zbit h-vbit h-cbit (0 4))
+)
 
 (dsh h-df "df test" () (register DF))
 (dsh h-tf "tf test" () (register TF))

@@ -133,8 +133,14 @@ otherwise specified all fields must be present.
 @item Symbols used to be allowed anywhere a string can be used.
 This is what earlier versions of Guile supported.
 Guile is more strict now, so this relaxation is gone.
-The reverse has always not been allowed, strings can't be used in place
+The reverse is generally not allowed, strings can't be used in place
 of symbols.
+@item Use @samp{()} or @samp{#f} to indicate ``not specified'',
+unless otherwise specified.  This is not necessary for
+@samp{define-foo} elements, one can just elide the entry,
+but it is useful for @samp{define-*-foo} that take a fixed number
+of arguments.  E.g., @samp{define-normal-ifield}.
+Whether to use @samp{()} or @samp{#f} is largely a matter of style.
 @end itemize
 
 @node Definitions
@@ -151,10 +157,17 @@ style is easier to construct from macros though.)
 
 While the general case is flexible, it also is excessively verbose in
 the normal case.  To reduce this verbosity, a second version of most
-define-foo's exists that takes positional arguments.  To further reduce
-this verbosity, preprocessor macros can be written to simplify things
-further for the normal case.  See sections titled ``Simplification
-macros'' later in this manual.
+define-foo's, generally named @samp{define-normal-foo} or
+@samp{define-simple-foo}, exist that takes a fixed number
+of positional arguments.  With pmacros they can be even shortened further
+to just their acronym.  E.g. @samp{define-normal-ifield} -> @samp{dnf}.
+Ports are free to write their own preprocessor macros to
+simplify things further as desired.
+See sections titled ``Simplification macros'' later in this chapter.
+
+@c define-full-foo's are not documented on purpose.
+@c They're fragile (e.g. if a new element is added),
+@c and their use is discouraged.
 
 @node Attributes
 @section Attributes
@@ -786,13 +799,14 @@ Hardware elements are defined with:
   (indices index-type index-arg1 index-arg2 ...)
   (values values-type values-arg1 values-arg2 ...)
   (handlers handler1 handler2 ...)
-  (get (args) (expression))
-  (set (args) (expression))
+  (get (args) expression)
+  (set (args) expression)
+  (layout layout-list)
 )
 @end example
 
-The only required members are @samp{name} and @samp{type}. Convention
-requires @samp{hardware-name} begin with @samp{h-}.
+The only required elements are @samp{name} and @samp{type}.
+Convention requires @samp{hardware-name} begin with @samp{h-}.
 
 @subsection attrs
 
@@ -1044,6 +1058,40 @@ in the register.  This may involve storing values in other registers as well.
 
 @code{index} is the name of the index as it appears in @code{expression}.
 
+@subsection layout
+
+For specific hardware elements, specifying a layout is an alternative
+to providing getter/setter specs.
+
+At present this applies to only @samp{register} hardware elements,
+but not the @samp{pc}.
+
+Some registers are a collection of bits with different meanings.
+It is often useful to define each field of such a register as its
+own register.  The @samp{layout} spec can then be used to build up
+the outer register from the individual register fields.
+
+The fields are written from least to most significant.
+Each field is either the name of another hardware register,
+or a list of (value length) to specify hardwired bits.
+
+A typical example is a ``flags'' register.
+Here is an example for a fictitious flags register.
+It is eight bits wide, with the lower four bits having defined values,
+and the upper four bits hardwired to zero.
+
+@smallexample
+(dsh h-cf "carry flag"    () (register BI))
+(dsh h-sf "sign flag"     () (register BI))
+(dsh h-of "overflow flag" () (register BI))
+(dsh h-zf "zero flag"     () (register BI))
+(define-hardware
+  (name flags)
+  (type register QI)
+  (layout (h-cf h-sf h-of h-zf (0 4)))
+)
+@end smallexample
+
 @subsection Predefined hardware elements
 
 Several hardware types are predefined:
@@ -1084,7 +1132,7 @@ If get/set specs are required, define it as:
 @end example
 
 If the architecture has multiple instruction sets, all must be specified.
-If they're not, the default is the first one which is not what you want.
+If they're not, the default is the first one which is often not what you want.
 Here's an example from @file{arm.cpu}:
 
 @example
@@ -1102,10 +1150,13 @@ Here's an example from @file{arm.cpu}:
 
 @subsection Simplification macros
 
-To simplify @file{.cpu} files, the @code{dnh}
-(@code{define-normal-hardware}) macro exists that takes a fixed set of
-positional arguments for the typical hardware element.  The syntax of
-@code{dnh} is:
+To simplify @file{.cpu} files several pmacros are provided.
+
+@anchor{a-define-normal-hardware}
+@anchor{a-dnh}
+The @code{define-normal-hardware} pmacro (with alias @code{dnh})
+takes a fixed set of positional arguments for the typical hardware element.
+The syntax is:
 
 @code{(dnh name comment attributes type indices values handlers)}
 
@@ -1128,8 +1179,10 @@ This defines an array of 16 registers of mode @code{WI} ("word int").
 The names of the registers are @code{r0...r15}, and registers 13, 14 and 
 15 also have the names @code{fp}, @code{lr} and @code{sp} respectively.
 
+@anchor{a-define-simple-hardware}
+@anchor{a-dsh}
 Scalar registers with no special requirements occur frequently.
-Macro @code{dsh} (@code{define-simple-hardware}) is identical to
+Macro @code{define-simple-hardware} (with alias @code{dsh}) is identical to
 @code{dnh} except does not include the @code{indices}, @code{values},
 or @code{handlers} specs.
 
@@ -1139,7 +1192,7 @@ or @code{handlers} specs.
 
 @node Instruction fields
 @section Instruction fields
-@cindex Fields, instruction
+@cindex Instruction fields
 
 Instruction fields define the raw bitfields of each instruction.
 Minimal semantic meaning is attributed to them.  Support is provided for
@@ -1163,6 +1216,8 @@ The syntax for defining instruction fields is:
   (decode (value pc) (rtx to describe decoding))
 )
 @end example
+
+The required elements are: @samp{name}, @samp{start}, @samp{length}.
 
 (*Note: Whether to also provide a way to specify instruction formats is not yet
 clear.  Currently they are computed from the instructions, so there's no
@@ -1215,6 +1270,7 @@ value is based on other values.  Multi-ifields are always virtual.
 @subsection word-offset
 The offset in bits from the start of the instruction to the word containing
 the field.
+This must be a multiple of eight.
 
 Either both of @samp{word-offset} and @samp{word-length} must be
 specified or neither of them must be specified.  The presence of
@@ -1224,6 +1280,7 @@ being used.  If absent then the short form is being used and the value for
 
 @subsection word-length
 The length in bits of the word containing the field.
+This must be a multiple of eight.
 
 @subsection start
 The bit number of the field's most significant bit in the instruction.
@@ -1238,8 +1295,7 @@ the word offset.  See the Porting document for more info
 
 @subsection length
 The number of bits in the field.  The field must be contiguous.  For
-non-contiguous instruction fields use "multi-ifields"
-(@pxref{Instruction fields}).
+non-contiguous instruction fields use ``multi-ifields''.
 
 @subsection follows
 Optional.  Experimental.
@@ -1309,7 +1365,7 @@ would never have an invalid value, though certainly one could provide an
 error case if one wanted to.
 
 @subsection Non-contiguous fields
-@cindex Fields, non-contiguous
+@cindex Instruction fields, non-contiguous
 
 Non-contiguous fields (e.g. sparc64's 16 bit displacement field) are
 built on top of support for contiguous fields.  The syntax for defining
@@ -1324,11 +1380,12 @@ such fields is:
   (subfields field1-name field2-name ...)
   (insert (code to set each subfield))
   (extract (code to set field from subfields))
+  (encode (value pc) (rtx to describe encoding))
+  (decode (value pc) (rtx to describe decoding))
 )
 @end example
 
-(*Note: insert/extract are analogous to encode/decode so maybe these
-fields are misnamed.  The operations are subtly different though.)
+The required elements are: @samp{name}, @samp{subfields}.
 
 Example:
 
@@ -1350,34 +1407,41 @@ Example:
 )
 @end example
 
-@subsection subfields
+@subsubsection subfields
 The names of the already defined fields that make up the multi-ifield.
 
-@subsection insert
+@subsubsection insert
 Code to set the subfields from the multi-ifield. All fields are referred
 to with @code{(ifield <name>)}.
 
-@subsection extract
+@subsubsection extract
 Code to set the multi-ifield from the subfields. All fields are referred
 to with @code{(ifield <name>)}.
 
 @subsection Simplification macros
-To simplify @file{.cpu} files, the @code{dnf}, @code{df} and @code{dnmf}
-macros have been created. Each takes a fixed set of positional arguments
-for the typical instruction field.  @code{dnf} is short for
-@code{define-normal-field}, @code{df} is short for @code{define-field},
-and @code{dnmf} is short for @code{define-normal-multi-ifield}.
 
-The syntax of @code{dnf} is:
+To simplify @file{.cpu} files several pmacros are provided.
+
+@anchor{a-define-normal-ifield}
+@anchor{a-dnf}
+The @code{define-normal-ifield} pmacro (with alias @code{dnf})
+takes a fixed set of positional arguments for the typical instruction field.
+The syntax is:
 
 @code{(dnf name comment attributes start length)}
 
 Example:
 
-@code{(dnf f-r1 "register r1" () 4 4)}
+@example
+(dnf f-r1 "register r1" () 4 4)
+@end example
 
 This defines a field called @samp{f-r1} that is an unsigned field of 4
 bits beginning at bit 4.  All fields defined with @code{dnf} are unsigned.
+
+@anchor{a-df}
+The @code{df} pmacro adds @code{mode}, @code{encode}, and
+@code{decode} elements.
 
 The syntax of @code{df} is:
 
@@ -1396,9 +1460,20 @@ Example:
 This defines a field called @samp{f-disp8} that is a signed PC-relative
 address beginning at bit 8 of size 8 bits that is left shifted by 2.
 
-The syntax of @code{dnmf} is:
+@anchor{a-define-normal-multi-ifield}
+@anchor{a-dnmf}
+The macro @code{define-normal-multi-ifield} (with alias @code{dnmf})
+takes a fixed set of positional arguments for the typical multi-ifield.
+The syntax is:
 
 @code{(dnmf name comment attributes mode subfields insert extract)}
+
+@anchor{a-dsmf}
+The macro @code{dsmf} takes a fixed set of positional arguments for
+simple multi-ifields.
+The syntax is:
+
+@code{(dsmf name comment attributes mode subfields)}
 
 @node Enumerated constants
 @section Enumerated constants
@@ -1406,8 +1481,8 @@ The syntax of @code{dnmf} is:
 @cindex Enumerations
 
 Enumerated constants (@emph{enums}) are important enough in instruction
-set descriptions that they are given special treatment. Enums are
-defined with:
+set descriptions that they are given special treatment.
+Enums are defined with:
 
 @example
 (define-enum
@@ -1423,32 +1498,21 @@ Enums in opcode fields are further enhanced by specifying the opcode
 field they are used in.  This allows the enum's name to be specified
 in an instruction's @code{format} entry.
 
+Instruction enums are defined with @code{define-insn-enum}:
+
 @example
 (define-insn-enum
   (name enum-name)
   (comment "description")
-  (attrs (attribute list))
+  (attrs attribute-list)
+  (ifield ifield-name)
   (prefix prefix)
-  (ifield instruction-field-name)
   (values val1 val2 ...)
 )
 @end example
 
-(*Note: @code{define-insn-enum} isn't implemented yet: use
-@code{define-normal-insn-enum})
-
-Example:
-
-@example
-(define-insn-enum
-  (name insn-op1)
-  (comment "op1 field values")
-  (prefix OP1_)
-  (ifield f-op1)
-  (values "0" "1" "2" "3" "4" "5" "6" "7"
-          "8" "9" "10" "11" "12" "13" "14" "15")
-)
-@end example
+@emph{define-insn-enum is currently not provided,
+use define-normal-insn-enum instead.}
 
 @subsection prefix
 Convention requires each enum value to be prefixed with the same text.
@@ -1482,12 +1546,25 @@ Example:
 
 @subsection Simplification macros
 
+To simplify @file{.cpu} files several pmacros are provided.
+
+@anchor{a-define-normal-enum}
+The @code{define-normal-enum} pmacro takes a fixed set of
+positional arguments for the typical enum.
+The syntax is:
+
 @code{(define-normal-enum name comment attrs prefix vals)}
 
+The @code{define-normal-enum} pmacro takes a fixed set of
+positional arguments for the typical instruction enum.
+The syntax is:
+
+@anchor{a-define-normal-insn-enum}
 @code{(define-normal-insn-enum name comment attrs prefix ifield vals)}
 
 @node Instruction operands
 @section Instruction operands
+@cindex Instruction operands
 @cindex Operands, instruction
 
 Instruction operands provide:
@@ -1499,7 +1576,7 @@ the semantic code
 @c More?
 @end itemize
 
-The syntax is:
+The syntax for defining an operand is:
 
 @example
 (define-operand
@@ -1507,10 +1584,19 @@ The syntax is:
   (comment "description")
   (attrs attribute-list)
   (type hardware-element)
+  (mode mode-name)
   (index instruction-field)
-  (asm asm-spec)
+  (handlers handler-spec)
+  (getter getter-spec)
+  (setter setter-spec)
 )
 @end example
+
+The required elements are: @code{name}, @code{type}, @code{mode},
+and if @code{type} is not a scaler @code{index}.
+
+There is no convention for prefixing operands,
+and generally for readability's sake operands don't have a prefix.
 
 @subsection name
 
@@ -1567,20 +1653,23 @@ use in semantic code than referring to the hardware element directly
 The hardware element this operand applies to. This must be the name of a
 hardware element.
 
+@subsection mode
+The mode the value is to be interpreted in.
+
 @subsection index
 The index of the hardware element. This is used to mate the hardware
 element with the instruction field that selects it, and must be the name
 of an ifield entry. (*Note: The index may be other things besides
 ifields in the future.)  It must not be a multi-ifield, currently.
 
-@subsection asm
+@subsection handlers
 Sometimes it's necessary to escape to C to parse assembler, or print
 a value.  This field is an escape hatch to implement this.
-The current syntax is:
+The syntax is:
 
-@code{(asm asm-spec)}
+@code{(handlers handler-spec)}
 
-where @code{asm-spec} is one or more of:
+where @code{handler-spec} is one or more of:
 
 @code{(parse "function_suffix")} -- a call to function
 @code{parse_<function_suffix>} is generated.
@@ -1590,7 +1679,7 @@ where @code{asm-spec} is one or more of:
 
 These functions are intended to be provided in a separate @file{.opc}
 file.  The prototype of a parse function depends on the hardware type.
-See @file{cgen/cpu/*.opc} for examples.
+See @file{cpu/*.opc} for examples.
 
 @c FIXME: The following needs review.
 
@@ -1617,7 +1706,7 @@ relocations are processed after the instruction has been parsed.
 The result is an error message or NULL if successful.
 
 The prototype of a print function depends on the hardware type.  See
-@file{cgen/cpu/*.opc} for examples. For integers it is:
+@file{cpu/*.opc} for examples. For integers it is:
 
 @example
 void print_foo (CGEN_CPU_DESC cd,
@@ -1638,8 +1727,33 @@ void print_foo (CGEN_CPU_DESC cd,
 Actual printing is done by calling @code{((disassemble_info *)
 dis_info)->fprintf_func}.
 
+@subsection Simplification macros
+
+To simplify @file{.cpu} files several pmacros are provided.
+
+@anchor{a-define-normal-operand}
+@anchor{a-dno}
+@anchor{a-dnop}
+The @code{define-normal-operand}) pmacro (with alias @code{dno})
+takes a fixed set of positional arguments for the typical operand.
+
+There is also the @code{dnop} pmacro, it is an alias of @code{dno}.
+
+The syntax of @code{dno} is:
+
+@code{(dno name comment attrs type index)}
+
+Example:
+
+@example
+(dno sr "source register" () h-gr f-r2)
+@end example
+
+This defines an operand name @samp{sr} that is an @samp{h-gr} register
+indexed by the @samp{f-r2} ifield.
+
 @node Derived operands
-@section Derived Operands
+@section Derived operands
 @cindex Derived operands
 @cindex Operands, instruction
 @cindex Operands, derived
@@ -1654,8 +1768,8 @@ complex operands the place to add the necessary support is in the
 operands.
 
 Two kinds of operands exist to support CISC-like cpus, and they work
-together.  "derived-operands" describe one variant of a complex
-argument, and "anyof" operands group them together.
+together.  ``derived-operands'' describe one variant of a complex
+argument, and ``anyof'' operands group them together.
 
 The syntax for defining derived operands is:
 
@@ -1763,10 +1877,13 @@ The syntax for defining an instruction is:
   (attrs attribute-list)
   (syntax "assembler syntax")
   (format (+ field-list))
-  (semantics (semantic-expression))
+  (ifield-assertion expression)
+  (semantics expression)
   (timing timing-data)
 )
 @end example
+
+The required elements are: @code{name}, ???.
 
 Instructions specific to a particular cpu variant are denoted as such with
 the MACH attribute.
@@ -1873,6 +1990,11 @@ Format elements can be any of:
 @item an operand name, e.g. @code{dr}
 @end itemize
 
+@subsection ifield-assertion
+
+This is an expression with a boolean result that is run as the final
+part of instruction decoding to verify a match.
+
 @subsection semantics
 @cindex Semantics
 
@@ -1915,9 +2037,12 @@ unit and is optional.
 
 @subsection Simplification macros
 
-To simplify @file{.cpu} files, the @code{dni} macro has been created.
-It takes a fixed set of positional arguments for the typical instruction
-field.  @code{dni} is short for @code{define-normal-insn}.
+To simplify @file{.cpu} files several pmacros are provided.
+
+@anchor{a-define-normal-insn}
+@anchor{a-dni}
+The @code{define-normal-insn} pmacro (with alias @code{dni})
+takes a fixed set of positional arguments for the typical instruction.
 
 The syntax of @code{dni} is:
 
@@ -1941,7 +2066,7 @@ Example:
 @cindex Instructions, macro
 
 Macro-instructions are for the assembler side of things and are not used
-by the simulator. The syntax for defining a macro-instruction is:
+by the simulator.  The syntax for defining a macro-instruction is:
 
 @example
 (define-macro-insn
@@ -1975,6 +2100,19 @@ in @code{insn}'s syntax and may be any of:
 @item operand specified in @code{syntax}
 @item @code{(operand value)}
 @end itemize
+
+@subsection Simplification macros
+
+To simplify @file{.cpu} files several pmacros are provided.
+
+@anchor{a-define-normal-macro-insn}
+@anchor{a-dnmi}
+The @code{define-normal-macro-insn}) pmacro (with alias @code{dnmi})
+takes a fixed set of positional arguments for the typical macro-instruction.
+
+The syntax of @code{dnmi} is:
+
+@code{(dnmi name comment attrs syntax expansion)}
 
 Example:
 

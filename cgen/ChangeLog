@@ -1,5 +1,14 @@
 2009-07-16  Doug Evans  <dje@sebabeach.org>
 
+	* cpu/play.cpu: Add example of hardware `layout'.
+	* doc/porting.tex: Add docs on simplify.inc.
+	* doc/rtl.texi: Cleanup pass over "Simplification macros",
+	and other things.
+
+	* ifield.scm: Whitespace/formatting cleanup.
+
+	* ifield.scm (-multi-ifield-parse): Watch for missing subfields.
+
 	* read.scm (parse-error): Don't print single entry args as a list.
 	(-reader-process-expanded-1): Convert symbol to string for
 	string-append.

@@ -1,5 +1,9 @@
 2009-07-16  Doug Evans  <dje@sebabeach.org>
 
+	* read.scm (parse-error): Don't print single entry args as a list.
+	(-reader-process-expanded-1): Convert symbol to string for
+	string-append.
+
 	* insn.scm (multi-insn-instantiate!): Tweak logging message.
 
 2009-07-15  Doug Evans  <dje@sebabeach.org>

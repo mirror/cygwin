@@ -1,5 +1,7 @@
 2009-07-16  Doug Evans  <dje@sebabeach.org>
 
+	* doc/porting.texi (Conventions): Add docs on writing integers.
+
 	* cpu/simplify.inc (*): One line doc strings don't need \n.
 	(df): Invoke define-full-ifield instead of claiming it's an alias.
 	(dno): Define.

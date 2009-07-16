@@ -125,7 +125,8 @@ descriptions of each type of entry that appears in the description file.
 
 First a digression on conventions and programming style.
 
-@enumerate
+@itemize @bullet
+
 @item @code{define-foo} vs. @code{define-normal-foo}
 
 Each CPU description @code{define-} entry generally provides two forms:
@@ -162,7 +163,38 @@ The convention is to have most things lowercase with words separated by
 values and mode names.
 @c FIXME: Seems to me there's a few others.
 This convention must be followed.
+
+@item Integers
+
+There are two things to keep in mind regarding integers in CGEN.
+
+@enumerate
+
+@item Unspecified width
+
+Integers in CGEN generally don't specify a width.
+The width is imposed by context.
+
+@item RTL canonicalization
+
+Integers in RTL may simply be written as a number,
+or in the full canonical form as
+@samp{(const [<option-list>] [<mode>] <value>)}.
+
+The ``option list'', if specified, must be @samp{()}
+as there are currently no options for constants.
+It is optional and is generally elided when written.
+
+The ``mode'' of the number specifies the precision.
+The default mode is @samp{INT} meaning arbitrary precision.
+
+In RTL, whether to write just the number, e.g. @samp{24},
+or the full canonical form, e.g., @samp{(const () INT 24)},
+or anything in between is a matter of style.
+
 @end enumerate
+
+@end itemize
 
 @node simplify.inc
 @subsection simplify.inc

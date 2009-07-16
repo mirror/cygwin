@@ -286,9 +286,15 @@
 )
 
 ; Signal a parse error while reading a .cpu file.
+; FIXME: Add expr arg and change args to optional help text.
 
 (define (parse-error errtxt message . args)
-  (reader-error (string-append errtxt ": " message ":") args "")
+  (cond ((null? args)
+	 (reader-error (string-append errtxt ": " message ":") "" ""))
+	((= (length args) 1)
+	 (reader-error (string-append errtxt ": " message ":") (car args) ""))
+	(else
+	 (reader-error (string-append errtxt ": " message ":") args "")))
 )
 
 ; Process a macro-expanded entry.
@@ -304,7 +310,7 @@
 	      ; Variable number of trailing arguments.
 	      (if (< (length (cdr entry)) (car num-args))
 		  (reader-error (string-append "Incorrect number of arguments to "
-					       (car entry)
+					       (symbol->string (car entry))
 					       ", expecting at least "
 					       (number->string (car num-args)))
 				entry
@@ -313,7 +319,7 @@
 	      ; Fixed number of arguments.
 	      (if (!= (length (cdr entry)) (car num-args))
 		  (reader-error (string-append "Incorrect number of arguments to "
-					       (car entry)
+					       (symbol->string (car entry))
 					       ", expecting "
 					       (number->string (car num-args)))
 				entry

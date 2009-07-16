@@ -322,10 +322,9 @@
 ; the global list, and leave it to the caller to add them.
 
 (define (multi-insn-instantiate! multi-insn)
-  (logit 2 "Instantiating " (obj:name multi-insn) " ...\n")
+  (logit 2 "Instantiating multi-insns for " (obj:name multi-insn) " ...\n")
 
   ; We shouldn't get called more than once.
-  ; ??? Though we could ignore second and subsequent calls.
   (assert (not (multi-insn-sub-insns multi-insn)))
 
   (let ((iflds (insn-iflds multi-insn)))

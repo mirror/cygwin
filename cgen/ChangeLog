@@ -34,8 +34,8 @@
 	(arch-analyze-insns!): Add hack to avoid differences in generated code.
 	Update use of arch-insn-list.
 	(mach-init!): Initialize ifld-table, op-table, insn-table, minsn-table.
-	(arch-finish!): Delete references to ifld-table, op-table, insn-table,
-	minsn-table.
+	(arch-finish!): Delete references to ifld-list, op-list, insn-list,
+	minsn-list.
 	* minsn.scm (<macro-insn>): Subclass from <ordered-ident> instead of
 	<ident>.  New constructor.
 	* operand.scm (<operand>): Subclass from <ordered-ident> instead of

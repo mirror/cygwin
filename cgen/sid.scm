@@ -1646,13 +1646,29 @@
   (non-multi-insns (real-insns (current-insn-list)))
 )
 
+;; Subroutine of -create-virtual-insns!.
+;; Add virtual insn INSN to the database.
+;; We put virtual insns ahead of normal insns because they're kind of special,
+;; and it helps to see them first in lists.
+;; ORDINAL is a used to place the insn ahead of normal insns;
+;; it is a pair so we can do the update for the next virtual insn here.
+
+(define (-virtual-insn-add! ordinal insn)
+  (obj-set-ordinal! insn (cdr ordinal))
+  (current-insn-add! insn)
+  (set-cdr! ordinal (- (cdr ordinal) 1))
+)
+
 ; Create the virtual insns.
 
 (define (-create-virtual-insns! isa)
   (let ((isa-name (obj:name isa))
-	(context "virtual insns"))
+	(context "virtual insns")
+	;; Record as a pair so -virtual-insn-add! can update it.
+	(ordinal (cons #f -1)))
 
-    (current-insn-add!
+    (-virtual-insn-add!
+     ordinal
      (insn-read context
 		'(name x-invalid)
 		'(comment "invalid insn handler")
@@ -1669,7 +1685,8 @@
 
     (if (with-pbb?)
 	(begin
-	  (current-insn-add!
+	  (-virtual-insn-add!
+	   ordinal
 	   (insn-read context
 		      '(name x-begin)
 		      '(comment "pbb begin handler")
@@ -1682,7 +1699,8 @@
 "))
 		      ))
 
-	  (current-insn-add!
+	  (-virtual-insn-add!
+	   ordinal
 	   (insn-read context
 		      '(name x-chain)
 		      '(comment "pbb chain handler")
@@ -1700,7 +1718,8 @@
 "))
 		      ))
 
-	  (current-insn-add!
+	  (-virtual-insn-add!
+	   ordinal
 	   (insn-read context
 		      '(name x-cti-chain)
 		      '(comment "pbb cti-chain handler")
@@ -1718,7 +1737,8 @@
 "))
 		      ))
 
-	  (current-insn-add!
+	  (-virtual-insn-add!
+	   ordinal
 	   (insn-read context
 		      '(name x-before)
 		      '(comment "pbb before handler")
@@ -1731,7 +1751,8 @@
 "))
 		      ))
 
-	  (current-insn-add!
+	  (-virtual-insn-add!
+	   ordinal
 	   (insn-read context
 		      '(name x-after)
 		      '(comment "pbb after handler")
@@ -1750,7 +1771,8 @@
     ; insn to handle that.
     (if (and (with-pbb?)
 	     (isa-conditional-exec? isa))
-	(current-insn-add!
+	(-virtual-insn-add!
+	 ordinal
 	 (insn-read context
 		    '(name x-cond)
 		    '(syntax "conditional exec test")
@@ -1860,28 +1882,25 @@
 
 	(begin
 	  (logit 1 "Splitting instructions ...\n")
-	  ; FIXME: We shouldn't need to know the innards of how insn lists
-	  ; are recorded.
-	  (let loop ((insns (current-raw-insn-list)))
-	    (if (null? insns)
-		#f ; done
-		(let ((insn (insn-list-car insns)))
-		  (if (and (insn-real? insn)
-			   (insn-semantics insn)
-			   (-decode-split-insn? insn isa))
-		      (begin
-			(for-each (lambda (new-insn)
-				    ; Splice new insns next to original.
-				    ; Keeps things tidy and generated code
-				    ; easier to read for human viewer.
-				    (let ((new-list (insn-list-splice! insns new-insn)))
-				      ; Assign insns separately.  Paranoia,
-				      ; insn-list-splice! modifies the list.
-				      (set! insns new-list))
-				    )
-				  (-decode-split-insn insn isa))
-			(obj-cons-attr! insn (bool-attr-make 'ALIAS #t))))
-		  (loop (cdr insns)))))
+	  (for-each (lambda (insn)
+		      (if (and (insn-real? insn)
+			       (insn-semantics insn)
+			       (-decode-split-insn? insn isa))
+			  (let ((ord (obj-ordinal insn))
+				(sub-ord 1))
+			    (for-each (lambda (new-insn)
+					;; Splice new insns next to original.
+					;; Keeps things tidy and generated code
+					;; easier to read for human viewer.
+					;; This is done by using an ordinal of
+					;; (major . minor).
+					(obj-set-ordinal! new-insn
+							  (cons ord sub-ord))
+					(current-insn-add! new-insn)
+					(set! sub-ord (+ sub-ord 1)))
+				      (-decode-split-insn insn isa))
+			    (obj-cons-attr! insn (bool-attr-make 'ALIAS #t)))))
+		    (current-insn-list))
 	  (logit 1 "Done splitting.\n"))
 	))
 

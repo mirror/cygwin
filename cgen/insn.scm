@@ -7,7 +7,7 @@
 
 (define <insn>
   (class-make '<insn>
-	      '(<ident>)
+	      '(<ordered-ident>)
 	      '(
 		; Used to explicitly specify mnemonic, now it's computed from
 		; syntax string.  ??? Might be useful as an override someday.
@@ -309,7 +309,16 @@
 		     (insn-timing insn)
 		     )))
 	  (logit 3 "   instantiated.\n")
-	  (current-insn-add! sub-insn))
+	  (current-insn-add! sub-insn)
+
+	  ;; FIXME: Hack to remove differences in generated code when we
+	  ;; switched to recording insns in hash tables.
+	  ;; See similar comment in arch-analyze-insns!.
+	  ;; Make the ordinals count backwards.
+	  ;; Subtract 2 because mach.scm:-get-next-ordinal! adds 1.
+	  (arch-set-next-ordinal! CURRENT-ARCH
+				  (- (arch-next-ordinal CURRENT-ARCH) 2))
+	  )
 
 	(begin
 	  logit 3 "    failed ifield assertions.\n")))
@@ -322,8 +331,6 @@
 ; the global list, and leave it to the caller to add them.
 
 (define (multi-insn-instantiate! multi-insn)
-  (logit 2 "Instantiating multi-insns for " (obj:name multi-insn) " ...\n")
-
   ; We shouldn't get called more than once.
   (assert (not (multi-insn-sub-insns multi-insn)))
 
@@ -353,6 +360,10 @@
 	     (todo (map anyof-all-choices anyof-operands))
 	     (lengths (map length todo))
 	     (total (apply * lengths)))
+
+	(logit 2 "Instantiating " total " multi-insns for "
+	       (obj:name multi-insn) " ...\n")
+
 	; ??? One might prefer a `do' loop here, but every time I see one I
 	; have to spend too long remembering its syntax.
 	(let loop ((i 0))

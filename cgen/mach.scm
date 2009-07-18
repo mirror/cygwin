@@ -13,6 +13,8 @@
 	      '(
 		; An object of type <arch-data>.
 		data
+
+		;; ??? All should really be assumed to be a black-box table.
 		(attr-list . (() . ()))
 		(enum-list . ())
 		(kw-list . ())
@@ -20,14 +22,15 @@
 		(cpu-list . ())
 		(mach-list . ())
 		(model-list . ())
-		(ifld-list . ())
+		(ifld-table . ())
 		(hw-list . ())
-		(op-list . ())
+		(op-table . ())
 		(ifmt-list . ())
 		(sfmt-list . ())
-		(insn-list . ())
-		(minsn-list . ())
+		(insn-table . ())
+		(minsn-table . ())
 		(subr-list . ())
+
 		(insn-extract . #f) ; FIXME: wip (and move elsewhere)
 		(insn-execute . #f) ; FIXME: wip (and move elsewhere)
 
@@ -40,6 +43,9 @@
 		(semantics-analyzed? . #f)
 		; #t if alias insns were included in the analysis
 		(aliases-analyzed? . #f)
+
+		; ordinal of next object that needs one
+		(next-ordinal . 0)
 		)
 	      nil)
 )
@@ -52,10 +58,11 @@
   (data
    attr-list enum-list kw-list
    isa-list cpu-list mach-list model-list
-   ifld-list hw-list op-list ifmt-list sfmt-list
-   insn-list minsn-list subr-list
+   ifld-table hw-list op-table ifmt-list sfmt-list
+   insn-table minsn-table subr-list
    derived
    insns-analyzed? semantics-analyzed? aliases-analyzed?
+   next-ordinal
    )
 )
 
@@ -63,11 +70,129 @@
   (data
    attr-list enum-list kw-list
    isa-list cpu-list mach-list model-list
-   ifld-list hw-list op-list ifmt-list sfmt-list
-   insn-list minsn-list subr-list
+   ifld-table hw-list op-table ifmt-list sfmt-list
+   insn-table minsn-table subr-list
    derived
    insns-analyzed? semantics-analyzed? aliases-analyzed?
+   next-ordinal
    )
+)
+
+; For elements recorded as a table, return a sorted list.
+; ??? All elements should really be assumed to be a black-box table.
+
+(define (arch-ifld-list arch)
+  (-ident-object-table->list (arch-ifld-table arch))
+)
+
+(define (arch-op-list arch)
+  (-ident-object-table->list (arch-op-table arch))
+)
+
+(define (arch-insn-list arch)
+  (-ident-object-table->list (arch-insn-table arch))
+)
+
+(define (arch-minsn-list arch)
+  (-ident-object-table->list (arch-minsn-table arch))
+)
+
+;; Get the next ordinal and increment it for the next time.
+
+(define (-get-next-ordinal! arch)
+  (let ((ordinal (arch-next-ordinal arch)))
+    (arch-set-next-ordinal! arch (+ ordinal 1))
+    ordinal)
+)
+
+;; FIXME: temp hack for current-ifld-lookup, current-op-lookup.
+;; Return the element of list L with the lowest ordinal.
+
+(define (-get-lowest-ordinal l)
+  (let ((lowest-obj #f)
+	(lowest-ord (-get-next-ordinal! CURRENT-ARCH)))
+    (for-each (lambda (elm)
+		(if (< (obj-ordinal elm) lowest-ord)
+		    (begin
+		      (set! lowest-obj elm)
+		      (set! lowest-ord (obj-ordinal elm)))))
+	      l)
+    lowest-obj)
+)
+
+;; Table of <ordered-ident> objects with two access styles:
+;; hash lookup, ordered list.
+;; The main table is the hash table, the list is lazily created and cached.
+;; The table is recorded as (hash-table . list).
+;; The list is #f if it needs to be computed.
+;; Each entry in the hash table is a list, multiple objects can have the same
+;; key (e.g. insns from different isas can have the same name).
+;;
+;; This relies on the ordinal element of <ordered-ident> objects to build the
+;; ordered list.
+
+(define (-make-ident-object-table hash-size)
+  (cons (make-hash-table hash-size) #f)
+)
+
+;; Return ordered list.
+;;
+;; To allow splicing in new objects we recognize two kinds of ordinal numbers:
+;; integer and (integer . integer) where the latter is a pair of
+;; major-ordinal-number and minor-ordinal-number.
+
+(define (-ident-object-table->list iot)
+  (if (cdr iot)
+      (cdr iot)
+      (let ((unsorted (hash-fold (lambda (key value prior)
+				   ;; NOTE: {value} usually contains just
+				   ;; one element.
+				   (append value prior))
+				 '()
+				 (car iot))))
+	(set-cdr! iot
+		  (sort unsorted (lambda (a b)
+				   ;; Ordinals are either an integer or
+				   ;; (major . minor).
+				   (let ((oa (obj-ordinal a))
+					 (ob (obj-ordinal b)))
+				     ;; Quick test for common case.
+				     (if (and (number? oa) (number? ob))
+					 (< oa ob)
+					 (let ((maj-a (if (pair? oa) (car oa) oa))
+					       (maj-b (if (pair? ob) (car ob) ob))
+					       (min-a (if (pair? oa) (cdr oa) 0))
+					       (min-b (if (pair? ob) (cdr ob) 0)))
+					   (cond ((< maj-a maj-b) #t)
+						 ((= maj-a maj-b) (< min-a min-b))
+						 (else #f))))))))
+	(cdr iot)))
+)
+
+;; Add an entry to an ident-object-table.
+
+(define (-ident-object-table-add! arch iot key object)
+  ;; Give OBJECT an ordinal if it doesn't have one already.
+  (if (not (obj-ordinal object))
+      (obj-set-ordinal! object (-get-next-ordinal! arch)))
+
+  ;; Remember: Elements in the hash table are lists of objects, this is because
+  ;; multiple objects can have the same key if they come from different isas.
+  (let ((elm (hashq-ref (car iot) key)))
+    (if elm
+	(hashq-set! (car iot) key (cons object elm))
+	(hashq-set! (car iot) key (cons object nil))))
+
+  ;; Need to recompute the sorted list.
+  (set-cdr! iot #f)
+
+  *UNSPECIFIED*
+)
+
+;; Look up KEY in an ident-object-table.
+
+(define (-ident-object-table-lookup iot key)
+  (hashq-ref iot key)
 )
 
 ; Class for recording things specified in `define-arch'.
@@ -275,20 +400,40 @@
 
 ; Instruction fields.
 
-(define (current-ifld-list) (map cdr (arch-ifld-list CURRENT-ARCH)))
+(define (current-ifld-list)
+  (-ident-object-table->list (arch-ifld-table CURRENT-ARCH))
+)
 
 (define (current-ifld-add! f)
   (if (-ifld-already-defined? f)
       (parse-error "define-ifield" "ifield already defined" (obj:name f)))
-  (arch-set-ifld-list! CURRENT-ARCH
-		       (acons (obj:name f) f (arch-ifld-list CURRENT-ARCH)))
+  (-ident-object-table-add! CURRENT-ARCH (arch-ifld-table CURRENT-ARCH)
+			    (obj:name f) f)
   *UNSPECIFIED*
 )
+
+;; Look up ifield X in the current architecture.
+;;
+;; If X is an <ifield> object, just return it.
+;; This is to handle ???
+;; Otherwise X is the name of the ifield to look up.
+;;
+;; ??? This doesn't work if there are multiple operands with the same name
+;; for different isas.
 
 (define (current-ifld-lookup x)
   (if (ifield? x)
       x
-      (assq-ref (arch-ifld-list CURRENT-ARCH) x))
+      (let ((f-list (-ident-object-table-lookup (car (arch-ifld-table CURRENT-ARCH))
+						x)))
+	(if f-list
+	    (if (= (length f-list) 1)
+		(car f-list)
+		;; FIXME: For now just return the first one,
+		;; same behaviour as before.
+		;; Here "first one" means "first defined".
+		(-get-lowest-ordinal f-list))
+	    #f)))
 )
 
 ; Return a boolean indicating if <ifield> F is currently defined.
@@ -296,33 +441,48 @@
 ; ifields with the same name.
 
 (define (-ifld-already-defined? f)
-  (let ((iflds (find (lambda (ff) (eq? (obj:name f) (car ff)))
-		     (arch-ifld-list CURRENT-ARCH))))
+  (let ((iflds (-ident-object-table-lookup (car (arch-ifld-table CURRENT-ARCH))
+					   (obj:name f))))
     ; We've got all the ifields with the same name,
     ; now see if any have the same ISA as F.
-    (let ((result #f)
-	  (f-isas (obj-isa-list f)))
-      (for-each (lambda (ff)
-		  (if (not (null? (intersection f-isas (obj-isa-list (cdr ff)))))
-		      (set! result #t)))
-		iflds)
-      result))
+    (if iflds
+	(let ((result #f)
+	      (f-isas (obj-isa-list f)))
+	  (for-each (lambda (ff)
+		      (if (not (null? (intersection f-isas (obj-isa-list ff))))
+			  (set! result #t)))
+		    iflds)
+	  result)
+	#f))
 )
 
 ; Operands.
 
-(define (current-op-list) (map cdr (arch-op-list CURRENT-ARCH)))
+(define (current-op-list)
+  (-ident-object-table->list (arch-op-table CURRENT-ARCH))
+)
 
 (define (current-op-add! op)
   (if (-op-already-defined? op)
       (parse-error "define-operand" "operand already defined" (obj:name op)))
-  (arch-set-op-list! CURRENT-ARCH
-		     (acons (obj:name op) op (arch-op-list CURRENT-ARCH)))
+  (-ident-object-table-add! CURRENT-ARCH (arch-op-table CURRENT-ARCH)
+			    (obj:name op) op)
   *UNSPECIFIED*
 )
 
+; ??? This doesn't work if there are multiple operands with the same name
+; for different isas.
+
 (define (current-op-lookup name)
-  (assq-ref (arch-op-list CURRENT-ARCH) name)
+  (let ((op-list (-ident-object-table-lookup (car (arch-op-table CURRENT-ARCH))
+					     name)))
+    (if op-list
+	(if (= (length op-list) 1)
+	    (car op-list)
+	    ;; FIXME: For now just return the first one, same behaviour as before.
+	    ;; Here "first one" means "first defined".
+	    (-get-lowest-ordinal op-list))
+	#f))
 )
 
 ; Return a boolean indicating if <operand> OP is currently defined.
@@ -330,17 +490,19 @@
 ; operands with the same name.
 
 (define (-op-already-defined? op)
-  (let ((ops (find (lambda (o) (eq? (obj:name op) (car o)))
-		     (arch-op-list CURRENT-ARCH))))
+  (let ((ops (-ident-object-table-lookup (car (arch-op-table CURRENT-ARCH))
+					 (obj:name op))))
     ; We've got all the operands with the same name,
     ; now see if any have the same ISA as OP.
-    (let ((result #f)
-	  (op-isas (obj-isa-list op)))
-      (for-each (lambda (o)
-		  (if (not (null? (intersection op-isas (obj-isa-list (cdr o)))))
-		      (set! result #t)))
-		ops)
-      result))
+    (if ops
+	(let ((result #f)
+	      (op-isas (obj-isa-list op)))
+	  (for-each (lambda (o)
+		      (if (not (null? (intersection op-isas (obj-isa-list o))))
+			  (set! result #t)))
+		    ops)
+	  result)
+	#f))
 )
 
 ; Instruction field formats.
@@ -354,20 +516,32 @@
 
 ; Instructions.
 
-(define (current-raw-insn-list) (arch-insn-list CURRENT-ARCH))
-
-(define (current-insn-list) (map cdr (arch-insn-list CURRENT-ARCH)))
+(define (current-insn-list)
+  (-ident-object-table->list (arch-insn-table CURRENT-ARCH))
+)
 
 (define (current-insn-add! i)
   (if (-insn-already-defined? i)
       (parse-error "define-insn" "insn already defined" (obj:name i)))
-  (arch-set-insn-list! CURRENT-ARCH
-		       (acons (obj:name i) i (arch-insn-list CURRENT-ARCH)))
+  (-ident-object-table-add! CURRENT-ARCH (arch-insn-table CURRENT-ARCH)
+			    (obj:name i) i)
   *UNSPECIFIED*
 )
 
+; ??? This doesn't work if there are multiple insns with the same name
+; for different isas.
+
 (define (current-insn-lookup name)
-  (assq-ref (arch-insn-list CURRENT-ARCH) name)
+  (let ((i (-ident-object-table-lookup (car (arch-insn-table CURRENT-ARCH))
+				       name)))
+    (if i
+	(begin
+	  (if (= (length i) 1)
+	      (car i)
+	      ;; FIXME: For now just flag an error.
+	      ;; Later add an isa-list arg to distinguish.
+	      (error "multiple insns with name:" name)))
+	#f))
 )
 
 ; Return a boolean indicating if <insn> INSN is currently defined.
@@ -375,47 +549,49 @@
 ; insns with the same name.
 
 (define (-insn-already-defined? insn)
-  (let ((insns (find (lambda (i) (eq? (obj:name insn) (car i)))
-		     (arch-insn-list CURRENT-ARCH))))
+  (let ((insns (-ident-object-table-lookup (car (arch-insn-table CURRENT-ARCH))
+					   (obj:name insn))))
     ; We've got all the insns with the same name,
     ; now see if any have the same ISA as INSN.
-    (let ((result #f)
-	  (insn-isas (obj-isa-list insn)))
-      (for-each (lambda (i)
-		  (if (not (null? (intersection insn-isas (obj-isa-list (cdr i)))))
-		      (set! result #t)))
-		insns)
-      result))
-)
-
-; Return the insn in the `car' position of INSN-LIST.
-
-(define insn-list-car cdar)
-
-; Splice INSN into INSN-LIST after (car INSN-LIST).
-; This is useful when creating machine generating insns - it's useful to
-; keep them close to their progenitor.
-; The result is the same list, but beginning at the spliced-in insn.
-
-(define (insn-list-splice! insn-list insn)
-  (set-cdr! insn-list (acons (obj:name insn) insn (cdr insn-list)))
-  (cdr insn-list)
+    (if insns
+	(let ((result #f)
+	      (insn-isas (obj-isa-list insn)))
+	  (for-each (lambda (i)
+		      (if (not (null? (intersection insn-isas (obj-isa-list i))))
+			  (set! result #t)))
+		    insns)
+	  result)
+	#f))
 )
 
 ; Macro instructions.
 
-(define (current-minsn-list) (map cdr (arch-minsn-list CURRENT-ARCH)))
+(define (current-minsn-list)
+  (-ident-object-table->list (arch-minsn-table CURRENT-ARCH))
+)
 
 (define (current-minsn-add! m)
   (if (-minsn-already-defined? m)
       (parse-error "define-minsn" "macro-insn already defined" (obj:name m)))
-  (arch-set-minsn-list! CURRENT-ARCH
-			(acons (obj:name m) m (arch-minsn-list CURRENT-ARCH)))
+  (-ident-object-table-add! CURRENT-ARCH (arch-minsn-table CURRENT-ARCH)
+			    (obj:name m) m)
   *UNSPECIFIED*
 )
 
+; ??? This doesn't work if there are multiple minsns with the same name
+; for different isas.
+
 (define (current-minsn-lookup name)
-  (assq-ref (arch-minsn-list CURRENT-ARCH) name)
+  (let ((m (-ident-object-table-lookup (car (arch-minsn-table CURRENT-ARCH))
+				       name)))
+    (if m
+	(begin
+	  (if (= (length m) 1)
+	      (car m)
+	      ;; FIXME: For now just flag an error.
+	      ;; Later add an isa-list arg to distinguish.
+	      (error "multiple macro-insns with name:" name)))
+	#f))
 )
 
 ; Return a boolean indicating if <macro-insn> MINSN is currently defined.
@@ -423,17 +599,19 @@
 ; macro-insns with the same name.
 
 (define (-minsn-already-defined? m)
-  (let ((minsns (find (lambda (mm) (eq? (obj:name m) (car mm)))
-		      (arch-minsn-list CURRENT-ARCH))))
+  (let ((minsns (-ident-object-table-lookup (car (arch-minsn-table CURRENT-ARCH))
+					    (obj:name m))))
     ; We've got all the macro-insns with the same name,
     ; now see if any have the same ISA as M.
-    (let ((result #f)
-	  (m-isas (obj-isa-list m)))
-      (for-each (lambda (mm)
-		  (if (not (null? (intersection m-isas (obj-isa-list (cdr mm)))))
-		      (set! result #t)))
-		minsns)
-      result))
+    (if minsns
+	(let ((result #f)
+	      (m-isas (obj-isa-list m)))
+	  (for-each (lambda (mm)
+		      (if (not (null? (intersection m-isas (obj-isa-list mm))))
+			  (set! result #t)))
+		    minsns)
+	  result)
+	#f))
 )
 
 ; rtx subroutines.
@@ -647,6 +825,25 @@
     )
 
   *UNSPECIFIED*
+)
+
+; Return the bitset attr value for all isas.
+
+(define (all-isas-attr-value)
+  (stringize (current-arch-isa-name-list) ",")
+)
+
+; Return an ISA attribute of all isas.
+; This is useful for things like f-nil which exist across all isas.
+
+(define (all-isas-attr)
+  (bitset-attr-make 'ISA (all-isas-attr-value))
+)
+
+; Return list of ISA names specified by attribute object ATLIST.
+
+(define (attr-isa-list atlist)
+  (bitset-attr->list (atlist-attr-value atlist 'ISA #f))
 )
 
 ; Return list of ISA names specified by OBJ.
@@ -1522,6 +1719,11 @@
 
 ; Instruction analysis control.
 
+;; The maximum number of virtual insns.
+;; They can be recorded with negative ordinals, and multi-insns are currently
+;; also recorded as negative numbers, so leave enough space.
+(define MAX-VIRTUAL-INSNS 100)
+
 ; Analyze the instruction set.
 ; The name is explicitly vague because it's intended that all insn analysis
 ; would be controlled here.
@@ -1543,13 +1745,30 @@
 	  (not (eq? include-aliases? (arch-aliases-analyzed? arch))))
 
       (begin
+
+	;; FIXME: This shouldn't be calling current-insn-list,
+	;; it should use (arch-insn-list arch).
+	;; Then again various subroutines assume arch == CURRENT-ARCH.
+	;; Still, something needs to be cleaned up.
 	(if (any-true? (map multi-insn? (current-insn-list)))
 	    (begin
 	      ; Instantiate sub-insns of all multi-insns.
 	      (logit 1 "Instantiating multi-insns ...\n")
-	      (for-each (lambda (insn)
-			  (multi-insn-instantiate! insn))
-			(multi-insns (current-insn-list)))
+
+	      ;; FIXME: Hack to remove differences in generated code when we
+	      ;; switched to recording insns in hash tables.
+	      ;; Multi-insn got instantiated after the list of insns had been
+	      ;; reversed and they got added to the front of the list, in
+	      ;; reverse order.  Blech!
+	      ;; Eventually remove this, have a flag day, and check in the
+	      ;; updated files.
+	      ;; NOTE: This causes major diffs to opcodes/m32c-*.[ch].
+	      (let ((orig-ord (arch-next-ordinal arch)))
+		(arch-set-next-ordinal! arch (- MAX-VIRTUAL-INSNS))
+		(for-each (lambda (insn)
+			    (multi-insn-instantiate! insn))
+			  (multi-insns (current-insn-list)))
+		(arch-set-next-ordinal! arch orig-ord))
 	      ))
 
 	; This is expensive so indicate start/finish.
@@ -1558,8 +1777,8 @@
 	(let ((fmt-lists
 	       (ifmt-compute! (non-multi-insns 
 			       (if include-aliases?
-				   (map cdr (arch-insn-list arch))
-				   (non-alias-insns (map cdr (arch-insn-list arch)))))
+				   (arch-insn-list arch)
+				   (non-alias-insns (arch-insn-list arch))))
 			      analyze-semantics?)))
 
 	  (arch-set-ifmt-list! arch (car fmt-lists))
@@ -1608,6 +1827,12 @@ Define a cpu family, name/value pair list version.
 ; Called before a .cpu file is read in.
 
 (define (mach-init!)
+  (let ((arch CURRENT-ARCH))
+    (arch-set-ifld-table! arch (-make-ident-object-table 127))
+    (arch-set-op-table! arch (-make-ident-object-table 127))
+    (arch-set-insn-table! arch (-make-ident-object-table 509))
+    (arch-set-minsn-table! arch (-make-ident-object-table 127))
+    )
 
   (reader-add-command! 'define-mach
 		       "\
@@ -1626,17 +1851,15 @@ Define a machine, name/value pair list version.
     ; Lists are constructed in the reverse order they appear in the file
     ; [for simplicity and efficiency].  Restore them to file order for the
     ; human reader/debugger.
+    ; We don't need to do this for ifld, op, insn, minsn lists because
+    ; they are handled differently.
     (arch-set-enum-list! arch (reverse (arch-enum-list arch)))
     (arch-set-kw-list! arch (reverse (arch-kw-list arch)))
     (arch-set-isa-list! arch (reverse (arch-isa-list arch)))
     (arch-set-cpu-list! arch (reverse (arch-cpu-list arch)))
     (arch-set-mach-list! arch (reverse (arch-mach-list arch)))
     (arch-set-model-list! arch (reverse (arch-model-list arch)))
-    (arch-set-ifld-list! arch (reverse (arch-ifld-list arch)))
     (arch-set-hw-list! arch (reverse (arch-hw-list arch)))
-    (arch-set-op-list! arch (reverse (arch-op-list arch)))
-    (arch-set-insn-list! arch (reverse (arch-insn-list arch)))
-    (arch-set-minsn-list! arch (reverse (arch-minsn-list arch)))
     (arch-set-subr-list! arch (reverse (arch-subr-list arch)))
     )
 

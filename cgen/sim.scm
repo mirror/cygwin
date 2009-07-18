@@ -1892,17 +1892,35 @@ struct scache {
   *UNSPECIFIED*
 )
 
-(define (sim-finish!)
-  ; Add begin,chain,before,after,invalid handlers if not provided.
-  ; The code generators should first look for x-foo-@prefix@, then for x-foo.
-  ; ??? This is good enough for the first pass.  Will eventually need to use
-  ; less C and more RTL.
+;; Subroutine of -create-virtual-insns!.
+;; Add virtual insn INSN to the database.
+;; We put virtual insns ahead of normal insns because they're kind of special,
+;; and it helps to see them first in lists.
+;; ORDINAL is a used to place the insn ahead of normal insns;
+;; it is a pair so we can do the update for the next virtual insn here.
 
-  (let ((all (stringize (current-arch-isa-name-list) ",")))
+(define (-virtual-insn-add! ordinal insn)
+  (obj-set-ordinal! insn (cdr ordinal))
+  (current-insn-add! insn)
+  (set-cdr! ordinal (- (cdr ordinal) 1))
+)
 
-    (define-full-insn 'x-begin "pbb begin handler"
-      `(VIRTUAL PBB (ISA ,all))
-      "--begin--" '() '() '(c-code VOID "\
+; Create the virtual insns.
+
+(define (-create-virtual-insns!)
+  (let ((all (all-isas-attr-value))
+	(context "virtual insns")
+	;; Record as a pair so -virtual-insn-add! can update it.
+	(ordinal (cons #f -1)))
+
+    (-virtual-insn-add!
+     ordinal
+     (insn-read context
+		'(name x-begin)
+		'(comment "pbb begin handler")
+		`(attrs VIRTUAL PBB (ISA ,all))
+		'(syntax "--begin--")
+		'(semantics (c-code VOID "\
   {
 #if WITH_SCACHE_PBB_@PREFIX@
 #if defined DEFINE_SWITCH || defined FAST_P
@@ -1918,11 +1936,17 @@ struct scache {
 #endif
 #endif
   }
-") nil)
+"))
+		))
 
-    (define-full-insn 'x-chain "pbb chain handler"
-      `(VIRTUAL PBB (ISA ,all))
-      "--chain--" '() '() '(c-code VOID "\
+    (-virtual-insn-add!
+     ordinal
+     (insn-read context
+		'(name x-chain)
+		'(comment "pbb chain handler")
+		`(attrs VIRTUAL PBB (ISA ,all))
+		'(syntax "--chain--")
+		'(semantics (c-code VOID "\
   {
 #if WITH_SCACHE_PBB_@PREFIX@
     vpc = @prefix@_pbb_chain (current_cpu, sem_arg);
@@ -1931,11 +1955,17 @@ struct scache {
 #endif
 #endif
   }
-") nil)
+"))
+		))
 
-    (define-full-insn 'x-cti-chain "pbb cti-chain handler"
-      `(VIRTUAL PBB (ISA ,all))
-      "--cti-chain--" '() '() '(c-code VOID "\
+    (-virtual-insn-add!
+     ordinal
+     (insn-read context
+		'(name x-cti-chain)
+		'(comment "pbb cti-chain handler")
+		`(attrs VIRTUAL PBB (ISA ,all))
+		'(syntax "--cti-chain--")
+		'(semantics (c-code VOID "\
   {
 #if WITH_SCACHE_PBB_@PREFIX@
 #ifdef DEFINE_SWITCH
@@ -1950,31 +1980,49 @@ struct scache {
 #endif
 #endif
   }
-") nil)
+"))
+		))
 
-    (define-full-insn 'x-before "pbb begin handler"
-      `(VIRTUAL PBB (ISA ,all))
-      "--before--" '() '() '(c-code VOID "\
+    (-virtual-insn-add!
+     ordinal
+     (insn-read context
+		'(name x-before)
+		'(comment "pbb begin handler")
+		`(attrs VIRTUAL PBB (ISA ,all))
+		'(syntax "--before--")
+		'(semantics (c-code VOID "\
   {
 #if WITH_SCACHE_PBB_@PREFIX@
     @prefix@_pbb_before (current_cpu, sem_arg);
 #endif
   }
-") nil)
+"))
+		))
 
-    (define-full-insn 'x-after "pbb after handler"
-      `(VIRTUAL PBB (ISA ,all))
-      "--after--" '() '() '(c-code VOID "\
+    (-virtual-insn-add!
+     ordinal
+     (insn-read context
+		'(name x-after)
+		'(comment "pbb after handler")
+		`(attrs VIRTUAL PBB (ISA ,all))
+		'(syntax "--after--")
+		'(semantics (c-code VOID "\
   {
 #if WITH_SCACHE_PBB_@PREFIX@
     @prefix@_pbb_after (current_cpu, sem_arg);
 #endif
   }
-") nil)
+"))
+		))
 
-    (define-full-insn 'x-invalid "invalid insn handler"
-      `(VIRTUAL (ISA ,all))
-      "--invalid--" '() '() (list 'c-code 'VOID (string-append "\
+    (-virtual-insn-add!
+     ordinal
+     (insn-read context
+		'(name x-invalid)
+		'(comment "invalid insn handler")
+		`(attrs VIRTUAL (ISA ,all))
+		'(syntax "--invalid--")
+		(list 'semantics (list 'c-code 'VOID (string-append "\
   {
     /* Update the recorded pc in the cpu state struct.
        Only necessary for WITH_SCACHE case, but to avoid the
@@ -1986,7 +2034,17 @@ struct scache {
     vpc = SEM_NEXT_VPC (sem_arg, pc, " (number->string (bits->bytes (state-default-insn-bitsize))) ");
     vpc = sim_engine_invalid_insn (current_cpu, pc, vpc);
   }
-")) nil))
+")))
+		))
+    )
+)
+
+(define (sim-finish!)
+  ; Add begin,chain,before,after,invalid handlers if not provided.
+  ; The code generators should first look for x-foo-@prefix@, then for x-foo.
+  ; ??? This is good enough for the first pass.  Will eventually need to use
+  ; less C and more RTL.
+  (-create-virtual-insns!)
 
   *UNSPECIFIED*
 )

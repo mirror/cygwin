@@ -1,3 +1,56 @@
+2009-07-17  Doug Evans  <dje@sebabeach.org>
+
+	Use hash tables to record ifields, operands, insns, macro-insns.
+	* attr.scm (attr-builtin!): Tweak some comments.
+	* hardware.scm (hardware-builtin!): Call all-isas-attr-value.
+	* ifield.scm (<ifield>): Subclass from <ordered-ident> instead of
+	<ident>.
+	(<multi-ifield>): New constructor.
+	(ifield-builtin!): Add isa attr to f-nil, f-anyof.
+	* insn.scm (<insn>): Subclass from <ordered-ident> instead of
+	<ident>.
+	(-sub-insn-make!): Add hack to avoid differences in generated code.
+	(multi-insn-instantiate!): Add total number of multi-insns to
+	logging message.
+	* mach.scm (<arch>): Rename members ifld-list, op-list, insn-list,
+	minsn-list to foo-table.  New member next-ordinal.
+	Update getters/setters.
+	(arch-ifld-list, arch-op-list, arch-insn-list, arch-minsn-list):
+	New functions.
+	(-get-next-ordinal!, -get-lowest-ordinal): New function.
+	(-make-ident-object-table, -ident-object-table->list,
+	-ident-object-table-add!, -ident-object-table-lookup): New functions.
+	(current-ifld-list, current-ifld-add! current-ifld-lookup,
+	-ifld-already-defined?): Rewrite.
+	(current-op-list, current-op-add! current-op-lookup,
+	-op-already-defined?): Rewrite.
+	(current-raw-insn-list, insn-list-car, insn-list-splice!): Delete.
+	(current-insn-list, current-insn-add! current-insn-lookup,
+	-insn-already-defined?): Rewrite.
+	(current-minsn-list, current-minsn-add! current-minsn-lookup,
+	-minsn-already-defined?): Rewrite.
+	(all-isas-attr-value, all-isas-attr, attr-isa-list): New functions.
+	(MAX-VIRTUAL-INSNS): Define.
+	(arch-analyze-insns!): Add hack to avoid differences in generated code.
+	Update use of arch-insn-list.
+	(mach-init!): Initialize ifld-table, op-table, insn-table, minsn-table.
+	(arch-finish!): Delete references to ifld-table, op-table, insn-table,
+	minsn-table.
+	* minsn.scm (<macro-insn>): Subclass from <ordered-ident> instead of
+	<ident>.  New constructor.
+	* operand.scm (<operand>): Subclass from <ordered-ident> instead of
+	<ident>.
+	* sid.scm (-virtual-insn-add!): New function.
+	(-create-virtual-insns!): Call it.
+	(-fill-sim-insn-list!): Rewrite.
+	* sim.scm (-virtual-insn-add!, -create-virtual-insns!): New functions.
+	(sim-finish!): Move contents to -create-virtual-insns!, and call it.
+	* utils-cgen.scm (<ordered-ident>): New class.
+	(obj-ordinal, obj-set-ordinal!): New functions.
+	(add-ident-methods!): Delete.
+
+	* model.scm (parse-insn-timing): Change logging message to level 3.
+
 2009-07-16  Doug Evans  <dje@sebabeach.org>
 
 	* doc/rtl.texi (Enumerated constants): Add example, fix a typo,

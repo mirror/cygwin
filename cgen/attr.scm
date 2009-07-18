@@ -735,7 +735,7 @@
 ; first.  This is used to sort a list of attributes for output (e.g. define
 ; the attr enum).
 ;
-; ??? Record index number with the INDEX attribute?
+; FIXME: Record index number with the INDEX attribute and sort on it.
 ; At present it's just a boolean.
 
 (define (-attr-sort attr-list)
@@ -840,7 +840,7 @@
        (atlist-attrs atlist))
 )
 
-; cons an attribute to an attribute list to create a new attribute list
+; Cons an attribute to an attribute list to create a new attribute list.
 ; ATLIST is either an attr-list object or #f or () (both of the latter two
 ; signify an empty attribute list, in which case we make the prefix of the
 ; result "").
@@ -1100,9 +1100,10 @@ Define an attribute, name/value pair list version.
   (define-attr '(for keyword) '(type boolean) '(name PRIVATE))
 
   ; Attributes requiring fixed indices.
+  (define-attr '(for attr) '(type boolean) '(name INDEX) '(attrs META))
+
   ; ALIAS is used for instructions that are aliases of more general insns.
   ; ALIAS insns are ignored by the simulator.
-  (define-attr '(for attr) '(type boolean) '(name INDEX) '(attrs META))
   (define-attr '(for insn) '(type boolean) '(name ALIAS)
     '(comment "insn is an alias of another")
     '(attrs INDEX))

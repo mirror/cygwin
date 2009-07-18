@@ -95,21 +95,27 @@
 
 (define (obj:str-name obj) (symbol->string (obj:name obj)))
 
-; Utility to add standard access methods for name, comment, attrs.
-; ??? Old.  Using <ident> baseclass now.
+; Subclass of <ident> for use by description file objects.
+;
+; We also record an internally generated entry, ordinal, to record the
+; relative position within the description file.  It's generally more efficient
+; to record some kinds of objects (e.g. insns) in a hash table.  But we also
+; want to emit these objects in file order.  Recording the object's relative
+; position lets us generate an ordered list when we need to.
 
-(define (add-ident-methods! class)
-  (method-make! class 'get-name (lambda (self) (elm-get self 'name)))
-  (method-make! class 'set-name! (lambda (self name) (elm-set! self 'name name)))
+(define <ordered-ident>
+  (class-make '<ordered-ident> '(<ident>)
+	      ;; #f for ordinal means "unassigned"
+	      '((ordinal . #f))
+	      '()))
 
-  (method-make! class 'get-comment (lambda (self) (elm-get self 'comment)))
-  (method-make! class 'set-comment! (lambda (self comment) (elm-set! self 'comment comment)))
+(method-make! <ordered-ident> 'get-ordinal
+	      (lambda (self) (elm-get self 'ordinal)))
+(method-make! <ordered-ident> 'set-ordinal!
+	      (lambda (self newval) (elm-set! self 'ordinal newval)))
 
-  (method-make! class 'get-atlist (lambda (self) (elm-get self 'attrs)))
-  (method-make! class 'set-atlist! (lambda (self attrs) (elm-set! self 'attrs attrs)))
-
-  *UNSPECIFIED*
-)
+(define (obj-ordinal obj) (send obj 'get-ordinal))
+(define (obj-set-ordinal! obj ordinal) (send obj 'set-ordinal! ordinal))
 
 ; Parsing utilities
 

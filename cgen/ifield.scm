@@ -23,7 +23,7 @@
 
 (define <ifield>
   (class-make '<ifield>
-	      '(<ident>)
+	      '(<ordered-ident>)
 	      '(
 		; The mode the raw value is to be interpreted in.
 		mode
@@ -708,6 +708,10 @@ Define an instruction multi-field, all arguments specified.
 	      nil)
 )
 
+(method-make-make! <multi-ifield> '(name comment attrs
+				    mode bitrange encode decode
+				    subfields insert extract))
+
 ; Accessors
 
 (define-getters <multi-ifield> multi-ifld
@@ -1167,14 +1171,14 @@ Define an instruction multi-field, all arguments specified.
   ; Also (defined elsewhere): VIRTUAL
 
   (set! f-nil (make <ifield> 'f-nil "empty ifield"
-		    atlist-empty
+		    (atlist-cons (all-isas-attr) nil)
 		    UINT
 		    (make <bitrange> 0 0 0 0 #f)
 		    #f #f)) ; encode/decode
   (current-ifld-add! f-nil)
 
   (set! f-anyof (make <ifield> 'f-anyof "placeholder for anyof operands"
-		    atlist-empty
+		    (atlist-cons (all-isas-attr) nil)
 		    UINT
 		    (make <bitrange> 0 0 0 0 #f)
 		    #f #f)) ; encode/decode

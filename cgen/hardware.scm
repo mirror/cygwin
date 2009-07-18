@@ -1161,7 +1161,7 @@ Modify a hardware element, name/value pair list version.
   (define-attr '(for hardware) '(type boolean) '(name PROFILE)
     '(comment "collect profiling data"))
 
-  (let ((all (stringize (current-arch-isa-name-list) ",")))
+  (let ((all (all-isas-attr-value)))
     ; ??? The program counter, h-pc, used to be defined here.
     ; However, some targets need to modify it (e.g. provide special get/set
     ; specs).  There's still an outstanding issue of how to add things to

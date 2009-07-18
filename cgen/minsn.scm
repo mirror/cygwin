@@ -24,7 +24,7 @@
 
 (define <macro-insn>
   (class-make '<macro-insn>
-	      '(<ident>)
+	      '(<ordered-ident>)
 	      '(
 		; syntax of the macro
 		syntax
@@ -33,6 +33,8 @@
 		)
 	      nil)
 )
+
+(method-make-make! <macro-insn> '(name comment attrs syntax expansions))
 
 ; Accessor fns
 

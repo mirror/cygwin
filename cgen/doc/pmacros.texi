@@ -147,7 +147,7 @@ These pmacros are processed differently in that parameters are
 @emph{not} evaluated first.  Instead it is up to the pmacro
 to decide when, and if, the parameters are evaluated.
 The syntactic forms are: @code{.pmacro}, @code{.let}, @code{.if},
-@code{.case}, @code{.cond}, @code{.begin}, @code{.and}, and @code{.or}.
+@code{.case}, @code{.cond}, @code{.begin}, @code{.andif}, and @code{.orif}.
 
 If the result of the pmacro is another pmacro invocation,
 it is in turn processed.
@@ -1010,8 +1010,8 @@ and ``false'' is represented by @code{#f}.
 
 @menu
 * .equals::      Deep comparison
-* .and::         && in C
-* .or::          || in C
+* .andif::       && in C
+* .orif::        || in C
 * .not::         ! in C
 * .eq::          Shallow comparison
 * .ne::          Shallow comparison
@@ -1041,11 +1041,11 @@ Examples:
 (.equals ((1 2 3) (4 5 6)) ((1 2 3) (4 5 6))) --> #t
 @end smallexample
 
-@node .and
-@subsection .and
-@cindex .and
+@node .andif
+@subsection .andif
+@cindex .andif
 
-Syntax: @samp{(.and [expr1 [expr2 ...]])}
+Syntax: @samp{(.andif [expr1 [expr2 ...]])}
 
 Each expression is evaluated in turn.
 If an expression evaluates to false (@code{#f}) then
@@ -1061,16 +1061,16 @@ that evaluates to ``false''.
 Examples:
 
 @smallexample
-(.and 1 #f 2) --> #f
-(.and 1 2 3) --> 3
-(.and) --> #t
+(.andif 1 #f 2) --> #f
+(.andif 1 2 3) --> 3
+(.andif) --> #t
 @end smallexample
 
-@node .or
-@subsection .or
-@cindex .or
+@node .orif
+@subsection .orif
+@cindex .orif
 
-Syntax: @samp{(.or [expr1 [expr2 ...]])}
+Syntax: @samp{(.orif [expr1 [expr2 ...]])}
 
 Each expression is evaluated in turn.
 If an expression evaluates to non-false (@code{#f}) then
@@ -1087,9 +1087,9 @@ that evaluates to non-``false''.
 Examples:
 
 @smallexample
-(.or 1 2 3) --> 1
-(.or #f #f #f) --> #f
-(.or) --> #f
+(.orif 1 2 3) --> 1
+(.orif #f #f #f) --> #f
+(.orif) --> #f
 @end smallexample
 
 @node .not
@@ -1100,6 +1100,8 @@ Syntax: @samp{(.not expr)}
 
 If @code{expr} is @code{#f} return @code{#t}.
 If @code{expr} is non-@code{#f} return @code{#f}.
+
+@emph{Note that (.not 0) is not 1, it is #f!}.
 
 @node .eq
 @subsection .eq
@@ -1259,10 +1261,10 @@ Builtin macros for shifts and bitwise functions.
 * .sll::       Shift left logical
 * .srl::       Shift right logical
 * .sra::       Shift right arithmetic
-* .bitand::    Bitwise and
-* .bitor::     Bitwise or
-* .bitxor::    Bitwise exclusive-or
-* .bitinv::    Bitwise inversion
+* .and::       Bitwise and
+* .or::        Bitwise or
+* .xor::       Bitwise exclusive-or
+* .inv::       Bitwise inversion
 @end menu
 
 @node .sll
@@ -1302,34 +1304,34 @@ The sign bit of @code{x} is shifted into the high-order bits.
 
 @code{n} must be a non-negative integer.
 
-@node .bitand
-@subsection .bitand
-@cindex .bitand
+@node .and
+@subsection .and
+@cindex .and
 
-Syntax: @samp{(.bitand x y)}
+Syntax: @samp{(.and x y)}
 
 Return the bitwise @code{and} of @code{x} and @code{y}.
 
-@node .bitor
-@subsection .bitor
-@cindex .bitor
+@node .or
+@subsection .or
+@cindex .or
 
-Syntax: @samp{(.bitor x y)}
+Syntax: @samp{(.or x y)}
 
 Return the bitwise @code{or} of @code{x} and @code{y}.
 
-@node .bitxor
-@subsection .bitxor
-@cindex .bitxor
+@node .xor
+@subsection .xor
+@cindex .xor
 
-Syntax: @samp{(.bitxor x y)}
+Syntax: @samp{(.xor x y)}
 
 Return the bitwise @code{exclusive-or} of @code{x} and @code{y}.
 
-@node .bitinv
-@subsection .bitinv
-@cindex .bitinv
+@node .inv
+@subsection .inv
+@cindex .inv
 
-Syntax: @samp{(.bitinv x)}
+Syntax: @samp{(.inv x)}
 
 Return the bitwise @code{inversion} of @code{x}.

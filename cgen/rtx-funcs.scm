@@ -618,12 +618,12 @@
      TRINARY
      #f
 )
-(drn (add-cflag &options &mode s1 s2 s3) ; FIXME: rename to addc-cflag
+(drn (addc-cflag &options &mode s1 s2 s3)
      (OPTIONS ANYMODE RTX RTX RTX) (NA NA OP0 MATCH1 BI)
      TRINARY
      #f
 )
-(drn (add-oflag &options &mode s1 s2 s3) ; FIXME: rename to addc-vflag
+(drn (addc-oflag &options &mode s1 s2 s3)
      (OPTIONS ANYMODE RTX RTX RTX) (NA NA OP0 MATCH1 BI)
      TRINARY
      #f
@@ -633,12 +633,34 @@
      TRINARY
      #f
 )
-(drn (sub-cflag &options &mode s1 s2 s3) ; FIXME: rename to subc-cflag
+(drn (subc-cflag &options &mode s1 s2 s3)
      (OPTIONS ANYMODE RTX RTX RTX) (NA NA OP0 MATCH1 BI)
      TRINARY
      #f
 )
-(drn (sub-oflag &options &mode s1 s2 s3) ; FIXME: rename to subc-vflag
+(drn (subc-oflag &options &mode s1 s2 s3)
+     (OPTIONS ANYMODE RTX RTX RTX) (NA NA OP0 MATCH1 BI)
+     TRINARY
+     #f
+)
+
+;; ??? These are deprecated.  Delete in time.
+(drn (add-cflag &options &mode s1 s2 s3)
+     (OPTIONS ANYMODE RTX RTX RTX) (NA NA OP0 MATCH1 BI)
+     TRINARY
+     #f
+)
+(drn (add-oflag &options &mode s1 s2 s3)
+     (OPTIONS ANYMODE RTX RTX RTX) (NA NA OP0 MATCH1 BI)
+     TRINARY
+     #f
+)
+(drn (sub-cflag &options &mode s1 s2 s3)
+     (OPTIONS ANYMODE RTX RTX RTX) (NA NA OP0 MATCH1 BI)
+     TRINARY
+     #f
+)
+(drn (sub-oflag &options &mode s1 s2 s3)
      (OPTIONS ANYMODE RTX RTX RTX) (NA NA OP0 MATCH1 BI)
      TRINARY
      #f

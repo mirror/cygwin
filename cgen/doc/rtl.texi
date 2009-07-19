@@ -2362,8 +2362,17 @@ Perform a binary arithmetic operation. @samp{binop} is one of
 @item (binop-with-bit mode operand1 operand2 operand3)
 Same as @samp{binop}, except taking 3 operands. The third operand is
 always a single bit. @samp{binop-with-bit} is one of @code{addc},
-@code{add-cflag}, @code{add-oflag}, @code{subc}, @code{sub-cflag},
-@code{sub-oflag}.
+@code{addc-cflag}, @code{addc-oflag}, @code{subc}, @code{subc-cflag},
+@code{subc-oflag}.
+
+Note: The following are deprecated:
+
+@itemize @bullet
+@item @code{add-cflag}, replaced with @code{addc-cflag}
+@item @code{add-oflag}, replaced with @code{addc-oflag}
+@item @code{sub-cflag}, replaced with @code{subc-cflag}
+@item @code{sub-cflag}, replaced with @code{subc-oflag}
+@end itemize
 
 @item (shiftop mode operand1 operand2)
 Perform a shift operation.

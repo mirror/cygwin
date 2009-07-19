@@ -67,8 +67,8 @@
 ; (.length x)                         - length of symbol, string, or list
 ; (.replicate n expr)                 - return list of expr replicated n times
 ; (.equals x y)                       - deep comparison
-; (.and expr . rest)                  - && in C
-; (.or expr . rest)                   - || in C
+; (.andif expr . rest)                - && in C
+; (.orif expr . rest)                 - || in C
 ; (.not expr)                         - ! in C
 ; (.eq x y)
 ; (.ne x y)
@@ -84,10 +84,10 @@
 ; (.sll x n)                          - shift left logical
 ; (.srl x n)                          - shift right logical
 ; (.sra x n)                          - shift right arithmetic
-; (.bitand x y)                       - bitwise and
-; (.bitor x y)                        - bitwise or
-; (.bitxor x y)                       - bitwise xor
-; (.bitinv x)                         - bitwise invert
+; (.and x y)                          - bitwise and
+; (.or x y)                           - bitwise or
+; (.xor x y)                          - bitwise xor
+; (.inv x)                            - bitwise invert
 ; (.car l)
 ; (.cdr l)
 ; (.caar l)
@@ -861,12 +861,12 @@
   (equal? x y)
 )
 
-; (.and . rest)
+; (.andif . rest)
 ; Note: syntactic form
 ; Elements of EXPRS are evaluated one at a time.
 ; Unprocessed elements are not evaluated.
 
-(define (-pmacro-builtin-and env . exprs)
+(define (-pmacro-builtin-andif env . exprs)
   (if (null? exprs)
       #t
       (let loop ((exprs exprs))
@@ -876,12 +876,12 @@
 		(else #f)))))
 )
 
-; (.or . rest)
+; (.orif . rest)
 ; Note: syntactic form
 ; Elements of EXPRS are evaluated one at a time.
 ; Unprocessed elements are not evaluated.
 
-(define (-pmacro-builtin-or env . exprs)
+(define (-pmacro-builtin-orif env . exprs)
   (let loop ((exprs exprs))
     (if (null? exprs)
 	#f
@@ -1049,34 +1049,34 @@
 	(else (quotient x (* n 2))))
 )
 
-; (.bitand x y) - bitwise and
+; (.and x y) - bitwise and
 
-(define (-pmacro-builtin-bitand x y)
-  (-pmacro-verify-integer ".bitand" x)
-  (-pmacro-verify-integer ".bitand" y)
+(define (-pmacro-builtin-and x y)
+  (-pmacro-verify-integer ".and" x)
+  (-pmacro-verify-integer ".and" y)
   (logand x y)
 )
 
-; (.bitor x y) - bitwise or
+; (.or x y) - bitwise or
 
-(define (-pmacro-builtin-bitor x y)
-  (-pmacro-verify-integer ".bitor" x)
-  (-pmacro-verify-integer ".bitor" y)
+(define (-pmacro-builtin-or x y)
+  (-pmacro-verify-integer ".or" x)
+  (-pmacro-verify-integer ".or" y)
   (logior x y)
 )
 
-; (.bitxor x y) - bitwise xor
+; (.xor x y) - bitwise xor
 
-(define (-pmacro-builtin-bitxor x y)
-  (-pmacro-verify-integer ".bitxor" x)
-  (-pmacro-verify-integer ".bitxor" y)
+(define (-pmacro-builtin-xor x y)
+  (-pmacro-verify-integer ".xor" x)
+  (-pmacro-verify-integer ".xor" y)
   (logxor x y)
 )
 
-; (.bitinv x) - bitwise invert
+; (.inv x) - bitwise invert
 
-(define (-pmacro-builtin-bitinv x)
-  (-pmacro-verify-integer ".bitinv" x)
+(define (-pmacro-builtin-inv x)
+  (-pmacro-verify-integer ".inv" x)
   (lognot x)
 )
 
@@ -1165,8 +1165,8 @@
 	  (list '.length '(x) #f -pmacro-builtin-length "return length of symbol, string, or list")
 	  (list '.replicate '(n expr) #f -pmacro-builtin-replicate "return list of expr replicated n times")
 	  (list '.equals '(x y) #f -pmacro-builtin-equals "deep comparison of x and y")
-	  (list '.and 'rest #t -pmacro-builtin-and "return #f if any element is #f, otherwise return last element")
-	  (list '.or 'rest #t -pmacro-builtin-or "return first non-#f element, otherwise #f")
+	  (list '.andif 'rest #t -pmacro-builtin-andif "return first #f element, otherwise return last element")
+	  (list '.orif 'rest #t -pmacro-builtin-orif "return first non-#f element found, otherwise #f")
 	  (list '.not '(x) #f -pmacro-builtin-not "return !x")
 	  (list '.eq '(x y) #f -pmacro-builtin-eq "return true if x == y")
 	  (list '.ne '(x y) #f -pmacro-builtin-ne "return true if x != y")
@@ -1182,10 +1182,10 @@
 	  (list '.sll '(x n) #f -pmacro-builtin-sll "return logical x << n")
 	  (list '.srl '(x n) #f -pmacro-builtin-srl "return logical x >> n")
 	  (list '.sra '(x n) #f -pmacro-builtin-sra "return arithmetic x >> n")
-	  (list '.bitand '(x y) #f -pmacro-builtin-bitand "return x & y")
-	  (list '.bitor '(x y) #f -pmacro-builtin-bitor "return x | y")
-	  (list '.bitxor '(x y) #f -pmacro-builtin-bitxor "return x ^ y")
-	  (list '.bitinv '(x) #f -pmacro-builtin-bitinv "return ~x")
+	  (list '.and '(x y) #f -pmacro-builtin-and "return x & y")
+	  (list '.or '(x y) #f -pmacro-builtin-or "return x | y")
+	  (list '.xor '(x y) #f -pmacro-builtin-xor "return x ^ y")
+	  (list '.inv '(x) #f -pmacro-builtin-inv "return ~x")
 	  (list '.car '(x) #f -pmacro-builtin-car "return (car x)")
 	  (list '.cdr '(x) #f -pmacro-builtin-cdr "return (cdr x)")
 	  (list '.caar '(x) #f -pmacro-builtin-caar "return (caar x)")

@@ -1,5 +1,12 @@
 2009-07-19  Doug Evans  <dje@sebabeach.org>
 
+	* rtl-c.scm (addc-cflag, addc-oflag, subc-cflag, subc-oflag): Define.
+	(add-cflag, add-oflag, sub-cflag, sub-oflag): Deprecate.
+	* rtx-funcs.scm (addc-cflag, addc-oflag, subc-cflag, subc-oflag):
+	Define.
+	(add-cflag, add-oflag, sub-cflag, sub-oflag): Deprecate.
+	* doc/rtl.texi: Update.
+
 	* doc/pmacros.texi (.not): Emphasize (.not 0) is not 1.
 
 	Rename builtin boolean pmacros, for consistency with rtl.

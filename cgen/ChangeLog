@@ -5,6 +5,7 @@
 	All callers updated.
 	(-pmacro-bulid-lambda): Ditto.
 	* doc/pmacros.texi: Update.
+	* testsuite/pmacros-1.test: Add testcase.
 
 	* ifield.scm (-multi-ifield-make-default-insert): Fix shifts
 	calculation.

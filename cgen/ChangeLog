@@ -1,5 +1,11 @@
 2009-07-19  Doug Evans  <dje@sebabeach.org>
 
+	Fix binding of nested pmacro parameters.
+	* pmacros.scm (-pmacro-env-make): New arg prev-env.
+	All callers updated.
+	(-pmacro-bulid-lambda): Ditto.
+	* doc/pmacros.texi: Update.
+
 	* ifield.scm (-multi-ifield-make-default-insert): Fix shifts
 	calculation.
 	(-multi-ifield-make-default-extract): Ditto.

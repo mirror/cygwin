@@ -35,6 +35,12 @@ cat > ${cpu_file} <<EOF
                  (.for-each (.pmacro (x y z)
 		              (.print x y z))
                             (a b c) (d e f) (g h i)))))
+(test-name "nested .pmacros with bindings")
+(print-match "(+ 4 3)")
+(print-thunk (.pmacro ()
+               (.dump ((.pmacro (arg1 arg2)
+                         ((.pmacro (bar) (+ arg2 bar)) arg1))
+                       3 4))))
 
 (test-name ".dump")
 (print-match "(name1 \"string1\" 1)(name2 \"string2\" 2)(name3 \"string3\" 3)\n")

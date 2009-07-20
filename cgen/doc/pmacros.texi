@@ -859,14 +859,13 @@ Example:
 (load-op uh OP2_11 HI (.pmacro (mode expr) (zext mode expr)))
 @end smallexample
 
-.pmacro's don't bind the way Scheme lambda expressions do.
-In the following example, arg2 in the second pmacro is not bound
-to the arg2 argument of the first pmacro.
-@c FIXME: Feels like a bug rather than a feechure.
+.pmacro's bind the same way Scheme lambda expressions do.
+In the following example, arg2 in the second pmacro is bound
+to the arg2 argument of the outer pmacro.
 
 @smallexample
 (define-pmacro (foo arg1 arg2) ((.pmacro (bar) (+ arg2 bar)) arg1))
-(foo 3 4) ==> (+ arg2 3)
+(foo 3 4) ==> (+ 4 3)
 @end smallexample
 
 @node Passing macros as arguments

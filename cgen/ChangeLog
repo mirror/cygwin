@@ -1,5 +1,9 @@
 2009-07-19  Doug Evans  <dje@sebabeach.org>
 
+	* ifield.scm (-multi-ifield-make-default-insert): Fix shifts
+	calculation.
+	(-multi-ifield-make-default-extract): Ditto.
+
 	* rtl-c.scm (addc-cflag, addc-oflag, subc-cflag, subc-oflag): Define.
 	(add-cflag, add-oflag, sub-cflag, sub-oflag): Deprecate.
 	* rtx-funcs.scm (addc-cflag, addc-oflag, subc-cflag, subc-oflag):

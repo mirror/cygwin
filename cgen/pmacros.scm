@@ -100,9 +100,7 @@
 ; .sym and .str convert numbers to symbols/strings as necessary (base 10).
 ;
 ; .pmacro is for constructing pmacros on-the-fly, like lambda, and is currently
-; only valid as arguments to other macros.
-; ??? Nested pmacros don't bind their arguments the way nested lambda's do.
-; Should they?
+; only valid as arguments to other macros or assigned to a local in a {.let}.
 ;
 ; ??? Methinks .foo isn't a valid R5RS symbol.  May need to change 
 ; to something else.
@@ -142,7 +140,9 @@
 ; Cover functions to manage an "environment" in case a need or desire for
 ; another method arises.
 
-(define (-pmacro-env-make names values) (map cons names values))
+(define (-pmacro-env-make prev-env names values)
+  (append! (map cons names values) prev-env)
+)
 (define (-pmacro-env-ref env name) (assq name env))
 
 ; Error message generator.
@@ -437,10 +437,11 @@
 
 ; Build a procedure that performs a pmacro expansion.
 
-(define (-pmacro-build-lambda params expansion)
+(define (-pmacro-build-lambda prev-env params expansion)
   (eval1 `(lambda ,params
 	    (-pmacro-expand ',expansion
-			    (-pmacro-env-make ',params (list ,@params)))))
+			    (-pmacro-env-make ',prev-env
+					      ',params (list ,@params)))))
 )
 
 ; ??? I'd prefer to use `define-macro', but boot-9.scm uses it and
@@ -458,7 +459,7 @@
 ; name).
 ; ??? The goal here is to follow Scheme's define/lambda, but not all variants
 ; are supported yet.  There's also the difference that we treat undefined
-; symbols as being themselves.
+; symbols as being themselves (i.e. "self quoting" so-to-speak).
 ;
 ; ??? We may want user-definable "syntactic" macros some day.  Later.
 
@@ -490,7 +491,8 @@
 	    (-pmacro-set! name (-pmacro-make name #f #f #f expansion comment)))
 	(-pmacro-set! name
 		      (-pmacro-make name arg-spec default-values #f
-				    (-pmacro-build-lambda arg-spec expansion)
+				    (-pmacro-build-lambda nil
+							  arg-spec expansion)
 				    comment))))
     *UNSPECIFIED*
 )
@@ -715,7 +717,8 @@
   ;; e.g. (define (foo bar . baz) ...)
   (if (not (list? params))
       (-pmacro-error ".pmacro parameter-spec is not a list" params))
-  (-pmacro-make '.anonymous params #f #f (-pmacro-build-lambda params expansion) "")
+  (-pmacro-make '.anonymous params #f #f
+		(-pmacro-build-lambda env params expansion) "")
 )
 
 ; (.let (var-list) expr1 . expr-rest)

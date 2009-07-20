@@ -57,7 +57,8 @@
 	      nil)
 )
 
-; {value},{follows} are missing on purpose
+; {ordinal} is missing on purpose, it's handled at a higher level.
+; {value},{follows} are missing on purpose.
 ; {value} is handled specially.
 ; {follows} is rarely used
 (method-make-make! <ifield> '(name comment attrs mode bitrange encode decode))
@@ -825,7 +826,7 @@ Define an instruction multi-field, all arguments specified.
 
 (define (-multi-ifield-make-default-insert container-name subfields)
   (let* ((lengths (map ifld-length subfields))
-	 (shifts (cons 0 (list-tail-drop 1 (plus-scan (cons 0 lengths))))))
+	 (shifts (list-tail-drop 1 (plus-scan (cons 0 lengths)))))
     ; Build RTL expression to shift and mask each ifield into right spot.
     (let ((exprs (map (lambda (f length shift)
 			(rtx-make 'and (rtx-make 'srl container-name shift)
@@ -843,7 +844,7 @@ Define an instruction multi-field, all arguments specified.
 
 (define (-multi-ifield-make-default-extract container-name subfields)
   (let* ((lengths (map ifld-length subfields))
-	 (shifts (cons 0 (list-tail-drop 1 (plus-scan (cons 0 lengths))))))
+	 (shifts (list-tail-drop 1 (plus-scan (cons 0 lengths)))))
     ; Build RTL expression to shift and mask each ifield into right spot.
     (let ((exprs (map (lambda (f length shift)
 			(rtx-make 'sll (rtx-make 'and (obj:name f)

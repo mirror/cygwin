@@ -272,7 +272,7 @@
 ; are returned as (model1), i.e. an empty unit list.
 
 (define (parse-insn-timing context insn-timing-desc)
-  (logit 3 "parse-insn-timing: context==" context ", desc==" insn-timing-desc "\n")
+  (logit 3 "  parse-insn-timing: context= " context ", desc= " insn-timing-desc "\n")
   (map (lambda (model-timing-desc)
 	 (let* ((model-name (car model-timing-desc))
 		(model (current-model-lookup model-name)))

@@ -217,6 +217,7 @@
 ; any arguments).
 ; ARG-TYPES is a list of argument types (-rtx-valid-types).
 ; ARG-MODES is a list of mode matchers (-rtx-valid-matches).
+; CLASS is the class of the rtx to be created.
 ; ACTION is a list of Scheme expressions to perform the operation.
 ;
 ; ??? Note that we can support variables.  Not sure it should be done.
@@ -1136,14 +1137,12 @@ Define an rtx subroutine, name/value pair list version.
 
   ; Add the operands to the eval symbol table.
   (for-each (lambda (op)
-	      (hashq-set! -rtx-operand-table (obj:name op) op)
-	      )
+	      (hashq-set! -rtx-operand-table (obj:name op) op))
 	    (current-op-list))
 
   ; Add ifields to the eval symbol table.
   (for-each (lambda (f)
-	      (hashq-set! -rtx-operand-table (obj:name f) f)
-	      )
+	      (hashq-set! -rtx-operand-table (obj:name f) f))
 	    (non-derived-ifields (current-ifld-list)))
 
   *UNSPECIFIED*

@@ -1,3 +1,13 @@
+2009-07-20  Doug Evans  <dje@sebabeach.org>
+
+	* model.scm (parse-insn-timing): Tweak logging message.
+	* operand.scm: Comment and whitespace tweaks.
+	(op:type): Tweak error message.
+	(op-ifield): Tweak logging message.
+	(-derived-operand-parse, anyof-merge-semantics): Ditto.
+	* read.scm: Whitespace cleanup.
+	* utils.scm: Whitespace cleanup.
+
 2009-07-19  Doug Evans  <dje@sebabeach.org>
 
 	Fix binding of nested pmacro parameters.

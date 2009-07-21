@@ -339,25 +339,26 @@
     ; What we want to create here is the set of all "anyof" alternatives.
     ; From that we create one <insn> per alternative.
 
-    (let ((anyof-iflds (find ifld-anyof-operand? iflds)))
+    (let* ((anyof-iflds (find ifld-anyof-operand? iflds))
+	   (anyof-operands (map ifld-get-value anyof-iflds)))
 
-      (assert (all-true? (map anyof-operand? (map ifld-get-value anyof-iflds))))
-      ;(display (obj:name multi-insn) (current-error-port))
-      ;(display " anyof: " (current-error-port))
-      ;(display (map obj:name (map ifld-get-value anyof-iflds)) (current-error-port))
-      ;(newline (current-error-port))
+      (assert (all-true? (map anyof-operand? anyof-operands)))
+      (logit 4 "  anyof: " (map obj:name anyof-operands) "\n")
+      (logit 4 "    choices: "
+	     (map (lambda (l) (map obj:name l))
+		  (map anyof-choices anyof-operands))
+	     "\n")
 
       ; Iterate over all combinations.
       ; TODO is a list with one element for each <anyof-operand>.
       ; Each element is in turn a list of all choices (<derived-operands>'s)
       ; for the <anyof-operand>.  Note that some of these values may be
       ; derived from nested <anyof-operand>'s.
-      ; ??? anyof-all-choices should cache the results.
+      ; ??? anyof-all-choices should cache the results. [Still useful?]
       ; ??? Need to cache results of assertion processing in addition or
-      ; instead of anyof-all-choices.
+      ; instead of anyof-all-choices. [Still useful?]
 
-      (let* ((anyof-operands (map ifld-get-value anyof-iflds))
-	     (todo (map anyof-all-choices anyof-operands))
+      (let* ((todo (map anyof-all-choices anyof-operands))
 	     (lengths (map length todo))
 	     (total (apply * lengths)))
 
@@ -370,9 +371,7 @@
 	  (if (< i total)
 	      (let* ((indices (split-value lengths i))
 		     (anyof-instances (map list-ref todo indices)))
-		;(display "derived: " (current-error-port))
-		;(display (map obj:name anyof-instances) (current-error-port))
-		;(newline (current-error-port))
+		(logit 4 "Derived: " (map obj:name anyof-instances) "\n")
 		(-sub-insn-make! multi-insn anyof-operands anyof-instances)
 		(loop (+ i 1))))))))
 

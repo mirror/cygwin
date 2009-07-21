@@ -320,6 +320,7 @@
 ;; original value is restored whether THUNK returns normally, throws
 ;; an exception, or invokes a continuation that leaves the call's
 ;; dynamic scope.
+
 (define (setter-getter-fluid-let setter getter value thunk)
   (let ((swap (lambda ()
 		(let ((temp (getter)))
@@ -334,6 +335,7 @@
 ;; This ensures the current ports get restored whether THUNK exits
 ;; normally, throws an exception, or leaves the call's dynamic scope
 ;; by applying a continuation.
+
 (define (with-input-and-output-to port thunk)
   (setter-getter-fluid-let
    set-current-input-port current-input-port port
@@ -567,20 +569,22 @@
 )
 
 ;; left fold
+
 (define (foldl kons accum lis) 
   (if (null? lis) accum 
       (foldl kons (kons accum (car lis)) (cdr lis))))
 
 ;; right fold
+
 (define (foldr kons knil lis) 
   (if (null? lis) knil 
       (kons (car lis) (foldr kons knil (cdr lis)))))
 
 ;; filter list on predicate
+
 (define (filter p ls)
   (foldr (lambda (x a) (if (p x) (cons x a) a)) 
 	 '() ls))
-
 
 ; APL's +\ operation on a vector of numbers.
 

@@ -91,7 +91,8 @@
 		; the instruction.
 		(cond? . #f)
 		
-		; whether (and by how much) this instance of the operand is delayed.
+		; whether (and by how much) this instance of the operand is
+		; delayed.
 		(delayed . #f)
 		)
 	      nil)
@@ -153,7 +154,7 @@
 	    (let* ((hw-name (op:hw-name op))
 		   (hw-objs (current-hw-sem-lookup hw-name)))
 	      (if (!= (length hw-objs) 1)
-		  (error "can't resolve h/w reference" hw-name))
+		  (error "cannot resolve h/w reference" hw-name))
 	      ((elm-make-setter <operand> 'type) op (car hw-objs))
 	      (car hw-objs))))))
 )
@@ -182,11 +183,12 @@
 ; Result is the <ifield> object or #f if there is none.
 
 (define (op-ifield op)
-  (logit 4 "op-ifield op=" (obj:name op) " indx=" (obj:name (op:index op)) "\n")
+  (logit 4 "  op-ifield op= " (obj:name op)
+	 ", indx= " (obj:name (op:index op)) "\n")
   (let ((indx (op:index op)))
     (if indx
 	(let ((maybe-ifld (hw-index:value (op:index op))))
-	  (logit 4 " ifld=" (obj:name maybe-ifld) "\n")
+	  (logit 4 "  ifld=" (obj:name maybe-ifld) "\n")
 	  (cond ((ifield? maybe-ifld) maybe-ifld)
 		((derived-ifield? maybe-ifld) maybe-ifld)
 		((ifield? indx) indx)
@@ -418,7 +420,6 @@
     (lambda () scalar-index))
 )
 
-
 ; Placeholder for indices of "anyof" operands.
 ; There only needs to be one of these, so we create one and always use that.
 
@@ -443,8 +444,6 @@
     (elm-xset! derived-index 'value #f)
     (lambda () derived-index))
 )
-
-
 
 ; Hardware selector support.
 ;
@@ -874,8 +873,9 @@
 	    ;(elm-set! result 'hw-name base-ifield)
 	    (elm-set! result 'index parsed-encoding)
 	    ; (elm-set! result 'index (hw-index-derived)) ; A temporary dummy
-	    (logit 2 "new derived-operand; name=" name " hw-name= " (op:hw-name result) 
-		   " index=" (obj:name parsed-encoding) "\n")
+	    (logit 2 "  new derived-operand; name= " name
+		   ", hw-name= " (op:hw-name result) 
+		   ", index=" (obj:name parsed-encoding) "\n")
 	    (derived-ifield-set-owner! parsed-encoding result)
 	    result))
 
@@ -1113,7 +1113,6 @@
   (elm-get anyof-instance 'name)
 )
 
-
 (define (-anyof-merge-syntax syntax value-names values)
   (let ((syntax-elements (syntax-break-out syntax)))
     (syntax-make (map (lambda (e)
@@ -1239,7 +1238,7 @@
 			     (else
 			      e)))
 		     semantics)))))
-    (logit 4 "Merged semantics [" semantics "] -> [" result "]\n")
+    (logit 4 "  merged semantics: [" semantics "] -> [" result "]\n")
     result)
 )
 
@@ -1301,7 +1300,7 @@
 		(-anyof-merge-setter (op:setter choice)
 				     arg-names new-args)
 		container)))
-    ;
+
     (elm-set! result 'index encoding)
     ; Creating the link from {encoding} to {result}.
     (derived-ifield-set-owner! encoding result)
@@ -1400,9 +1399,9 @@
 
     ; For each choice, scan the operands for further derived operands.
     ; If found, replace the choice with the list of its subchoices.
-    ; If not found, create an <anyof-instance> object for it.  This is basically
-    ; just a copy of the object, but {anyof-operand} is recorded with it so
-    ; that we can later resolve `follows' specs.
+    ; If not found, create an <anyof-instance> object for it.  This is
+    ; basically just a copy of the object, but {anyof-operand} is recorded
+    ; with it so that we can later resolve `follows' specs.
 
     (let loop ((choices (anyof-choices anyof-operand)))
       (if (not (null? choices))

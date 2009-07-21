@@ -940,10 +940,12 @@ Define a preprocessor-style macro.
 
 ; A handle on /dev/tty, so we can be sure we're talking with the user.
 ; We open this the first time we actually need it.
+
 (define debug-tty #f)
 
 ; Return the port we should use for interacting with the user,
 ; opening it if necessary.
+
 (define (debug-tty-port)
   (if (not debug-tty)
       (set! debug-tty (open-file "/dev/tty" "r+")))
@@ -1015,9 +1017,11 @@ Define a preprocessor-style macro.
 ; Default place to look.
 ; This gets overridden to point to the directory of the loaded .cpu file.
 ; ??? Ideally this would be local to this file.
+
 (define arch-path (string-append srcdir "/cpu"))
 
 ; Accessors for application option specs
+
 (define (opt-get-first-pass opt)
   (or (list-ref opt 3) (lambda args #f)))
 (define (opt-get-second-pass opt)

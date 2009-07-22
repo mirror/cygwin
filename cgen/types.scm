@@ -89,38 +89,69 @@
 
 (define (parse-type errtxt type-spec)
   ; Preliminary error checking.
-  (if (and (list? (car type-spec))
-	   (not (= (length (car type-spec)) 2)))
-      (parse-error errtxt "invalid type spec" type-spec))
+  (let ((expected
+	 ", expected (mode [(dimensions)]) or ((mode bits) [(dimensions)])"))
+    (if (not (list? type-spec))
+	(parse-error errtxt (string-append "invalid type spec" expected)
+		     type-spec))
+    (let ((len (length type-spec)))
+      (if (or (< len 1)
+	      (> len 2))
+	  (parse-error errtxt (string-append "invalid type spec" expected)
+		       type-spec))
+      ; Validate the mode spec.
+      (cond ((symbol? (car type-spec))
+	     #t) ; ok
+	    ((list? (car type-spec))
+	     (begin
+	       (if (not (= (length (car type-spec)) 2))
+		   (parse-error errtxt
+				(string-append "invalid mode in type spec"
+					       expected)
+				type-spec))
+	       (if (not (symbol? (caar type-spec)))
+		   (parse-error errtxt
+				(string-append "invalid mode in type spec"
+					       expected)
+				type-spec))
+	       (if (not (integer? (cadar type-spec)))
+		   (parse-error errtxt
+				(string-append "invalid #bits in type spec"
+					       expected)
+				type-spec))
+	       ))
+	     (else
+	      (parse-error errtxt
+			   (string-append "invalid mode in type spec" expected)
+			   type-spec)))
+      ; Validate the dimension list if present.
+      (if (= len 2)
+	  (if (or (not (list? (cadr type-spec)))
+		  (not (all-true? (map non-negative-integer?
+				       (cadr type-spec)))))
+	      (parse-error errtxt
+			   (string-append "invalid dimension spec in type spec"
+					  expected)
+			   type-spec)))
+      ))
 
   ; Pick out the arguments.
   (let ((mode (if (list? (car type-spec)) (caar type-spec) (car type-spec)))
 	(bits (if (list? (car type-spec)) (cadar type-spec) #f))
 	(dims (if (> (length type-spec) 1) (cadr type-spec) nil)))
 
-    ; FIXME: Need more error checking here.
-    ; Validate the mode and bits.
-    (let ((mode-obj
-	   (case mode
-	     ((INT)
-	      (if (integer? bits)
-		  (mode-make-int bits)
-		  (parse-error errtxt "invalid number of bits" bits)))
-	     ((UINT)
-	      (if (integer? bits)
-		  (mode-make-uint bits)
-		  (parse-error errtxt "invalid number of bits" bits)))
-	     ((BI QI HI SI DI WI UQI UHI USI UDI UWI SF DF XF TF)
-	      (let ((x (parse-mode-name mode errtxt)))
-		(if (and bits (not (= bits (mode:bits x))))
-		    (parse-error errtxt "wrong number of bits for mode" bits))
-		x))
-	     (else (parse-error errtxt "unknown/unsupported mode" mode)))))
-
-      ; Validate the dimension spec.
-      (if (or (not (list? dims))
-	      (not (all-true? (map integer? dims))))
-	  (parse-error errtxt "invalid dimension spec" dims))
+    ; Look up the mode and create the mode object.
+    (let* ((base-mode (parse-mode-name mode errtxt))
+	   (mode-obj
+	    (cond ((eq? mode 'INT)
+		   (mode-make-int bits))
+		  ((eq? mode 'UINT)
+		   (mode-make-uint bits))
+		  (else
+		   (if (and bits (!= bits (mode:bits base-mode)))
+		       (parse-error errtxt "wrong number of bits for mode"
+				    bits))
+		   base-mode))))
 
       ; All done, create the <array> object.
       ; ??? Special casing scalars is a concession for apps that think

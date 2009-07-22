@@ -144,6 +144,10 @@ cat > ${cpu_file} <<EOF
 (print-match "(no no no no)")
 (print-expr (.replicate 4 no))
 
+(test-name ".find")
+(print-match "(0 1)")
+(print-expr (.find (.pmacro (n) (.lt n 2)) (.iota 4)))
+
 (test-name ".equals")
 (print-match "#t")
 (print-expr (.equals (yo yo) (yo yo)))

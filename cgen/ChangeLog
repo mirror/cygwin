@@ -1,5 +1,10 @@
 2009-07-22  Doug Evans  <dje@sebabeach.org>
 
+	* modes.scm (TI,OI): New modes.
+	* types.scm (parse-type): Improve error checking.  Don't hardwire
+	mode names here.
+	* utils.scm (non-negative-integer?): New function.
+
 	* pmacros.scm (-pmacro-builtin-find): New predicate.
 	(pmacros-init!): Add .find.
 	* doc/pmacros.tex: Document .find.

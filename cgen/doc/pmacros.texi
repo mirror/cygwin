@@ -448,9 +448,10 @@ Builtin macros for maninpulating lists.
 @menu
 * Creating lists::
 * List splicing::                 The @code{.splice} builtin
-* Referencing a list element::
+* Referencing a list element::    The @code{.ref} builtin
 * List length::
-* Lists of repeated elements::
+* Lists of repeated elements::    The @code{.replicate} builtin
+* Finding a subset of a list::    The @code{.find} builtin
 * car/cdr::                       car, cdr, etc. from Scheme/Lisp
 @end menu
 
@@ -587,6 +588,20 @@ Example:
 
 @smallexample
 (.replicate 4 5) --> (5 5 5 5)
+@end smallexample
+
+@node Finding a subset of a list
+@subsection Finding a subset of a list
+@cindex .find
+
+Compute a subset of a list matching a specified predicate with @code{.find}.
+
+Syntax: @samp{(.find predicate l)}
+
+Example:
+
+@smallexample
+(.find (.pmacro (n) (.lt n 2)) (.iota 4)) --> (0 1)
 @end smallexample
 
 @node car/cdr

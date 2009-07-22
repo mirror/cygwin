@@ -66,6 +66,7 @@
 ; (.ref l n)                          - extract the n'th element of list l
 ; (.length x)                         - length of symbol, string, or list
 ; (.replicate n expr)                 - return list of expr replicated n times
+; (.find pred l)                      - return elements of list l matching pred
 ; (.equals x y)                       - deep comparison
 ; (.andif expr . rest)                - && in C
 ; (.orif expr . rest)                 - || in C
@@ -858,6 +859,19 @@
   (make-list n expr)
 )
 
+; (.find pred l)
+
+(define (-pmacro-builtin-find pred l)
+  (if (not (-pmacro? pred))
+      (-pmacro-error "not a pmacro" pred))
+  (if (not (list? l))
+      (-pmacro-error "not a list" l))
+  (let ((transformer (-pmacro-transformer pred)))
+    (if (not (procedure? transformer))
+	(-pmacro-error "not a procedural macro" pred))
+    (find transformer l))
+)
+
 ; (.equals x y)
 
 (define (-pmacro-builtin-equals x y)
@@ -1167,6 +1181,7 @@
 	  (list '.ref '(l n) #f -pmacro-builtin-ref "return n'th element of list l")
 	  (list '.length '(x) #f -pmacro-builtin-length "return length of symbol, string, or list")
 	  (list '.replicate '(n expr) #f -pmacro-builtin-replicate "return list of expr replicated n times")
+	  (list '.find '(pred l) #f -pmacro-builtin-find "return elements of list l matching pred")
 	  (list '.equals '(x y) #f -pmacro-builtin-equals "deep comparison of x and y")
 	  (list '.andif 'rest #t -pmacro-builtin-andif "return first #f element, otherwise return last element")
 	  (list '.orif 'rest #t -pmacro-builtin-orif "return first non-#f element found, otherwise #f")

@@ -1064,6 +1064,13 @@
     (map compute-indices selectors))
 )
 
+; Return #t if n is a non-negative integer.
+
+(define (non-negative-integer? n)
+  (and (integer? n)
+       (>= n 0))
+)
+
 ; Convert a list of numbers to a string, separated by SEP.
 ; The result is prefixed by SEP too.
 

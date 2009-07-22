@@ -33,7 +33,9 @@
 		;
 		; Possible values:
 		; %x - as always
-		; %D - DI mode
+		; %D - DI mode (8 bytes)
+		; %T - TI mode (16 bytes)
+		; %O - OI mode (32 bytes)
 		; %f - SF,DF modes
 		; %F - XF,TF modes
 		printf-type
@@ -501,6 +503,10 @@ Define a mode, all arguments specified.
     (dfm 'HI "16 bit int" '() 'INT 16 2 "int" "'x'" #f #f #f)
     (dfm 'SI "32 bit int" '() 'INT 32 4 "int" "'x'" #f #f #f)
     (dfm 'DI "64 bit int" '(FN-SUPPORT) 'INT 64 8 "" "'D'" #f #f #f)
+
+    ; No unsigned versions on purpose for now.
+    (dfm 'TI "128 bit int" '(FN-SUPPORT) 'INT 128 16 "" "'T'" #f #f #f)
+    (dfm 'OI "256 bit int" '(FN-SUPPORT) 'INT 256 32 "" "'O'" #f #f #f)
 
     (dfm 'UQI "8 bit unsigned byte" '() 'UINT
 	 8 1 "unsigned int" "'x'" (mode:lookup 'QI) #f #f)

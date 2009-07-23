@@ -59,7 +59,7 @@ void package_list (int, char **);
 void dump_dodgy_apps (int verbose);
 
 
-static const char version[] = "$Revision: 1.117 $";
+static const char version[] = "$Revision: 1.118 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1301,7 +1301,7 @@ dump_sysinfo ()
 		  " Essential Business Server Management Server",
 		  " Essential Business Server Security Server"
 		  " Essential Business Server Messaging Server",
-		  "",
+		  " Server Foundation",
 		  "",
 		  " without Hyper-V for Windows Essential Server Solutions",
 		  " Server Standard without Hyper-V",

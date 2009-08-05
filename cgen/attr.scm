@@ -402,17 +402,17 @@
 	   (set! default #f)) ; really a nop, but for consistency
        (if (eq? values #f)
 	   (set! values '(#f #t))))
-      ((bitset-attribute>)
+      ((bitset-attribute>) ;; FIXME
        (if (eq? default #f)
 	   (parse-error errtxt "bitset-attribute default not specified"))
        (if (eq? values #f)
 	   (parse-error errtxt "bitset-attribute values not specified")))
-      ((integer-attribute>)
+      ((integer-attribute>) ;; FIXME
        (if (eq? default #f)
 	   (set! default 0))
        (if (eq? values #f)
 	   (set! values #f))) ; really a nop, but for consistency
-      ((enum-attribute>)
+      ((enum-attribute>) ;; FIXME
        (if (eq? default #f)
 	   (parse-error errtxt "enum-attribute default not specified"))
        (if (eq? values #f)

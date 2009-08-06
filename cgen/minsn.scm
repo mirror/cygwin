@@ -24,7 +24,7 @@
 
 (define <macro-insn>
   (class-make '<macro-insn>
-	      '(<ordered-ident>)
+	      '(<source-ident>)
 	      '(
 		; syntax of the macro
 		syntax

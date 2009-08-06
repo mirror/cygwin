@@ -17,7 +17,7 @@
 
 (define <operand>
   (class-make '<operand>
-	      '(<ordered-ident>)
+	      '(<source-ident>)
 	      '(
 		; Name as used in semantic code.
 		; Generally this is the same as NAME.  It is changed by the

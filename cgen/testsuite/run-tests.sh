@@ -30,7 +30,7 @@ do
     then
 	pass_count=$(( ${pass_count} + 1 ))
     else
-	fail_count=$(( ${pass_count} + 1 ))
+	fail_count=$(( ${fail_count} + 1 ))
     fi
 done
 

@@ -23,7 +23,7 @@
 
 (define <ifield>
   (class-make '<ifield>
-	      '(<ordered-ident>)
+	      '(<source-ident>)
 	      '(
 		; The mode the raw value is to be interpreted in.
 		mode

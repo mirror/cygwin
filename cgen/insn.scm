@@ -7,7 +7,7 @@
 
 (define <insn>
   (class-make '<insn>
-	      '(<ordered-ident>)
+	      '(<source-ident>)
 	      '(
 		; Used to explicitly specify mnemonic, now it's computed from
 		; syntax string.  ??? Might be useful as an override someday.
@@ -437,6 +437,7 @@
 
 ; Read an instruction description.
 ; This is the main routine for analyzing instructions in the .cpu file.
+; This is also used to create virtual insns by apps like simulators.
 ; ERRTXT is prepended to error messages to provide context.
 ; ARG-LIST is an associative list of field name and field value.
 ; -insn-parse is invoked to create the <insn> object.
@@ -950,7 +951,7 @@ Define an instruction, all arguments specified.
   *UNSPECIFIED*
 )
 
-; Called before a . cpu file is read in to install any builtins.
+; Called before a .cpu file is read in to install any builtins.
 
 (define (insn-builtin!)
   ; Standard insn attributes.

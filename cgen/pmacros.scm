@@ -14,8 +14,9 @@
 ; Required routines:
 ; make-hash-table, hashq-ref, hashq-set!
 ; string-append, symbol-append, map, apply, number?, number->string,
-; eval, num-args-ok?, *UNSPECIFIED*.
+; eval, reader-process-expanded!, num-args-ok?, *UNSPECIFIED*.
 ; `num-args-ok?' and `*UNSPECIFIED*' are defined in cgen's utils.scm.
+; reader-process-expanded! is defined in cgen's read.scm.
 
 ; The convention we use says `-' begins "local" objects.
 ; At some point this might also use the Guile module system.
@@ -24,22 +25,26 @@
 ;
 ; pmacro-init! - initialize the pmacro system
 ;
-; define-pmacro - define a symbolic or procedural macro
+; define-pmacro - define a symbolic or procedural pmacro
 ;
 ;	(define-pmacro symbol ["comment"] expansion)
 ;	(define-pmacro (symbol [args]) ["comment"] (expansion))
 ;
 ; ARGS is a list of `symbol' or `(symbol default-value)' elements.
 ;
-; pmacro-expand - expand all macros in an expression
+; pmacro-expand - expand all pmacros in an expression
 ;
-;	(pmacro-expand expression)
+;	(pmacro-expand expression loc)
+;
+; pmacro-debug - expand all pmacros in an expression, but don't process .eval
+;
+;	(pmacro-debug expression)
 ;
 ; pmacro-trace - same as pmacro-expand, but print debugging messages
 ;
 ;	(pmacro-trace expression)
 
-; Builtin macros:
+; Builtin pmacros:
 ;
 ; (.sym symbol1 symbol2 ...)          - symbolstr-append
 ; (.str string1 string2 ...)          - stringsym-append
@@ -52,7 +57,7 @@
 ; (.map pmacro arg1 . arg-rest)
 ; (.for-each pmacro arg1 . arg-rest)
 ; (.eval expr)                        - process expr immediately
-; (.apply macro-name arg)
+; (.apply pmacro-name arg)
 ; (.pmacro (arg-list) expansion)      - akin go lambda in Scheme
 ; (.let (var-list) expr1 . expr-rest) - akin to let in Scheme
 ; (.if expr then [else])
@@ -101,14 +106,14 @@
 ; .sym and .str convert numbers to symbols/strings as necessary (base 10).
 ;
 ; .pmacro is for constructing pmacros on-the-fly, like lambda, and is currently
-; only valid as arguments to other macros or assigned to a local in a {.let}.
+; only valid as arguments to other pmacros or assigned to a local in a {.let}.
 ;
 ; ??? Methinks .foo isn't a valid R5RS symbol.  May need to change 
 ; to something else.
 
-; True if doing macro expansion via pmacro-debug or pmacro-trace.
+; True if doing pmacro expansion via pmacro-debug or pmacro-trace.
 (define -pmacro-debug? #f)
-; True if doing macro expansion via pmacro-trace.
+; True if doing pmacro expansion via pmacro-trace.
 (define -pmacro-trace? #f)
 
 ; The pmacro table.
@@ -199,20 +204,13 @@
       (-pmacro-expected-non-negative-integer op n))
 )
 
-; Utility to evaluate pmacro args.
-; ??? Currently unused, keep for now.
-
-(define (-pmacro-eval expr)
-  (eval1 expr)
-)
-
-; Expand a list of expressions, in order
+; Expand a list of expressions, in order.
 ; The result is the value of the last one.
 
-(define (-pmacro-expand-expr-list exprs env)
+(define (-pmacro-expand-expr-list exprs env loc)
   (let ((result nil))
     (for-each (lambda (expr)
-		(set! result (-pmacro-expand expr env)))
+		(set! result (-pmacro-expand expr env loc)))
 	      exprs)
     result)
 )
@@ -292,14 +290,15 @@
 ; Invoke a syntactic-form pmacro.
 ; ENV is handed down from -pmacro-expand.
 
-(define (-smacro-apply macro args env)
+(define (-smacro-apply macro args env loc)
   (apply (-pmacro-transformer macro)
-	 (cons env (-pmacro-process-args macro args)))
+	 (cons loc (cons env (-pmacro-process-args macro args))))
 )
 
-; Expand expression EXP using ENV, an alist of variable assignments.
+;; Expand expression EXP using ENV, an alist of variable assignments.
+;; LOC is the location stack thus far.
 
-(define (-pmacro-expand exp env)
+(define (-pmacro-expand exp env loc)
 
   (define cep (current-error-port))
 
@@ -312,18 +311,18 @@
 	  (cdr val) ; cdr is value of (name . value) pair
 	  (let ((val (-pmacro-lookup sym)))
 	    (if val
-		; Symbol is a macro.
-		; If this is a procedural macro, let caller perform expansion.
-		; Otherwise, return the macro's value.
+		; Symbol is a pmacro.
+		; If this is a procedural pmacro, let caller perform expansion.
+		; Otherwise, return the pmacro's value.
 		(if (procedure? (-pmacro-transformer val))
 		    val
 		    (-pmacro-transformer val))
 		; Return symbol unchanged.
 		sym)))))
 
-  ; See if (car exp) is a macro.
-  ; Return macro or #f.
-  (define (check-macro exp)
+  ; See if (car exp) is a pmacro.
+  ; Return pmacro or #f.
+  (define (check-pmacro exp)
     (if -pmacro-trace?
 	(begin
 	  (display "macro?   " cep)
@@ -331,30 +330,64 @@
 	  (newline cep)))
     (and (-pmacro? (car exp)) (car exp)))
 
-  ;; Scan each element in EXP and see if the result is a macro invocation.
-  (define (scan-list exp)
+  ;; Subroutine of scan-list to simplify it.
+  ;; Macro expand EXP which is known to be a non-null list.
+  ;; LOC is the location stack thus far.
+  (define (scan-list1 exp loc)
     ;; Check for syntactic forms.
     ;; They are handled differently in that we leave it to the transformer
     ;; routine to evaluate the arguments.
     (let ((sform (-smacro-lookup (car exp))))
       (if sform
-	  (-smacro-apply sform (cdr exp) env)
+	  (-smacro-apply sform (cdr exp) env loc)
 	  ;; Not a syntactic form.
 	  ;; Evaluate all the arguments first.
-	  (let ((scanned-exp (map scan exp)))
-	    (let ((macro (check-macro scanned-exp)))
+	  (let ((scanned-exp (map (lambda (e) (scan e loc))
+				  exp)))
+	    (let ((macro (check-pmacro scanned-exp)))
 	      (if macro
 		  (if (procedure? (-pmacro-transformer macro))
 		      (-pmacro-apply macro (cdr scanned-exp))
 		      (cons (-pmacro-transformer macro) (cdr scanned-exp)))
 		  scanned-exp))))))
 
-  ; Scan EXP, an arbitrary value.
-  (define (scan exp)
-    (let ((result (cond ((symbol? exp) (scan-symbol exp))
-			((and (list? exp) (not (null? exp))) (scan-list exp))
-			; Not a symbol or expression, return unchanged.
-			(else exp))))
+  ;; Macro expand EXP which is known to be a non-null list.
+  ;; LOC is the location stack thus far.
+  ;;
+  ;; This uses scan-list1 to do the real work, this handles location tracking.
+  (define (scan-list exp loc)
+    (let ((src-props (source-properties exp))
+	  (new-loc loc))
+      (logit 4 "scan-list exp: " exp)
+      (logit 4 "    src-props: " src-props)
+      (if (not (null? src-props))
+	  (let ((file (assq-ref src-props 'filename))
+		(line (assq-ref src-props 'line))
+		(column (assq-ref src-props 'column)))
+	    (logit 4 "new src-props: " file line)
+	    (set! new-loc (location-push-single loc file line column #f))))
+      (let ((result (scan-list1 exp new-loc)))
+	(if (pair? result) ;; pair? -> cheap non-null-list?
+	    (begin
+	      ;; Copy source location to new expression.
+	      (if (null? (source-properties result))
+		  (set-source-properties! result src-props))
+	      (let ((loc-prop (location-property result)))
+		(if loc-prop
+		    (location-property-set! result (location-push new-loc loc-prop))
+		    (location-property-set! result new-loc)))))
+	result)))
+
+  ;; Scan EXP, an arbitrary value.
+  ;; LOC is the location stack thus far.
+  (define (scan exp loc)
+    (let ((result (cond ((symbol? exp)
+			 (scan-symbol exp))
+			((pair? exp) ;; pair? -> cheap non-null-list?
+			 (scan-list exp loc))
+			;; Not a symbol or expression, return unchanged.
+			(else
+			 exp))))
       ; Re-examining `result' to see if it is another pmacro invocation
       ; allows doing things like ((.sym a b c) arg1 arg2)
       ; where `abc' is a pmacro.  Scheme doesn't work this way, but then
@@ -367,7 +400,7 @@
 	(display "expand: " cep) (write exp cep) (newline cep)
 	(display "   env: " cep) (display env cep) (newline cep)))
 
-  (let ((result (scan exp)))
+  (let ((result (scan exp loc)))
     (if -pmacro-trace?
 	(begin
 	  (display "result:  " cep) (write result cep) (newline cep)))
@@ -438,17 +471,27 @@
 
 ; Build a procedure that performs a pmacro expansion.
 
-(define (-pmacro-build-lambda prev-env params expansion)
-  (eval1 `(lambda ,params
-	    (-pmacro-expand ',expansion
-			    (-pmacro-env-make ',prev-env
-					      ',params (list ,@params)))))
+; Earlier version, doesn't work with LOC as a <location> object,
+; COS objects don't pass through eval1.
+;(define (-pmacro-build-lambda prev-env params expansion)
+;  (eval1 `(lambda ,params
+;	    (-pmacro-expand ',expansion
+;			    (-pmacro-env-make ',prev-env
+;					      ',params (list ,@params))))
+;)
+
+(define (-pmacro-build-lambda loc prev-env params expansion)
+  (lambda args
+    (-pmacro-expand expansion
+		    (-pmacro-env-make prev-env params args)
+		    loc))
 )
 
-; ??? I'd prefer to use `define-macro', but boot-9.scm uses it and
+; While using `define-macro' seems preferable, boot-9.scm uses it and
 ; I'd rather not risk a collision.  I could of course make the association
 ; during parsing, maybe later.
-; ??? On the other hand, calling them pmacros removes all ambiguity.
+; On the other hand, calling them pmacros removes all ambiguity.
+; In the end the ambiguity removal is the deciding win.
 ;
 ; The syntax is one of:
 ; (define-pmacro symbol expansion)
@@ -462,12 +505,12 @@
 ; are supported yet.  There's also the difference that we treat undefined
 ; symbols as being themselves (i.e. "self quoting" so-to-speak).
 ;
-; ??? We may want user-definable "syntactic" macros some day.  Later.
+; ??? We may want user-definable "syntactic" pmacros some day.  Later.
 
 (define (define-pmacro header arg1 . arg-rest)
   (if (and (not (symbol? header))
 	   (not (list? header)))
-      (-pmacro-error "invalid pmacro definition" header))
+      (-pmacro-error "invalid pmacro header" header))
   (let ((name (if (symbol? header) header (car header)))
 	(arg-spec (if (symbol? header) #f (-pmacro-get-arg-spec (cdr header))))
 	(default-values (if (symbol? header) #f (-pmacro-get-default-values (cdr header))))
@@ -492,16 +535,19 @@
 	    (-pmacro-set! name (-pmacro-make name #f #f #f expansion comment)))
 	(-pmacro-set! name
 		      (-pmacro-make name arg-spec default-values #f
-				    (-pmacro-build-lambda nil
-							  arg-spec expansion)
+				    (-pmacro-build-lambda (current-reader-location)
+							  nil
+							  arg-spec
+							  expansion)
 				    comment))))
     *UNSPECIFIED*
 )
 
 ; Expand any pmacros in EXPR.
+; LOC is the <location> of EXPR.
 
-(define (pmacro-expand expr)
-  (-pmacro-expand expr '())
+(define (pmacro-expand expr loc)
+  (-pmacro-expand expr '() loc)
 )
 
 ; Expand any pmacros in EXPR, without processing .eval.
@@ -510,12 +556,12 @@
   ; FIXME: Need unwind protection.
   (let ((old-debug -pmacro-debug?))
     (set! -pmacro-debug? #t)
-    (let ((result (-pmacro-expand expr '())))
+    (let ((result (-pmacro-expand expr '() (unspecified-location))))
       (set! -pmacro-debug? old-debug)
       result))
 )
 
-; Debugging routine to trace macro expansion.
+; Debugging routine to trace pmacro expansion.
 
 (define (pmacro-trace expr)
   ; FIXME: Need unwind protection.
@@ -523,13 +569,13 @@
 	(old-trace -pmacro-trace?))
     (set! -pmacro-debug? #t)
     (set! -pmacro-trace? #t)
-    (let ((result (-pmacro-expand expr '())))
+    (let ((result (-pmacro-expand expr '() (unspecified-location))))
       (set! -pmacro-debug? old-debug)
       (set! -pmacro-trace? old-trace)
       result))
 )
 
-; Builtin macros.
+; Builtin pmacros.
 
 ; (.sym symbol1 symbol2 ...) - symbol-append, auto-convert numbers
 
@@ -671,7 +717,7 @@
       (-pmacro-error "not a pmacro" pmacro))
   (let ((transformer (-pmacro-transformer pmacro)))
     (if (not (procedure? transformer))
-	(-pmacro-error "not a procedural macro" pmacro))
+	(-pmacro-error "not a procedural pmacro" pmacro))
     (apply map (cons transformer (cons arg1 arg-rest))))
 )
 
@@ -682,7 +728,7 @@
       (-pmacro-error "not a pmacro" pmacro))
   (let ((transformer (-pmacro-transformer pmacro)))
     (if (not (procedure? transformer))
-	(-pmacro-error "not a procedural macro" pmacro))
+	(-pmacro-error "not a procedural pmacro" pmacro))
     (apply for-each (cons transformer (cons arg1 arg-rest)))
     nil) ; need to return something the reader will accept
 )
@@ -690,42 +736,42 @@
 ; (.eval expr)
 
 (define (-pmacro-builtin-eval expr)
-  ;; If we're expanding macros for debugging purposes, don't eval,
+  ;; If we're expanding pmacros for debugging purposes, don't eval,
   ;; just return unchanged.
   (if -pmacro-debug?
       (list '.eval expr)
       (begin
-	(reader-process-expanded expr)
+	(reader-process-expanded! expr)
 	nil)) ;; need to return something the reader will accept
 )
 
-; (.apply macro-name arg)
+; (.apply pmacro-name arg)
 
 (define (-pmacro-builtin-apply pmacro arg-list)
   (if (not (-pmacro? pmacro))
       (-pmacro-error "not a pmacro" pmacro))
   (let ((transformer (-pmacro-transformer pmacro)))
     (if (not (procedure? transformer))
-	(-pmacro-error "not a procedural macro" pmacro))
+	(-pmacro-error "not a procedural pmacro" pmacro))
     (apply transformer arg-list))
 )
 
 ; (.pmacro (arg-list) expansion)
-; Note: syntactic form
+; NOTE: syntactic form
 
-(define (-pmacro-builtin-pmacro env params expansion)
+(define (-pmacro-builtin-pmacro loc env params expansion)
   ;; ??? Prohibiting improper lists seems unnecessarily restrictive here.
   ;; e.g. (define (foo bar . baz) ...)
   (if (not (list? params))
       (-pmacro-error ".pmacro parameter-spec is not a list" params))
   (-pmacro-make '.anonymous params #f #f
-		(-pmacro-build-lambda env params expansion) "")
+		(-pmacro-build-lambda loc env params expansion) "")
 )
 
 ; (.let (var-list) expr1 . expr-rest)
-; Note: syntactic form
+; NOTE: syntactic form
 
-(define (-pmacro-builtin-let env locals expr1 . expr-rest)
+(define (-pmacro-builtin-let loc env locals expr1 . expr-rest)
   (if (not (list? locals))
       (-pmacro-error ".let locals is not a list" locals))
   (if (not (all-true? (map (lambda (l)
@@ -735,32 +781,32 @@
 			   locals)))
       (-pmacro-error "syntax error in locals list" locals))
   (let* ((evald-locals (map (lambda (l)
-			      (cons (car l) (-pmacro-expand (cadr l) env)))
+			      (cons (car l) (-pmacro-expand (cadr l) env loc)))
 			    locals))
 	 (new-env (append! evald-locals env)))
-    (-pmacro-expand-expr-list (cons expr1 expr-rest) new-env))
+    (-pmacro-expand-expr-list (cons expr1 expr-rest) new-env loc))
 )
 
 ; (.if expr then [else])
-; Note: syntactic form
+; NOTE: syntactic form
 
-(define (-pmacro-builtin-if env expr then-clause . else-clause)
+(define (-pmacro-builtin-if loc env expr then-clause . else-clause)
   (case (length else-clause)
-    ((0) (if (-pmacro-expand expr env)
-	     (-pmacro-expand then-clause env)
+    ((0) (if (-pmacro-expand expr env loc)
+	     (-pmacro-expand then-clause env loc)
 	     nil))
-    ((1) (if (-pmacro-expand expr env)
-	     (-pmacro-expand then-clause env)
-	     (-pmacro-expand (car else-clause) env)))
+    ((1) (if (-pmacro-expand expr env loc)
+	     (-pmacro-expand then-clause env loc)
+	     (-pmacro-expand (car else-clause) env loc)))
     (else (-pmacro-error "too many elements in else-clause, expecting 0 or 1" else-clause)))
 )
 
 ; (.case expr ((case-list1) stmt) [case-expr-stmt-list] [(else stmt)])
-; Note: syntactic form
-; Note: this uses "member" for case comparison (Scheme uses memq I think)
+; NOTE: syntactic form
+; NOTE: this uses "member" for case comparison (Scheme uses memq I think)
 
-(define (-pmacro-builtin-case env expr case1 . rest)
-  (let ((evald-expr (-pmacro-expand expr env)))
+(define (-pmacro-builtin-case loc env expr case1 . rest)
+  (let ((evald-expr (-pmacro-expand expr env loc)))
     (let loop ((cases (cons case1 rest)))
       (if (null? cases)
 	  nil
@@ -773,34 +819,34 @@
 		     (not (list? (caar cases))))
 		(-pmacro-error "case must be \"else\" or list of choices" (caar cases)))
 	    (cond ((eq? (caar cases) 'else)
-		   (-pmacro-expand-expr-list (cdar cases) env))
+		   (-pmacro-expand-expr-list (cdar cases) env loc))
 		  ((member evald-expr (caar cases))
-		   (-pmacro-expand-expr-list (cdar cases) env))
+		   (-pmacro-expand-expr-list (cdar cases) env loc))
 		  (else
 		   (loop (cdr cases))))))))
 )
 
 ; (.cond (expr stmt) [(cond-expr-stmt-list)] [(else stmt)])
-; Note: syntactic form
+; NOTE: syntactic form
 
-(define (-pmacro-builtin-cond env expr1 . rest)
+(define (-pmacro-builtin-cond loc env expr1 . rest)
   (let loop ((exprs (cons expr1 rest)))
     (cond ((null? exprs)
 	   nil)
 	  ((eq? (car exprs) 'else)
-	   (-pmacro-expand-expr-list (cdar exprs) env))
+	   (-pmacro-expand-expr-list (cdar exprs) env loc))
 	  (else
-	   (let ((evald-expr (-pmacro-expand (caar exprs) env)))
+	   (let ((evald-expr (-pmacro-expand (caar exprs) env loc)))
 	     (if evald-expr
-		 (-pmacro-expand-expr-list (cdar exprs) env)
+		 (-pmacro-expand-expr-list (cdar exprs) env loc)
 		 (loop (cdr exprs)))))))
 )
 
 ; (.begin . stmt-list)
-; Note: syntactic form
+; NOTE: syntactic form
 
-(define (-pmacro-builtin-begin env . rest)
-  (-pmacro-expand-expr-list rest env)
+(define (-pmacro-builtin-begin loc env . rest)
+  (-pmacro-expand-expr-list rest env loc)
 )
 
 ; (.print . expr)
@@ -879,30 +925,30 @@
 )
 
 ; (.andif . rest)
-; Note: syntactic form
+; NOTE: syntactic form
 ; Elements of EXPRS are evaluated one at a time.
 ; Unprocessed elements are not evaluated.
 
-(define (-pmacro-builtin-andif env . exprs)
+(define (-pmacro-builtin-andif loc env . exprs)
   (if (null? exprs)
       #t
       (let loop ((exprs exprs))
-	(let ((evald-expr (-pmacro-expand (car exprs) env)))
+	(let ((evald-expr (-pmacro-expand (car exprs) env loc)))
 	  (cond ((null? (cdr exprs)) evald-expr)
 		(evald-expr (loop (cdr exprs)))
 		(else #f)))))
 )
 
 ; (.orif . rest)
-; Note: syntactic form
+; NOTE: syntactic form
 ; Elements of EXPRS are evaluated one at a time.
 ; Unprocessed elements are not evaluated.
 
-(define (-pmacro-builtin-orif env . exprs)
+(define (-pmacro-builtin-orif loc env . exprs)
   (let loop ((exprs exprs))
     (if (null? exprs)
 	#f
-	(let ((evald-expr (-pmacro-expand (car exprs) env)))
+	(let ((evald-expr (-pmacro-expand (car exprs) env loc)))
 	  (if evald-expr
 	      evald-expr
 	      (loop (cdr exprs))))))
@@ -1151,7 +1197,7 @@
   (set! -pmacro-table (make-hash-table 127))
   (set! -smacro-table (make-hash-table 41))
 
-  ; Some "predefined" macros.
+  ; Some "predefined" pmacros.
 
   (let ((macros
 	 ;; name arg-spec syntactic? function description
@@ -1164,10 +1210,10 @@
 	  (list '.substring '(string start end) #f -pmacro-builtin-substring "get start of a string")
 	  (list '.splice 'arg-list #f -pmacro-builtin-splice "splice lists into the outer list")
 	  (list '.iota '(count . start-incr) #f -pmacro-builtin-iota "iota number generator")
-	  (list '.map '(pmacro list1 . rest) #f -pmacro-builtin-map "map a macro over a list of arguments")
-	  (list '.for-each '(pmacro list1 . rest) #f -pmacro-builtin-for-each "execute a macro over a list of arguments")
+	  (list '.map '(pmacro list1 . rest) #f -pmacro-builtin-map "map a pmacro over a list of arguments")
+	  (list '.for-each '(pmacro list1 . rest) #f -pmacro-builtin-for-each "execute a pmacro over a list of arguments")
 	  (list '.eval '(expr) #f -pmacro-builtin-eval "process expr immediately")
-	  (list '.apply '(macro arg-list) #f -pmacro-builtin-apply "apply a macro to a list of arguments")
+	  (list '.apply '(pmacro arg-list) #f -pmacro-builtin-apply "apply a pmacro to a list of arguments")
 	  (list '.pmacro '(params expansion) #t -pmacro-builtin-pmacro "create a pmacro on-the-fly")
 	  (list '.let '(locals expr1 . rest) #t -pmacro-builtin-let "create a binding context")
 	  (list '.if '(expr then . else) #t -pmacro-builtin-if "if expr is true, process then, else else")

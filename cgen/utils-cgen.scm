@@ -67,6 +67,114 @@
 	  (error "vmake: unknown options:" unrecognized))))
 )
 
+;;; Source locations are recorded as a stack, with (ideally) one extra level
+;;; for each macro invocation.
+
+(define <location> (class-make '<location>
+			       nil
+			       '(
+				 ;; A list of "single-location" objects,
+				 ;; sorted by most recent location first.
+				 list
+				 )
+			       nil))
+
+(define-getters <location> location (list))
+(define-setters <location> location (list))
+
+;;; A single source location.
+;;; This is recorded as a vector for simplicity.
+;;; END? is true if the location marks the end of the expression.
+
+(define (make-single-location file line column end?)
+  (vector file line column end?)
+)
+
+(define (single-location-file sloc) (vector-ref sloc 0))
+(define (single-location-line sloc) (vector-ref sloc 1))
+(define (single-location-column sloc) (vector-ref sloc 2))
+(define (single-location-end? sloc) (vector-ref sloc 3))
+
+;;; Return a single-location in a readable form.
+
+(define (pretty-print-single-location sloc)
+  (string-append (single-location-file sloc)
+		 ":"
+		 ;; +1: numbers are recorded origin-0
+		 (number->string (+ (single-location-line sloc)
+				    1))
+		 ":"
+		 (number->string (+ (single-location-column sloc)
+				    1))
+		 (if (single-location-end? sloc) "(end)" "")
+		 )
+)
+
+;;; Return a location in a readable form.
+
+(define (pretty-print-location loc)
+  (let ((ref-from " referenced from:"))
+    (string-drop
+     (- (string-length ref-from))
+     (string-drop1
+      (apply string-append
+	     (map (lambda (sloc)
+		    (string-append "\n"
+				   (pretty-print-single-location sloc)
+				   ":"
+				   ref-from))
+		  (location-list loc))))))
+)
+
+;;; Return the top location on LOC's stack.
+
+(define (location-top loc)
+  (car (location-list loc))
+)
+
+;;; Return a new <location> with FILE, LINE pushed onto the stack.
+
+(define (location-push-single loc file line column end?)
+  (make <location> (cons (make-single-location file line column end?)
+			 (location-list loc)))
+)
+
+;;; Return a new <location> with NEW-LOC preappended to LOC.
+
+(define (location-push loc new-loc)
+  (make <location> (append (location-list new-loc)
+			   (location-list loc)))
+)
+
+;;; Return an unspecified <location>.
+;;; This is for use in debugging utilities.
+
+(define (unspecified-location)
+  (make <location> (list (cons "unspecified" 1)))
+)
+
+;;; Return a <location> object for the current input port.
+;;; END? is true if the location marks the end of the expression.
+
+(define (current-input-location end?)
+  (let ((cip (current-input-port)))
+    (make <location> (list (make-single-location (port-filename cip)
+						 (port-line cip)
+						 (port-column cip)
+						 end?))))
+)
+
+;;; An object property for tracking source locations during macro expansion.
+
+(define location-property (make-object-property))
+
+;;; Set FORM's location to LOC.
+
+(define (location-property-set! form loc)
+  (set! (location-property form) loc)
+  *UNSPECIFIED*
+)
+
 ; Each named entry in the description file typically has these three members:
 ; name, comment attrs.
 
@@ -97,23 +205,37 @@
 
 ; Subclass of <ident> for use by description file objects.
 ;
+; Records the source location of the object.
+;
 ; We also record an internally generated entry, ordinal, to record the
 ; relative position within the description file.  It's generally more efficient
 ; to record some kinds of objects (e.g. insns) in a hash table.  But we also
 ; want to emit these objects in file order.  Recording the object's relative
 ; position lets us generate an ordered list when we need to.
+; We can't just use the line number because we want an ordering over multiple
+; input files.
 
-(define <ordered-ident>
-  (class-make '<ordered-ident> '(<ident>)
-	      ;; #f for ordinal means "unassigned"
-	      '((ordinal . #f))
+(define <source-ident>
+  (class-make '<source-ident> '(<ident>)
+	      '(
+		;; A <location> object.
+		(location . ())
+		;; #f for ordinal means "unassigned"
+		(ordinal . #f)
+		)
 	      '()))
 
-(method-make! <ordered-ident> 'get-ordinal
-	      (lambda (self) (elm-get self 'ordinal)))
-(method-make! <ordered-ident> 'set-ordinal!
-	      (lambda (self newval) (elm-set! self 'ordinal newval)))
+(method-make! <source-ident> 'get-location
+	      (lambda (self) (elm-get self 'location)))
+(method-make! <source-ident> 'set-location!
+	      (lambda (self newval) (elm-set! self 'location newval)))
+(define (obj-location obj) (send obj 'get-location))
+(define (obj-set-location! obj location) (send obj 'set-location! location))
 
+(method-make! <source-ident> 'get-ordinal
+	      (lambda (self) (elm-get self 'ordinal)))
+(method-make! <source-ident> 'set-ordinal!
+	      (lambda (self newval) (elm-set! self 'ordinal newval)))
 (define (obj-ordinal obj) (send obj 'get-ordinal))
 (define (obj-set-ordinal! obj ordinal) (send obj 'set-ordinal! ordinal))
 
@@ -718,7 +840,7 @@
 
 ; Misc. object utilities.
 
-; Sort a list of <ident> objects alphabetically.
+; Sort a list of objects with get-name methods alphabetically.
 
 (define (alpha-sort-obj-list l)
   (sort l

@@ -984,75 +984,6 @@ Define a preprocessor-style macro.
       (parse-error "option processing" "missing argument to" (car args)))
 )
 
-; Record of arguments passed to debug-repl, so they can be accessed in
-; the repl loop.
-
-(define debug-env #f)
-
-; Return list of recorded variables for debugging.
-
-(define (debug-var-names) (map car debug-env))
-
-; Return value of recorded var NAME.
-
-(define (debug-var name) (assq-ref debug-env name))
-
-; A handle on /dev/tty, so we can be sure we're talking with the user.
-; We open this the first time we actually need it.
-
-(define debug-tty #f)
-
-; Return the port we should use for interacting with the user,
-; opening it if necessary.
-
-(define (debug-tty-port)
-  (if (not debug-tty)
-      (set! debug-tty (open-file "/dev/tty" "r+")))
-  debug-tty)
-
-; Enter a repl loop for debugging purposes.
-; Use (quit) to exit cgen completely.
-; Use (debug-quit) or (quit 0) to exit the debugging session and
-; resume argument processing.
-;
-; ENV-ALIST can be anything, but it is intended to be an alist of values
-; the caller will want to be able to access in the repl loop.
-; It is stored in global `debug-env'.
-;
-; FIXME: Move to utils.scm.
-
-(define (debug-repl env-alist)
-  (with-input-and-output-to
-   (debug-tty-port)
-   (lambda ()
-     (set! debug-env env-alist)
-     (let loop ()
-       (let ((rc (top-repl)))
-	 (if (null? rc)
-	     (quit 1))			; indicate error to `make'
-	 (if (not (equal? rc '(0)))
-	     (loop))))))
-)
-
-; Utility for debug-repl.
-
-(define (debug-quit)
-  ; Keep around for later debugging.
-  ;(set! debug-env #f)
-
-  (quit 0)
-)
-
-; Macro to simplify calling debug-repl.
-; Usage: (debug-repl-env var-name1 var-name2 ...)
-
-(defmacro debug-repl-env var-names
-  (let ((env (map (lambda (var-name)
-		    (list 'cons (list 'quote var-name) var-name))
-		  var-names)))
-    (list 'debug-repl (cons 'list env)))
-)
-
 ; List of common arguments.
 ;
 ; ??? Another useful arg would be one that says "do file generation with
@@ -1223,6 +1154,7 @@ Define a preprocessor-style macro.
 
 	   (if repl?
 	       (debug-repl nil))
+
 	   (cpu-load arch-file
 		     keep-mach keep-isa flags
 		     app-init! app-finish! app-analyze!)

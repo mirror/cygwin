@@ -31,17 +31,26 @@ rm -f ${tmp_match} ${tmp_expr}
 
 exit_code=0
 
+# Invoke this to run cgen.
+# Usage: run_cgen [-f] cpu-file-path
+# -f: cgen is expected to fail (useful for testing error handling)
+
 run_cgen() {
-    [ $# == 1 ] || { echo "missing cpu_file" >&2 ; exit 1 ; }
+    expect_fail=false
+    [ "$1" == "-f" ] && { expect_fail=true ; shift ; }
+
+    [ $# -ne 1 ] && { echo "missing cpu_file" >&2 ; exit 1 ; }
     cpu_file=$1
 
-    if ! ${GUILE} ${GUILEFLAGS} ${cgendir}/cgen-testsuite.scm \
+    if ${GUILE} ${GUILEFLAGS} ${cgendir}/cgen-testsuite.scm \
 	-s ${cgendir} \
 	-b ${CGENFLAGS} \
 	-a ${cpu_file} \
 	-T ${cgen_output_file} >& ${test_output_file}
     then
-	fail "${test} run of cgen"
+	${expect_fail} && { fail "${test} run of cgen expected to fail" ; }
+    else
+	${expect_fail} || { fail "${test} run of cgen" ; }
     fi
 }
 

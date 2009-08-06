@@ -1,3 +1,9 @@
+2009-08-06  Doug Evans  <dje@sebabeach.org>
+
+	* read.scm (debug-env, debug-var-names, debug-var, debug-tty,
+	debug-tty-port, debug-repl, debug-quit, debug-repl-env): Move to ...
+	* utils.scm: ... here.
+
 2009-08-05  Doug Evans  <dje@sebabeach.org>
 
 	Track source location better, for better error messages.

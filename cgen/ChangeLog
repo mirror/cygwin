@@ -1,3 +1,46 @@
+2009-08-05  Doug Evans  <dje@sebabeach.org>
+
+	Track source location better, for better error messages.
+	* pmacros.scm (-pmacro-eval): Delete, unused.
+	(pmacro-expand, -pmacro-expand): New arg `loc', all callers updated.
+	(-pmacro-expand-expr-list, -smacro-apply): Ditto.
+	(scan-list, scan): Ditto.
+	(-pmacro-builtin-pmacro, -pmacro-builtin-let, -pmacro-builtin-if,
+	-pmacro-builtin-case, -pmacro-builtin-cond, -pmacro-builtin-begin,
+	-pmacro-builtin-andif, -pmacro-builtin-orif): Ditto.
+	(scan-list1): New function.
+	(-pmacro-build-lambda): New arg `loc', all callers updated.  Rewrite.
+	* read.scm (<reader>): New member `location'.
+	(-reader-lookup-command): Renamed from reader-lookup-command,
+	all callers updated.
+	(reader-error): Rewrite to produce better source location info.
+	(current-reader-location): New function.
+	(-reader-process-expanded-1!): Renamed from -reader-process-expanded-1.
+	All callers updated.  Record source location of expression.
+	(reader-process-expanded!): Renamed from reader-process-expanded.
+	All callers updated.
+	(-reader-process!): Renamed from reader-process.  New arg `loc'.
+	All callers updated.  Record source location of define-pmacro.
+	* utils-cgen.scm (<location>): New class.
+	(single-location): New (pseudo) class.
+	(pretty-print-single-location, pretty-print-location): New functions.
+	(location-top, location-push-single, location-push): New functions.
+	(unspecified-location, current-input-location): New functions.
+	(location-property): New object property.
+	(location-property-set!): New function.
+	(<source-ident>): Renamed from <ordered-ident>.  New member `location'.
+	All uses updated.
+	* testsuite/location-1.test: New testcase.
+	* testsuite/run-tests.sh: Fix fail count handling.
+	* testsuite/test-utils.sh.in (run_cgen): New option `-f'.  Allow tests
+	to expect cgen to fail.
+
+	* pmacros.scm (*): Use "pmacro" instead of "macro" more consistently.
+
+	* read.scm (-cmd-include): Renamed from include.  All callers updated.
+	(-cmd-if): Renamed from cmd-if.  All callers updated.
+	Use reader-process-expanded! on then/else clauses instead of eval1.
+
 2009-07-22  Doug Evans  <dje@sebabeach.org>
 
 	* modes.scm (TI,OI): New modes.

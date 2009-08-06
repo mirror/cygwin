@@ -213,7 +213,7 @@
 )
 
 ; A pair of two lists: machs to keep, machs to drop.
-; Keep all machs, drop none.
+; The default is "keep all machs", "drop none".
 
 (define -keep-all-machs '((all)))
 
@@ -245,14 +245,21 @@
 	       ; (e.g. define-insn, etc.).
 	       ; Each entry is (name . command-object).
 	       (cons 'commands nil)
+
+	       ; The current source location.
+	       ; This is recorded here by the higher level reader and is
+	       ; fetched by commands as necessary.
+	       'location
 	       )
 	      nil)
 )
 
 ; Accessors.
 
-(define-getters <reader> reader (keep-mach keep-isa current-cpu commands))
-(define-setters <reader> reader (keep-mach keep-isa current-cpu commands))
+(define-getters <reader> reader
+  (keep-mach keep-isa current-cpu commands location))
+(define-setters <reader> reader
+  (keep-mach keep-isa current-cpu commands location))
 
 (define (reader-add-command! name comment attrs arg-spec handler)
   (reader-set-commands! CURRENT-READER
@@ -262,7 +269,7 @@
 			       (reader-commands CURRENT-READER)))
 )
 
-(define (reader-lookup-command name)
+(define (-reader-lookup-command name)
   (assq-ref (reader-commands CURRENT-READER) name)
 )
 
@@ -270,19 +277,37 @@
 
 (define CURRENT-READER #f)
 
-; Signal an error while reading a .cpu file.
+; Return the current source location in readable form.
+; FIXME: Currently unused, keep for reference for awhile.
 
-(define (reader-error msg expr help-text)
-  (let ((errmsg
-	 (string-append (or (port-filename (current-input-port))
+(define (-readable-current-location)
+  (let ((loc (current-reader-location)))
+    (if loc
+	(pretty-print-location loc)
+	;; Blech, we don't have a current reader location.  That's odd.
+	;; Fall back to the current input port's location.
+	(string-append (or (port-filename (current-input-port))
 			    "<input>")
 			":"
 			(number->string (port-line (current-input-port)))
-			": "
-			msg
 			":")))
-    (error (string-append errmsg "\n" help-text)
-	   expr))
+)
+
+; Signal an error while reading a .cpu file.
+
+(define (reader-error msg expr help-text)
+  (let* ((loc (current-reader-location))
+	 (top-sloc (location-top loc))
+	 (errmsg
+	  (string-append (pretty-print-single-location top-sloc)
+			 ": "
+			 msg
+			 ":\n"
+			 (if (string=? help-text "")
+			     ""
+			     (string-append help-text "\n")))))
+    (error (simple-format #f "While reading description:\n~A ~A\nReference chain:\n~A"
+			  errmsg expr (pretty-print-location loc))))
 )
 
 ; Signal a parse error while reading a .cpu file.
@@ -297,11 +322,22 @@
 	 (reader-error (string-append errtxt ": " message ":") args "")))
 )
 
+; Return the current source location.
+
+(define (current-reader-location)
+  (reader-location CURRENT-READER)
+)
+
 ; Process a macro-expanded entry.
 
-(define (-reader-process-expanded-1 entry)
+(define (-reader-process-expanded-1! entry)
   (logit 4 (with-output-to-string (lambda () (pretty-print entry))))
-  (let ((command (reader-lookup-command (car entry))))
+
+  ;; Set the current source location for better diagnostics.
+  ;; Access with current-reader-location.
+  (reader-set-location! CURRENT-READER (location-property entry))
+
+  (let ((command (-reader-lookup-command (car entry))))
     (if command
 	(let* ((handler (command-handler command))
 	       (arg-spec (command-arg-spec command))
@@ -326,12 +362,23 @@
 				(command-help command))
 		  (apply handler (cdr entry)))))
 	(reader-error "unknown entry type" entry "")))
+
   *UNSPECIFIED*
 )
 
 ;; Process 1 or more macro-expanded entries.
+;; ENTRY is expected to have a location-property object property.
 
-(define (reader-process-expanded entry)
+;; NOTE: This is "public" so the .eval pmacro can use it.
+;; This is also used by -cmd-if.
+
+(define (reader-process-expanded! entry)
+  (if (and (verbose? 4)
+	   (pair? entry))
+      (let ((loc (location-property entry)))
+	(logit 4 "reader-process-expanded!: " (source-properties entry))
+	(logit 4 "                     loc: " (pretty-print-location loc))))
+
   ;; () is used to indicate a no-op
   (cond ((null? entry)
 	 #f) ;; nothing to do
@@ -340,23 +387,31 @@
 	;; Scheme of course).
 	;; Recurse in case there are nested begins.
 	((eq? (car entry) 'begin)
-	 (for-each reader-process-expanded
+	 (for-each reader-process-expanded!
 		   (cdr entry)))
 	(else
-	 (-reader-process-expanded-1 entry)))
+	 (-reader-process-expanded-1! entry)))
+
+  *UNSPECIFIED*
 )
 
 ; Process file entry ENTRY.
+; LOC is a <location> object for ENTRY.
 
-(define (reader-process entry)
+(define (-reader-process! entry loc)
   (if (not (form? entry))
       (reader-error "improperly formed entry" entry ""))
 
   ; First do macro expansion, but not if define-pmacro of course.
+  ; ??? Singling out define-pmacro this way seems a bit odd.  The way to look
+  ; at it, I guess, is to think of define-pmacro as the only current
+  ; "syntactic" command (it doesn't pre-evaluate its arguments).
   (let ((expansion (if (eq? (car entry) 'define-pmacro)
-		       entry
-		       (pmacro-expand entry))))
-    (reader-process-expanded expansion))
+		       (begin (location-property-set! entry loc) entry)
+		       (pmacro-expand entry loc))))
+    (reader-process-expanded! expansion))
+
+  *UNSPECIFIED*
 )
 
 ; Read in and process FILE.
@@ -371,12 +426,17 @@
 		    (if (eof-object? entry)
 			#t ; done
 			(begin
-			  (reader-process entry)
+			  ;; ??? The location we pass here isn't ideal.
+			  ;; Ideally we'd pass the start location of the
+			  ;; expression, instead we currently pass the end
+			  ;; location (it's easier).
+			  (-reader-process! entry (current-input-location #t))
 			  (loop (read)))))))
 	)
 
-    (with-input-from-file file readit)
-    *UNSPECIFIED*)
+    (with-input-from-file file readit))
+
+  *UNSPECIFIED*
 )
 
 ; Cpu data is recorded in an object of class <arch>.
@@ -700,12 +760,10 @@
 
   (reader-add-command! 'include
 		       "Include a file.\n"
-		       nil '(file) include
-  )
+		       nil '(file) -cmd-include)
   (reader-add-command! 'if
 		       "(if test then . else)\n"
-		       nil '(test then . else) cmd-if
-  )
+		       nil '(test then . else) -cmd-if)
 
   ; Rather than add cgen-internal specific stuff to pmacros.scm, we create
   ; the pmacro commands here.
@@ -789,7 +847,7 @@ Define a preprocessor-style macro.
 
 ; .cpu file include mechanism
 
-(define (include file)
+(define (-cmd-include file)
   (logit 1 "Including file " (string-append arch-path "/" file) " ...\n")
   (reader-read-file! (string-append arch-path "/" file))
   (logit 2 "Resuming previous file ...\n")
@@ -799,33 +857,34 @@ Define a preprocessor-style macro.
 ; This is a work-in-progress.  Its presence in the description file is ok,
 ; but the implementation will need to evolve.
 
-(define (cmd-if test then . else)
+(define (-cmd-if test then . else)
   (if (> (length else) 1)
       (reader-error "wrong number of arguments to `if'"
 		    (cons 'if (cons test (cons then else)))
 		    ""))
+  ; FIXME: Assumes TEST is a non-null-list.
   ; ??? rtx-eval test
   (if (not (memq (car test) '(keep-isa? keep-mach? application-is?)))
       (reader-error "only (if (keep-mach?|keep-isa?|application-is? ...) ...) are currently supported" test ""))
   (case (car test)
     ((keep-isa?)
      (if (keep-isa? (cadr test))
-	 (eval1 then)
+	 (reader-process-expanded! then)
 	 (if (null? else)
 	     #f
-	     (eval1 (car else)))))
+	     (reader-process-expanded! (car else)))))
     ((keep-mach?)
      (if (keep-mach? (cadr test))
-	 (eval1 then)
+	 (reader-process-expanded! then)
 	 (if (null? else)
 	     #f
-	     (eval1 (car else)))))
+	     (reader-process-expanded! (car else)))))
     ((application-is?)
      (if (eq? APPLICATION (cadr test))
-	 (eval1 then)
+	 (reader-process-expanded! then)
 	 (if (null? else)
 	     #f
-	     (eval1 (car else))))))
+	     (reader-process-expanded! (car else))))))
 )
 
 ; Top level routine for loading .cpu files.

@@ -120,7 +120,7 @@
     lowest-obj)
 )
 
-;; Table of <ordered-ident> objects with two access styles:
+;; Table of <source-ident> objects with two access styles:
 ;; hash lookup, ordered list.
 ;; The main table is the hash table, the list is lazily created and cached.
 ;; The table is recorded as (hash-table . list).
@@ -128,7 +128,7 @@
 ;; Each entry in the hash table is a list, multiple objects can have the same
 ;; key (e.g. insns from different isas can have the same name).
 ;;
-;; This relies on the ordinal element of <ordered-ident> objects to build the
+;; This relies on the ordinal element of <source-ident> objects to build the
 ;; ordered list.
 
 (define (-make-ident-object-table hash-size)

@@ -60,6 +60,7 @@
     (for-each (lambda (str)
 		(if (pair? str)
 		    (if (list? str)
+			;; ??? Incorrect for improper lists, later.
 			(begin
 			  (message "(")
 			  (for-each (lambda (s) (message s " ")) str)

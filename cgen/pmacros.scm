@@ -6,20 +6,24 @@
 ; TODO:
 ; - Like C preprocessor macros, there is no scoping [one can argue
 ;   there should be].  Maybe in time (??? Hmmm... done?)
-;   On the other hand these macros aren't intended for use outside
-;   the cpu description file.
 ; - Support for multiple macro tables.
-; - Comments for .pmacros.
 
-; Required routines:
-; make-hash-table, hashq-ref, hashq-set!
-; string-append, symbol-append, map, apply, number?, number->string,
-; eval, reader-process-expanded!, num-args-ok?, *UNSPECIFIED*.
-; `num-args-ok?' and `*UNSPECIFIED*' are defined in cgen's utils.scm.
-; reader-process-expanded! is defined in cgen's read.scm.
+; Non-standard required routines:
+; Provided by Guile:
+;   make-hash-table, hashq-ref, hashq-set!, symbol-append,
+;   source-properties
+; Provided by CGEN:
+;   location-property, location-property-set!,
+;   source-properties-location->string,
+;   single-location->string, location-top, unspecified-location,
+;   reader-process-expanded!, num-args-ok?, *UNSPECIFIED*.
 
 ; The convention we use says `-' begins "local" objects.
 ; At some point this might also use the Guile module system.
+
+; This uses Guile's source-properties system to track source location.
+; The chain of macro invocations is tracked and stored in the result as
+; object property "location-property".
 
 ; Exported routines:
 ;
@@ -36,13 +40,16 @@
 ;
 ;	(pmacro-expand expression loc)
 ;
-; pmacro-debug - expand all pmacros in an expression, but don't process .eval
+; pmacro-trace - same as pmacro-expand, but trace macro expansion
+;                Output is sent to current-error-port.
+;
+;	(pmacro-trace expression loc)
+;
+; pmacro-debug - expand all pmacros in an expression,
+;                printing various debugging messages.
+;                This does not process .eval.
 ;
 ;	(pmacro-debug expression)
-;
-; pmacro-trace - same as pmacro-expand, but print debugging messages
-;
-;	(pmacro-trace expression)
 
 ; Builtin pmacros:
 ;
@@ -111,7 +118,7 @@
 ; ??? Methinks .foo isn't a valid R5RS symbol.  May need to change 
 ; to something else.
 
-; True if doing pmacro expansion via pmacro-debug or pmacro-trace.
+; True if doing pmacro expansion via pmacro-debug.
 (define -pmacro-debug? #f)
 ; True if doing pmacro expansion via pmacro-trace.
 (define -pmacro-trace? #f)
@@ -302,28 +309,30 @@
 
   (define cep (current-error-port))
 
-  ; If the symbol is in `env', return its value.
-  ; Otherwise see if symbol is a globally defined pmacro.
-  ; Otherwise return the symbol unchanged.
+  ;; If the symbol is in `env', return its value.
+  ;; Otherwise see if symbol is a globally defined pmacro.
+  ;; Otherwise return the symbol unchanged.
+
   (define (scan-symbol sym)
     (let ((val (-pmacro-env-ref env sym)))
       (if val
-	  (cdr val) ; cdr is value of (name . value) pair
+	  (cdr val) ;; cdr is value of (name . value) pair
 	  (let ((val (-pmacro-lookup sym)))
 	    (if val
-		; Symbol is a pmacro.
-		; If this is a procedural pmacro, let caller perform expansion.
-		; Otherwise, return the pmacro's value.
+		;; Symbol is a pmacro.
+		;; If this is a procedural pmacro, let caller perform expansion.
+		;; Otherwise, return the pmacro's value.
 		(if (procedure? (-pmacro-transformer val))
 		    val
 		    (-pmacro-transformer val))
-		; Return symbol unchanged.
+		;; Return symbol unchanged.
 		sym)))))
 
-  ; See if (car exp) is a pmacro.
-  ; Return pmacro or #f.
+  ;; See if (car exp) is a pmacro.
+  ;; Return pmacro or #f.
+
   (define (check-pmacro exp)
-    (if -pmacro-trace?
+    (if -pmacro-debug?
 	(begin
 	  (display "macro?   " cep)
 	  (write exp cep)
@@ -333,38 +342,66 @@
   ;; Subroutine of scan-list to simplify it.
   ;; Macro expand EXP which is known to be a non-null list.
   ;; LOC is the location stack thus far.
+
   (define (scan-list1 exp loc)
     ;; Check for syntactic forms.
     ;; They are handled differently in that we leave it to the transformer
     ;; routine to evaluate the arguments.
     (let ((sform (-smacro-lookup (car exp))))
       (if sform
-	  (-smacro-apply sform (cdr exp) env loc)
+	  (begin
+	    ;; ??? Is it useful to trace these?
+	    (-smacro-apply sform (cdr exp) env loc))
 	  ;; Not a syntactic form.
 	  ;; Evaluate all the arguments first.
 	  (let ((scanned-exp (map (lambda (e) (scan e loc))
 				  exp)))
 	    (let ((macro (check-pmacro scanned-exp)))
 	      (if macro
-		  (if (procedure? (-pmacro-transformer macro))
-		      (-pmacro-apply macro (cdr scanned-exp))
-		      (cons (-pmacro-transformer macro) (cdr scanned-exp)))
+		  (begin
+		    ;; Trace expansion here, we know we have a pmacro.
+		    (if -pmacro-trace?
+			(let ((src-props (source-properties exp))
+			      (indent (spaces (* 2 (length (location-list loc))))))
+			  ;; We use `write' to display `exp' to see strings quoted.
+			  (display indent cep)
+			  (display "Expanding: " cep)
+			  (write exp cep)
+			  (newline cep)
+			  (display indent cep)
+			  (display "      env: " cep)
+			  (display env cep)
+			  (newline cep)
+			  (if (not (null? src-props))
+			      (begin
+				(display indent cep)
+				(display " location: " cep)
+				(display (source-properties-location->string src-props) cep)
+				(newline cep)))))
+		    (let ((result (if (procedure? (-pmacro-transformer macro))
+				      (-pmacro-apply macro (cdr scanned-exp))
+				      (cons (-pmacro-transformer macro) (cdr scanned-exp)))))
+		      (if -pmacro-trace?
+			  (let ((indent (spaces (* 2 (length (location-list loc))))))
+			    (display indent cep)
+			    (display "   result: " cep)
+			    (write result cep)
+			    (newline cep)))
+		      result))
 		  scanned-exp))))))
 
   ;; Macro expand EXP which is known to be a non-null list.
   ;; LOC is the location stack thus far.
   ;;
   ;; This uses scan-list1 to do the real work, this handles location tracking.
+
   (define (scan-list exp loc)
     (let ((src-props (source-properties exp))
 	  (new-loc loc))
-      (logit 4 "scan-list exp: " exp)
-      (logit 4 "    src-props: " src-props)
       (if (not (null? src-props))
 	  (let ((file (assq-ref src-props 'filename))
 		(line (assq-ref src-props 'line))
 		(column (assq-ref src-props 'column)))
-	    (logit 4 "new src-props: " file line)
 	    (set! new-loc (location-push-single loc file line column #f))))
       (let ((result (scan-list1 exp new-loc)))
 	(if (pair? result) ;; pair? -> cheap non-null-list?
@@ -380,6 +417,7 @@
 
   ;; Scan EXP, an arbitrary value.
   ;; LOC is the location stack thus far.
+
   (define (scan exp loc)
     (let ((result (cond ((symbol? exp)
 			 (scan-symbol exp))
@@ -388,23 +426,13 @@
 			;; Not a symbol or expression, return unchanged.
 			(else
 			 exp))))
-      ; Re-examining `result' to see if it is another pmacro invocation
-      ; allows doing things like ((.sym a b c) arg1 arg2)
-      ; where `abc' is a pmacro.  Scheme doesn't work this way, but then
-      ; this is CGEN.
+      ;; Re-examining `result' to see if it is another pmacro invocation
+      ;; allows doing things like ((.sym a b c) arg1 arg2)
+      ;; where `abc' is a pmacro.  Scheme doesn't work this way, but then
+      ;; this is CGEN.
       (if (symbol? result) (scan-symbol result) result)))
 
-  (if -pmacro-trace?
-      (begin
-	; We use `write' to display `exp' to see strings quoted.
-	(display "expand: " cep) (write exp cep) (newline cep)
-	(display "   env: " cep) (display env cep) (newline cep)))
-
-  (let ((result (scan exp loc)))
-    (if -pmacro-trace?
-	(begin
-	  (display "result:  " cep) (write result cep) (newline cep)))
-    result)
+  (scan exp loc)
 )
 
 ; Return the argument spec from ARGS.
@@ -550,28 +578,37 @@
   (-pmacro-expand expr '() loc)
 )
 
-; Expand any pmacros in EXPR, without processing .eval.
+; Debugging routine to trace pmacro expansion.
+
+(define (pmacro-trace expr loc)
+  ; FIXME: Need unwind protection.
+  (let ((old-trace -pmacro-trace?)
+	(src-props (and (pair? expr) (source-properties expr)))
+	(cep (current-error-port)))
+    (set! -pmacro-trace? #t)
+    ;; We use `write' to display `expr' to see strings quoted.
+    (display "Pmacro expanding: " cep) (write expr cep) (newline cep)
+    ;;(display "Top level env: " cep) (display nil cep) (newline cep)
+    (display "Pmacro location: " cep)
+    (if (and src-props (not (null? src-props)))
+	(display (source-properties-location->string src-props) cep)
+	(display (single-location->string (location-top loc)) cep))
+    (newline cep)
+    (let ((result (-pmacro-expand expr '() loc)))
+      (display "Pmacro result: " cep) (write result cep) (newline cep)
+      (set! -pmacro-trace? old-trace)
+      result))
+)
+
+; Expand any pmacros in EXPR, printing various debugging messages.
+; This does not process .eval.
 
 (define (pmacro-debug expr)
   ; FIXME: Need unwind protection.
   (let ((old-debug -pmacro-debug?))
     (set! -pmacro-debug? #t)
-    (let ((result (-pmacro-expand expr '() (unspecified-location))))
+    (let ((result (pmacro-trace expr (unspecified-location))))
       (set! -pmacro-debug? old-debug)
-      result))
-)
-
-; Debugging routine to trace pmacro expansion.
-
-(define (pmacro-trace expr)
-  ; FIXME: Need unwind protection.
-  (let ((old-debug -pmacro-debug?)
-	(old-trace -pmacro-trace?))
-    (set! -pmacro-debug? #t)
-    (set! -pmacro-trace? #t)
-    (let ((result (-pmacro-expand expr '() (unspecified-location))))
-      (set! -pmacro-debug? old-debug)
-      (set! -pmacro-trace? old-trace)
       result))
 )
 

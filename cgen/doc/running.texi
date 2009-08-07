@@ -34,6 +34,7 @@ and applications use uppercase letters for their arguments.
 * i::            -i Specify isa-list entries to keep.
 * m::            -m Specify mach-list entries to keep.
 * s::            -s Specify the source directory.
+* t::            -t Specify tracing of various things.
 * v::            -v Increment the verbosity level.
 * version::      --version Print version info.
 
@@ -248,6 +249,29 @@ Use this to specify where the rest of CGEN's files are.
 
 For example in @code{Binutils} CGEN is typically a sibling
 of @file{src/opcodes}, i.e., @file{src/cgen}.
+
+@node t
+@section Specify tracing of various things. @option{-t} @var{trace-list}
+
+Use this to turn on the tracing of various things.
+The argument is a comma-separated list of things to trace.
+At present the following may be traced.
+
+@itemize @bullet
+
+@item @option{commands}
+
+Trace the commands from the description file(s).
+
+@item @option{pmacros}
+
+Trace the invocation and expansion of pmacros from the description file(s).
+
+@item @option{all}
+
+Trace everything.
+
+@end itemize
 
 @node v
 @section Increment the verbosity level. @option{-v}

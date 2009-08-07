@@ -1,3 +1,27 @@
+2009-08-07  Doug Evans  <dje@sebabeach.org>
+
+	Add -t option for tracing things like commands, pmacro expansion.
+	* dev.scm (cload): New arg #:trace.
+	* pmacros.scm (-pmacro-expand): Rewrite pmacro tracing.
+	(pmacro-trace): New arg `loc'.  Rewrite pmacro tracing.
+	(pmacro-debug): Call pmacro-trace instead of -pmacro-expand.
+	* read.scm (<reader>): New members trace-commands?, trace-pmacros?.
+	(-reader-process-expanded-1!): Trace commands if requested.
+	(-reader-process!): Call pmacro-trace of pmacro tracing requested.
+	(-set-trace-options!): New function.
+	(-init-reader!): New function.
+	(cpu-load): New arg trace-options, all callers updated.
+	Call -init-reader! and -set-trace-options!.
+	(cgen-usage): Improve output formatting.
+	(common-arguments): New option -t.
+	(-cgen): Process -t.
+	* utils-cgen.scm (single-location->string): Renamed from
+	pretty-print-single-location.  All callers updated.
+	(location->string): Renamed from pretty-print-location.
+	All callers updated.
+	(source-properties-location->string): New function.
+	* doc/running.texi: Document -t.
+
 2009-08-06  Doug Evans  <dje@sebabeach.org>
 
 	* read.scm (debug-env, debug-var-names, debug-var, debug-tty,

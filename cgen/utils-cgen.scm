@@ -97,7 +97,7 @@
 
 ;;; Return a single-location in a readable form.
 
-(define (pretty-print-single-location sloc)
+(define (single-location->string sloc)
   (string-append (single-location-file sloc)
 		 ":"
 		 ;; +1: numbers are recorded origin-0
@@ -112,18 +112,32 @@
 
 ;;; Return a location in a readable form.
 
-(define (pretty-print-location loc)
+(define (location->string loc)
   (let ((ref-from " referenced from:"))
     (string-drop
-     (- (string-length ref-from))
+     (- 0 (string-length ref-from) 1)
      (string-drop1
       (apply string-append
 	     (map (lambda (sloc)
 		    (string-append "\n"
-				   (pretty-print-single-location sloc)
+				   (single-location->string sloc)
 				   ":"
 				   ref-from))
 		  (location-list loc))))))
+)
+
+;;; Return the location information in Guile's source-properties
+;;; in a readable form.
+
+(define (source-properties-location->string src-props)
+  (let ((file (assq-ref src-props 'filename))
+	(line (assq-ref src-props 'line))
+	(column (assq-ref src-props 'column)))
+    (string-append file
+		   ":"
+		   (number->string (+ line 1))
+		   ":"
+		   (number->string (+ column 1))))
 )
 
 ;;; Return the top location on LOC's stack.

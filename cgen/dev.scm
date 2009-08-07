@@ -30,11 +30,13 @@
 
 ; Supply the path name and suffic for the .cpu file and delete the analyzer
 ; arg from cpu-load to lessen the typing.
+
 (define (cload . args)
   (let ((cpu-file #f)
 	(keep-mach "all")
 	(keep-isa "all")
-	(options ""))
+	(options "")
+	(trace-options ""))
 
     ; Doesn't check if (cadr args) exists or if #:arch was specified, but
     ; this is a debugging tool!
@@ -47,48 +49,49 @@
 	      ((#:machs) (set! keep-mach (cadr args)))
 	      ((#:isas) (set! keep-isa (cadr args)))
 	      ((#:options) (set! options (cadr args)))
+	      ((#:trace) (set! trace-options (cadr args)))
 	      (else (error "unknown option:" (car args))))
 	    (loop (cddr args)))))
 
     (case APPLICATION
       ((UNKNOWN) (error "application not loaded"))
       ((DESC) (cpu-load cpu-file
-			keep-mach keep-isa options
+			keep-mach keep-isa options trace-options
 			desc-init!
 			desc-finish!
 			desc-analyze!))
       ((DOC) (cpu-load cpu-file
-			keep-mach keep-isa options
+			keep-mach keep-isa options trace-options
 			doc-init!
 			doc-finish!
 			doc-analyze!))
       ((OPCODES) (cpu-load cpu-file
-			   keep-mach keep-isa options
+			   keep-mach keep-isa options trace-options
 			   opcodes-init!
 			   opcodes-finish!
 			   opcodes-analyze!))
       ((GAS-TEST) (cpu-load cpu-file
-			    keep-mach keep-isa options
+			    keep-mach keep-isa options trace-options
 			    gas-test-init!
 			    gas-test-finish!
 			    gas-test-analyze!))
       ((SIMULATOR) (cpu-load cpu-file
-			     keep-mach keep-isa options
+			     keep-mach keep-isa options trace-options
 			     sim-init!
 			     sim-finish!
 			     sim-analyze!))
       ((SID-SIMULATOR) (cpu-load cpu-file
-			     keep-mach keep-isa options
+			     keep-mach keep-isa options trace-options
 			     sim-init!
 			     sim-finish!
 			     sim-analyze!))
       ((SIM-TEST) (cpu-load cpu-file
-			    keep-mach keep-isa options
+			    keep-mach keep-isa options trace-options
 			    sim-test-init!
 			    sim-test-finish!
 			    sim-test-analyze!))
       ((TESTSUITE) (cpu-load cpu-file
-			     keep-mach keep-isa options
+			     keep-mach keep-isa options trace-options
 			     testsuite-init!
 			     testsuite-finish!
 			     testsuite-analyze!))

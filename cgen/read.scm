@@ -236,6 +236,12 @@
 	       ; Selected isas to keep or `all'.
 	       '(keep-isa . (all))
 
+	       ; Boolean indicating if command tracing is on.
+	       (cons 'trace-commands? #f)
+
+	       ; Boolean indicating if pmacro tracing is on.
+	       (cons 'trace-pmacros? #f)
+
 	       ; Currently select cpu family, computed from `keep-mach'.
 	       ; Some applications don't care, and this is moderately
 	       ; expensive to compute so we use delay/force.
@@ -257,9 +263,13 @@
 ; Accessors.
 
 (define-getters <reader> reader
-  (keep-mach keep-isa current-cpu commands location))
+  (keep-mach keep-isa
+   trace-commands? trace-pmacros?
+   current-cpu commands location))
 (define-setters <reader> reader
-  (keep-mach keep-isa current-cpu commands location))
+  (keep-mach keep-isa
+   trace-commands? trace-pmacros?
+   current-cpu commands location))
 
 (define (reader-add-command! name comment attrs arg-spec handler)
   (reader-set-commands! CURRENT-READER
@@ -283,7 +293,7 @@
 (define (-readable-current-location)
   (let ((loc (current-reader-location)))
     (if loc
-	(pretty-print-location loc)
+	(location->string loc)
 	;; Blech, we don't have a current reader location.  That's odd.
 	;; Fall back to the current input port's location.
 	(string-append (or (port-filename (current-input-port))
@@ -299,7 +309,7 @@
   (let* ((loc (current-reader-location))
 	 (top-sloc (location-top loc))
 	 (errmsg
-	  (string-append (pretty-print-single-location top-sloc)
+	  (string-append (single-location->string top-sloc)
 			 ": "
 			 msg
 			 ":\n"
@@ -307,7 +317,7 @@
 			     ""
 			     (string-append help-text "\n")))))
     (error (simple-format #f "While reading description:\n~A ~A\nReference chain:\n~A"
-			  errmsg expr (pretty-print-location loc))))
+			  errmsg expr (location->string loc))))
 )
 
 ; Signal a parse error while reading a .cpu file.
@@ -331,11 +341,16 @@
 ; Process a macro-expanded entry.
 
 (define (-reader-process-expanded-1! entry)
-  (logit 4 (with-output-to-string (lambda () (pretty-print entry))))
-
   ;; Set the current source location for better diagnostics.
   ;; Access with current-reader-location.
   (reader-set-location! CURRENT-READER (location-property entry))
+
+  (if (reader-trace-commands? CURRENT-READER)
+      (let ((loc (location-property entry)))
+	(message "Processing command:\n  @ "
+		 (if loc (location->string loc) "location unknown")
+		 "\n"
+		 (with-output-to-string (lambda () (pretty-print entry))))))
 
   (let ((command (-reader-lookup-command (car entry))))
     (if command
@@ -373,12 +388,6 @@
 ;; This is also used by -cmd-if.
 
 (define (reader-process-expanded! entry)
-  (if (and (verbose? 4)
-	   (pair? entry))
-      (let ((loc (location-property entry)))
-	(logit 4 "reader-process-expanded!: " (source-properties entry))
-	(logit 4 "                     loc: " (pretty-print-location loc))))
-
   ;; () is used to indicate a no-op
   (cond ((null? entry)
 	 #f) ;; nothing to do
@@ -404,11 +413,13 @@
 
   ; First do macro expansion, but not if define-pmacro of course.
   ; ??? Singling out define-pmacro this way seems a bit odd.  The way to look
-  ; at it, I guess, is to think of define-pmacro as the only current
+  ; at it, I guess, is to think of define-pmacro as (currently) the only
   ; "syntactic" command (it doesn't pre-evaluate its arguments).
   (let ((expansion (if (eq? (car entry) 'define-pmacro)
 		       (begin (location-property-set! entry loc) entry)
-		       (pmacro-expand entry loc))))
+		       (if (reader-trace-pmacros? CURRENT-READER)
+			   (pmacro-trace entry loc)
+			   (pmacro-expand entry loc)))))
     (reader-process-expanded! expansion))
 
   *UNSPECIFIED*
@@ -430,6 +441,8 @@
 			  ;; Ideally we'd pass the start location of the
 			  ;; expression, instead we currently pass the end
 			  ;; location (it's easier).
+			  ;; ??? Use source-properties of entry, and only if
+			  ;; not present fall back on current-input-location.
 			  (-reader-process! entry (current-input-location #t))
 			  (loop (read)))))))
 	)
@@ -687,6 +700,42 @@
   (reader-keep-isa CURRENT-READER)
 )
 
+;; Tracing support.
+;; This is akin to the "logit" support, but is for specific things that
+;; can be named (whereas logit support is based on a simple integer verbosity
+;; level).
+
+;;; Enable the specified tracing.
+;;; TRACE-OPTIONS is a comma-separated list of things to trace.
+;;;
+;;; Currently supported tracing:
+;;; commands - trace invocation of description file commands (e.g. define-insn)
+;;; pmacros  - trace pmacro expansion
+;;; all      - trace everything
+;;;
+;;; [If we later need to support disabling some tracing, one way is to
+;;; recognize an "-" in front of an option.]
+
+(define (-set-trace-options! trace-options)
+  (let ((all (list "commands" "pmacros"))
+	(requests (string-cut trace-options #\,)))
+    (if (member "all" requests)
+	(append! requests all))
+    (for-each (lambda (item)
+	      (cond ((string=? "commands" item)
+		     (reader-set-trace-commands?! CURRENT-READER #t))
+		    ((string=? "pmacros" item)
+		     (reader-set-trace-pmacros?! CURRENT-READER #t))
+		    ((string=? "all" item)
+		     #t) ;; handled above
+		    (else
+		     (cgen-usage 'unknown (string-append "-t " item)
+				 common-arguments))))
+	      requests))
+
+  *UNSPECIFIED*
+)
+
 ; If #f, treat reserved fields as operands and extract them with the insn.
 ; Code can then be emitted in the extraction routines to validate them.
 ; If #t, treat reserved fields as part of the opcode.
@@ -742,21 +791,13 @@
 
 ; .cpu file loader support
 
-; Prepare to parse a .cpu file.
-; This initializes the application independent tables.
-; KEEP-MACH specifies what machs to keep.
-; KEEP-ISA specifies what isas to keep.
-; OPTIONS is a list of options to control code generation.
-; The values are application dependent.
+;; Initialize a new <reader> object.
+;; This doesn't add cgen-specific commands, leaving each element (ifield,
+;; hardware, etc.) to add their own.
+;; The "result" is stored in global CURRENT-READER.
 
-(define (-init-parse-cpu! keep-mach keep-isa options)
-  (set! -cpu-new-class-list nil)
-
+(define (-init-reader!)
   (set! CURRENT-READER (new <reader>))
-  (set! CURRENT-ARCH (new <arch>))
-  (-keep-mach-set! keep-mach)
-  (-keep-isa-set! keep-isa)
-  (set-cgen-options! options)
 
   (reader-add-command! 'include
 		       "Include a file.\n"
@@ -773,6 +814,24 @@
 Define a preprocessor-style macro.
 "
 		       nil '(name arg1 . arg-rest) define-pmacro)
+
+  *UNSPECIFIED*
+)
+
+; Prepare to parse a .cpu file.
+; This initializes the application independent tables.
+; KEEP-MACH specifies what machs to keep.
+; KEEP-ISA specifies what isas to keep.
+; OPTIONS is a list of options to control code generation.
+; The values are application dependent.
+
+(define (-init-parse-cpu! keep-mach keep-isa options)
+  (set! -cpu-new-class-list nil)
+
+  (set! CURRENT-ARCH (new <arch>))
+  (-keep-mach-set! keep-mach)
+  (-keep-isa-set! keep-isa)
+  (set-cgen-options! options)
 
   ; The order here is important.
   (arch-init!) ; Must be done first.
@@ -893,6 +952,7 @@ Define a preprocessor-style macro.
 ; (or not keep if prefixed with !).
 ; KEEP-ISA is a string of comma separated isas to keep.
 ; OPTIONS is the OPTIONS argument to -init-parse-cpu!.
+; TRACE-OPTIONS is a random list of things to trace.
 ; APP-INITER! is an application specific zero argument proc (thunk)
 ; to call after -init-parse-cpu!
 ; APP-FINISHER! is an application specific zero argument proc to call after
@@ -903,9 +963,11 @@ Define a preprocessor-style macro.
 ;
 ; This function isn't local because it's used by dev.scm.
 
-(define (cpu-load file keep-mach keep-isa options
+(define (cpu-load file keep-mach keep-isa options trace-options
 		  app-initer! app-finisher! analyzer!)
+  (-init-reader!)
   (-init-parse-cpu! keep-mach keep-isa options)
+  (-set-trace-options! trace-options)
   (app-initer!)
   (logit 1 "Loading cpu description " file " ...\n")
   (set! arch-path (dirname file))
@@ -933,10 +995,20 @@ Define a preprocessor-style macro.
       (else (display "Unknown error!\n" cep)))
     (display "Usage: cgen arguments ...\n" cep)
     (for-each (lambda (arg)
-		(display (string-append (car arg)
-					" " (if (cadr arg) (cadr arg) "")
-					"  - " (caddr arg)
-					"\n")
+		(display (string-append
+			  (let ((arg-str (string-append (car arg) " "
+							(or (cadr arg) ""))))
+			    (if (< (string-length arg-str) 16)
+				(string-take 16 arg-str)
+				arg-str))
+			  "  - " (caddr arg)
+			  (apply string-append
+				 (map (lambda (text)
+					(string-append "\n"
+						       (string-take 20 "")
+						       text))
+				      (cdddr arg)))
+			  "\n")
 			 cep))
 	      arguments)
     (display "...\n" cep)
@@ -999,6 +1071,11 @@ Define a preprocessor-style macro.
     ("-i" "isa-list"  "specify isa-list entries to keep")
     ("-m" "mach-list" "specify mach-list entries to keep")
     ("-s" "srcdir"    "set srcdir")
+    ("-t" "trace-options" "specify list of things to trace"
+                       "Options:"
+                       "commands - trace cgen commands (e.g. define-insn)"
+                       "pmacros  - trace pmacro expansion"
+		       "all      - trace everything")
     ("-v" #f          "increment verbosity level")
     ("--version" #f   "print version info")
     )
@@ -1074,6 +1151,7 @@ Define a preprocessor-style macro.
 	    (flags "")
 	    (moreopts? #t)
 	    (debugging #f)    ; default is off, for speed
+	    (trace-options "")
 	    (cep (current-error-port))
 	    (str=? string=?)
 	    )
@@ -1118,6 +1196,9 @@ Define a preprocessor-style macro.
 		     ((str=? "-s" (car opt))
 		      #f ; ignore, already processed by caller
 		      )
+		     ((str=? "-t" (car opt))
+		      (set! trace-options arg)
+		      )
 		     ((str=? "-v" (car opt))
 		      (verbose-inc!)
 		      )
@@ -1156,7 +1237,7 @@ Define a preprocessor-style macro.
 	       (debug-repl nil))
 
 	   (cpu-load arch-file
-		     keep-mach keep-isa flags
+		     keep-mach keep-isa flags trace-options
 		     app-init! app-finish! app-analyze!)
 
 	   ;; Start another repl loop if -d.

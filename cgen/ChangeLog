@@ -1,3 +1,7 @@
+2009-08-11  Doug Evans  <dje@sebabeach.org>
+
+	* doc/rtl.texi (hardware types): Add pc.
+
 2009-08-07  Doug Evans  <dje@sebabeach.org>
 
 	Add -t option for tracing things like commands, pmacro expansion.

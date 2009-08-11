@@ -845,8 +845,10 @@ provided.
 
 @subsection type
 
-This is the type of hardware.  Current values are: @samp{register},
+This is the type of hardware.  Current values are: @samp{pc}, @samp{register},
 @samp{memory}, and @samp{immediate}.
+
+For @samp{pc}, see @xref{Program counter}.
 
 For registers the syntax is one of:
 
@@ -1109,6 +1111,7 @@ data address (data only)
 instruction address (instructions only)
 @end table
 
+@anchor{Program counter}
 @subsection Program counter
 
 The program counter must be defined and is not a builtin.

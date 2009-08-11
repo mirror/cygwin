@@ -884,7 +884,7 @@ and developing the .CPU file interactively.  The basic steps are:
 @item Run @code{guile}.
 @item @code{(load "dev.scm")}
 @item Load application, e.g. @code{(load-opc)} or @code{(load-sim)}
-@item Load CPU description file, e.g. @code{(cload #:arch "cpu/m32r")}
+@item Load CPU description file, e.g. @code{(cload #:arch "cpu/m32r.cpu")}
 @item Run generators until output looks reasonable, e.g. @code{(cgen-opc.c)}
 @end enumerate
 

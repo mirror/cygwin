@@ -175,9 +175,10 @@
 ; Cover-fn to context-error for signalling an error during rtx traversal.
 
 (define (-rtx-traverse-error tstate errmsg expr op-num)
-;  (parse-error context (string-append errmsg ", operand number "
-;				      (number->string op-num))
-;	       (rtx-dump expr))
+;  (parse-error (tstate-context context)
+;               (string-append errmsg ", operand number "
+;                              (number->string op-num))
+;               (rtx-dump expr))
   (context-error (tstate-context tstate)
 		 (string-append errmsg ", operand #" (number->string op-num))
 		 (rtx-strdump expr))
@@ -378,7 +379,7 @@
 )
 
 (define (-rtx-traverse-attrs val mode expr op-num tstate appstuff)
-;  (cons val ; (atlist-source-form (atlist-parse val "" "with-attr"))
+;  (cons val ; (atlist-source-form (atlist-parse (make-prefix-context "with-attr") val ""))
 ;	tstate)
   #f
 )

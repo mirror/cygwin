@@ -222,18 +222,20 @@
 ; This is the main routine for building a mode object.
 ; All arguments are in raw (non-evaluated) form.
 
-(define (-mode-parse errtxt name comment attrs class bits bytes
-		    non-mode-c-type printf-type sem-mode ptr-to host?)
+(define (-mode-parse context name comment attrs class bits bytes
+		     non-mode-c-type printf-type sem-mode ptr-to host?)
   (logit 2 "Processing mode " name " ...\n")
-  (let* ((name (parse-name name errtxt))
-	 (errtxt (stringsym-append errtxt " " name))
-	 (result (make <mode>
-		       name
-		       (parse-comment comment errtxt)
-		       (atlist-parse attrs "mode" errtxt)
-		       class bits bytes non-mode-c-type printf-type
-		       sem-mode ptr-to host?)))
-    result)
+
+  ;; Pick out name first to augment the error context.
+  (let* ((name (parse-name context name))
+	 (context (context-append-name context name)))
+
+    (make <mode>
+      name
+      (parse-comment context comment)
+      (atlist-parse context attrs "mode")
+      class bits bytes non-mode-c-type printf-type
+      sem-mode ptr-to host?))
 )
 
 ; ??? At present there is no define-mode that takes an associative list
@@ -243,7 +245,8 @@
 
 (define (define-full-mode name comment attrs class bits bytes
 	  non-mode-c-type printf-type sem-mode ptr-to host?)
-  (let ((m (-mode-parse "define-full-mode" name comment attrs
+  (let ((m (-mode-parse (make-current-context "define-full-mode")
+			name comment attrs
 			class bits bytes
 			non-mode-c-type printf-type sem-mode ptr-to host?)))
     ; Add it to the list of insn modes.
@@ -328,11 +331,13 @@
 )
 
 ; Parse MODE-NAME and return the mode object.
+; CONTEXT is a <context> object for error messages.
 ; An error is signalled if MODE isn't valid.
 
-(define (parse-mode-name mode-name errtxt)
+(define (parse-mode-name context mode-name)
   (let ((m (mode:lookup mode-name)))
-    (if (not m) (parse-error errtxt "not a valid mode" mode-name))
+    (if (not m)
+	(parse-error context "not a valid mode" mode-name))
     m)
 )
 

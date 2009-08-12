@@ -634,23 +634,23 @@
 
 ; Parse an alignment spec.
 
-(define (-arch-parse-alignment errtxt alignment)
+(define (-arch-parse-alignment context alignment)
   (if (memq alignment '(aligned unaligned forced))
       alignment
-      (parse-error errtxt "invalid alignment" alignment))
+      (parse-error context "invalid alignment" alignment))
 )
 
 ; Parse an arch mach spec.
 ; The value is a list of mach names or (mach-name sanitize-key) elements.
 ; The result is a list of (mach-name . sanitize-key) elements.
 
-(define (-arch-parse-machs errtxt machs)
+(define (-arch-parse-machs context machs)
   (for-each (lambda (m)
 	      (if (or (symbol? m)
 		      (and (list? m) (= (length m) 2)
 			   (symbol? (car m)) (symbol? (cadr m))))
 		  #t ; ok
-		  (parse-error errtxt "bad arch mach spec" m)))
+		  (parse-error context "bad arch mach spec" m)))
 	    machs)
   (map (lambda (m)
 	 (if (symbol? m)
@@ -663,13 +663,13 @@
 ; The value is a list of isa names or (isa-name sanitize-key) elements.
 ; The result is a list of (isa-name . sanitize-key) elements.
 
-(define (-arch-parse-isas errtxt isas)
+(define (-arch-parse-isas context isas)
   (for-each (lambda (m)
 	      (if (or (symbol? m)
 		      (and (list? m) (= (length m) 2)
 			   (symbol? (car m)) (symbol? (cadr m))))
 		  #t ; ok
-		  (parse-error errtxt "bad arch isa spec" m)))
+		  (parse-error context "bad arch isa spec" m)))
 	    isas)
   (map (lambda (m)
 	 (if (symbol? m)
@@ -688,9 +688,9 @@
 		     machs isas)
   (logit 2 "Processing arch " name " ...\n")
   (make <arch-data>
-    (parse-name name context)
-    (parse-comment comment context)
-    (atlist-parse attrs "arch" context)
+    (parse-name context name)
+    (parse-comment context comment)
+    (atlist-parse context attrs "arch")
     (-arch-parse-alignment context default-alignment)
     (parse-boolean context insn-lsb0?)
     (-arch-parse-machs context machs)
@@ -1154,7 +1154,10 @@
 		    setup-semantics decode-splits)
   (logit 2 "Processing isa " name " ...\n")
 
-  (let ((name (parse-name name context)))
+  ;; Pick out name first to augment the error context.
+  (let* ((name (parse-name context name))
+	 (context (context-append-name context name)))
+
     (if (not (memq name (current-arch-isa-name-list)))
 	(parse-error context "isa name is not present in `define-arch'" name))
 
@@ -1164,16 +1167,16 @@
     ; for builtin objects.
     (make <isa>
       name
-      (parse-comment comment context)
-      (atlist-parse attrs "isa" context)
-      (parse-number (string-append context
-				   ": default-insn-word-bitsize")
+      (parse-comment context comment)
+      (atlist-parse context attrs "isa")
+      (parse-number (context-append context
+				    ": default-insn-word-bitsize")
 		    default-insn-word-bitsize '(8 . 128))
-      (parse-number (string-append context
-				   ": default-insn-bitsize")
+      (parse-number (context-append context
+				    ": default-insn-bitsize")
 		    default-insn-bitsize '(8 . 128))
-      (parse-number (string-append context
-				   ": base-insn-bitsize")
+      (parse-number (context-append context
+				    ": base-insn-bitsize")
 		    base-insn-bitsize '(8 . 128))
       decode-assist
       liw-insns
@@ -1187,69 +1190,68 @@
 ; Read an isa entry.
 ; ARG-LIST is an associative list of field name and field value.
 
-(define -isa-read
-  (lambda arg-list
-    (let ((context "isa-read")
-	  ; <isa> object members and default values
-	  (name #f)
-	  (attrs nil)
-	  (comment "")
-	  (base-insn-bitsize #f)
-	  (default-insn-bitsize #f)
-	  (default-insn-word-bitsize #f)
-	  (decode-assist nil)
-	  (liw-insns 1)
-	  ; FIXME: Hobbit computes the wrong symbol for `parallel-insns'
-	  ; in the `case' expression below because there is a local var
-	  ; of the same name ("__1" gets appended to the symbol name).
-	  (parallel-insns- 1)
-	  (condition nil)
-	  (setup-semantics nil)
-	  (decode-splits nil)
-	  )
-      (let loop ((arg-list arg-list))
-	(if (null? arg-list)
-	    nil
-	    (let ((arg (car arg-list))
-		  (elm-name (caar arg-list)))
-	      (case elm-name
-		((name) (set! name (cadr arg)))
-		((comment) (set! comment (cadr arg)))
-		((attrs) (set! attrs (cdr arg)))
-		((default-insn-word-bitsize)
-		 (set! default-insn-word-bitsize (cadr arg)))
-		((default-insn-bitsize) (set! default-insn-bitsize (cadr arg)))
-		((base-insn-bitsize) (set! base-insn-bitsize (cadr arg)))
-		((decode-assist) (set! decode-assist (cadr arg)))
-		((liw-insns) (set! liw-insns (cadr arg)))
-		((parallel-insns) (set! parallel-insns- (cadr arg)))
-		((condition) (set! condition (cdr arg)))
-		((setup-semantics) (set! setup-semantics (cadr arg)))
-		((decode-splits) (set! decode-splits (cdr arg)))
-		((insn-types) #t) ; ignore for now
-		((frame) #t) ; ignore for now
-		(else (parse-error context "invalid isa arg" arg)))
-	      (loop (cdr arg-list)))))
-      ; Now that we've identified the elements, build the object.
-      (-isa-parse context name comment attrs
-		  base-insn-bitsize
-		  (if default-insn-word-bitsize
-		      default-insn-word-bitsize
-		      base-insn-bitsize)
-		  (if default-insn-bitsize
-		      default-insn-bitsize
-		      base-insn-bitsize)
-		  decode-assist liw-insns parallel-insns- condition
-		  setup-semantics decode-splits)
-      )
-    )
+(define (-isa-read context . arg-list)
+  (let (
+	(name #f)
+	(attrs nil)
+	(comment "")
+	(base-insn-bitsize #f)
+	(default-insn-bitsize #f)
+	(default-insn-word-bitsize #f)
+	(decode-assist nil)
+	(liw-insns 1)
+	;; FIXME: Hobbit computes the wrong symbol for `parallel-insns'
+	;; in the `case' expression below because there is a local var
+	;; of the same name ("__1" gets appended to the symbol name).
+	(parallel-insns- 1)
+	(condition nil)
+	(setup-semantics nil)
+	(decode-splits nil)
+	)
+
+    (let loop ((arg-list arg-list))
+      (if (null? arg-list)
+	  nil
+	  (let ((arg (car arg-list))
+		(elm-name (caar arg-list)))
+	    (case elm-name
+	      ((name) (set! name (cadr arg)))
+	      ((comment) (set! comment (cadr arg)))
+	      ((attrs) (set! attrs (cdr arg)))
+	      ((default-insn-word-bitsize)
+	       (set! default-insn-word-bitsize (cadr arg)))
+	      ((default-insn-bitsize) (set! default-insn-bitsize (cadr arg)))
+	      ((base-insn-bitsize) (set! base-insn-bitsize (cadr arg)))
+	      ((decode-assist) (set! decode-assist (cadr arg)))
+	      ((liw-insns) (set! liw-insns (cadr arg)))
+	      ((parallel-insns) (set! parallel-insns- (cadr arg)))
+	      ((condition) (set! condition (cdr arg)))
+	      ((setup-semantics) (set! setup-semantics (cadr arg)))
+	      ((decode-splits) (set! decode-splits (cdr arg)))
+	      ((insn-types) #t) ; ignore for now
+	      ((frame) #t) ; ignore for now
+	      (else (parse-error context "invalid isa arg" arg)))
+	    (loop (cdr arg-list)))))
+
+    ;; Now that we've identified the elements, build the object.
+    (-isa-parse context name comment attrs
+		base-insn-bitsize
+		(if default-insn-word-bitsize
+		    default-insn-word-bitsize
+		    base-insn-bitsize)
+		(if default-insn-bitsize
+		    default-insn-bitsize
+		    base-insn-bitsize)
+		decode-assist liw-insns parallel-insns- condition
+		setup-semantics decode-splits))
 )
 
 ; Define a <isa> object, name/value pair list version.
 
 (define define-isa
   (lambda arg-list
-    (let ((i (apply -isa-read arg-list)))
+    (let ((i (apply -isa-read (cons (make-current-context "define-isa")
+				    arg-list))))
       (if i
 	  (current-isa-add! i))
       i))
@@ -1267,14 +1269,14 @@
 
 (define modify-isa
   (lambda arg-list
-    (let ((errtxt "modify-isa")
+    (let ((context (make-current-context "modify-isa"))
 	  (isa-spec (assq 'name arg-list)))
       (if (not isa-spec)
-	  (parse-error errtxt "isa name not specified"))
+	  (parse-error context "isa name not specified"))
 
-      (let ((isa (current-isa-lookup (arg-list-symbol-arg errtxt isa-spec))))
+      (let ((isa (current-isa-lookup (arg-list-symbol-arg context isa-spec))))
 	(if (not isa)
-	    (parse-error errtxt "undefined isa" isa-spec))
+	    (parse-error context "undefined isa" isa-spec))
 
 	(let loop ((args arg-list))
 	  (if (null? args)
@@ -1283,9 +1285,9 @@
 		(case (car arg-spec)
 		  ((name) #f) ; ignore, already processed
 		  ((add-decode-split)
-		   (-isa-add-decode-split! errtxt isa (cdr arg-spec)))
+		   (-isa-add-decode-split! context isa (cdr arg-spec)))
 		  (else
-		   (parse-error errtxt "invalid/unsupported option" (car arg-spec))))
+		   (parse-error context "invalid/unsupported option" (car arg-spec))))
 		(loop (cdr args)))))))
 
     *UNSPECIFIED*)
@@ -1396,18 +1398,20 @@
 ; description in the .cpu file.
 ; All arguments are in raw (non-evaluated) form.
 
-(define (-cpu-parse name comment attrs
+(define (-cpu-parse context name comment attrs
 		    endian insn-endian data-endian float-endian
 		    word-bitsize insn-chunk-bitsize file-transform parallel-insns)
   (logit 2 "Processing cpu family " name " ...\n")
-  ; Pick out name first 'cus we need it as a string(/symbol).
-  (let* ((name (parse-name name "cpu"))
-	 (errtxt (stringsym-append "cpu " name)))
+
+  ;; Pick out name first to augment the error context.
+  (let* ((name (parse-name context name))
+	 (context (context-append-name context name)))
+
     (if (keep-cpu? name)
 	(make <cpu>
 	      name
-	      (parse-comment comment errtxt)
-	      (atlist-parse attrs "cpu" errtxt)
+	      (parse-comment context comment)
+	      (atlist-parse context attrs "cpu")
 	      endian insn-endian data-endian float-endian
 	      word-bitsize
 	      insn-chunk-bitsize
@@ -1422,61 +1426,61 @@
 
 ; Read a cpu family description
 ; This is the main routine for analyzing a cpu description in the .cpu file.
+; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
 ; -cpu-parse is invoked to create the <cpu> object.
 
-(define -cpu-read
-  (lambda arg-list
-    (let ((errtxt "cpu-read")
-	  ; <cpu> object members and default values
-	  (name nil)
-	  (comment nil)
-	  (attrs nil)
-	  (endian #f)
-	  (insn-endian #f)
-	  (data-endian #f)
-	  (float-endian #f)
-	  (word-bitsize #f)
-	  (insn-chunk-bitsize 0)
-	  (file-transform "")
-	  ; FIXME: Hobbit computes the wrong symbol for `parallel-insns'
-	  ; in the `case' expression below because there is a local var
-	  ; of the same name ("__1" gets appended to the symbol name).
-	  (parallel-insns- #f)
-	  )
-      ; Loop over each element in ARG-LIST, recording what's found.
-      (let loop ((arg-list arg-list))
-	(if (null? arg-list)
-	    nil
-	    (let ((arg (car arg-list))
-		  (elm-name (caar arg-list)))
-	      (case elm-name
-		((name) (set! name (cadr arg)))
-		((comment) (set! comment (cadr arg)))
-		((attrs) (set! attrs (cdr arg)))
-		((endian) (set! endian (cadr arg)))
-		((insn-endian) (set! insn-endian (cadr arg)))
-		((data-endian) (set! data-endian (cadr arg)))
-		((float-endian) (set! float-endian (cadr arg)))
-		((word-bitsize) (set! word-bitsize (cadr arg)))
-		((insn-chunk-bitsize) (set! insn-chunk-bitsize (cadr arg)))
-		((file-transform) (set! file-transform (cadr arg)))
-		((parallel-insns) (set! parallel-insns- (cadr arg)))
-		(else (parse-error errtxt "invalid cpu arg" arg)))
-	      (loop (cdr arg-list)))))
-      ; Now that we've identified the elements, build the object.
-      (-cpu-parse name comment attrs
-		  endian insn-endian data-endian float-endian
-		  word-bitsize insn-chunk-bitsize file-transform parallel-insns-)
-      )
-    )
+(define (-cpu-read context . arg-list)
+  (let (
+	(name nil)
+	(comment nil)
+	(attrs nil)
+	(endian #f)
+	(insn-endian #f)
+	(data-endian #f)
+	(float-endian #f)
+	(word-bitsize #f)
+	(insn-chunk-bitsize 0)
+	(file-transform "")
+	;; FIXME: Hobbit computes the wrong symbol for `parallel-insns'
+	;; in the `case' expression below because there is a local var
+	;; of the same name ("__1" gets appended to the symbol name).
+	(parallel-insns- #f)
+	)
+
+    ;; Loop over each element in ARG-LIST, recording what's found.
+    (let loop ((arg-list arg-list))
+      (if (null? arg-list)
+	  nil
+	  (let ((arg (car arg-list))
+		(elm-name (caar arg-list)))
+	    (case elm-name
+	      ((name) (set! name (cadr arg)))
+	      ((comment) (set! comment (cadr arg)))
+	      ((attrs) (set! attrs (cdr arg)))
+	      ((endian) (set! endian (cadr arg)))
+	      ((insn-endian) (set! insn-endian (cadr arg)))
+	      ((data-endian) (set! data-endian (cadr arg)))
+	      ((float-endian) (set! float-endian (cadr arg)))
+	      ((word-bitsize) (set! word-bitsize (cadr arg)))
+	      ((insn-chunk-bitsize) (set! insn-chunk-bitsize (cadr arg)))
+	      ((file-transform) (set! file-transform (cadr arg)))
+	      ((parallel-insns) (set! parallel-insns- (cadr arg)))
+	      (else (parse-error context "invalid cpu arg" arg)))
+	    (loop (cdr arg-list)))))
+
+    ;; Now that we've identified the elements, build the object.
+    (-cpu-parse context name comment attrs
+		endian insn-endian data-endian float-endian
+		word-bitsize insn-chunk-bitsize file-transform parallel-insns-))
 )
 
 ; Define a cpu family object, name/value pair list version.
 
 (define define-cpu
   (lambda arg-list
-    (let ((c (apply -cpu-read arg-list)))
+    (let ((c (apply -cpu-read (cons (make-current-context "define-cpu")
+				    arg-list))))
       (if c
 	  (begin
 	    (current-cpu-add! c)
@@ -1525,7 +1529,10 @@
 (define (-mach-parse context name comment attrs cpu bfd-name isas)
   (logit 2 "Processing mach " name " ...\n")
 
-  (let ((name (parse-name name context)))
+  ;; Pick out name first to augment the error context.
+  (let* ((name (parse-name context name))
+	 (context (context-append-name context name)))
+
     (if (not (list? isas))
 	(parse-error context "isa spec not a list" isas))
     (let ((cpu-obj (current-cpu-lookup cpu))
@@ -1542,61 +1549,65 @@
 	  (parse-error context "unknown isa in" isas))
       (if (not (string? bfd-name))
 	  (parse-error context "bfd-name not a string" bfd-name))
+
       (if (keep-mach? (list name))
+
 	  (make <mach>
 		name
-		(parse-comment comment context)
-		(atlist-parse attrs "mach" context)
+		(parse-comment context comment)
+		(atlist-parse context attrs "mach")
 		cpu-obj
 		bfd-name
 		isa-list)
+
 	  (begin
 	    (logit 2 "Ignoring " name ".\n")
 	    #f)))) ; mach is not to be kept
 )
 
 ; Read a mach entry.
+; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
 
-(define -mach-read
-  (lambda arg-list
-    (let ((context "mach-read")
-	  (name nil)
-	  (attrs nil)
-	  (comment nil)
-	  (cpu nil)
-	  (bfd-name #f)
-	  (isas #f)
-	  )
-      (let loop ((arg-list arg-list))
-	(if (null? arg-list)
-	    nil
-	    (let ((arg (car arg-list))
-		  (elm-name (caar arg-list)))
-	      (case elm-name
-		((name) (set! name (cadr arg)))
-		((comment) (set! comment (cadr arg)))
-		((attrs) (set! attrs (cdr arg)))
-		((cpu) (set! cpu (cadr arg)))
-		((bfd-name) (set! bfd-name (cadr arg)))
-		((isas) (set! isas (cdr arg)))
-		(else (parse-error context "invalid mach arg" arg)))
-	      (loop (cdr arg-list)))))
-      ; Now that we've identified the elements, build the object.
-      (-mach-parse context name comment attrs cpu
-		   ; Default bfd-name is same as object's name.
-		   (if bfd-name bfd-name (symbol->string name))
-		   ; Default isa is the first one.
-		   (if isas isas (list (obj:name (car (current-isa-list))))))
-      )
-    )
+(define (-mach-read context . arg-list)
+  (let (
+	(name nil)
+	(attrs nil)
+	(comment nil)
+	(cpu nil)
+	(bfd-name #f)
+	(isas #f)
+	)
+
+    (let loop ((arg-list arg-list))
+      (if (null? arg-list)
+	  nil
+	  (let ((arg (car arg-list))
+		(elm-name (caar arg-list)))
+	    (case elm-name
+	      ((name) (set! name (cadr arg)))
+	      ((comment) (set! comment (cadr arg)))
+	      ((attrs) (set! attrs (cdr arg)))
+	      ((cpu) (set! cpu (cadr arg)))
+	      ((bfd-name) (set! bfd-name (cadr arg)))
+	      ((isas) (set! isas (cdr arg)))
+	      (else (parse-error context "invalid mach arg" arg)))
+	    (loop (cdr arg-list)))))
+
+    ;; Now that we've identified the elements, build the object.
+    (-mach-parse context name comment attrs cpu
+		 ;; Default bfd-name is same as object's name.
+		 (if bfd-name bfd-name (symbol->string name))
+		 ;; Default isa is the first one.
+		 (if isas isas (list (obj:name (car (current-isa-list)))))))
 )
 
 ; Define a <mach> object, name/value pair list version.
 
 (define define-mach
   (lambda arg-list
-    (let ((m (apply -mach-read arg-list)))
+    (let ((m (apply -mach-read (cons (make-current-context "define-mach")
+				     arg-list))))
       (if m
 	  (current-mach-add! m))
       m))

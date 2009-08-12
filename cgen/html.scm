@@ -682,9 +682,6 @@ See the input .cpu file(s) for copyright information.
   (let*
       ((context #f) ; ??? do we need a better context?
 
-       ; String for error messages.
-       (errtxt "semantic attribute computation for html")
-
        ; List of attributes computed from SEM-CODE-LIST.
        ; The first element is just a dummy so that append! always works.
        (sem-attrs (list #f))

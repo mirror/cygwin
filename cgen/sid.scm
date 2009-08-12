@@ -1541,7 +1541,7 @@
 					  ";\n")
 			   ""))
 		      (else
-		       (parse-error "insn function unit spec"
+		       (parse-error (make-prefix-context "insn function unit spec")
 				    "invalid spec" arg))))
 		  overrides)
       ; Create bitmask indicating which args were referenced.
@@ -1663,7 +1663,7 @@
 
 (define (-create-virtual-insns! isa)
   (let ((isa-name (obj:name isa))
-	(context "virtual insns")
+	(context (make-prefix-context "virtual insns"))
 	;; Record as a pair so -virtual-insn-add! can update it.
 	(ordinal (cons #f -1)))
 

@@ -87,17 +87,17 @@
 ; TYPE-SPEC is: (mode [(dimensions ...)])
 ;           or: ((mode bits) [(dimensions ...)])
 
-(define (parse-type errtxt type-spec)
+(define (parse-type context type-spec)
   ; Preliminary error checking.
   (let ((expected
 	 ", expected (mode [(dimensions)]) or ((mode bits) [(dimensions)])"))
     (if (not (list? type-spec))
-	(parse-error errtxt (string-append "invalid type spec" expected)
+	(parse-error context (string-append "invalid type spec" expected)
 		     type-spec))
     (let ((len (length type-spec)))
       (if (or (< len 1)
 	      (> len 2))
-	  (parse-error errtxt (string-append "invalid type spec" expected)
+	  (parse-error context (string-append "invalid type spec" expected)
 		       type-spec))
       ; Validate the mode spec.
       (cond ((symbol? (car type-spec))
@@ -105,23 +105,23 @@
 	    ((list? (car type-spec))
 	     (begin
 	       (if (not (= (length (car type-spec)) 2))
-		   (parse-error errtxt
+		   (parse-error context
 				(string-append "invalid mode in type spec"
 					       expected)
 				type-spec))
 	       (if (not (symbol? (caar type-spec)))
-		   (parse-error errtxt
+		   (parse-error context
 				(string-append "invalid mode in type spec"
 					       expected)
 				type-spec))
 	       (if (not (integer? (cadar type-spec)))
-		   (parse-error errtxt
+		   (parse-error context
 				(string-append "invalid #bits in type spec"
 					       expected)
 				type-spec))
 	       ))
 	     (else
-	      (parse-error errtxt
+	      (parse-error context
 			   (string-append "invalid mode in type spec" expected)
 			   type-spec)))
       ; Validate the dimension list if present.
@@ -129,7 +129,7 @@
 	  (if (or (not (list? (cadr type-spec)))
 		  (not (all-true? (map non-negative-integer?
 				       (cadr type-spec)))))
-	      (parse-error errtxt
+	      (parse-error context
 			   (string-append "invalid dimension spec in type spec"
 					  expected)
 			   type-spec)))
@@ -141,7 +141,7 @@
 	(dims (if (> (length type-spec) 1) (cadr type-spec) nil)))
 
     ; Look up the mode and create the mode object.
-    (let* ((base-mode (parse-mode-name mode errtxt))
+    (let* ((base-mode (parse-mode-name context mode))
 	   (mode-obj
 	    (cond ((eq? mode 'INT)
 		   (mode-make-int bits))
@@ -149,7 +149,7 @@
 		   (mode-make-uint bits))
 		  (else
 		   (if (and bits (!= bits (mode:bits base-mode)))
-		       (parse-error errtxt "wrong number of bits for mode"
+		       (parse-error context "wrong number of bits for mode"
 				    bits))
 		   base-mode))))
 

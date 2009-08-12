@@ -261,15 +261,17 @@
 ; that is left to the application.  Still, it might be preferable to impose
 ; some restrictions which can later be relaxed as necessary.
 
-(define (keyword-parse context name comment attrs mode print-name prefix values)
+(define (-keyword-parse context name comment attrs mode print-name prefix values)
   ; FIXME: parse values.
   (let ((result (make <keyword>
-		  (parse-name name context)
-		  (parse-comment comment context)
-		  (atlist-parse attrs "" context)
-		  (parse-mode-name mode (string-append context ": mode"))
-		  (parse-string (string-append context ": print-name") print-name)
-		  (parse-string (string-append context ": prefix") prefix)
+		  (parse-name context name)
+		  (parse-comment context comment)
+		  (atlist-parse context attrs "")
+		  (parse-mode-name (context-append context ": mode") mode)
+		  (parse-string (context-append context ": print-name")
+				print-name)
+		  (parse-string (context-append context ": prefix")
+				prefix)
 		  values)))
     result)
 )
@@ -277,18 +279,21 @@
 ; Read a keyword description
 ; This is the main routine for analyzing a keyword description in the .cpu
 ; file.
+; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
-; keyword-parse is invoked to create the <keyword> object.
+; -keyword-parse is invoked to create the <keyword> object.
 
 (define (-keyword-read context . arg-list)
-  (let ((name #f)
+  (let (
+	(name #f)
 	(comment "")
 	(attrs nil)
 	(mode INT)
-	(print-name #f)
+	(print-name #f) ;; #f indicates "not set"
 	(prefix "")
 	(values nil)
 	)
+
     ; Loop over each element in ARG-LIST, recording what's found.
     (let loop ((arg-list arg-list))
       (if (null? arg-list)
@@ -305,18 +310,19 @@
 	      ((values) (set! values (cdr arg)))
 	      (else (parse-error context "invalid hardware arg" arg)))
 	    (loop (cdr arg-list)))))
+
     ; Now that we've identified the elements, build the object.
-    (keyword-parse context name comment attrs mode
-		   (or print-name name)
-		   prefix values)
-    )
+    (-keyword-parse context name comment attrs mode
+		    (or print-name name)
+		    prefix values))
 )
 
 ; Define a keyword object, name/value pair list version.
 
 (define define-keyword
   (lambda arg-list
-    (let ((kw (apply -keyword-read (cons "define-keyword" arg-list))))
+    (let ((kw (apply -keyword-read (cons (make-current-context "define-keyword")
+					 arg-list))))
       (if kw
 	  (begin
 	    (current-kw-add! kw)
@@ -356,14 +362,14 @@
   ; They're needed to output the table.
   ; ??? This isn't quite right as the container may contain multiple keyword
   ; instances.  To be fixed in time.
-  (keyword-parse context (obj:name container) (obj:comment container)
-		 ; PRIVATE: keyword table is implicitly defined and made
-		 ; "static" (in the C sense).
-		 (cons 'PRIVATE (atlist-source-form (obj-atlist container)))
-		 mode
-		 (obj:name container) ; print-name
-		 (car args) ; prefix
-		 (cadr args)) ; value
+  (-keyword-parse context (obj:name container) (obj:comment container)
+		  ;; PRIVATE: keyword table is implicitly defined and made
+		  ;; "static" (in the C sense).
+		  (cons 'PRIVATE (atlist-source-form (obj-atlist container)))
+		  mode
+		  (obj:name container) ; print-name
+		  (car args) ; prefix
+		  (cadr args)) ; value
 )
 
 ; Parse an indices spec.
@@ -372,26 +378,26 @@
 ; Otherwise MODE is used.
 ; The syntax is: (keyword keyword-spec) - see <keyword> for details.
 
-(define (-hw-parse-indices errtxt indices container mode)
+(define (-hw-parse-indices context indices container mode)
   (if (null? indices)
       (make <hw-asm>
 	(obj:name container) (obj:comment container) (obj-atlist container)
 	mode)
       (begin
 	(if (not (list? indices))
-	    (parse-error errtxt "invalid indices spec" indices))
+	    (parse-error context "invalid indices spec" indices))
 	(case (car indices)
-	  ((keyword) (-hw-parse-keyword errtxt (cdr indices) container mode))
+	  ((keyword) (-hw-parse-keyword context (cdr indices) container mode))
 	  ((extern-keyword) (begin
 			      (if (null? (cdr indices))
-				  (parse-error errtxt "missing keyword name"
+				  (parse-error context "missing keyword name"
 					       indices))
 			      (let ((kw (current-kw-lookup (cadr indices))))
 				(if (not kw)
-				    (parse-error errtxt "unknown keyword"
+				    (parse-error context "unknown keyword"
 						 indices))
 				kw)))
-	  (else (parse-error errtxt "unknown indices type" (car indices))))))
+	  (else (parse-error context "unknown indices type" (car indices))))))
 )
 
 ; Parse a values spec.
@@ -400,33 +406,33 @@
 ; Otherwise MODE is used.
 ; The syntax is: (keyword keyword-spec) - see <keyword> for details.
 
-(define (-hw-parse-values errtxt values container mode)
+(define (-hw-parse-values context values container mode)
   (if (null? values)
       (make <hw-asm>
 	(obj:name container) (obj:comment container) (obj-atlist container)
 	mode)
       (begin
 	(if (not (list? values))
-	    (parse-error errtxt "invalid values spec" values))
+	    (parse-error context "invalid values spec" values))
 	(case (car values)
-	  ((keyword) (-hw-parse-keyword errtxt (cdr values) container mode))
+	  ((keyword) (-hw-parse-keyword context (cdr values) container mode))
 	  ((extern-keyword) (begin
 			      (if (null? (cdr values))
-				  (parse-error errtxt "missing keyword name"
+				  (parse-error context "missing keyword name"
 					       values))
 			      (let ((kw (current-kw-lookup (cadr values))))
 				(if (not kw)
-				    (parse-error errtxt "unknown keyword"
+				    (parse-error context "unknown keyword"
 						 values))
 				kw)))
-	  (else (parse-error errtxt "unknown values type" (car values))))))
+	  (else (parse-error context "unknown values type" (car values))))))
 )
 
 ; Parse a handlers spec.
 ; Each element is (name "string").
 
-(define (-hw-parse-handlers errtxt handlers)
-  (parse-handlers errtxt '(parse print) handlers)
+(define (-hw-parse-handlers context handlers)
+  (parse-handlers context '(parse print) handlers)
 )
 
 ; Parse a getter spec.
@@ -434,7 +440,7 @@
 ; Omit `index' for scalar objects.
 ; Externally they're specified as `get'.  Internally we use `getter'.
 
-(define (-hw-parse-getter errtxt getter scalar?)
+(define (-hw-parse-getter context getter scalar?)
   (if (null? getter)
       #f ; use default
       (let ((valid "((index) (expression))")
@@ -443,12 +449,12 @@
 		(!= (length getter) 2)
 		(not (and (list? (car getter))
 			  (= (length (car getter)) (if scalar? 0 1)))))
-	    (parse-error errtxt
+	    (parse-error context
 			 (string-append "invalid getter, should be "
 					(if scalar? scalar-valid valid))
 			 getter))
 	(if (not (rtx? (cadr getter)))
-	    (parse-error errtxt "invalid rtx expression" getter))
+	    (parse-error context "invalid rtx expression" getter))
 	getter))
 )
 
@@ -457,7 +463,7 @@
 ; Omit `index' for scalar objects.
 ; Externally they're specified as `set'.  Internally we use `setter'.
 
-(define (-hw-parse-setter errtxt setter scalar?)
+(define (-hw-parse-setter context setter scalar?)
   (if (null? setter)
       #f ; use default
       (let ((valid "((index newval) (expression))")
@@ -466,12 +472,12 @@
 		(!= (length setter) 2)
 		(not (and (list? (car setter))
 			  (= (length (car setter)) (if scalar? 1 2)))))
-	    (parse-error errtxt
+	    (parse-error context
 			 (string-append "invalid setter, should be "
 					(if scalar? scalar-valid valid))
 			 setter))
 	(if (not (rtx? (cadr setter)))
-	    (parse-error errtxt "invalid rtx expression" setter))
+	    (parse-error context "invalid rtx expression" setter))
 	setter))
 )
 
@@ -484,38 +490,40 @@
 ; ??? Might want to redo to handle hardware type specific specs more cleanly.
 ; E.g. <hw-immediate> shouldn't have to see get/set specs.
 
-(define (-hw-parse errtxt name comment attrs semantic-name type
+(define (-hw-parse context name comment attrs semantic-name type
 		   indices values handlers get set layout)
   (logit 2 "Processing hardware element " name " ...\n")
 
   (if (null? type)
-      (parse-error errtxt "missing hardware type" name))
+      (parse-error context "missing hardware type" name))
 
-  ; Pick out name first 'cus we need it as a string(/symbol).
-  (let ((name (parse-name name "hardware"))
-	(class-name (assq-ref -hardware-types (car type)))
-	(atlist-obj (atlist-parse attrs "cgen_hw" errtxt)))
+  ;; Pick out name first to augment the error context.
+  (let* ((name (parse-name context name))
+	 (context (context-append-name context name))
+	 (class-name (assq-ref -hardware-types (car type)))
+	 (atlist-obj (atlist-parse context attrs "cgen_hw")))
 
     (if (not class-name)
-	(parse-error errtxt "unknown hardware type" type))
+	(parse-error context "unknown hardware type" type))
 
     (if (keep-atlist? atlist-obj #f)
 
 	(let ((result (new (class-lookup class-name))))
 	  (send result 'set-name! name)
-	  (send result 'set-comment! (parse-comment comment errtxt))
+	  (send result 'set-comment! (parse-comment context comment))
 	  (send result 'set-atlist! atlist-obj)
 	  (elm-xset! result 'sem-name semantic-name)
-	  (send result 'parse! errtxt
+	  (send result 'parse! context
 		(cdr type) indices values handlers get set layout)
 	  ; If this is a virtual reg, get/set specs must be provided.
 	  (if (and (obj-has-attr? result 'VIRTUAL)
 		   (not (and (hw-getter result) (hw-setter result))))
-	      (parse-error errtxt "virtual reg requires get/set specs" name))
+	      (parse-error context "virtual reg requires get/set specs" name))
 	  ; If get or set specs are specified, can't have CACHE-ADDR.
 	  (if (and (obj-has-attr? result 'CACHE-ADDR)
 		   (or (hw-getter result) (hw-setter result)))
-	      (parse-error errtxt "can't have CACHE-ADDR with get/set specs" name))
+	      (parse-error context "can't have CACHE-ADDR with get/set specs"
+			   name))
 	  result)
 
 	(begin
@@ -526,11 +534,13 @@
 ; Read a hardware description
 ; This is the main routine for analyzing a hardware description in the .cpu
 ; file.
+; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
 ; -hw-parse is invoked to create the <hardware> object.
 
-(define (-hw-read errtxt . arg-list)
-  (let ((name nil)          ; name of hardware
+(define (-hw-read context . arg-list)
+  (let (
+	(name nil)
 	(comment "")
 	(attrs nil)
 	(semantic-name nil) ; name used in semantics, default is `name'
@@ -542,6 +552,7 @@
 	(set nil)
 	(layout nil)
 	)
+
     ; Loop over each element in ARG-LIST, recording what's found.
     (let loop ((arg-list arg-list))
       (if (null? arg-list)
@@ -560,20 +571,21 @@
 	      ((get) (set! get (cdr arg)))
 	      ((set) (set! set (cdr arg)))
 	      ((layout) (set! layout (cdr arg)))
-	      (else (parse-error errtxt "invalid hardware arg" arg)))
+	      (else (parse-error context "invalid hardware arg" arg)))
 	    (loop (cdr arg-list)))))
+
     ; Now that we've identified the elements, build the object.
-    (-hw-parse errtxt name comment attrs
+    (-hw-parse context name comment attrs
 	       (if (null? semantic-name) name semantic-name)
-	       type indices values handlers get set layout)
-    )
+	       type indices values handlers get set layout))
 )
 
 ; Define a hardware object, name/value pair list version.
 
 (define define-hardware
   (lambda arg-list
-    (let ((hw (apply -hw-read (cons "define-hardware" arg-list))))
+    (let ((hw (apply -hw-read (cons (make-current-context "define-hardware")
+				    arg-list))))
       (if hw
 	  (current-hw-add! hw))
       hw))
@@ -583,7 +595,7 @@
 
 (define (define-full-hardware name comment attrs semantic-name type
 			      indices values handlers get set layout)
-  (let ((hw (-hw-parse "define-full-hardware"
+  (let ((hw (-hw-parse (make-current-context "define-full-hardware")
 		       name comment attrs semantic-name type
 		       indices values handlers get set layout)))
     (if hw
@@ -595,7 +607,7 @@
 
 (define modify-hardware
   (lambda arg-list
-    (let ((errtxt "modify-hardware"))
+    (let ((context (make-current-context "modify-hardware")))
 
       ; FIXME: Experiment.  This implements the :name/value style by
       ; converting it to (name value).  In the end there shouldn't be two
@@ -608,11 +620,11 @@
       ; There's no requirement that the name be specified first.
       (let ((hw-spec (assq 'name arg-list)))
 	(if (not hw-spec)
-	    (parse-error errtxt "hardware name not specified"))
+	    (parse-error context "hardware name not specified" arg-list))
 
-	(let ((hw (current-hw-lookup (arg-list-symbol-arg errtxt hw-spec))))
+	(let ((hw (current-hw-lookup (arg-list-symbol-arg context hw-spec))))
 	  (if (not hw)
-	      (parse-error errtxt "undefined hardware element" hw-spec))
+	      (parse-error context "undefined hardware element" hw-spec))
 
 	  ; Process the rest of the args now that we have the affected object.
 	  (let loop ((args arg-list))
@@ -622,12 +634,13 @@
 		  (case (car arg-spec)
 		    ((name) #f) ; ignore, already processed
 		    ((add-attrs)
-		     (let ((atlist-obj (atlist-parse (cdr arg-spec)
-						     "cgen_hw" errtxt)))
+		     (let ((atlist-obj (atlist-parse context (cdr arg-spec)
+						     "cgen_hw")))
 		       ; prepend attrs so new ones override existing ones
 		       (obj-prepend-atlist! hw atlist-obj)))
 		    (else
-		     (parse-error errtxt "invalid/unsupported option" (car arg-spec))))
+		     (parse-error context "invalid/unsupported option"
+				  (car arg-spec))))
 		  (loop (cdr args))))))))
 
     *UNSPECIFIED*)
@@ -668,25 +681,25 @@
 ; - (value length)
 ; - hardware-name
 
-(define (-hw-validate-layout errtxt layout width)
+(define (-hw-validate-layout context layout width)
   (if (not (list? layout))
-      (parse-error errtxt "layout is not a list" layout))
+      (parse-error context "layout is not a list" layout))
 
   (let loop ((layout layout) (shift 0))
     (if (null? layout)
 	(begin
 	  ; Done.  Now see if number of bits in layout matches total width.
 	  (if (not (= shift width))
-	      (parse-error errtxt (string-append
-				   "insufficient number of bits (need "
-				   (number->string width)
-				   ")")
+	      (parse-error context (string-append
+				    "insufficient number of bits (need "
+				    (number->string width)
+				    ")")
 			   shift)))
 	; Validate next entry.
 	(let ((val (car layout)))
 	  (cond ((number? val)
 		 (if (not (memq val '(0 1)))
-		     (parse-error errtxt
+		     (parse-error context
 				  "non 0/1 layout entry requires length"
 				  val))
 		 (loop (cdr layout) (1+ shift)))
@@ -695,20 +708,21 @@
 			 (not (pair? (cdr val)))
 			 (not (number? (cadr val)))
 			 (not (null? (cddr val))))
-		     (parse-error errtxt
+		     (parse-error context
 				  "syntax error in layout, expecting `(value length)'"
 				  val))
 		 (loop (cdr layout) (+ shift (cadr val))))
 		((symbol? val)
 		 (let ((hw (current-hw-lookup val)))
 		   (if (not hw)
-		       (parse-error errtxt "unknown hardware element" val))
+		       (parse-error context "unknown hardware element" val))
 		   (if (not (hw-scalar? hw))
-		       (parse-error errtxt "non-scalar hardware element" val))
+		       (parse-error context "non-scalar hardware element" val))
 		   (loop (cdr layout)
 			 (+ shift (hw-bits hw)))))
 		(else
-		 (parse-error errtxt "bad layout element" val))))))
+		 (parse-error context "bad layout element" val))))))
+
   *UNSPECIFIED*
 )
 
@@ -723,7 +737,7 @@
 ;      (or SI (sll SI (zext SI (reg h-hw2)) 1)
 ;          (zext SI (reg h-hw3)))))
 
-(define (-hw-create-getter-from-layout errtxt layout width)
+(define (-hw-create-getter-from-layout context layout width)
   (let ((add-to-res (lambda (result mode-name val shift)
 		      (if (null? result)
 			  (rtx-make 'sll mode-name val shift)
@@ -775,7 +789,7 @@
 ;            (set (reg h-hw3) (and (srl val 0) 1))
 ;            ))
 
-(define (-hw-create-setter-from-layout errtxt layout width)
+(define (-hw-create-setter-from-layout context layout width)
   (let ((mode-name (obj:name (mode-find width 'UINT))))
     (let loop ((sets nil) (layout (reverse layout)) (shift 0))
       (if (null? layout)
@@ -806,17 +820,17 @@
 
 (method-make!
  <hw-register> 'parse!
- (lambda (self errtxt type indices values handlers getter setter layout)
+ (lambda (self context type indices values handlers getter setter layout)
    (if (or (null? type)
 	   (> (length type) 2))
-       (parse-error errtxt "invalid register spec" type))
+       (parse-error context "invalid register spec" type))
    (if (and (= (length type) 2)
 	    (or (not (list? (cadr type)))
 		(> (length (cadr type)) 1)))
-       (parse-error errtxt "bad register dimension spec" type))
+       (parse-error context "bad register dimension spec" type))
 
    ; Must parse and set type before analyzing LAYOUT.
-   (elm-set! self 'type (parse-type errtxt type))
+   (elm-set! self 'type (parse-type context type))
 
    ; LAYOUT is a shorthand way of specifying getter/setter specs.
    ; For registers that are just a collection of other registers
@@ -826,22 +840,22 @@
    ; We don't override any provided get/set specs though.
    (if (not (null? layout))
        (let ((width (hw-bits self)))
-	 (-hw-validate-layout errtxt layout width)
+	 (-hw-validate-layout context layout width)
 	 (if (null? getter)
 	     (set! getter
-		   (-hw-create-getter-from-layout errtxt layout width)))
+		   (-hw-create-getter-from-layout context layout width)))
 	 (if (null? setter)
 	     (set! setter
-		   (-hw-create-setter-from-layout errtxt layout width)))
+		   (-hw-create-setter-from-layout context layout width)))
 	 ))
 
-   (elm-set! self 'indices (-hw-parse-indices errtxt indices self UINT))
-   (elm-set! self 'values (-hw-parse-values errtxt values self
+   (elm-set! self 'indices (-hw-parse-indices context indices self UINT))
+   (elm-set! self 'values (-hw-parse-values context values self
 					    (send (elm-get self 'type)
 						  'get-mode)))
-   (elm-set! self 'handlers (-hw-parse-handlers errtxt handlers))
-   (elm-set! self 'get (-hw-parse-getter errtxt getter (hw-scalar? self)))
-   (elm-set! self 'set (-hw-parse-setter errtxt setter (hw-scalar? self)))
+   (elm-set! self 'handlers (-hw-parse-handlers context handlers))
+   (elm-set! self 'get (-hw-parse-getter context getter (hw-scalar? self)))
+   (elm-set! self 'set (-hw-parse-setter context setter (hw-scalar? self)))
    *UNSPECIFIED*)
 )
 
@@ -908,20 +922,20 @@
 
 (method-make!
  <hw-pc> 'parse!
- (lambda (self errtxt type indices values handlers getter setter layout)
+ (lambda (self context type indices values handlers getter setter layout)
    (if (not (null? type))
-       (elm-set! self 'type (parse-type errtxt type))
+       (elm-set! self 'type (parse-type context type))
        (elm-set! self 'type (make <scalar> (mode:lookup 'IAI))))
    (if (not (null? indices))
-       (parse-error errtxt "indices specified for pc" indices))
+       (parse-error context "indices specified for pc" indices))
    (if (not (null? values))
-       (parse-error errtxt "values specified for pc" values))
+       (parse-error context "values specified for pc" values))
    (if (not (null? layout))
-       (parse-error errtxt "layout specified for pc" values))
+       (parse-error context "layout specified for pc" values))
    ; The initial value of INDICES, VALUES is #f which is what we want.
-   (elm-set! self 'handlers (-hw-parse-handlers errtxt handlers))
-   (elm-set! self 'get (-hw-parse-getter errtxt getter (hw-scalar? self)))
-   (elm-set! self 'set (-hw-parse-setter errtxt setter (hw-scalar? self)))
+   (elm-set! self 'handlers (-hw-parse-handlers context handlers))
+   (elm-set! self 'get (-hw-parse-getter context getter (hw-scalar? self)))
+   (elm-set! self 'set (-hw-parse-setter context setter (hw-scalar? self)))
    *UNSPECIFIED*)
 )
 
@@ -939,25 +953,25 @@
 
 (method-make!
  <hw-memory> 'parse!
- (lambda (self errtxt type indices values handlers getter setter layout)
+ (lambda (self context type indices values handlers getter setter layout)
    (if (or (null? type)
 	   (> (length type) 2))
-       (parse-error errtxt "invalid memory spec" type))
+       (parse-error context "invalid memory spec" type))
    (if (and (= (length type) 2)
 	    (or (not (list? (cadr type)))
 		(> (length (cadr type)) 1)))
-       (parse-error errtxt "bad memory dimension spec" type))
+       (parse-error context "bad memory dimension spec" type))
    (if (not (null? layout))
-       (parse-error errtxt "layout specified for memory" values))
-   (elm-set! self 'type (parse-type errtxt type))
+       (parse-error context "layout specified for memory" values))
+   (elm-set! self 'type (parse-type context type))
    ; Setting INDICES,VALUES here is mostly for experimentation at present.
-   (elm-set! self 'indices (-hw-parse-indices errtxt indices self AI))
-   (elm-set! self 'values (-hw-parse-values errtxt values self
+   (elm-set! self 'indices (-hw-parse-indices context indices self AI))
+   (elm-set! self 'values (-hw-parse-values context values self
 					    (send (elm-get self 'type)
 						  'get-mode)))
-   (elm-set! self 'handlers (-hw-parse-handlers errtxt handlers))
-   (elm-set! self 'get (-hw-parse-getter errtxt getter (hw-scalar? self)))
-   (elm-set! self 'set (-hw-parse-setter errtxt setter (hw-scalar? self)))
+   (elm-set! self 'handlers (-hw-parse-handlers context handlers))
+   (elm-set! self 'get (-hw-parse-getter context getter (hw-scalar? self)))
+   (elm-set! self 'set (-hw-parse-setter context setter (hw-scalar? self)))
    *UNSPECIFIED*)
 )
 
@@ -993,23 +1007,23 @@
 
 (method-make!
  <hw-immediate> 'parse!
- (lambda (self errtxt type indices values handlers getter setter layout)
+ (lambda (self context type indices values handlers getter setter layout)
    (if (not (= (length type) 1))
-       (parse-error errtxt "invalid immediate spec" type))
-   (elm-set! self 'type (parse-type errtxt type))
+       (parse-error context "invalid immediate spec" type))
+   (elm-set! self 'type (parse-type context type))
    ; An array of immediates may be useful some day, but not yet.
    (if (not (null? indices))
-       (parse-error errtxt "indices specified for immediate" indices))
+       (parse-error context "indices specified for immediate" indices))
    (if (not (null? layout))
-       (parse-error errtxt "layout specified for immediate" values))
-   (elm-set! self 'values (-hw-parse-values errtxt values self
+       (parse-error context "layout specified for immediate" values))
+   (elm-set! self 'values (-hw-parse-values context values self
 					    (send (elm-get self 'type)
 						  'get-mode)))
-   (elm-set! self 'handlers (-hw-parse-handlers errtxt handlers))
+   (elm-set! self 'handlers (-hw-parse-handlers context handlers))
    (if (not (null? getter))
-       (parse-error errtxt "getter specified for immediate" getter))
+       (parse-error context "getter specified for immediate" getter))
    (if (not (null? setter))
-       (parse-error errtxt "setter specified for immediate" setter))
+       (parse-error context "setter specified for immediate" setter))
    *UNSPECIFIED*)
 )
 
@@ -1050,24 +1064,24 @@
 
 (method-make!
  <hw-address> 'parse!
- (lambda (self errtxt type indices values handlers getter setter layout)
+ (lambda (self context type indices values handlers getter setter layout)
    (if (not (null? type))
-       (parse-error errtxt "invalid address spec" type))
+       (parse-error context "invalid address spec" type))
    (elm-set! self 'type (make <scalar> AI))
    (if (not (null? indices))
-       (parse-error errtxt "indices specified for address" indices))
+       (parse-error context "indices specified for address" indices))
    (if (not (null? values))
-       (parse-error errtxt "values specified for address" values))
+       (parse-error context "values specified for address" values))
    (if (not (null? layout))
-       (parse-error errtxt "layout specified for address" values))
-   (elm-set! self 'values (-hw-parse-values errtxt values self
+       (parse-error context "layout specified for address" values))
+   (elm-set! self 'values (-hw-parse-values context values self
 					    (send (elm-get self 'type)
 						  'get-mode)))
-   (elm-set! self 'handlers (-hw-parse-handlers errtxt handlers))
+   (elm-set! self 'handlers (-hw-parse-handlers context handlers))
    (if (not (null? getter))
-       (parse-error errtxt "getter specified for address" getter))
+       (parse-error context "getter specified for address" getter))
    (if (not (null? setter))
-       (parse-error errtxt "setter specified for address" setter))
+       (parse-error context "setter specified for address" setter))
    *UNSPECIFIED*)
 )
 

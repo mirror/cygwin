@@ -1,3 +1,78 @@
+2009-08-12  Doug Evans  <dje@sebabeach.org>
+
+	Clean up cpu file parsing, pass context consistently instead of the
+	old "errtxt" argument.
+	NOTE: ACU == "All Callers Updated".
+	* attr.scm (-parse-simple-attribute): Renamed from
+	parse-simple-attribute, ACU.
+	(-attr-parse): Change errtxt argument to context, ACU.
+	(-attr-read): Ditto.
+	(atlist-parse): Ditto.  Put context arg first.
+	(attr-parse): Use parse-error instead of context-error.
+	* enum.scm (parse-enum-vals): Change errtxt argument to context, ACU.
+	(-enum-parse-prefix, -enum-parse, -enum-read): Ditto.
+	* hardware.scm (-keyword-parse): Renamed from keyword-parse.
+	`context' arg is now a <context> object.  ACU.
+	(-keyword-read): `context' arg is now a <context> object.  ACU.
+	(-hw-parse-indices): Change errtxt argument to context, ACU.
+	(-hw-parse-values, -hw-parse-handlers): Ditto.
+	(-hw-parse-getter, -hw-parse-setter, -hw-parse, -hw-read): Ditto.
+	(-hw-validate-layout, -hw-create-getter-from-layout,
+	-hw-create-setter-from-layout): Ditto.
+	(<hw-register>:parse!, <hw-pc>:parse!): Ditto.
+	(<hw-memory>:parse!, <hw-immediate>:parse!): Ditto.
+	(<hw-address>:parse!): Ditto.
+	* ifield.scm (-ifield-parse, ifield-read): Ditto.
+	(-ifld-parse-follows, -ifld-parse-encode-decode): Ditto.
+	(-ifld-parse-encode, -ifld-parse-decode): Ditto.
+	(-multi-ifield-parse, -multi-ifield-read): Ditto.
+	* insn.scm (-insn-parse, -insn-read): Ditto.
+	(parse-syntax): Ditto.  Put context arg first.
+	(-parse-insn-format-symbol): Change errtxt argument to context, ACU.
+	(-parse-insn-format-ifield-spec, -parse-insn-format-list): Ditto.
+	(-parse-insn-format): Ditto.
+	* mach.scm (-arch-parse-alignment, -arch-parse-machs): Ditto.
+	(-arch-parse-isas): Ditto.
+	(-isa-read): Add context arg, ACU.
+	(-cpu-parse, -cpu-read, -mach-read): Ditto.
+	* minsn.scm (-minsn-parse-expansion): Change errtxt argument to
+	context, ACU.
+	(-minsn-parse, -minsn-read, -minsn-compute-iflds): Ditto.
+	(minsn-make-alias): Ditto.
+	* mode.scm (-mode-parse): Ditto.
+	(parse-mode-name): Ditto.  Put context arg first.
+	* model.scm (-prefetch-parse, -retire-parse, -pipeline-parse): Change
+	errtxt argument to context, ACU.
+	(-unit-parse, -model-parse, -model-read): Ditto.
+	* operand.scm (-operand-parse-getter): Use parse-error instead of
+	context-error.
+	(-operand-parse-setter): Ditto.
+	(-operand-parse): Change errtxt argument to context, ACU.
+	(-operand-read, -derived-operand-parse, -derived-operand-read): Ditto.
+	(-anyof-operand-parse, -anyof-operand-read): Ditto.
+	* read.scm (reader-error): Delete.  Use parse-error instead.
+	(parse-error): Change errtxt argument to context, ACU.  Split args
+	argument into expr and maybe-help-text.
+	(-reader-process-expanded-1!): Reorganize.
+	* rtl.scm (-subr-read): Change errtxt argument to context, ACU.
+	* types.scm (parse-type): Ditto.
+	* utils-cgen.scm (single-location->simple-string): New function.
+	(<context>): Replace members file,lineno with location.
+	(make-prefix-context): Renamed from context-make-prefix, ACU.
+	(make-current-context): New function.
+	(context-append, context-append-name): New functions.
+	(context-make-reader): Delete.
+	(parse-name): Change errtxt argument to context, ACU.
+	Put context arg first.
+	(parse-comment): Ditto.
+	(parse-number): Change errtxt argument to context, ACU.
+	(arg-list-validate-name, arg-list-check-no-args,
+	arg-list-symbol-arg): Ditto.
+
+	* read.scm (-cmd-if): Don't assume test is a list.
+
+	* html.scm (get-insn-properties): Delete errtxt, unused.
+
 2009-08-11  Doug Evans  <dje@sebabeach.org>
 
 	* doc/rtl.texi (hardware types): Add pc.

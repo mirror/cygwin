@@ -384,12 +384,14 @@
 ; All arguments are in raw (non-evaluated) form.
 ; The result is the parsed object or #f if insn isn't for selected mach(s).
 
-(define (-insn-parse errtxt name comment attrs syntax fmt ifield-assertion
+(define (-insn-parse context name comment attrs syntax fmt ifield-assertion
 		     semantics timing)
   (logit 2 "Processing insn " name " ...\n")
 
-  (let ((name (parse-name name errtxt))
-	(atlist-obj (atlist-parse attrs "cgen_insn" errtxt)))
+  ;; Pick out name first to augment the error context.
+  (let ((name (parse-name context name))
+	(context (context-append-name context name))
+	(atlist-obj (atlist-parse context attrs "cgen_insn")))
 
     (if (keep-atlist? atlist-obj #f)
 
@@ -399,17 +401,17 @@
 	      (semantics (if (not (null? semantics))
 			     semantics
 			     #f))
-	      (format (-parse-insn-format (string-append errtxt " format")
+	      (format (-parse-insn-format (context-append context " format")
 					  fmt))
-	      (comment (parse-comment comment errtxt))
+	      (comment (parse-comment context comment))
 	      ; If there are no semantics, mark this as an alias.
 	      ; ??? Not sure this makes sense for multi-insns.
 	      (atlist-obj (if semantics
 			      atlist-obj
 			      (atlist-cons (bool-attr-make 'ALIAS #t)
 					   atlist-obj)))
-	      (syntax (parse-syntax syntax errtxt))
-	      (timing (parse-insn-timing errtxt timing))
+	      (syntax (parse-syntax context syntax))
+	      (timing (parse-insn-timing context timing))
 	      )
 
 	  (if (anyof-operand-format? format)
@@ -438,12 +440,13 @@
 ; Read an instruction description.
 ; This is the main routine for analyzing instructions in the .cpu file.
 ; This is also used to create virtual insns by apps like simulators.
-; ERRTXT is prepended to error messages to provide context.
+; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
 ; -insn-parse is invoked to create the <insn> object.
 
-(define (insn-read errtxt . arg-list)
-  (let ((name nil)
+(define (insn-read context . arg-list)
+  (let (
+	(name nil)
 	(comment "")
 	(attrs nil)
 	(syntax nil)
@@ -452,6 +455,7 @@
 	(semantics nil)
 	(timing nil)
 	)
+
     ; Loop over each element in ARG-LIST, recording what's found.
     (let loop ((arg-list arg-list))
       (if (null? arg-list)
@@ -467,19 +471,20 @@
 	      ((ifield-assertion) (set! ifield-assertion (cadr arg)))
 	      ((semantics) (set! semantics (cadr arg)))
 	      ((timing) (set! timing (cdr arg)))
-	      (else (parse-error errtxt "invalid insn arg" arg)))
+	      (else (parse-error context "invalid insn arg" arg)))
 	    (loop (cdr arg-list)))))
+
     ; Now that we've identified the elements, build the object.
-    (-insn-parse errtxt name comment attrs syntax fmt ifield-assertion
-		 semantics timing)
-    )
+    (-insn-parse context name comment attrs syntax fmt ifield-assertion
+		 semantics timing))
 )
 
 ; Define an instruction object, name/value pair list version.
 
 (define define-insn
   (lambda arg-list
-    (let ((i (apply insn-read (cons "define-insn" arg-list))))
+    (let ((i (apply insn-read (cons (make-current-context "define-insn")
+				    arg-list))))
       (if i
 	  (current-insn-add! i))
       i))
@@ -489,7 +494,8 @@
 
 (define (define-full-insn name comment attrs syntax fmt ifield-assertion
 	  semantics timing)
-  (let ((i (-insn-parse "define-full-insn" name comment attrs
+  (let ((i (-insn-parse (make-current-context "define-full-insn")
+			name comment attrs
 			syntax fmt ifield-assertion
 			semantics timing)))
     (if i
@@ -504,17 +510,17 @@
 ; in turn be a list of strings.
 ; ??? Not sure this extra flexibility is worth it yet.
 
-(define (parse-syntax syntax errtxt)
+(define (parse-syntax context syntax)
   (cond ((list? syntax)
-	 (string-map (lambda (elm) (parse-syntax elm errtxt)) syntax))
+	 (string-map (lambda (elm) (parse-syntax context elm)) syntax))
 	((or (string? syntax) (symbol? syntax))
 	 syntax)
-	(else (parse-error errtxt "improper syntax" syntax)))
+	(else (parse-error context "improper syntax" syntax)))
 )
 
 ; Subroutine of -parse-insn-format to parse a symbol ifield spec.
 
-(define (-parse-insn-format-symbol errtxt sym)
+(define (-parse-insn-format-symbol context sym)
   ;(debug-repl-env sym)
   (let ((op (current-op-lookup sym)))
     (if op
@@ -533,7 +539,7 @@
 	(let ((e (ienum-lookup-val sym)))
 	  (if e
 	      (ifld-new-value (ienum:fld (cdr e)) (car e))
-	      (parse-error errtxt "bad format element, expecting symbol to be operand or insn enum" sym)))))
+	      (parse-error context "bad format element, expecting symbol to be operand or insn enum" sym)))))
 )
 
 ; Subroutine of -parse-insn-format to parse an (ifield-name value) ifield spec.
@@ -548,9 +554,9 @@
 ;
 ; ??? Error messages need improvement, but that's generally true of cgen.
 
-(define (-parse-insn-format-ifield-spec errtxt ifld ifld-spec)
+(define (-parse-insn-format-ifield-spec context ifld ifld-spec)
   (if (!= (length ifld-spec) 2)
-      (parse-error errtxt "bad ifield format, should be (ifield-name value)" ifld-spec))
+      (parse-error context "bad ifield format, should be (ifield-name value)" ifld-spec))
 
   (let ((value (cadr ifld-spec)))
     ; ??? This use to allow (ifield-name operand-name).  That's how
@@ -561,10 +567,10 @@
 	  ((symbol? value)
 	   (let ((e (enum-lookup-val value)))
 	     (if (not e)
-		 (parse-error errtxt "symbolic ifield value not an enum" ifld-spec))
+		 (parse-error context "symbolic ifield value not an enum" ifld-spec))
 	     (ifld-new-value ifld (car e))))
 	  (else
-	   (parse-error errtxt "ifield value not an integer or enum" ifld-spec))))
+	   (parse-error context "ifield value not an integer or enum" ifld-spec))))
 )
 
 ; Subroutine of -parse-insn-format to parse an
@@ -572,11 +578,11 @@
 ; ??? There is room for growth in the specification syntax here.
 ; Possibilities are (ifield-name|operand-name [options] [value]).
 
-(define (-parse-insn-format-list errtxt spec)
+(define (-parse-insn-format-list context spec)
   (let ((ifld (current-ifld-lookup (car spec))))
     (if ifld
-	(-parse-insn-format-ifield-spec errtxt ifld spec)
-	(parse-error errtxt "unknown ifield" spec)))
+	(-parse-insn-format-ifield-spec context ifld spec)
+	(parse-error context "unknown ifield" spec)))
 )
 
 ; Given an insn format field from a .cpu file, replace it with a list of
@@ -609,7 +615,7 @@
 ; It's called for each instruction, and is one of the more expensive routines
 ; in insn parsing.
 
-(define (-parse-insn-format errtxt fld-list)
+(define (-parse-insn-format context fld-list)
   (if (null? fld-list)
       nil ; field list unspecified
       (case (car fld-list)
@@ -618,30 +624,30 @@
 				 (string->symbol fld)
 				 fld)))
 		      (cond ((symbol? f)
-			     (-parse-insn-format-symbol errtxt f))
+			     (-parse-insn-format-symbol context f))
 			    ((and (list? f)
 				  ; ??? This use to allow <ifield> objects
 				  ; in the `car' position.  Checked for below.
 				  (symbol? (car f)))
-			     (-parse-insn-format-list errtxt f))
+			     (-parse-insn-format-list context f))
 			    (else
 			     (if (and (list? f)
 				      (ifield? (car f)))
-				 (parse-error errtxt "FIXME: <ifield> object in format spec"))
-			     (parse-error errtxt "bad format element, neither symbol nor ifield spec" f)))))
+				 (parse-error context "FIXME: <ifield> object in format spec" f))
+			     (parse-error context "bad format element, neither symbol nor ifield spec" f)))))
 		  (cdr fld-list)))
 	((=) (begin
 	       (if (or (!= (length fld-list) 2)
 		       (not (symbol? (cadr fld-list))))
-		   (parse-error errtxt
+		   (parse-error context
 				"bad `=' format spec, should be `(= insn-name)'"
 				fld-list))
 	       (let ((insn (current-insn-lookup (cadr fld-list))))
 		 (if (not insn)
-		     (parse-error errtxt "unknown insn" (cadr fld-list)))
+		     (parse-error context "unknown insn" (cadr fld-list)))
 		 (insn-iflds insn))))
 	(else
-	 (parse-error errtxt "format must begin with `+' or `='" fld-list))
+	 (parse-error context "format must begin with `+' or `='" fld-list))
 	))
 )
 

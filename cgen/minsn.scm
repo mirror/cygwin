@@ -61,11 +61,11 @@
 ; Parse a macro-insn expansion description.
 ; ??? At present we only support unconditional simple expansion.
 
-(define (-minsn-parse-expansion errtxt expn)
+(define (-minsn-parse-expansion context expn)
   (if (not (form? expn))
-      (parse-error errtxt "invalid macro expansion" expn))
+      (parse-error context "invalid macro expansion" expn))
   (if (not (eq? 'emit (car expn)))
-      (parse-error errtxt "invalid macro expansion, must be `(emit ...)'" expn))
+      (parse-error context "invalid macro expansion, must be `(emit ...)'" expn))
   expn
 )
 
@@ -75,23 +75,25 @@
 ; All arguments are in raw (non-evaluated) form.
 ; The result is the parsed object or #f if object isn't for selected mach(s).
 
-(define (-minsn-parse errtxt name comment attrs syntax expansions)
+(define (-minsn-parse context name comment attrs syntax expansions)
   (logit 2 "Processing macro-insn " name " ...\n")
 
   (if (not (list? expansions))
-      (parse-error errtxt "invalid macro expansion list" expansions))
+      (parse-error context "invalid macro expansion list" expansions))
 
-  (let ((name (parse-name name errtxt))
-	(atlist-obj (atlist-parse attrs "cgen_minsn" errtxt)))
+  ;; Pick out name first to augment the error context.
+  (let* ((name (parse-name context name))
+	 (context (context-append-name context name))
+	 (atlist-obj (atlist-parse context attrs "cgen_minsn")))
 
     (if (keep-atlist? atlist-obj #f)
 
 	(let ((result (make <macro-insn>
 			name
-			(parse-comment comment errtxt)
+			(parse-comment context comment)
 			atlist-obj
-			(parse-syntax syntax errtxt)
-			(map (lambda (e) (-minsn-parse-expansion errtxt e))
+			(parse-syntax context syntax)
+			(map (lambda (e) (-minsn-parse-expansion context e))
 			     expansions))))
 	  result)
 
@@ -102,18 +104,19 @@
 
 ; Read a macro-insn description
 ; This is the main routine for analyzing macro-insns in the .cpu file.
-; ERRTXT is prepended to error messages to provide context.
+; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
 ; -minsn-parse is invoked to create the `macro-insn' object.
 
-(define (-minsn-read errtxt . arg-list)
-  (let (; Current macro-insn elements:
+(define (-minsn-read context . arg-list)
+  (let (
 	(name nil)
 	(comment "")
 	(attrs nil)
 	(syntax "")
 	(expansions nil)
 	)
+
     ; Loop over each element in ARG-LIST, recording what's found.
     (let loop ((arg-list arg-list))
       (if (null? arg-list)
@@ -126,11 +129,11 @@
 	      ((attrs) (set! attrs (cdr arg)))
 	      ((syntax) (set! syntax (cadr arg)))
 	      ((expansions) (set! expansions (cdr arg)))
-	      (else (parse-error errtxt "invalid macro-insn arg" arg)))
+	      (else (parse-error context "invalid macro-insn arg" arg)))
 	    (loop (cdr arg-list)))))
+
     ; Now that we've identified the elements, build the object.
-    (-minsn-parse errtxt name comment attrs syntax expansions)
-    )
+    (-minsn-parse context name comment attrs syntax expansions))
 )
 
 ; Define a macro-insn object, name/value pair list version.
@@ -139,7 +142,8 @@
   (lambda arg-list
     (if (eq? APPLICATION 'SIMULATOR)
 	#f ; don't waste time if simulator
-	(let ((m (apply -minsn-read (cons "define-minsn" arg-list))))
+	(let ((m (apply -minsn-read (cons (make-current-context "define-minsn")
+					  arg-list))))
 	  (if m
 	      (current-minsn-add! m))
 	  m)))
@@ -153,7 +157,8 @@
 (define (define-full-minsn name comment attrs syntax expansion)
   (if (eq? APPLICATION 'SIMULATOR)
       #f ; don't waste time if simulator
-      (let ((m (-minsn-parse "define-full-minsn" name comment
+      (let ((m (-minsn-parse (make-current-context "define-full-minsn")
+			     name comment
 			     (cons 'ALIAS attrs)
 			     syntax (list expansion))))
 	(if m
@@ -165,7 +170,7 @@
 ; This involves making a copy of REAL-INSN's ifield list and assigning
 ; known quantities to operands that have fixed values in the macro-insn.
 
-(define (minsn-compute-iflds errtxt minsn-iflds real-insn)
+(define (-minsn-compute-iflds context minsn-iflds real-insn)
   (let* ((iflds (list-copy (insn-iflds real-insn)))
 	 ; List of "free variables", i.e. operands.
 	 (ifld-ops (find ifld-operand? iflds))
@@ -190,41 +195,41 @@
 		       (ifld-pair (object-memq f-name iflds)))
 		  ;(logit 3 "Processing ifield " f-name " ...\n")
 		  (if (not ifld-pair)
-		      (parse-error errtxt "unknown operand" f))
+		      (parse-error context "unknown operand" f))
 		  ; Ensure `f' is an operand.
 		  (if (not (memq f-name ifld-names))
-		      (parse-error errtxt "not an operand" f))
+		      (parse-error context "not an operand" f))
 		  (if (pair? f)
 		      (set-car! ifld-pair (ifld-new-value (car ifld-pair) (cadr f))))
 		  (delq! f-name ifld-names)))
 	      minsn-iflds)
     (if (not (equal? ifld-names '(#f)))
-	(parse-error errtxt "incomplete operand list, missing: " (cdr ifld-names)))
+	(parse-error context "incomplete operand list, missing: " (cdr ifld-names)))
     iflds)
 )
 
 ; Create an aliased real insn from an alias macro-insn.
 
-(define (minsn-make-alias errtxt minsn)
+(define (minsn-make-alias context minsn)
   (if (or (not (has-attr? minsn 'ALIAS))
 	  ; Must emit exactly one real insn.
 	  (not (eq? 'emit (caar (minsn-expansions minsn)))))
-      (parse-error errtxt "not an alias macro-insn" minsn))
+      (parse-error context "not an alias macro-insn" minsn))
 
   (let* ((expn (car (minsn-expansions minsn)))
 	 (alias-of (current-insn-lookup (cadr expn))))
 
     (if (not alias-of)
-	(parse-error errtxt "unknown real insn in expansion" minsn))
+	(parse-error context "unknown real insn in expansion" minsn))
 
     (let ((i (make <insn>
 		   (obj:name minsn)
 		   (obj:comment minsn)
 		   (obj-atlist minsn)
 		   (minsn-syntax minsn)
-		   (minsn-compute-iflds (string-append errtxt
-						       ": " (obj:str-name minsn))
-					(cddr expn) alias-of)
+		   (-minsn-compute-iflds (context-append context
+							 (string-append ": " (obj:str-name minsn)))
+					 (cddr expn) alias-of)
 		   #f ; ifield-assertion
 		   #f ; semantics
 		   #f ; timing

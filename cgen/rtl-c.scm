@@ -951,7 +951,8 @@
 			(string-upcase (gen-c-symbol val))) ; yes, upcase
 		       ((string? val) val)
 		       (else
-			(parse-error "case:" "bad case" val)))
+			(parse-error (make-prefix-context "case:")
+				     "bad case" val)))
 		 " : ")
 )
 

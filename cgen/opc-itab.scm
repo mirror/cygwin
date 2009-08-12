@@ -123,7 +123,7 @@
 ; Values >= 128 are 128 + the index into the operand table.
 
 (define (compute-syntax strip-mnemonic? strip-mnem-operands? syntax op-macro)
-  (let ((context "syntax computation")
+  (let ((context (make-prefix-context "syntax computation"))
 	(syntax (if strip-mnemonic?
 		    (strip-mnemonic strip-mnem-operands? syntax)
 		    syntax)))
@@ -548,7 +548,8 @@ static unsigned int dis_hash_insn (const char *, CGEN_INSN_INT);
   (logit 2 "Generating macro-instruction table ...\n")
   (let* ((minsn-list (map (lambda (minsn)
 			    (if (has-attr? minsn 'ALIAS)
-				(minsn-make-alias "gen-macro-insn-table" minsn)
+				(minsn-make-alias (make-prefix-context "gen-macro-insn-table")
+						  minsn)
 				minsn))
 			  (current-minsn-list)))
 	 (all-attrs (current-insn-attr-list))

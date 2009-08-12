@@ -137,7 +137,7 @@
 		(append! op-list (list try))
 		(cadr try))))
 
-	(parse-error "FIXME" "unknown reg" expr)))
+	(parse-error (tstate-context tstate) "unknown reg" expr)))
 )
 
 ; Subroutine of semantic-compile:process-expr!, to simplify it.
@@ -147,7 +147,8 @@
 	(indx-sel (rtx-mem-index-sel expr)))
 
     (if (memq mode '(DFLT VOID))
-	(parse-error "FIXME" "memory must have explicit mode" expr))
+	(parse-error (tstate-context tstate)
+		     "memory must have explicit mode" expr))
 
     (let* ((try (list 'mem #f mode 'h-memory indx-sel))
 	   (existing-op (-rtx-find-op try op-list)))
@@ -174,7 +175,7 @@
 	 (f (current-ifld-lookup f-name)))
 
     (if (not f)
-	(parse-error "FIXME" "unknown ifield" f-name))
+	(parse-error (tstate-context tstate) "unknown ifield" f-name))
 
     (let* ((mode (obj:name (ifld-mode f)))
 	   (try (list '-op- #f mode f-name #f))
@@ -207,13 +208,15 @@
 (define (-build-index-of-operand! expr tstate op-list)
   (if (not (and (rtx? (rtx-index-of-value expr))
 		(rtx-kind? 'operand (rtx-index-of-value expr))))
-      (parse-error "FIXME" "only `(index-of operand)' is currently supported"
+      (parse-error (tstate-context tstate)
+		   "only `(index-of operand)' is currently supported"
 		   expr))
 
   (let ((op (rtx-operand-obj (rtx-index-of-value expr))))
     (let ((indx (op:index op)))
       (if (not (eq? (hw-index:type indx) 'ifield))
-	  (parse-error "FIXME" "only ifield indices are currently supported"
+	  (parse-error (tstate-context tstate)
+		       "only ifield indices are currently supported"
 		       expr))
       (let* ((f (hw-index:value indx))
 	     (f-name (obj:name f)))
@@ -314,9 +317,7 @@
   (assert (rtx? sem-code))
 
   (let*
-      ; String for error messages.
-      ((errtxt "semantic compilation")
-
+      (
        ; These record the result of traversing SEM-CODE.
        ; They're lists of (type object mode name [args ...]).
        ; TYPE is one of: -op- reg mem.
@@ -349,7 +350,7 @@
 		     (cond ((number? regno) #t)
 			   ((form? regno)
 			    (rtx-traverse-operands rtx-obj expr tstate appstuff))
-			   (else (parse-error errtxt
+			   (else (parse-error (tstate-context tstate)
 					      "invalid register number"
 					      regno)))
 		     (-build-reg-operand! expr tstate
@@ -389,7 +390,8 @@
 	    ; Instruction fields.
 	    ((ifield) (let ((ref-type (-rtx-ref-type parent-expr op-pos)))
 			(if (not (eq? ref-type 'use))
-			    (parse-error errtxt "can't set an `ifield'" expr))
+			    (parse-error (tstate-context tstate)
+					 "can't set an `ifield'" expr))
 			(-build-ifield-operand! expr tstate in-ops)))
 
 	    ; Hardware indices.
@@ -398,7 +400,8 @@
 	    ; For constants, this is the constant.
 	    ((index-of) (let ((ref-type (-rtx-ref-type parent-expr op-pos)))
 			  (if (not (eq? ref-type 'use))
-			      (parse-error errtxt "can't set an `index-of'" expr))
+			      (parse-error (tstate-context tstate)
+					   "can't set an `index-of'" expr))
 			  (-build-index-of-operand! expr tstate in-ops)))
 
 	    ; Machine generate the SKIP-CTI attribute.
@@ -476,7 +479,7 @@
 		 "End of operands.\n"))
 
 	(csem-make compiled-expr sorted-ins sorted-outs
-		   (atlist-parse sem-attrs "" "semantic attributes")))))
+		   (atlist-parse context sem-attrs "")))))
 )
 
 ; Traverse SEM-CODE, computing attributes derivable from it.
@@ -494,9 +497,7 @@
   (assert (rtx? sem-code))
 
   (let*
-      ; String for error messages.
-      ((errtxt "semantic attribute computation")
-
+      (
        ; List of attributes computed from SEM-CODE.
        ; The first element is just a dummy so that append! always works.
        (sem-attrs (list #f))
@@ -538,5 +539,5 @@
     (let
 	; Drop dummy first arg.
 	((sem-attrs (cdr sem-attrs)))
-      (atlist-parse sem-attrs "" "semantic attributes")))
+      (atlist-parse context sem-attrs "")))
 )

@@ -1084,7 +1084,8 @@
 		      (make <sfrag>
 			'x-header
 			"header fragment for insns without one"
-			(atlist-parse '(VIRTUAL) "" "semantic frag computation")
+			(atlist-parse (make-prefix-context "semantic frag computation")
+				      '(VIRTUAL) "")
 			nil ; users
 			nil ; user ordinals
 			(insn-sfmt (current-insn-lookup 'x-before))
@@ -1101,7 +1102,8 @@
 		      (make <sfrag>
 			'x-trailer
 			"trailer fragment for insns without one"
-			(atlist-parse '(VIRTUAL) "" "semantic frag computation")
+			(atlist-parse (make-prefix-context "semantic frag computation")
+				      '(VIRTUAL) "")
 			nil ; users
 			nil ; user ordinals
 			(insn-sfmt (current-insn-lookup 'x-before))

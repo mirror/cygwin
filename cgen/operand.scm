@@ -250,7 +250,8 @@
  <pc> 'make!
  (lambda (self)
    (send-next self 'make! 'pc "program counter"
-	      (atlist-parse '(SEM-ONLY) "cgen_operand" "make! of pc")
+	      (atlist-parse (make-prefix-context "make! of pc")
+			    '(SEM-ONLY) "cgen_operand")
 	      'h-pc
 	      'DFLT
 	      (make <hw-index> 'anonymous
@@ -505,12 +506,12 @@
 		(!= (length getter) 2)
 		(not (and (list? (car getter))
 			  (= (length (car getter)) rank))))
-	    (context-error context
-			   (string-append "invalid getter, should be "
-					  (-operand-g/setter-syntax rank #f))
-			   getter))
+	    (parse-error context
+			 (string-append "invalid getter, should be "
+					(-operand-g/setter-syntax rank #f))
+			 getter))
 	(if (not (rtx? (cadr getter)))
-	    (context-error context "invalid rtx expression" getter))
+	    (parse-error context "invalid rtx expression" getter))
 	getter))
 )
 
@@ -527,12 +528,12 @@
 		(!= (length setter) 2)
 		(not (and (list? (car setter))
 			  (= (+ 1 (length (car setter)) rank)))))
-	    (context-error context
-			   (string-append "invalid setter, should be "
-					  (-operand-g/setter-syntax rank #t))
-			   setter))
+	    (parse-error context
+			 (string-append "invalid setter, should be "
+					(-operand-g/setter-syntax rank #t))
+			 setter))
 	(if (not (rtx? (cadr setter)))
-	    (context-error context "invalid rtx expression" setter))
+	    (parse-error context "invalid rtx expression" setter))
 	setter))
 )
 
@@ -544,34 +545,34 @@
 ; ??? This only takes insn fields as the index.  May need another proc (or an
 ; enhancement of this one) that takes other kinds of indices.
 
-(define (-operand-parse errtxt name comment attrs hw mode ifld handlers getter setter)
+(define (-operand-parse context name comment attrs hw mode ifld handlers getter setter)
   (logit 2 "Processing operand " name " ...\n")
 
-  (let ((name (parse-name name errtxt))
-	(atlist-obj (atlist-parse attrs "cgen_operand" errtxt)))
+  ;; Pick out name first to augment the error context.
+  (let* ((name (parse-name context name))
+	 (context (context-append-name context name))
+	 (atlist-obj (atlist-parse context attrs "cgen_operand")))
 
     (if (keep-atlist? atlist-obj #f)
 
 	(let ((hw-objs (current-hw-sem-lookup hw))
-	      (mode-obj (parse-mode-name mode errtxt))
+	      (mode-obj (parse-mode-name context mode))
 	      (ifld-val (if (integer? ifld)
 			    ifld
-			    (current-ifld-lookup ifld)))
-	      ; FIXME: quick hack
-	      (context (context-make-reader errtxt)))
+			    (current-ifld-lookup ifld))))
 
 	  (if (not mode-obj)
-	      (parse-error errtxt "unknown mode" mode))
+	      (parse-error context "unknown mode" mode))
 	  (if (not ifld-val)
-	      (parse-error errtxt "unknown insn field" ifld))
+	      (parse-error context "unknown insn field" ifld))
 	  ; Disallow some obviously invalid numeric indices.
 	  (if (and (integer? ifld-val)
 		   (< ifld-val 0))
-	      (parse-error errtxt "invalid integer index" ifld-val))
+	      (parse-error context "invalid integer index" ifld-val))
 	  ; Don't validate HW until we know whether this operand will be kept
 	  ; or not.  If not, HW may have been discarded too.
 	  (if (null? hw-objs)
-	      (parse-error errtxt "unknown hardware element" hw))
+	      (parse-error context "unknown hardware element" hw))
 
 	  ; At this point IFLD-VAL is either an integer or an <ifield> object.
 	  ; Since we can't look up the hardware element at this time
@@ -589,7 +590,7 @@
 				'ifield 'UINT ifld-val)))))
 	    (make <operand>
 	      name
-	      (parse-comment comment errtxt)
+	      (parse-comment context comment)
 	      ; Copy FLD's attributes so one needn't duplicate attrs like
 	      ; PCREL-ADDR, etc.  An operand inherits the attributes of
 	      ; its field.  They are overridable of course, which is why we use
@@ -600,7 +601,7 @@
 	      hw   ; note that this is the hw's name, not an object
 	      mode ; ditto, this is a name, not an object
 	      hw-index
-	      (parse-handlers errtxt '(parse print) handlers)
+	      (parse-handlers context '(parse print) handlers)
 	      (-operand-parse-getter context getter (if scalar? 0 1))
 	      (-operand-parse-setter context setter (if scalar? 0 1))
 	      )))
@@ -612,12 +613,12 @@
 
 ; Read an operand description.
 ; This is the main routine for analyzing operands in the .cpu file.
-; ERRTXT is prepended to error messages to provide context.
+; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
 ; -operand-parse is invoked to create the <operand> object.
 
-(define (-operand-read errtxt . arg-list)
-  (let (; Current operand elements:
+(define (-operand-read context . arg-list)
+  (let (
 	(name nil)
 	(comment nil)
 	(attrs nil)
@@ -628,6 +629,7 @@
 	(getter nil)
 	(setter nil)
 	)
+
     (let loop ((arg-list arg-list))
       (if (null? arg-list)
 	  nil
@@ -643,19 +645,20 @@
 	      ((handlers) (set! handlers (cdr arg)))
 	      ((getter) (set! getter (cdr arg)))
 	      ((setter) (set! setter (cdr arg)))
-	      (else (parse-error errtxt "invalid operand arg" arg)))
+	      (else (parse-error context "invalid operand arg" arg)))
 	    (loop (cdr arg-list)))))
+
     ; Now that we've identified the elements, build the object.
-    (-operand-parse errtxt name comment attrs type mode index handlers
-		    getter setter)
-    )
+    (-operand-parse context name comment attrs type mode index handlers
+		    getter setter))
 )
 
 ; Define an operand object, name/value pair list version.
 
 (define define-operand
   (lambda arg-list
-    (let ((op (apply -operand-read (cons "define-operand" arg-list))))
+    (let ((op (apply -operand-read (cons (make-current-context "define-operand")
+					 arg-list))))
       (if op
 	  (current-op-add! op))
       op))
@@ -664,7 +667,8 @@
 ; Define an operand object, all arguments specified.
 
 (define (define-full-operand name comment attrs type mode index handlers getter setter)
-  (let ((op (-operand-parse "define-full-operand" name comment attrs
+  (let ((op (-operand-parse (make-current-context "define-full-operand")
+			    name comment attrs
 			    type mode index handlers getter setter)))
     (if op
 	(current-op-add! op))
@@ -780,13 +784,13 @@
 (define (-derived-parse-encoding context operand-name encoding)
   (if (or (null? encoding)
 	  (not (list? encoding)))
-      (context-error context "encoding not a list" encoding))
+      (parse-error context "encoding not a list" encoding))
   (if (not (eq? (car encoding) '+))
-      (context-error context "encoding must begin with `+'" encoding))
+      (parse-error context "encoding must begin with `+'" encoding))
 
   ; ??? Calling -parse-insn-format is a quick hack.
   ; It's an internal routine of some other file.
-  (let ((iflds (-parse-insn-format "anyof encoding" encoding)))
+  (let ((iflds (-parse-insn-format context encoding)))
     (make <derived-ifield>
 	  operand-name
 	  'derived-ifield ; (string-append "<derived-ifield> for " operand-name)
@@ -818,37 +822,37 @@
 ; ??? Currently no support for handlers(,???) found in normal operands.
 ; Later, when necessary.
 
-(define (-derived-operand-parse errtxt name comment attrs mode
+(define (-derived-operand-parse context name comment attrs mode
 				args syntax
 				base-ifield encoding ifield-assertion
 				getter setter)
   (logit 2 "Processing derived operand " name " ...\n")
 
-  (let ((name (parse-name name errtxt))
-	(atlist-obj (atlist-parse attrs "cgen_operand" errtxt)))
+  ;; Pick out name first to augment the error context.
+  (let* ((name (parse-name context name))
+	 (context (context-append-name context name))
+	 (atlist-obj (atlist-parse context attrs "cgen_operand")))
 
     (if (keep-atlist? atlist-obj #f)
 
-	(let* ((mode-obj (parse-mode-name mode errtxt))
-	      ; FIXME: quick hack
-	      (context (context-make-reader errtxt))
-	      (parsed-encoding (-derived-parse-encoding context name encoding))
-	      )
+	(let ((mode-obj (parse-mode-name context mode))
+	      (parsed-encoding (-derived-parse-encoding context name encoding)))
+
 	  (if (not mode-obj)
-	      (parse-error errtxt "unknown mode" mode))
+	      (parse-error context "unknown mode" mode))
 
 	  (let ((result
 		 (make <derived-operand>
 		       name
-		       (parse-comment comment errtxt)
+		       (parse-comment context comment)
 		       atlist-obj
 		       mode-obj
 		       (map (lambda (a)
 			      (if (not (symbol? a))
-				  (parse-error errtxt "arg not a symbol" a))
+				  (parse-error context "arg not a symbol" a))
 			      (let ((op (current-op-lookup a)))
 				(if (not op)
-				    (parse-error errtxt "not an operand" a))
+				    (parse-error context "not an operand" a))
 				op))
 			    args)
 		       syntax
@@ -886,12 +890,12 @@
 
 ; Read a derived operand description.
 ; This is the main routine for analyzing derived operands in the .cpu file.
-; ERRTXT is prepended to error messages to provide context.
+; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
 ; -derived-operand-parse is invoked to create the <derived-operand> object.
 
-(define (-derived-operand-read errtxt . arg-list)
-  (let (; Current derived-operand elements:
+(define (-derived-operand-read context . arg-list)
+  (let (
 	(name nil)
 	(comment nil)
 	(attrs nil)
@@ -904,6 +908,7 @@
 	(getter nil)
 	(setter nil)
 	)
+
     (let loop ((arg-list arg-list))
       (if (null? arg-list)
 	  nil
@@ -921,13 +926,13 @@
 	      ((ifield-assertion) (set! ifield-assertion (cadr arg)))
 	      ((getter) (set! getter (cadr arg)))
 	      ((setter) (set! setter (cadr arg)))
-	      (else (parse-error errtxt "invalid derived-operand arg" arg)))
+	      (else (parse-error context "invalid derived-operand arg" arg)))
 	    (loop (cdr arg-list)))))
+
     ; Now that we've identified the elements, build the object.
-    (-derived-operand-parse errtxt name comment attrs mode args
+    (-derived-operand-parse context name comment attrs mode args
 			    syntax base-ifield encoding ifield-assertion
-			    getter setter)
-    )
+			    getter setter))
 )
 
 ; Define a derived operand object, name/value pair list version.
@@ -935,7 +940,8 @@
 (define define-derived-operand
   (lambda arg-list
     (let ((op (apply -derived-operand-read
-		     (cons "define-derived-operand" arg-list))))
+		     (cons (make-current-context "define-derived-operand")
+			   arg-list))))
       (if op
 	  (current-op-add! op))
       op))
@@ -945,7 +951,7 @@
 ; ??? Not supported (yet).
 ;
 ;(define (define-full-derived-operand name comment attrs mode ...)
-;  (let ((op (-derived-operand-parse "define-full-derived-operand"
+;  (let ((op (-derived-operand-parse (make-current-context "define-full-derived-operand")
 ;				    name comment attrs
 ;				    mode ...)))
 ;    (if op
@@ -958,10 +964,10 @@
 
 (define (-anyof-parse-choice context choice)
   (if (not (symbol? choice))
-      (context-error context "anyof choice not a symbol" choice))
+      (parse-error context "anyof choice not a symbol" choice))
   (let ((op (current-op-lookup choice)))
     (if (not (derived-operand? op))
-	(context-error context "anyof choice not a derived-operand" choice))
+	(parse-error context "anyof choice not a derived-operand" choice))
     op)
 )
 
@@ -974,24 +980,24 @@
 ; ??? Currently no support for handlers(,???) found in normal operands.
 ; Later, when necessary.
 
-(define (-anyof-operand-parse errtxt name comment attrs mode
+(define (-anyof-operand-parse context name comment attrs mode
 			      base-ifield choices)
   (logit 2 "Processing anyof operand " name " ...\n")
 
-  (let ((name (parse-name name errtxt))
-	(atlist-obj (atlist-parse attrs "cgen_operand" errtxt)))
+  ;; Pick out name first to augment the error context.
+  (let* ((name (parse-name context name))
+	 (context (context-append-name context name))
+	 (atlist-obj (atlist-parse context attrs "cgen_operand")))
 
     (if (keep-atlist? atlist-obj #f)
 
-	(let ((mode-obj (parse-mode-name mode errtxt))
-	      ; FIXME: quick hack
-	      (context (context-make-reader errtxt)))
+	(let ((mode-obj (parse-mode-name context mode)))
 	  (if (not mode-obj)
-	      (parse-error errtxt "unknown mode" mode))
+	      (parse-error context "unknown mode" mode))
 
 	  (make <anyof-operand>
 		name
-		(parse-comment comment errtxt)
+		(parse-comment context comment)
 		atlist-obj
 		mode
 		base-ifield
@@ -1006,12 +1012,12 @@
 
 ; Read an anyof operand description.
 ; This is the main routine for analyzing anyof operands in the .cpu file.
-; ERRTXT is prepended to error messages to provide context.
+; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
 ; -anyof-operand-parse is invoked to create the <anyof-operand> object.
 
-(define (-anyof-operand-read errtxt . arg-list)
-  (let (; Current operand elements:
+(define (-anyof-operand-read context . arg-list)
+  (let (
 	(name nil)
 	(comment nil)
 	(attrs nil)
@@ -1019,6 +1025,7 @@
 	(base-ifield nil)
 	(choices nil)
 	)
+
     (let loop ((arg-list arg-list))
       (if (null? arg-list)
 	  nil
@@ -1031,11 +1038,11 @@
 	      ((mode) (set! mode (cadr arg)))
 	      ((base-ifield) (set! base-ifield (cadr arg)))
 	      ((choices) (set! choices (cdr arg)))
-	      (else (parse-error errtxt "invalid anyof-operand arg" arg)))
+	      (else (parse-error context "invalid anyof-operand arg" arg)))
 	    (loop (cdr arg-list)))))
+
     ; Now that we've identified the elements, build the object.
-    (-anyof-operand-parse errtxt name comment attrs mode base-ifield choices)
-    )
+    (-anyof-operand-parse context name comment attrs mode base-ifield choices))
 )
 
 ; Define an anyof operand object, name/value pair list version.
@@ -1043,7 +1050,8 @@
 (define define-anyof-operand
   (lambda arg-list
     (let ((op (apply -anyof-operand-read
-		     (cons "define-anyof-operand" arg-list))))
+		     (cons (make-current-context "define-anyof-operand")
+			   arg-list))))
       (if op
 	  (current-op-add! op))
       op))

@@ -303,33 +303,32 @@
 			":")))
 )
 
-; Signal an error while reading a .cpu file.
+;;; Signal a parse error while reading a .cpu file.
+;;; If CONTEXT is #f, use a default context of the current reader location
+;;; and an empty prefix.
+;;; If MAYBE-HELP-TEXT is specified, elide the last trailing \n.
+;;; Multiple lines of help text need embedded newlines, and should be no longer
+;;; than 79 characters.
 
-(define (reader-error msg expr help-text)
-  (let* ((loc (current-reader-location))
+(define (parse-error context message expr . maybe-help-text)
+  (if (not context)
+      (set! context (make <context> (current-reader-location) #f)))
+  (let* ((loc (context-location context))
 	 (top-sloc (location-top loc))
-	 (errmsg
-	  (string-append (single-location->string top-sloc)
-			 ": "
-			 msg
-			 ":\n"
-			 (if (string=? help-text "")
-			     ""
-			     (string-append help-text "\n")))))
-    (error (simple-format #f "While reading description:\n~A ~A\nReference chain:\n~A"
-			  errmsg expr (location->string loc))))
-)
-
-; Signal a parse error while reading a .cpu file.
-; FIXME: Add expr arg and change args to optional help text.
-
-(define (parse-error errtxt message . args)
-  (cond ((null? args)
-	 (reader-error (string-append errtxt ": " message ":") "" ""))
-	((= (length args) 1)
-	 (reader-error (string-append errtxt ": " message ":") (car args) ""))
-	(else
-	 (reader-error (string-append errtxt ": " message ":") args "")))
+	 (prefix (context-prefix context)))
+    (error
+     (simple-format
+      #f
+      "While reading description:\n~A: ~A:\n  ~S\nReference chain:\n~A~A"
+      (single-location->simple-string top-sloc)
+      (if prefix
+	  (string-append prefix ": " message)
+	  message)
+      expr
+      (location->string loc)
+      (if (null? maybe-help-text)
+	  ""
+	  (string-append "\n" (car maybe-help-text))))))
 )
 
 ; Return the current source location.
@@ -341,42 +340,49 @@
 ; Process a macro-expanded entry.
 
 (define (-reader-process-expanded-1! entry)
-  ;; Set the current source location for better diagnostics.
-  ;; Access with current-reader-location.
-  (reader-set-location! CURRENT-READER (location-property entry))
+  (let ((location (location-property entry)))
 
-  (if (reader-trace-commands? CURRENT-READER)
-      (let ((loc (location-property entry)))
+    ;; Set the current source location for better diagnostics.
+    ;; Access with current-reader-location.
+    (reader-set-location! CURRENT-READER location)
+
+    (if (reader-trace-commands? CURRENT-READER)
 	(message "Processing command:\n  @ "
-		 (if loc (location->string loc) "location unknown")
+		 (if location (location->string location) "location unknown")
 		 "\n"
-		 (with-output-to-string (lambda () (pretty-print entry))))))
+		 (with-output-to-string (lambda () (pretty-print entry)))))
 
-  (let ((command (-reader-lookup-command (car entry))))
-    (if command
-	(let* ((handler (command-handler command))
-	       (arg-spec (command-arg-spec command))
-	       (num-args (num-args arg-spec)))
-	  (if (cdr num-args)
-	      ; Variable number of trailing arguments.
-	      (if (< (length (cdr entry)) (car num-args))
-		  (reader-error (string-append "Incorrect number of arguments to "
-					       (symbol->string (car entry))
-					       ", expecting at least "
-					       (number->string (car num-args)))
-				entry
-				(command-help command))
-		  (apply handler (cdr entry)))
-	      ; Fixed number of arguments.
-	      (if (!= (length (cdr entry)) (car num-args))
-		  (reader-error (string-append "Incorrect number of arguments to "
-					       (symbol->string (car entry))
-					       ", expecting "
-					       (number->string (car num-args)))
-				entry
-				(command-help command))
-		  (apply handler (cdr entry)))))
-	(reader-error "unknown entry type" entry "")))
+    (let ((command (-reader-lookup-command (car entry)))
+	  (context (make-current-context #f)))
+
+      (if command
+
+	  (let* ((handler (command-handler command))
+		 (arg-spec (command-arg-spec command))
+		 (num-args (num-args arg-spec)))
+	    (if (cdr num-args)
+		;; Variable number of trailing arguments.
+		(if (< (length (cdr entry)) (car num-args))
+		    (parse-error context
+				 (string-append "Incorrect number of arguments to "
+						(symbol->string (car entry))
+						", expecting at least "
+						(number->string (car num-args)))
+				 entry
+				 (command-help command))
+		    (apply handler (cdr entry)))
+		;; Fixed number of arguments.
+		(if (!= (length (cdr entry)) (car num-args))
+		    (parse-error context
+				 (string-append "Incorrect number of arguments to "
+						(symbol->string (car entry))
+						", expecting "
+						(number->string (car num-args)))
+				 entry
+				 (command-help command))
+		    (apply handler (cdr entry)))))
+
+	  (parse-error context "unknown entry type" entry))))
 
   *UNSPECIFIED*
 )
@@ -409,7 +415,7 @@
 
 (define (-reader-process! entry loc)
   (if (not (form? entry))
-      (reader-error "improperly formed entry" entry ""))
+      (parse-error loc "improperly formed entry" entry))
 
   ; First do macro expansion, but not if define-pmacro of course.
   ; ??? Singling out define-pmacro this way seems a bit odd.  The way to look
@@ -918,13 +924,15 @@ Define a preprocessor-style macro.
 
 (define (-cmd-if test then . else)
   (if (> (length else) 1)
-      (reader-error "wrong number of arguments to `if'"
-		    (cons 'if (cons test (cons then else)))
-		    ""))
-  ; FIXME: Assumes TEST is a non-null-list.
+      (parse-error #f
+		   "wrong number of arguments to `if'"
+		   (cons 'if (cons test (cons then else)))))
   ; ??? rtx-eval test
-  (if (not (memq (car test) '(keep-isa? keep-mach? application-is?)))
-      (reader-error "only (if (keep-mach?|keep-isa?|application-is? ...) ...) are currently supported" test ""))
+  (if (or (not (pair? test))
+	  (not (memq (car test) '(keep-isa? keep-mach? application-is?))))
+      (parse-error #f
+		   "only (if (keep-mach?|keep-isa?|application-is? ...) ...) are currently supported"
+		   test))
   (case (car test)
     ((keep-isa?)
      (if (keep-isa? (cadr test))
@@ -1053,7 +1061,9 @@ Define a preprocessor-style macro.
 (define (option-arg args)
   (if (and (pair? args) (pair? (cdr args)))
       (cadr args)
-      (parse-error "option processing" "missing argument to" (car args)))
+      (parse-error (make-prefix-context "option processing")
+		   "missing argument to"
+		   (car args)))
 )
 
 ; List of common arguments.

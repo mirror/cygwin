@@ -195,25 +195,29 @@
 
 (define (enum-attr-make name value) (cons name value))
 
-(define (parse-simple-attribute right-type? message)
-  (lambda (self errtxt val)
+;;; Return a procedure to parse an attribute.
+;;; RIGHT-TYPE? is a procedure that verifies the value is the right type.
+;;; MESSAGE is printed if there is an error.
+
+(define (-parse-simple-attribute right-type? message)
+  (lambda (self context val)
     (if (and (not (null? val))
 	     (right-type? (car val))
 	     (null? (cdr val)))
 	(cons (obj:name self) (car val))
-	(parse-error errtxt message (cons (obj:name self) val))))
+	(parse-error context message (cons (obj:name self) val))))
 )
 
 ; A boolean attribute's value is either #t or #f.
 
 (method-make!
  <boolean-attribute> 'parse-value
- (parse-simple-attribute boolean? "boolean attribute not one of #f/#t")
+ (-parse-simple-attribute boolean? "boolean attribute not one of #f/#t")
 )
 
 (method-make!
  <string-attribute> 'parse-value
- (parse-simple-attribute string? "invalid argument to string attribute"))
+ (-parse-simple-attribute string? "invalid argument to string attribute"))
 
 ; A bitset attribute's value is a comma separated list of elements.
 ; We don't validate the values.  In the case of the MACH attribute,
@@ -227,8 +231,8 @@
 
 (method-make!
  <bitset-attribute> 'parse-value
- (parse-simple-attribute (lambda (x) (or (symbol? x) (string? x)))
-			 "improper bitset attribute")
+ (-parse-simple-attribute (lambda (x) (or (symbol? x) (string? x)))
+			  "improper bitset attribute")
 )
 
 ; An integer attribute's value is a number
@@ -236,26 +240,26 @@
 
 (method-make!
  <integer-attribute> 'parse-value
- (parse-simple-attribute (lambda (x) (or (number? x) (symbol? x)))
-			 "improper integer attribute")
+ (-parse-simple-attribute (lambda (x) (or (number? x) (symbol? x)))
+			  "improper integer attribute")
 )
 
 ; An enum attribute's value is a symbol representing that value.
 
 (method-make!
  <enum-attribute> 'parse-value
- (parse-simple-attribute (lambda (x) (or (symbol? x) (string? x)))
-			 "improper enum attribute")
+ (-parse-simple-attribute (lambda (x) (or (symbol? x) (string? x)))
+			  "improper enum attribute")
 )
 
 ; Parse a boolean attribute's value definition.
 
 (method-make!
  <boolean-attribute> 'parse-value-def
- (lambda (self errtxt values)
+ (lambda (self context values)
    (if (equal? values '(#f #t))
        values
-       (parse-error errtxt "boolean value list must be (#f #t)" values)))
+       (parse-error context "boolean value list must be (#f #t)" values)))
 )
 
 ; Ignore values for strings.  We can't do any error checking since
@@ -263,7 +267,7 @@
 
 (method-make!
  <string-attribute> 'parse-value-def
- (lambda (self errtxt values) #f)
+ (lambda (self context values) #f)
 )
 
 ; Parse a bitset attribute's value definition.
@@ -271,8 +275,8 @@
 
 (method-make!
  <bitset-attribute> 'parse-value-def
- (lambda (self errtxt values)
-   (parse-enum-vals errtxt "" values))
+ (lambda (self context values)
+   (parse-enum-vals context "" values))
 )
 
 ; Parse an integer attribute's value definition.
@@ -280,12 +284,14 @@
 
 (method-make!
  <integer-attribute> 'parse-value-def
- (lambda (self errtxt values)
+ (lambda (self context values)
    (if values
        (for-each (lambda (val)
 		   (if (or (not (list? val))
 			   (not (number? (car val))))
-		       (parse-error errtxt "invalid element in integer attribute list" val)))
+		       (parse-error context
+				    "invalid element in integer attribute list"
+				    val)))
 		 values))
    values)
 )
@@ -295,8 +301,8 @@
 
 (method-make!
  <enum-attribute> 'parse-value-def
- (lambda (self errtxt values)
-   (parse-enum-vals errtxt "" values))
+ (lambda (self context values)
+   (parse-enum-vals context "" values))
 )
 
 ; Make an attribute list object from a list of name/value pairs.
@@ -312,61 +318,66 @@
 ; If DEFAULT is #f, use the first value.
 ; ??? Allowable values for integer attributes is wip.
 
-(define (-attr-parse errtxt type-class name comment attrs for default values)
+(define (-attr-parse context type-class name comment attrs for default values)
   (logit 2 "Processing attribute " name " ...\n")
-  (let* ((name (parse-name name errtxt))
-	 (errtxt (stringsym-append errtxt ":" name))
+
+  ;; Pick out name first to augment the error context.
+  (let* ((name (parse-name context name))
+	 (context (context-append-name context name))
 	 (result (new type-class))
-	 (parsed-values (send result 'parse-value-def errtxt values)))
+	 (parsed-values (send result 'parse-value-def context values)))
+
     (elm-xset! result 'name name)
-    (elm-xset! result 'comment (parse-comment comment errtxt))
-    (elm-xset! result 'attrs (atlist-parse attrs "" errtxt))
+    (elm-xset! result 'comment (parse-comment context comment))
+    (elm-xset! result 'attrs (atlist-parse context attrs ""))
     (elm-xset! result 'for for)
     ; Set the default.
     (case (class-name type-class)
       ((<boolean-attribute>)
        (if (and (not (memq default '(#f #t)))
 		(not (rtx? default)))
-	   (parse-error errtxt "invalid default" default))
+	   (parse-error context "invalid default" default))
        (elm-xset! result 'default default))
       ((<string-attribute>)
        (let ((default (or default "")))
 	 (if (and (not (string? default))
 		  (not (rtx? default)))
-	     (parse-error errtxt "invalid default" default))
+	     (parse-error context "invalid default" default))
 	 (elm-xset! result 'default default)))
       ((<integer-attribute>)
        (let ((default (if default default (if (null? values) 0 (car values)))))
 	 (if (and (not (integer? default))
 		  (not (rtx? default)))
-	     (parse-error errtxt "invalid default" default))
+	     (parse-error context "invalid default" default))
 	 (elm-xset! result 'default default)))
       ((<bitset-attribute> <enum-attribute>)
        (let ((default (if default default (caar parsed-values))))
 	 (if (and (not (assq default parsed-values))
 		  (not (rtx? default)))
-	     (parse-error errtxt "invalid default" default))
+	     (parse-error context "invalid default" default))
 	 (elm-xset! result 'default default))))
     (elm-xset! result 'values parsed-values)
+
     result)
 )
 
 ; Read an attribute description
 ; This is the main routine for analyzing attributes in the .cpu file.
-; ERRTXT is prepended to error messages to provide context.
+; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
 ; -attr-parse is invoked to create the attribute object.
 
-(define (-attr-read errtxt . arg-list)
-  (let (; Current attribute elements:
+(define (-attr-read context . arg-list)
+  (let (
 	(type-class 'not-set) ; attribute type
-	(name nil)
+	(name #f)
 	(comment "")
 	(attrs nil)
 	(for #f) ; assume for everything
-	(default #f) ; indicates "not set"
-	(values #f) ; indicates "not set"
+	(default #f) ; #f indicates "not set"
+	(values #f) ; #f indicates "not set"
 	)
+
     ; Loop over each element in ARG-LIST, recording what's found.
     (let loop ((arg-list arg-list))
       (if (null? arg-list)
@@ -381,7 +392,7 @@
 					((integer) <integer-attribute>)
 					((enum) <enum-attribute>)
 					(else (parse-error
-					       errtxt
+					       context
 					       "invalid attribute type"
 					       (cadr arg))))))
 	      ((name) (set! name (cadr arg)))
@@ -390,11 +401,12 @@
 	      ((for) (set! for (cdr arg)))
 	      ((default) (set! default (cadr arg)))
 	      ((values) (set! values (cdr arg)))
-	      (else (parse-error errtxt "invalid attribute arg" arg)))
+	      (else (parse-error context "invalid attribute arg" arg)))
 	    (loop (cdr arg-list)))))
+
     ; Must have type now.
     (if (eq? type-class 'not-set)
-	(parse-error errtxt "type not specified"))
+	(parse-error context "type not specified") arg-list)
     ; Establish proper defaults now that we know the type.
     (case (class-name type-class)
       ((<boolean-attribute>)
@@ -404,9 +416,11 @@
 	   (set! values '(#f #t))))
       ((bitset-attribute>) ;; FIXME
        (if (eq? default #f)
-	   (parse-error errtxt "bitset-attribute default not specified"))
+	   (parse-error context "bitset-attribute default not specified"
+			arg-list))
        (if (eq? values #f)
-	   (parse-error errtxt "bitset-attribute values not specified")))
+	   (parse-error context "bitset-attribute values not specified"
+			arg-list)))
       ((integer-attribute>) ;; FIXME
        (if (eq? default #f)
 	   (set! default 0))
@@ -414,20 +428,23 @@
 	   (set! values #f))) ; really a nop, but for consistency
       ((enum-attribute>) ;; FIXME
        (if (eq? default #f)
-	   (parse-error errtxt "enum-attribute default not specified"))
+	   (parse-error context "enum-attribute default not specified"
+			arg-list))
        (if (eq? values #f)
-	   (parse-error errtxt "bitset-attribute values not specified")))
+	   (parse-error context "bitset-attribute values not specified"
+			arg-list)))
       )
+
     ; Now that we've identified the elements, build the object.
-    (-attr-parse errtxt type-class name comment attrs for default values)
-    )
+    (-attr-parse context type-class name comment attrs for default values))
 )
 
 ; Main routines for defining attributes in .cpu files.
 
 (define define-attr
   (lambda arg-list
-    (let ((a (apply -attr-read (cons "define-attr" arg-list))))
+    (let ((a (apply -attr-read (cons (make-current-context "define-attr")
+				     arg-list))))
       (current-attr-add! a)
       a))
 )
@@ -800,7 +817,7 @@
 
 (define (attr-parse context attrs)
   (if (not (list? attrs))
-      (context-error context "improper attribute list" attrs))
+      (parse-error context "improper attribute list" attrs))
   (let ((alist nil))
     (for-each (lambda (elm)
 		(cond ((symbol? elm)
@@ -809,15 +826,15 @@
 			   (set! alist (acons (string->symbol (string-drop1 (symbol->string elm))) #f alist))
 			   (set! alist (acons elm #t alist)))
 		       (if (not (current-attr-lookup (caar alist)))
-			   (context-error context "unknown attribute" (caar alist))))
+			   (parse-error context "unknown attribute" (caar alist))))
 		      ((and (list? elm) (pair? elm) (symbol? (car elm)))
 		       (let ((a (current-attr-lookup (car elm))))
 			 (if (not a)
-			     (context-error context "unknown attribute" elm))
+			     (parse-error context "unknown attribute" elm))
 			 (set! alist (cons (send a 'parse-value
-						 (context-prefix context);FIXME
-						 (cdr elm)) alist))))
-		      (else (context-error context "improper attribute" elm))))
+						 context (cdr elm))
+					   alist))))
+		      (else (parse-error context "improper attribute" elm))))
 	      attrs)
     alist)
 )
@@ -826,8 +843,8 @@
 ; ATTRS is a list of attribute specs (e.g. (FOO !BAR (BAZ 3))).
 ; The result is an <attr-list> object.
 
-(define (atlist-parse attrs prefix errtxt)
-  (make <attr-list> prefix (attr-parse (context-make-prefix errtxt) attrs))
+(define (atlist-parse context attrs prefix)
+  (make <attr-list> prefix (attr-parse context attrs))
 )
 
 ; Return the source form of an atlist's values.

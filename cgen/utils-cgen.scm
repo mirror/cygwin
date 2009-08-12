@@ -98,16 +98,26 @@
 ;;; Return a single-location in a readable form.
 
 (define (single-location->string sloc)
+  ;; +1: numbers are recorded origin-0
   (string-append (single-location-file sloc)
 		 ":"
-		 ;; +1: numbers are recorded origin-0
-		 (number->string (+ (single-location-line sloc)
-				    1))
+		 (number->string (+ (single-location-line sloc) 1))
 		 ":"
-		 (number->string (+ (single-location-column sloc)
-				    1))
-		 (if (single-location-end? sloc) "(end)" "")
-		 )
+		 (number->string (+ (single-location-column sloc) 1))
+		 (if (single-location-end? sloc) "(end)" ""))
+)
+
+;;; Same as single-location->string, except omit any directory info in
+;;; the file name.
+
+(define (single-location->simple-string sloc)
+  ;; +1: numbers are recorded origin-0
+  (string-append (basename (single-location-file sloc))
+		 ":"
+		 (number->string (+ (single-location-line sloc) 1))
+		 ":"
+		 (number->string (+ (single-location-column sloc) 1))
+		 (if (single-location-end? sloc) "(end)" ""))
 )
 
 ;;; Return a location in a readable form.
@@ -255,40 +265,48 @@
 
 ; Parsing utilities
 
-; Parsing context, used to give better error messages.
+;;; A parsing/processing context, used to give better error messages.
+;;; LOCATION must be an object created with make-location.
 
 (define <context>
   (class-make '<context> nil
 	      '(
-		; Name of file containing object being processed.
-		(file . #f)
-		; Line number in the file.
-		(lineno . #f)
-		; Error message prefix
-		(prefix . "")
+		;; Location of the object being processed,
+		;; or #f if unknown (or there is none).
+		(location . #f)
+		;; Error message prefix or #f if there is none.
+		(prefix . #f)
 		)
 	      nil)
 )
 
 ; Accessors.
 
-(define-getters <context> context (file lineno prefix))
+(define-getters <context> context (location prefix))
 
 ; Create a <context> object that is just a prefix.
 
-(define (context-make-prefix prefix)
-  (make <context> #f #f prefix)
+(define (make-prefix-context prefix)
+  (make <context> #f prefix)
 )
 
-; Create a <context> object for the reader.
-; This sets file,lineno from (current-input-port).
+; Create a <context> object that (current-reader-location) with PREFIX.
 
-(define (context-make-reader prefix)
-  (make <context>
-    (or (port-filename (current-input-port))
-	"<input>")
-    (port-line (current-input-port))
-    prefix)
+(define (make-current-context prefix)
+  (make <context> (current-reader-location) prefix)
+)
+
+; Create a new context from CONTEXT with TEXT appended to the prefix.
+
+(define (context-append context text)
+  (make <context> (context-location context)
+	(string-append (context-prefix context) text))
+)
+
+; Create a new context from CONTEXT with NAME appended to the prefix.
+
+(define (context-append-name context name)
+  (context-append context (stringsym-append ":" name))
 )
 
 ; Call this to issue an error message.
@@ -296,10 +314,11 @@
 ; ARG is the value that had the error if there is one.
 
 (define (context-error context errmsg . arg)
-  (cond ((and context (context-file context))
+  (cond ((and context (context-location context))
 	 (let ((msg (string-append
-		     (context-file context) ":"
-		     (number->string (context-lineno context)) ": "
+		     "@ "
+		     (location->string (context-location context))
+		     ": "
 		     (context-prefix context) ": "
 		     errmsg ": ")))
 	   (apply error (cons msg arg))))
@@ -314,29 +333,27 @@
 ; together.  Each element can in turn be a list of symbols, and so on.
 ; This supports symbol concatenation in the description file without having
 ; to using string-append or some such.
-; FIXME: Isn't the plan to move ERRTXT to the 1st arg?
 
-(define (parse-name name errtxt)
+(define (parse-name context name)
   (string->symbol
    (let parse ((name name))
      (cond
       ((list? name) (string-map parse name))
       ((symbol? name) (symbol->string name))
       ((string? name) name)
-      (else (parse-error errtxt "improper name" name)))))
+      (else (parse-error context "improper name" name)))))
 )
 
 ; Parse an object comment.
 ; COMMENT is either a string or a list of strings, each element of which may
 ; in turn be a list of strings.
-; FIXME: Isn't the plan to move ERRTXT to the 1st arg?
 
-(define (parse-comment comment errtxt)
+(define (parse-comment context comment)
   (cond ((list? comment)
-	 (string-map (lambda (elm) (parse-comment elm errtxt)) comment))
+	 (string-map (lambda (elm) (parse-comment context elm)) comment))
 	((or (string? comment) (symbol? comment))
 	 (->string comment))
-	(else (parse-error errtxt "improper comment" comment)))
+	(else (parse-error context "improper comment" comment)))
 )
 
 ; Parse a symbol.
@@ -358,9 +375,9 @@
 ; Parse a number.
 ; VALID-VALUES is a list of numbers and (min . max) pairs.
 
-(define (parse-number errtxt value . valid-values)
+(define (parse-number context value . valid-values)
   (if (not (number? value))
-      (parse-error errtxt "not a number" value))
+      (parse-error context "not a number" value))
   (if (any-true? (map (lambda (test)
 			(if (pair? test)
 			    (and (>= value (car test))
@@ -368,7 +385,7 @@
 			    (= value test)))
 		      valid-values))
       value
-      (parse-error errtxt "invalid number" value valid-values))
+      (parse-error context "invalid number" value valid-values))
 )
 
 ; Parse a boolean value
@@ -445,34 +462,34 @@
 ; This is done by each of the argument validation routines so the caller
 ; doesn't need to make two calls.
 
-(define (arg-list-validate-name errtxt arg-spec)
+(define (arg-list-validate-name context arg-spec)
   (if (null? arg-spec)
-      (parse-error errtxt "empty argument spec"))
+      (parse-error context "empty argument spec" arg-spec))
   (if (not (symbol? (car arg-spec)))
-      (parse-error errtxt "argument name not a symbol" arg-spec))
+      (parse-error context "argument name not a symbol" arg-spec))
   *UNSPECIFIED*
 )
 
 ; Signal a parse error if an argument was specified with a value.
 ; ARG-SPEC is (name value).
 
-(define (arg-list-check-no-args errtxt arg-spec)
-  (arg-list-validate-name errtxt arg-spec)
+(define (arg-list-check-no-args context arg-spec)
+  (arg-list-validate-name context arg-spec)
   (if (not (null? (cdr arg-spec)))
-      (parse-error errtxt (string-append (car arg-spec)
-					 " takes zero arguments")))
+      (parse-error context (string-append (car arg-spec)
+					  " takes zero arguments")))
   *UNSPECIFIED*
 )
 
 ; Validate and return a symbol argument.
 ; ARG-SPEC is (name value).
 
-(define (arg-list-symbol-arg errtxt arg-spec)
-  (arg-list-validate-name errtxt arg-spec)
+(define (arg-list-symbol-arg context arg-spec)
+  (arg-list-validate-name context arg-spec)
   (if (or (!= (length (cdr arg-spec)) 1)
 	  (not (symbol? (cadr arg-spec))))
-      (parse-error errtxt (string-append (car arg-spec)
-					 ": argument not a symbol")))
+      (parse-error context (string-append (car arg-spec)
+					  ": argument not a symbol")))
   (cadr arg-spec)
 )
 
@@ -502,7 +519,8 @@
 		  ((operand) (set! entry (current-op-lookup entry-name)))
 		  ((insn) (set! entry (current-insn-lookup entry-name)))
 		  ((macro-insn) (set! entry (current-minsn-lookup entry-name)))
-		  (else (parse-error "sanitize" "unknown entry type" entry-type)))
+		  (else (parse-error (make-prefix-context "sanitize")
+				     "unknown entry type" entry-type)))
 
 		; ENTRY is #f in the case where the element was discarded
 		; because its mach wasn't selected.  But in the case where
@@ -528,7 +546,7 @@
 			))
 
 		    (if (and (eq? APPLICATION 'OPCODES) (keep-all?))
-			(parse-error "sanitize"
+			(parse-error (make-prefix-context "sanitize")
 				     (string-append "unknown " entry-type)
 				     entry-name)))))
 	    entry-names)

@@ -907,26 +907,26 @@
 (define (hw estate mode-name hw-name index-arg selector)
   ; Enforce some rules to keep things in line with the current design.
   (if (not (symbol? mode-name))
-      (parse-error "hw" "invalid mode name" mode-name))
+      (parse-error (estate-context estate) "invalid mode name" mode-name))
   (if (not (symbol? hw-name))
-      (parse-error "hw" "invalid hw name" hw-name))
+      (parse-error (estate-context estate) "invalid hw name" hw-name))
   (if (not (or (number? index-arg)
 	       (rtx? index-arg)))
-      (parse-error "hw" "invalid index" index-arg))
+      (parse-error (estate-context estate) "invalid index" index-arg))
   (if (not (or (number? selector)
 	       (rtx? selector)))
-      (parse-error "hw" "invalid selector" selector))
+      (parse-error (estate-context estate) "invalid selector" selector))
 
   (let ((hw (current-hw-sem-lookup-1 hw-name)))
     (if (not hw)
-	(parse-error "hw" "invalid hardware element" hw-name))
+	(parse-error (estate-context estate) "invalid hardware element" hw-name))
 
     (let* ((mode (if (eq? mode-name 'DFLT) (hw-mode hw) (mode:lookup mode-name)))
 	   (hw-name-with-mode (symbol-append hw-name '- (obj:name mode)))
 	   (result (new <operand>))) ; ??? lookup-for-new?
 
       (if (not mode)
-	  (parse-error "hw" "invalid mode" mode-name))
+	  (parse-error (estate-context estate) "invalid mode" mode-name))
 
       ; Record the selector.
       (elm-xset! result 'selector selector)
@@ -949,10 +949,12 @@
 				  (rtx-constant-value index-arg))
 			    (make <hw-index> 'anonymous 'rtx DFLT
 				  (-rtx-closure-make estate index-arg))))
-		       (else (parse-error "hw" "invalid index" index-arg))))
+		       (else (parse-error (estate-context estate)
+					  "invalid index" index-arg))))
 
       (if (not (hw-mode-ok? hw (obj:name mode) (elm-xget result 'index)))
-	  (parse-error "hw" "invalid mode for hardware" mode-name))
+	  (parse-error (estate-context estate)
+		       "invalid mode for hardware" mode-name))
 
       (elm-xset! result 'hw-name hw-name)
       (elm-xset! result 'type hw)
@@ -1034,7 +1036,7 @@
 ; Subroutines.
 ; ??? Not sure this should live here.
 
-(define (-subr-read errtxt . arg-list)
+(define (-subr-read context . arg-list)
   #f
 )
 

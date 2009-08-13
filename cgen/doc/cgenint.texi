@@ -276,6 +276,8 @@ These need to be investigated and documented here.
 
 At the implementation level, pmacros are expanded with the
 @code{pmacro-expand} Scheme procedure.
+For interactive debugging purposes there is @code{pmacro-dump}
+which is easier to use.
 
 When debugging pmacros it is useful to see how they are expanded.
 When expanding them from the a Guile shell, remember that expressions
@@ -283,11 +285,11 @@ needed to be quoted lest Scheme try to evaluate them.
 
 @smallexample
 guile> (define-pmacro '(foo a b) '(+ a b))
-guile> (pmacro-expand '(foo 3 4))
+guile> (pmacro-dump '(foo 3 4))
 (+ 3 4)
 @end smallexample
 
-One can also use @code{pmacro-trace} to expand a macro and trace its
+One can also use @code{pmacro-debug} to expand a macro and trace its
 expansion.
 
 @node Index

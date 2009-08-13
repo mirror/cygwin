@@ -508,7 +508,7 @@ This is best explained with an example.
 @smallexample
 (define-pmacro (splice-test a b c)
                (.splice a (.unsplice b) c))
-(pmacro-expand (splice-test 1 (2) 3))
+(pmacro-dump (splice-test 1 (2) 3))
 
 --> (1 2 3)
 @end smallexample

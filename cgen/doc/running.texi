@@ -273,7 +273,12 @@ Trace everything.
 
 @end itemize
 
-Example:
+Each application will invoke CGEN in its own way, so the details of
+enabling tracing may vary from application to application.
+Generally though, each application has a CGENFLAGS makefile variable
+for passing flags to CGEN.
+
+Binutils example:
 
 @smallexample
 # Trace pmacro expansion while generating the m32r port's opcodes files

@@ -146,7 +146,7 @@ Some function pmacros are called @samp{syntactic forms}.
 These pmacros are processed differently in that parameters are
 @emph{not} evaluated first.  Instead it is up to the pmacro
 to decide when, and if, the parameters are evaluated.
-The syntactic forms are: @code{.pmacro}, @code{.let}, @code{.if},
+The syntactic forms are: @code{.pmacro}, @code{.let}, @code{.let*}, @code{.if},
 @code{.case}, @code{.cond}, @code{.begin}, @code{.andif}, and @code{.orif}.
 
 If the result of the pmacro is another pmacro invocation,
@@ -798,9 +798,9 @@ Macros for working with pmacros.
 @menu
 * Immediate evaluation of a macro:: The @code{.eval} builtin
 * Applying a macro to a list::      The @code{.apply} builtin
-* Defining a macro inline::         The @code{.pmacro} builtin
+* Defining a pmacro inline::        The @code{.pmacro} builtin
 * Passing macros as arguments::     Passing a macro to another macro
-* Defining a block of locals::      The @code{.let} builtin
+* Defining a block of locals::      The @code{.let}, @code{.let*} builtins
 * A block of statements::           The @code{.begin} builtin
 @end menu
 
@@ -847,13 +847,13 @@ Note that @code{(.str (.iota 5))} is an error.  Here the list
 @samp{(0 1 2 3 4)} is passed as the first argument of @code{.str},
 which is wrong.
 
-@node Defining a macro inline
-@subsection Defining a macro inline
+@node Defining a pmacro inline
+@subsection Defining a pmacro inline
 @cindex .pmacro
 
 Define a macro inline with @code{.pmacro}.
 This is only supported when passing macros as arguments to other macros,
-and as values for local variables in @code{.let}.
+and as values for local variables in @code{.let} or @code{.let*}.
 
 Example:
 
@@ -918,17 +918,29 @@ Example:
 @node Defining a block of locals
 @subsection Defining a block of locals
 @cindex .let
+@cindex .let*
 
 It is often handy to assign expressions to local variables,
 if only to improve readability.
-This is accomplished with the @code{.let} builtin pmacro.
+This is accomplished with the @code{.let} and @code{.let*} builtin pmacros.
 
-Note that one can also assign pmacros to local variables.
+@code{.let} and @code{.let*} have the same syntax:
 
-Syntax: @samp{(.let local-list expr1 [expr2 ...])}
+    @samp{(.let local-list expr1 [expr2 ...])}
+
+    @samp{(.let* local-list expr1 [expr2 ...])}
 
 where @samp{local-list} is a list of local variable assignments,
-with the syntax @samp{(name expr)}.
+with the syntax @samp{(name expr)}.  All variable names must be distinct.
+
+The difference is that in @code{.let} all expressions of all locals
+are evaluated @emph{first} and @emph{then} assigned to the locals,
+whereas in @code{.let*} each local is evaluated and assigned in turn.
+This means that expressions in @code{.let} cannot refer to other locals
+in the @code{.let}.  If they do, they will get the values the variables had
+before the @code{.let}.  Also remember that symbols in pmacros are
+``self-quoting'', so if a symbol isn't bound to any value, its value is
+the symbol name.
 
 Example:
 
@@ -955,6 +967,17 @@ Example:
 (load-op h OP2_10 HI ext-expr)
 (load-op ub OP2_9 QI zext-expr)
 (load-op uh OP2_11 HI zext-expr)
+@end smallexample
+
+Note that one can also assign pmacros to local variables.
+
+Note that @code{.let*} is equivalent to a set of nested @code{.let}
+expressions:
+
+@smallexample
+(.let* ((x 1) (y x)) y)
+;; is equivalent to
+(.let ((x 1)) (.let ((y x)) y))
 @end smallexample
 
 @node A block of statements

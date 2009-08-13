@@ -67,6 +67,7 @@
 ; (.apply pmacro-name arg)
 ; (.pmacro (arg-list) expansion)      - akin go lambda in Scheme
 ; (.let (var-list) expr1 . expr-rest) - akin to let in Scheme
+; (.let* (var-list) expr1 . expr-rest) - akin to let* in Scheme
 ; (.if expr then [else])
 ; (.case expr ((case-list1) stmt) [case-expr-stmt-list] [(else stmt)])
 ; (.cond (expr stmt) [(cond-expr-stmt-list)] [(else stmt)])
@@ -113,7 +114,11 @@
 ; .sym and .str convert numbers to symbols/strings as necessary (base 10).
 ;
 ; .pmacro is for constructing pmacros on-the-fly, like lambda, and is currently
-; only valid as arguments to other pmacros or assigned to a local in a {.let}.
+; only valid as arguments to other pmacros or assigned to a local in a {.let}
+; or {.let*}.
+;
+; NOTE: While Scheme requires tail recursion to be implemented as a loop,
+; we do not.  We might some day, but not today.
 ;
 ; ??? Methinks .foo isn't a valid R5RS symbol.  May need to change 
 ; to something else.
@@ -810,7 +815,7 @@
 
 (define (-pmacro-builtin-let loc env locals expr1 . expr-rest)
   (if (not (list? locals))
-      (-pmacro-error ".let locals is not a list" locals))
+      (-pmacro-error "locals is not a list" locals))
   (if (not (all-true? (map (lambda (l)
 			     (and (list? l)
 				  (= (length l) 2)
@@ -822,6 +827,26 @@
 			    locals))
 	 (new-env (append! evald-locals env)))
     (-pmacro-expand-expr-list (cons expr1 expr-rest) new-env loc))
+)
+
+; (.let* (var-list) expr1 . expr-rest)
+; NOTE: syntactic form
+
+(define (-pmacro-builtin-let* loc env locals expr1 . expr-rest)
+  (if (not (list? locals))
+      (-pmacro-error "locals is not a list" locals))
+  (if (not (all-true? (map (lambda (l)
+			     (and (list? l)
+				  (= (length l) 2)
+				  (symbol? (car l))))
+			   locals)))
+      (-pmacro-error "syntax error in locals list" locals))
+  (let loop ((locals locals) (new-env env))
+    (if (null? locals)
+	(-pmacro-expand-expr-list (cons expr1 expr-rest) new-env loc)
+	(loop (cdr locals) (acons (caar locals)
+				  (-pmacro-expand (cadar locals) new-env loc)
+				  new-env))))
 )
 
 ; (.if expr then [else])
@@ -1252,7 +1277,8 @@
 	  (list '.eval '(expr) #f -pmacro-builtin-eval "process expr immediately")
 	  (list '.apply '(pmacro arg-list) #f -pmacro-builtin-apply "apply a pmacro to a list of arguments")
 	  (list '.pmacro '(params expansion) #t -pmacro-builtin-pmacro "create a pmacro on-the-fly")
-	  (list '.let '(locals expr1 . rest) #t -pmacro-builtin-let "create a binding context")
+	  (list '.let '(locals expr1 . rest) #t -pmacro-builtin-let "create a binding context, let-style")
+	  (list '.let* '(locals expr1 . rest) #t -pmacro-builtin-let* "create a binding context, let*-style")
 	  (list '.if '(expr then . else) #t -pmacro-builtin-if "if expr is true, process then, else else")
 	  (list '.case '(expr case1 . rest) #t -pmacro-builtin-case "process statement that matches expr")
 	  (list '.cond '(expr1 . rest) #t -pmacro-builtin-cond "process first statement whose expr succeeds")

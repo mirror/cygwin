@@ -273,6 +273,16 @@ Trace everything.
 
 @end itemize
 
+Example:
+
+@smallexample
+# Trace pmacro expansion while generating the m32r port's opcodes files
+# in the binutils package.
+cd obj/opcodes
+rm stamp-m32r
+make stamp-m32r CGENFLAGS="-v -b -t pmacros"
+@end smallexample
+
 @node v
 @section Increment the verbosity level. @option{-v}
 

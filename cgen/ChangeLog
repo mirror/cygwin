@@ -1,3 +1,16 @@
+2009-08-13  Doug Evans  <dje@sebabeach.org>
+
+	* pmacros.scm (pmacro-dump): New function.
+	(check-pmacro): Tweak debugging output.
+	* doc/cgenint.texi: Mention pmacro-dump, pmacro-debug.
+	* doc/pmacros.texi (.splice): Use pmacro-dump instead of pmacro-expand.
+
+	Add .let* pmacro builtin.
+	* pmacros.scm (-pmacro-builtin-let*): New function.
+	(pmacros-init!): Add .let*.
+	* doc/pmacros.texi: Document .let*.
+	* testsuite/pmacros-1.test: Test .let*.
+
 2009-08-12  Doug Evans  <dje@sebabeach.org>
 
 	Clean up cpu file parsing, pass context consistently instead of the

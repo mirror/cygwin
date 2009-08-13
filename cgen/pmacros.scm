@@ -45,6 +45,10 @@
 ;
 ;	(pmacro-trace expression loc)
 ;
+; pmacro-dump - expand all pmacros in an expression, for debugging purposes
+;
+;	(pmacro-dump expression)
+
 ; pmacro-debug - expand all pmacros in an expression,
 ;                printing various debugging messages.
 ;                This does not process .eval.
@@ -339,7 +343,7 @@
   (define (check-pmacro exp)
     (if -pmacro-debug?
 	(begin
-	  (display "macro?   " cep)
+	  (display "Checking for pmacro: " cep)
 	  (write exp cep)
 	  (newline cep)))
     (and (-pmacro? (car exp)) (car exp)))
@@ -603,6 +607,12 @@
       (display "Pmacro result: " cep) (write result cep) (newline cep)
       (set! -pmacro-trace? old-trace)
       result))
+)
+
+; Debugging utility to expand a pmacro, with no initial source location.
+
+(define (pmacro-dump expr)
+  (-pmacro-expand expr '() (unspecified-location))
 )
 
 ; Expand any pmacros in EXPR, printing various debugging messages.

@@ -103,6 +103,16 @@ cat > ${cpu_file} <<EOF
 (test-name ".let")
 (print-match "xyzzy")
 (print-expr (.let ((x xyzzy)) x))
+;; FIXME: This is the currently defined behaviour, but it's somewhat
+;; unintuitive.
+;; pmacro expansion re-evaluates the result if it's also a pmacro,
+;; so x -> y -> x and y -> x -> y.
+(print-match "(x y)")
+(print-expr (.let ((x y) (y x)) (.list x y)))
+
+(test-name ".let*")
+(print-match "(1 2)")
+(print-expr (.let* ((x 1) (y (.add x 1))) (.list x y)))
 
 (test-name ".if")
 (print-match "then")

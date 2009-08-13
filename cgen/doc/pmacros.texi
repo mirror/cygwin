@@ -596,7 +596,7 @@ Example:
 
 Compute a subset of a list matching a specified predicate with @code{.find}.
 
-Syntax: @samp{(.find predicate l)}
+Syntax: @samp{(.find predicate list)}
 
 Example:
 
@@ -663,7 +663,9 @@ Example:
 
 @item cdar
 
-Return all elements of the first element of the list after the first one.
+Return all elements after the first element of the first element of the list.
+That's a bit of a mouthful, it's easier to understand by applying
+@code{car} and @code{cdr} in turn.
 
 I.e., the @code{cdr} of the @code{car} of the list.
 

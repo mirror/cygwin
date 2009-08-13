@@ -15,17 +15,18 @@ Preprocessor macros provide a way of simplifying the writing of
 * Defining pmacros::       @code{define-pmacro}
 * Using pmacros::          Using preprocessor macros
 * Pmacro expansion::       How pmacros are expanded
+* Syntactic forms::        Pmacros that defer argument expansion
 * Default argument values::  Specifying default values of arguments
 * Multiple result statements::  Using @code{begin}
-* Symbols and strings::    Macros for symbols and strings
-* Number utilities::       Macros for manipulating numbers
-* List utilities::         Macros for manipulating lists
-* Iteration utilities::    Macros for iterating over lists
-* Conditional macros::     Macros for conditional execution
-* Pmacro utilities::       Macros for using macros
-* Debugging utilities::    Macros for debugging
-* Comparisons::            Macros for comparing things
-* Arithmetic functions::   Macros for doing math
+* Symbols and strings::    Symbols and strings
+* Number utilities::       Manipulating numbers
+* List utilities::         Manipulating lists
+* Iteration utilities::    Iterating over lists
+* Conditional macros::     Conditional execution
+* Pmacro utilities::       Utilities for using macros
+* Debugging utilities::    Pmacros to assist debugging
+* Comparisons::            Comparing things
+* Arithmetic functions::   Math
 * Logical functions::      Shifts, bitwise logical functions
 @end menu
 
@@ -132,7 +133,9 @@ Variable macros are invoked simply by specifying their name.
 @node Pmacro expansion
 @section Pmacro expansion
 
-Most function pmacros are expanded by processing any macros in th invocation,
+Most@footnote{Syntactic form pmacros don't pre-evaluate their arguments.
+@xref{Syntactic forms}.}
+function pmacros are expanded by first processing any macros in the invocation,
 binding the resulting expressions to the pmacro's parameters,
 processing the pmacro according to its definition, and returning the result.
 Free variables are left unchanged.@footnote{A "free variable",
@@ -142,18 +145,11 @@ Note that to pmacros, cpu description file elements like
 @code{reg}, @code{sequence}, @code{VOID}, etc. are just symbols;
 they have no special meaning.}
 
-Some function pmacros are called @samp{syntactic forms}.
-These pmacros are processed differently in that parameters are
-@emph{not} evaluated first.  Instead it is up to the pmacro
-to decide when, and if, the parameters are evaluated.
-The syntactic forms are: @code{.pmacro}, @code{.let}, @code{.let*}, @code{.if},
-@code{.case}, @code{.cond}, @code{.begin}, @code{.andif}, and @code{.orif}.
-
-If the result of the pmacro is another pmacro invocation,
-it is in turn processed.
-@c Need to document whether this happens just once, or repeatedly.
-
 Variable macros are expanded simply by replacing their name with their value.
+
+After a pmacro has been expanded, if the result of the pmacro is another
+pmacro invocation, it is in turn processed.  This happens just once,
+not repeatedly.
 
 Here is a simple example that uses pmacros to simplify the
 definition of several instructions.
@@ -231,6 +227,42 @@ return a result.  Therefore, in order to actually cause the
 )
 (.for-each define-arith-insn arithmetic-insns)
 @end smallexample
+
+@node Syntactic forms
+@section Syntactic forms
+
+Some function pmacros are called @samp{syntactic forms}.
+These pmacros are processed differently in that parameters are
+@emph{not} evaluated first.  Instead it is up to the pmacro
+to decide when, and if, the parameters are evaluated.
+
+The syntactic forms are:
+
+@itemize @bullet
+
+@item @code{.pmacro}.
+@xref{Defining a pmacro inline}.
+@item @code{.let}, @code{.let*}.
+@xref{Defining a block of locals}.
+@item @code{.if}.
+@xref{Traditional @code{if}}.
+@item @code{.case}.
+@xref{Traditional @code{case}}.
+@item @code{.cond}.
+@xref{Extended if/elseif/else}.
+@item @code{.begin}.
+@xref{A block of statements}.
+@item @code{.andif}.
+@xref{.andif}.
+@item @code{.orif}.
+@xref{.orif}.
+
+@end itemize
+
+The docs for each syntactic pmacro describes when it evaluates its arguments.
+
+All syntactic form pmacros are pre-defined.
+The user can not currently define his/her own.
 
 @node Default argument values
 @section Default argument values
@@ -885,6 +917,9 @@ to the arg2 argument of the outer pmacro.
 (foo 3 4) ==> (+ 4 3)
 @end smallexample
 
+The contents of a @code{.pmacro} are not evaluated until the pmacro
+is invoked.
+
 @node Passing macros as arguments
 @subsection Passing macros as arguments
 
@@ -991,6 +1026,9 @@ clauses of the @code{.if} builtin pmacro.
 Use the @code{.begin} builtin pmacro for these situations.
 
 Syntax: @samp{(.begin [expr1 [expr2 ...]])}
+
+Each expression is evaluated in turn and the result is the result
+of the last expression.
 
 @node Debugging utilities
 @section Debugging utilities

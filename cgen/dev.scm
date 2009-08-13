@@ -11,7 +11,8 @@
 ; (load-sim)
 ; (load-sid)
 ; (load-testsuite)
-; (cload #:arch path-to-cpu-file #:machs "mach-list" #:isas "isa-list" #:options "options")
+; (cload #:arch path-to-cpu-file #:machs "mach-list" #:isas "isa-list"
+;        #:options "options" #:trace "trace-options")
 
 ; First load guile.scm to coerce guile into something we've been using.
 ; Guile is always in flux.
@@ -200,13 +201,17 @@ Then choose the application via one of:
 
 Then load the .cpu file with:
 
-(cload #:arch \"path-to-cpu-file\" #:machs \"keep-mach\" #:isas \"keep-isa\" #:options \"options\")
+(cload #:arch \"path-to-cpu-file\" #:machs \"keep-mach\" #:isas \"keep-isa\" #:options \"options\" #:trace \"trace-options\")
+
+Only the #:arch parameter is mandatory, the rest are optional.
 
 keep-mach:
 comma separated list of machs to keep or `all'
 
 keep-isa:
 comma separated list of isas to keep or `all'
+
+#:options specifies a list of application-specific options
 
 doc options:
 [none yet]
@@ -231,6 +236,13 @@ sim test options:
 (display "\
 sid options:
 [wip]
+\n")
+
+(display "\
+trace-options: (comma-separated list of options)
+commands - trace cgen command invocation
+pmacros - trace pmacro expansion
+all - trace everything
 \n")
 
 ; If ~/.cgenrc exists, load it.

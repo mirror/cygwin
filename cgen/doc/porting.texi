@@ -75,7 +75,7 @@ to be written.  @xref{Doing a simulator port}.
 
 In order to avoid suffering from the bug of the day when using
 snapshots, CGEN development has been confined to Guile releases only.
-CGEN has been tested with Guile versions @code{1.4.1}, @code{1.6.8}
+CGEN has been tested with and supports Guile versions @code{1.6.8}
 and @code{1.8.5}.
 As time passes older versions of Guile will no longer be supported.
 

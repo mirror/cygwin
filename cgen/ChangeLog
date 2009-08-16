@@ -1,5 +1,7 @@
 2009-08-16  Doug Evans  <dje@sebabeach.org>
 
+	* doc/porting.texi: Remove support for Guile 1.4.
+
 	* read.scm (current-reader-location): Return unspecified location
 	if reader hasn't been initialized yet.
 

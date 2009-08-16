@@ -332,9 +332,14 @@
 )
 
 ; Return the current source location.
+;
+; If CURRENT-READER is uninitialized, return "unspecified" location.
+; This is done so that things like define-pmacro work in interactive mode.
 
 (define (current-reader-location)
-  (reader-location CURRENT-READER)
+  (if CURRENT-READER
+      (reader-location CURRENT-READER)
+      (unspecified-location))
 )
 
 ; Process a macro-expanded entry.

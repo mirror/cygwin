@@ -1,3 +1,8 @@
+2009-08-16  Doug Evans  <dje@sebabeach.org>
+
+	* read.scm (current-reader-location): Return unspecified location
+	if reader hasn't been initialized yet.
+
 2009-08-13  Doug Evans  <dje@sebabeach.org>
 
 	* dev.scm: Document tracing options.

@@ -1,3 +1,13 @@
+2009-08-17  Doug Evans  <dje@sebabeach.org>
+
+	Rename .eval -> .exec.  Add new .eval.
+	* pmacros.scm (-pmacro-built-exec): Renamed from -pmacro-builtin-eval.
+	(-pmacro-builtin-eval): New function.
+	(pmacros-init!): Add .exec.
+	* doc/pmacros.texi: Update, .exec -> .eval.  Document new .eval.
+	* testsuite/location-1.test: Update.
+	* testsuite/pmacros-1.test: Add test for .eval.
+
 2009-08-16  Doug Evans  <dje@sebabeach.org>
 
 	* doc/porting.texi: Remove support for Guile 1.4.

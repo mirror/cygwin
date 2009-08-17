@@ -51,7 +51,7 @@
 
 ; pmacro-debug - expand all pmacros in an expression,
 ;                printing various debugging messages.
-;                This does not process .eval.
+;                This does not process .exec.
 ;
 ;	(pmacro-debug expression)
 
@@ -63,11 +63,12 @@
 ; (.upcase string)
 ; (.downcase string)
 ; (.substring string start end)       - get part of a string
-; (.splice a b (.unsplice c) d e ...) - quasi-quote/unquote-splicing
+; (.splice a b (.unsplice c) d e ...) - splice list into another list
 ; (.iota count [start [increment]])   - number generator
 ; (.map pmacro arg1 . arg-rest)
 ; (.for-each pmacro arg1 . arg-rest)
-; (.eval expr)                        - process expr immediately
+; (.eval expr)                        - expand (or evaluate it) expr
+; (.exec expr)                        - execute expr immediately
 ; (.apply pmacro-name arg)
 ; (.pmacro (arg-list) expansion)      - akin go lambda in Scheme
 ; (.let (var-list) expr1 . expr-rest) - akin to let in Scheme
@@ -616,7 +617,7 @@
 )
 
 ; Expand any pmacros in EXPR, printing various debugging messages.
-; This does not process .eval.
+; This does not process .exec.
 
 (define (pmacro-debug expr)
   ; FIXME: Need unwind protection.
@@ -720,13 +721,19 @@
 ; (pmacro-expand '(splice-test (1 (2) 3))) --> (1 2 3)
 ;
 ; Similar to `(1 ,@'(2) 3) in Scheme, though the terminology is slightly
-; different (??? may need to revisit).  In Scheme we have quasi-quote,
-; unquote, unquote-splicing.  Here we have splice, unsplice.
+; different (??? may need to revisit).  In Scheme there's quasi-quote,
+; unquote, unquote-splicing.  Here we have splice, unsplice; with the proviso
+; that pmacros don't have the concept of "quoting", thus all subexpressions
+; are macro-expanded first, before performing any unsplicing.
+; [??? Some may want a quoting facility, but I'd like to defer adding it as
+; long as possible (and ideally never add it).]
+;
+; NOTE: The implementation relies on .unsplice being undefined so that
+; (.unsplice (42)) is expanded unchanged.
 
 (define -pmacro-builtin-splice
   (lambda arg-list
-    ; ??? Not the most efficient implementation, but will the difference
-    ; ever be measureable?
+    ; ??? Not the most efficient implementation.
     (let loop ((arg-list arg-list) (result '()))
       (cond ((null? arg-list) result)
 	    ((and (pair? (car arg-list)) (eq? '.unsplice (caar arg-list)))
@@ -786,12 +793,27 @@
 )
 
 ; (.eval expr)
+; NOTE: This is implemented as a syntactic form in order to get ENV and LOC.
+; That's an implementation detail, and this is not really a syntactic form.
+;
+; ??? I debated whether to call this .expand, .eval has been a source of
+; confusion/headaches.
 
-(define (-pmacro-builtin-eval expr)
-  ;; If we're expanding pmacros for debugging purposes, don't eval,
+(define (-pmacro-builtin-eval loc env expr)
+  ;; -pmacro-expand is invoked twice because we're implemented as a syntactic
+  ;; form:  We *want* to be passed an evaluated expression, and then we
+  ;; re-evaluate it.  But syntactic forms pass parameters unevaluated, so we
+  ;; have to do the first one ourselves.
+  (-pmacro-expand (-pmacro-expand expr env loc) env loc)
+)
+
+; (.exec expr)
+
+(define (-pmacro-builtin-exec expr)
+  ;; If we're expanding pmacros for debugging purposes, don't execute,
   ;; just return unchanged.
   (if -pmacro-debug?
-      (list '.eval expr)
+      (list '.exec expr)
       (begin
 	(reader-process-expanded! expr)
 	nil)) ;; need to return something the reader will accept
@@ -1284,7 +1306,8 @@
 	  (list '.iota '(count . start-incr) #f -pmacro-builtin-iota "iota number generator")
 	  (list '.map '(pmacro list1 . rest) #f -pmacro-builtin-map "map a pmacro over a list of arguments")
 	  (list '.for-each '(pmacro list1 . rest) #f -pmacro-builtin-for-each "execute a pmacro over a list of arguments")
-	  (list '.eval '(expr) #f -pmacro-builtin-eval "process expr immediately")
+	  (list '.eval '(expr) #t -pmacro-builtin-eval "expand(evaluate) expr")
+	  (list '.exec '(expr) #f -pmacro-builtin-exec "execute expr immediately")
 	  (list '.apply '(pmacro arg-list) #f -pmacro-builtin-apply "apply a pmacro to a list of arguments")
 	  (list '.pmacro '(params expansion) #t -pmacro-builtin-pmacro "create a pmacro on-the-fly")
 	  (list '.let '(locals expr1 . rest) #t -pmacro-builtin-let "create a binding context, let-style")

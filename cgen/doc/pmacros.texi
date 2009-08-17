@@ -147,9 +147,10 @@ they have no special meaning.}
 
 Variable macros are expanded simply by replacing their name with their value.
 
-After a pmacro has been expanded, if the result of the pmacro is another
-pmacro invocation, it is in turn processed.  This happens just once,
-not repeatedly.
+After a pmacro has been expanded, if the result is a symbol that names
+another pmacro, it is in turn processed.  This happens just once,
+not repeatedly.@footnote{This behaviour will go away eventually, do not
+rely on it.}
 
 Here is a simple example that uses pmacros to simplify the
 definition of several instructions.
@@ -200,15 +201,15 @@ Note how the first @code{begin} is nested within a list, and does not
 appear in the ``top level'' list.
 
 Another way to accomplish the same thing that doesn't require
-@code{.splice}, @code{.unsplice} is to use @code{.for-each}, @code{.eval}.
+@code{.splice}, @code{.unsplice} is to use @code{.for-each}, @code{.exec}.
 @code{.for-each} is only used for its side-effects, it does not
 return a result.  Therefore, in order to actually cause the
 @file{.cpu} file reader to see any definitions we need to use
-@code{.eval} to pass the dnis to the reader.
+@code{.exec} to pass the dnis to the reader.
 
 @smallexample
 (define-pmacro (define-arith-insn ispec)
-  (.eval (dni (.ref ispec 0)
+  (.exec (dni (.ref ispec 0)
            (.str (.ref ispec 0) " reg/reg")
            ()
            (.str (.ref ispec 0) " $dr,$sr")
@@ -216,7 +217,7 @@ return a result.  Therefore, in order to actually cause the
            (set dr ((.ref ispec 0) dr sr))
            ()
            ))
-  (.eval (dni (.ref ispec 0)
+  (.exec (dni (.ref ispec 0)
            (.str (.ref ispec 0) " reg/imm")
            ()
            (.str (.ref ispec 0) " $dr,$imm")
@@ -769,7 +770,7 @@ The syntax is @samp{(.for-each macro list1 [list2 ...])}.
 There is no result, or rather the result is always the empty list ().
 Note that this macro is therefore useless for macro expansion.
 It's purpose is to process @code{macro} for its side-effects.
-The @code{.eval} builtin pmacro is useful here.
+The @code{.exec} builtin pmacro is useful here.
 
 @node Conditional macros
 @section Conditional macros
@@ -825,33 +826,58 @@ then the empty list @code{()} is returned.
 @node Pmacro utilities
 @section Pmacro utilities
 
-Macros for working with pmacros.
+Pmacros for working with pmacros.
 
 @menu
-* Immediate evaluation of a macro:: The @code{.eval} builtin
-* Applying a macro to a list::      The @code{.apply} builtin
-* Defining a pmacro inline::        The @code{.pmacro} builtin
-* Passing macros as arguments::     Passing a macro to another macro
-* Defining a block of locals::      The @code{.let}, @code{.let*} builtins
-* A block of statements::           The @code{.begin} builtin
+* Re-evaluating an expression::      The @code{.eval} builtin
+* Immediate execution of a command:: The @code{.exec} builtin
+* Applying a pmacro to a list::      The @code{.apply} builtin
+* Defining a pmacro inline::         The @code{.pmacro} builtin
+* Passing pmacros as arguments::     Passing a pmacro to another pmacro
+* Defining a block of locals::       The @code{.let}, @code{.let*} builtins
+* A block of statements::            The @code{.begin} builtin
 @end menu
 
-@node Immediate evaluation of a macro
-@subsection Immediate evaluation of a macro
+@node Re-evaluating an expression
+@subsection Re-evaluating an expression
 @cindex .eval
 
 Syntax: @samp{(.eval expr)}
+
+Sometimes one wishes to build up an expression in non-trivial ways
+and then have the expression evaluated.
+Use the @code{.eval} builtin pmacro for this purpose,
+it re-evaluates @samp{expr}, invoking any pmacros contained therein.
+
+A perhaps contrived example is when one wants to construct the pmacro's
+name from a set of parameters.
+
+Example:
+
+@smallexample
+(define-pmacro (do-foo a b) (foo a b))
+(define-pmacro (do-bar a b) (bar a b))
+(define-pmacro (doer what a b) (.eval (.list (.sym do- what) a b)))
+(doer foo 1 2) ;; --> (foo 1 2)
+(doer bar 3 4) ;; --> (bar 3 4)
+@end smallexample
+
+@node Immediate execution of a command
+@subsection Immediate execution of a command
+@cindex .exec
+
+Syntax: @samp{(.exec expr)}
 
 Sometimes one wishes to pass an expression to the @file{.cpu} file reader
 immediately, rather than waiting for it to process the expression
 that is the result of a pmacro.  This typically happens with the
 @code{.for-each} builtin pmacro.
-Use the @code{.eval} builtin pmacro for this purpose.
+Use the @code{.exec} builtin pmacro for this purpose.
 It immediately passes @samp{expr} to the @file{.cpu} file reader
-and returns @code{()} as a result.
+for processing and returns @code{()} as a result.
 
-@node Applying a macro to a list
-@subsection Applying a macro to a list
+@node Applying a pmacro to a list
+@subsection Applying a pmacro to a list
 @cindex .apply
 
 Invoke a macro with each argument coming from an element of a list,
@@ -920,8 +946,8 @@ to the arg2 argument of the outer pmacro.
 The contents of a @code{.pmacro} are not evaluated until the pmacro
 is invoked.
 
-@node Passing macros as arguments
-@subsection Passing macros as arguments
+@node Passing pmacros as arguments
+@subsection Passing pmacros as arguments
 
 Macros may be passed to other macros.
 

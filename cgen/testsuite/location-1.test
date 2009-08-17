@@ -18,7 +18,7 @@ cat > ${cpu_file} <<EOF
 )
 
 (.for-each (.pmacro (name)
-             (.eval (define-test-insn name)))
+             (.exec (define-test-insn name)))
            test-insns)
 EOF
 

@@ -415,6 +415,7 @@
   ; (a) doesn't exist if we're compiled with Hobbit and mode.scm isn't
   ; and (b) will fail anyway since #f isn't a valid mode.
   (let ((scalar-index (new <hw-index>)))
+    (elm-xset! scalar-index 'name 'hw-index-scalar)
     (elm-xset! scalar-index 'type 'scalar)
     (elm-xset! scalar-index 'mode #f)
     (elm-xset! scalar-index 'value #f)
@@ -429,6 +430,7 @@
   ; (a) doesn't exist if we're compiled with Hobbit and mode.scm isn't
   ; and (b) will fail anyway since #f isn't a valid mode.
   (let ((anyof-index (new <hw-index>)))
+    (elm-xset! anyof-index 'name 'hw-index-anyof)
     (elm-xset! anyof-index 'type 'scalar)
     (elm-xset! anyof-index 'mode #f)
     (elm-xset! anyof-index 'value #f)
@@ -440,6 +442,7 @@
   ; (a) doesn't exist if we're compiled with Hobbit and mode.scm isn't
   ; and (b) will fail anyway since #f isn't a valid mode.
   (let ((derived-index (new <hw-index>)))
+    (elm-xset! derived-index 'name 'hw-index-derived)
     (elm-xset! derived-index 'type 'scalar)
     (elm-xset! derived-index 'mode #f)
     (elm-xset! derived-index 'value #f)

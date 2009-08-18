@@ -30,25 +30,31 @@
 ; in the operand's position.
 
 ; For a general assembler operand, just turn the value into a string.
+
 (method-make!
  <hw-asm> 'test-data
  (lambda (self ops)
-   (map number->string ops))
+   (map (lambda (op)
+	  (cond ((null? op) "")
+		((number? op) (number->string op))
+		(else (error "unsupported assembler operand" op))))
+	ops))
 )
 
 ; For a keyword operand, choose the appropriate keyword.
+
 (method-make!
  <keyword> 'test-data
  (lambda (self ops)
-   (let* ((test-cases (elm-get self 'values))
-	  (prefix (elm-get self 'prefix)))
+   (let ((test-cases (elm-get self 'values))
+	 (prefix (elm-get self 'prefix)))
      (map (lambda (n)
- 	    (string-append 
- 	     (if (and (not (string=? prefix ""))
+	    (string-append 
+	     (if (and (not (string=? prefix ""))
 		      (eq? (string-ref prefix 0) #\$))
 		 "\\" "")
- 	     prefix 
-	     (car (list-ref test-cases n))))
+	     prefix
+	     (->string (car (list-ref test-cases n)))))
  	  ops)))
 )
 
@@ -76,6 +82,7 @@
 ; Test data for a field is chosen firstly out of some bit patterns,
 ; then randomly.  It is then interpreted based on whether there 
 ; is a decode method.
+
 (method-make!
  <ifield> 'test-data
  (lambda (self n)
@@ -104,13 +111,19 @@
 			(mode:class (ifld-mode self))))))))
 )
 
+;; Return N values for assembler test data, or nil if there are none
+;; (e.g. scalars).
+;; ??? This also returns nil for str-expr and rtx.
+
 (method-make!
  <hw-index> 'test-data
  (lambda (self n)
    (case (hw-index:type self)
      ((ifield operand) (send (hw-index:value self) 'test-data n))
-     ((constant) (hw-index:value self))
-     (else nil)))
+     ((constant) (make-list n (hw-index:value self)))
+     ((scalar) (make-list n nil))
+     ((str-expr rtx) (make-list n nil)) ;; ???
+     (else (error "invalid hw-index type" (hw-index:type self)))))
 )
 
 (method-make!
@@ -141,9 +154,10 @@
 ; Input is a list of operand lists. Returns a collated set of test
 ; inputs. For example:
 ; ((r0 r1 r2) (r3 r4 r5) (2 3 8)) => ((r0 r3 2) (r1 r4 3) (r2 r5 8))
+; L is a list of lists.  All elements must have the same length.
 
 (define (-collate-test-set L)
-  (if (=? (length (car L)) 0)
+  (if (= (length (car L)) 0)
       '()
       (cons (map car L)
 	    (-collate-test-set (map cdr L))))
@@ -157,7 +171,7 @@
 (define (build-test-set op-list n)
   (let ((test-data (map (lambda (op) (operand-test-data op n)) op-list))
 	(len (length op-list)))
-    (cond ((=? len 0) (list (list)))
+    (cond ((= len 0) (list (list)))
 	  (else (-collate-test-set test-data))))
 )
 

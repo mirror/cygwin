@@ -389,9 +389,9 @@
   (logit 2 "Processing insn " name " ...\n")
 
   ;; Pick out name first to augment the error context.
-  (let ((name (parse-name context name))
-	(context (context-append-name context name))
-	(atlist-obj (atlist-parse context attrs "cgen_insn")))
+  (let* ((name (parse-name context name))
+	 (context (context-append-name context name))
+	 (atlist-obj (atlist-parse context attrs "cgen_insn")))
 
     (if (keep-atlist? atlist-obj #f)
 

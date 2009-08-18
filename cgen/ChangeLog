@@ -1,5 +1,17 @@
 2009-08-17  Doug Evans  <dje@sebabeach.org>
 
+	* pmacros.scm (-pmacro-builtin-internal-test): New function.
+	(pmacros-init!): Add .internal-test.
+	* testsuite/test-utils.sh.in (post_process): Tweak FAIL output.
+	* testsuite/testsuite.cpu (internal-verify): New pmacro.
+	* doc/pmacros.text: Document .internal-test.
+
+	* utils-cgen.scm (parse-name): Handle (add 3) -> add3.
+	(parse-comment): Allow numbers.
+	* doc/porting.texi: Document that names and comments may be lists.
+
+	* insn.scm (-insn-parse): Fix typo.
+
 	Rename .eval -> .exec.  Add new .eval.
 	* pmacros.scm (-pmacro-built-exec): Renamed from -pmacro-builtin-eval.
 	(-pmacro-builtin-eval): New function.

@@ -59,7 +59,7 @@ post_process() {
 
     if grep -q FAIL $file
     then
-	fail "FAIL found in test output:"
+	fail "In test output:"
 	grep FAIL $file
     fi
 

@@ -70,3 +70,10 @@
    (thunk)
    (newline))
 )
+
+;; Wrapper around .internal-test to include pass/fail messages.
+(define-pmacro (internal-verify test-name expr)
+  (.if (.internal-test expr)
+       (.print "PASS: " test-name "\n")
+       (.print "FAIL: " test-name "\n"))
+)

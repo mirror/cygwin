@@ -338,9 +338,10 @@
   (string->symbol
    (let parse ((name name))
      (cond
-      ((list? name) (string-map parse name))
       ((symbol? name) (symbol->string name))
       ((string? name) name)
+      ((number? name) (number->string name))
+      ((list? name) (string-map parse name))
       (else (parse-error context "improper name" name)))))
 )
 
@@ -349,10 +350,11 @@
 ; in turn be a list of strings.
 
 (define (parse-comment context comment)
-  (cond ((list? comment)
+  (cond ((string? comment) comment)
+	((symbol? comment) (symbol->string comment))
+	((number? comment) (number->string comment))
+	((list? comment)
 	 (string-map (lambda (elm) (parse-comment context elm)) comment))
-	((or (string? comment) (symbol? comment))
-	 (->string comment))
 	(else (parse-error context "improper comment" comment)))
 )
 

@@ -104,6 +104,7 @@ descriptions of each type of entry that appears in the description file.
 @menu
 * Conventions::                      Programming style conventions
 * simplify.inc::                     Simplifying writing @file{.cpu} files
+* Names and comments::               Special note on names and comments
 * Writing define-arch::              Architecture wide specs
 * Writing define-isa::               Instruction set characteristics
 * Writing define-cpu::               CPU families
@@ -275,6 +276,38 @@ To use it add the following to your @file{.cpu} file.
 (@pxref{a-dnmi, dnmi})
 
 @end itemize
+
+@node Names and comments
+@subsection Names and comments
+
+Most description entries have a few fields in common: name, comment,
+and attrs (for attributes).
+
+The @samp{name} and @samp{comment} fields have a special property to
+help simplify writing description files.
+
+The proper type for a name is a @code{symbol} and the proper type for a
+comment is @code{string}.  It is sometimes useful, however, to construct
+names and comments from a list of values.  To support this without
+forcing the description file writer to have to explicitly construct a name
+or comment from pieces, CGEN accepts a list as a valid @samp{name} or
+@samp{comment} field, and will (recursively) append each element
+automagically.  Each list must consist of symbols, strings, and numbers,
+or lists.
+CGEN will automagically convert the value to a symbol for a name field,
+and a string for a comment field.
+
+Example:
+
+@smallexample
+(define-insn (name (add 3))
+             (comment (("This is a" " comment")
+                       " constructed as a list."))
+             ...)
+@end smallexample
+
+The name of this instruction is ``add3'' and the comment is
+"This is a comment constructed as a list.".
 
 @node Writing define-arch
 @subsection Writing define-arch

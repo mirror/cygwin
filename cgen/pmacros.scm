@@ -113,6 +113,7 @@
 ; (.cadr l)
 ; (.cdar l)
 ; (.cddr l)
+; (.internal-test expr)               - testsuite internal use only
 ;
 ; NOTE: .cons currently absent on purpose
 ;
@@ -789,7 +790,7 @@
     (if (not (procedure? transformer))
 	(-pmacro-error "not a procedural pmacro" pmacro))
     (apply for-each (cons transformer (cons arg1 arg-rest)))
-    nil) ; need to return something the reader will accept
+    nil) ; need to return something the reader will accept and ignore
 )
 
 ; (.eval expr)
@@ -816,7 +817,7 @@
       (list '.exec expr)
       (begin
 	(reader-process-expanded! expr)
-	nil)) ;; need to return something the reader will accept
+	nil)) ;; need to return something the reader will accept and ignore
 )
 
 ; (.apply pmacro-name arg)
@@ -948,7 +949,7 @@
 
 (define (-pmacro-builtin-print . exprs)
   (apply message exprs)
-  nil ; need to return something the reader will accept
+  nil ; need to return something the reader will accept and ignore
 )
 
 ; (.dump expr)
@@ -956,7 +957,7 @@
 
 (define (-pmacro-builtin-dump expr)
   (write expr (current-error-port))
-  nil ; need to return something the reader will accept
+  nil ; need to return something the reader will accept and ignore
 )
 
 ; (.error . expr)
@@ -1284,6 +1285,18 @@
       (cddr l)
       (-pmacro-error "invalid arg for .cddr" l))
 )
+
+; (.internal-test expr)
+; This is an internal builtin for use by the testsuite.
+; EXPR is a Scheme expression that is executed to verify proper
+; behaviour of something.  It must return #f for FAIL, non-#f for PASS.
+; The result is #f for FAIL, #t for PASS.
+; This must be used in an expression, it is not sufficient to do
+; (.internal-test mumble) because the reader will see #f or #t and complain.
+
+(define (-pmacro-builtin-internal-test expr)
+  (and (eval1 expr) #t)
+)
 
 ; Initialization.
 
@@ -1352,6 +1365,7 @@
 	  (list '.cadr '(x) #f -pmacro-builtin-cadr "return (cadr x)")
 	  (list '.cdar '(x) #f -pmacro-builtin-cdar "return (cdar x)")
 	  (list '.cddr '(x) #f -pmacro-builtin-cddr "return (cddr x)")
+	  (list '.internal-test '(expr) #f -pmacro-builtin-internal-test "testsuite use only")
 	  )))
     (for-each (lambda (x)
 		(let ((name (list-ref x 0))

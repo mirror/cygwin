@@ -28,6 +28,7 @@ Preprocessor macros provide a way of simplifying the writing of
 * Comparisons::            Comparing things
 * Arithmetic functions::   Math
 * Logical functions::      Shifts, bitwise logical functions
+* Internal use pmacros::   For internal use only
 @end menu
 
 @node Pmacros introduction
@@ -1438,3 +1439,21 @@ Return the bitwise @code{exclusive-or} of @code{x} and @code{y}.
 Syntax: @samp{(.inv x)}
 
 Return the bitwise @code{inversion} of @code{x}.
+
+@node Internal use pmacros
+@section Internal use pmacros
+
+This section documents pmacros that are for internal use only.
+Today there's only one, @samp{.internal-test}, and it is used
+by the testsuite.
+
+@subsection .internal-test
+@cindex .internal-test
+
+Syntax: @samp{(.internal-test expr)}
+
+Execute @samp{expr} as a Scheme expression and return #f if the
+expression returns #f and return #t if the expression returns non-#f.
+
+This is for use in the CGEN testsuite only.
+See the testsuite for usage examples.

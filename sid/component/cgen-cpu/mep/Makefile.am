@@ -11,7 +11,7 @@ CXXFLAGS = $(TOP_CXXFLAGS) -DHAVE_CONFIG_H
 
 pkgdata_DATA = hw-cpu-mep.txt
 
-CPU_SOURCES = mep-core1-decode.cxx mep-core1-sem.cxx mep-core1-model.cxx mep-cop1-16-decode.cxx mep-cop1-16-sem.cxx mep-cop1-16-model.cxx mep-cop1-32-decode.cxx mep-cop1-32-sem.cxx mep-cop1-32-model.cxx mep-cop1-48-decode.cxx mep-cop1-48-sem.cxx mep-cop1-48-model.cxx mep-cop1-64-decode.cxx mep-cop1-64-sem.cxx mep-cop1-64-model.cxx mep-ivc2.cxx
+CPU_SOURCES = mep-core1-decode.cxx mep-core1-sem.cxx mep-core1-model.cxx mep-cop1-16-decode.cxx mep-cop1-16-sem.cxx mep-cop1-16-model.cxx mep-cop1-32-decode.cxx mep-cop1-32-sem.cxx mep-cop1-32-model.cxx mep-cop1-48-decode.cxx mep-cop1-48-sem.cxx mep-cop1-48-model.cxx mep-cop1-64-decode.cxx mep-cop1-64-sem.cxx mep-cop1-64-model.cxx ivc2-cop.cxx
 
 libmep_la_SOURCES = mep.cxx common_model.cxx mep-decode.cxx mep-sem.cxx mep-model.cxx $(CPU_SOURCES)
 libmep_la_LDFLAGS =

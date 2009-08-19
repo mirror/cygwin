@@ -5,6 +5,7 @@
 
 	* doc/rtl.texi (Instructions): Improve docs of when ${...} is needed
 	in assembler syntax.
+	(Operands): Similarly.
 
 2009-08-18  Doug Evans  <dje@sebabeach.org>
 

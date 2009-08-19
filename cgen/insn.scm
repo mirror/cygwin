@@ -123,6 +123,7 @@
 ; The mnemonic, as we define it, is everything up to, but not including, the
 ; first space or '$'.
 ; FIXME: Rename to syntax-mnemonic, and take a syntax string argument.
+; FIXME: Doesn't handle \$ to indicate a $ is actually in the mnemonic.
 
 (define (insn-mnemonic insn)
   (letrec ((mnem-len (lambda (str len)
@@ -893,16 +894,17 @@
       (if (> (string-length syntax) 0)
 	  (begin
 	    (cond 
-	     ; Handle escaped syntax metacharacters 
+	     ; Handle escaped syntax metacharacters.
 	     ((char=? #\\ (string-ref syntax 0))
 	      (begin
 		(if (= (string-length syntax) 1)
 		    (parse-error context "syntax-break-out: missing char after '\\' in " syntax))
 		(set! result (cons (substring syntax 1 2) result))
 		(set! syntax (string-drop 2 syntax))))
-		; Handle operand reference
+		; Handle operand reference.
 	     ((char=? #\$ (string-ref syntax 0))
 	      ; Extract the symbol from the string, get the operand.
+	      ; FIXME: Will crash if $ is last char in string.
 	      (if (char=? #\{ (string-ref syntax 1))
 		  (let ((n (string-index syntax #\})))
 		    (set! result (cons (current-op-lookup
@@ -916,7 +918,7 @@
 					 (substring syntax 1 (+ 1 n))))
 				       result))
 		    (set! syntax (string-drop (+ 1 n) syntax)))))
-	     ; Handle everything else
+	     ; Handle everything else.
 	     (else (set! result (cons (substring syntax 0 1) result))
 		   (set! syntax (string-drop1 syntax))))
 	    (loop))))

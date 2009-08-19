@@ -244,14 +244,14 @@ cat > ${cpu_file} <<EOF
 (print-expr (.rem 8 2))
 
 (test-name ".sll")
-(print-match "4")
-(print-expr (.sll 1 2))
+(print-match "8")
+(print-expr (.sll 1 3))
 (print-match "4")
 (print-expr (.sll 4 0))
 
 (test-name ".srl")
 (print-match "1")
-(print-expr (.srl 4 2))
+(print-expr (.srl 8 3))
 (print-match "4")
 (print-expr (.srl 4 0))
 
@@ -260,7 +260,7 @@ cat > ${cpu_file} <<EOF
 (print-expr (.sra -1 0))
 (print-match "-1")
 (print-expr (.sra -1 1))
-(print-match "-1")
+(print-match "-2")
 (print-expr (.sra -3 1))
 
 (test-name ".and")

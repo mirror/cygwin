@@ -1972,18 +1972,21 @@ For macro-instructions, don't use during disassembly.
 
 This is a character string consisting of raw characters and operands.
 Fields are denoted by @code{$operand} or
-@code{$@{operand@}}@footnote{Support for @code{$@{operand@}} is
-work-in-progress.}.  If a @samp{$} is required in the syntax, it is
-specified with @samp{\$}.  At most one white-space character may be
+@code{$@{operand@}}.  The @code{$@{operand@}} form is required if
+the operand name contains non-alphanumeric characters.
+@c ??? Technically, '_' and '@' are ok too, I think, but do we want that?
+If a @samp{$} is required in the syntax, it is specified with @samp{\$}.
+If a @samp{\} is required in the syntax, it is specified with @samp{\\}.
+
+At most one white-space character may be
 present and it must be a blank separating the instruction mnemonic from
 the operands.  This doesn't restrict the user's assembler, this is
 @c Is this reasonable?
 just a description file restriction to separate the mnemonic from the
 operands@footnote{The restriction can be relaxed by saying the first
 blank is the one that separates the mnemonic from its operands.}.
-The assembly language accepted by the generated assembler does not
-have to take exactly the same form as the syntax described in this
-field--additional whitespace may be present in the input file.
+Note that the assembler will accept multiple spaces in the assembler code
+after the mnemonic and between operands as expected.
 
 Operands can refer to registers, constants, and whatever else is necessary.
 

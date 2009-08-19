@@ -5,9 +5,9 @@
   <!-- call this with a result-tree-fragment -->
   <xsl:template name="maybecell-copy">
     <td>
-      <xsl:param name="body"></xsl:param>
+      <xsl:variable name="body" />
       <xsl:choose>
-	<xsl:when test="count($body)=0">-</xsl:when>
+	<xsl:when test="string-length($body)=0">-</xsl:when>
 	<xsl:otherwise>
 	  <xsl:copy-of select="$body"/>
 	</xsl:otherwise>
@@ -18,9 +18,9 @@
   <!-- call this with a node-set or expression value -->
   <xsl:template name="maybecell">
     <td>
-      <xsl:param name="body"></xsl:param>
+      <xsl:variable name="body" />
       <xsl:choose>
-	<xsl:when test="count($body)=0">-</xsl:when>
+	<xsl:when test="string-length($body)=0">-</xsl:when>
 	<xsl:otherwise>
 	  <xsl:apply-templates select="$body"/>
 	</xsl:otherwise>

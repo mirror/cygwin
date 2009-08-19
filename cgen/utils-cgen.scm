@@ -85,6 +85,7 @@
 ;;; A single source location.
 ;;; This is recorded as a vector for simplicity.
 ;;; END? is true if the location marks the end of the expression.
+;;; NOTE: LINE and COLUMN are origin-0 (the first line is line 0).
 
 (define (make-single-location file line column end?)
   (vector file line column end?)
@@ -171,10 +172,12 @@
 )
 
 ;;; Return an unspecified <location>.
-;;; This is for use in debugging utilities.
+;;; This is mainly for use in debugging utilities.
+;;; Ideally for .cpu-file related stuff we always have a location,
+;;; but that's not always true.
 
 (define (unspecified-location)
-  (make <location> (list (cons "unspecified" 1)))
+  (make <location> (list (make-single-location "unspecified" 0 0 #f)))
 )
 
 ;;; Return a <location> object for the current input port.

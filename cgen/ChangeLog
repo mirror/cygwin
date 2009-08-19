@@ -1,11 +1,20 @@
 2009-08-18  Doug Evans  <dje@sebabeach.org>
 
+	* ifield.scm (ifld-encode-mode): Add FIXME.
+	* opcodes.scm (<ifield> 'gen-insert): Handle encode parameters with
+	modes.
+	(<ifield> 'gen-extract): Similarly.
+
+	* read.scm (parse-error): Handle #f for context-location.
+	* utils-cgen.scm (unspecified-location): Fix building of
+	single-location.
+
 	* doc/rtl.texi: Document how to write hex and boolean values.
 
-	* gas-test.scm (<hw-asm>, test-data): Handle () values.
-	(<keyword>, test-data): Convert symbols to strings before passing
+	* gas-test.scm (<hw-asm> test-data): Handle () values.
+	(<keyword> test-data): Convert symbols to strings before passing
 	to string-append.
-	(<hw-index>, test-data): Enumerate all cases.  Emit correctly sized
+	(<hw-index> test-data): Enumerate all cases.  Emit correctly sized
 	result for scalars.
 
 	* operand.scm (hw-index-scalar): Set `name'.

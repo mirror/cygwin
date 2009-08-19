@@ -1614,9 +1614,6 @@ The syntax for defining an operand is:
 The required elements are: @code{name}, @code{type}, @code{mode},
 and if @code{type} is not a scaler @code{index}.
 
-There is no convention for prefixing operands,
-and generally for readability's sake operands don't have a prefix.
-
 @subsection name
 
 This is the name of the operand as a Scheme symbol.
@@ -1629,6 +1626,12 @@ The convention is that operands have no prefix (whereas ifields begin
 with @samp{f-} and hardware elements begin with @samp{h-}).  A prefix
 like @samp{o-} would avoid collisions with other semantic elements, but
 operands are used often enough that any prefix is a hassle.
+
+Note that if you @emph{do} decide to prefix operand names, e.g. use
+a style like @samp{o-foo}, then you will need to remember to use the
+@samp{$@{o-foo@}} form in the assembler syntax and not the @samp{$o-foo}
+form because the latter only takes alphanumeric characters.
+@xref{assembler-syntax, syntax}.
 
 @subsection attrs
 
@@ -1968,6 +1971,7 @@ real insn.
 For macro-instructions, don't use during disassembly.
 @end table
 
+@anchor{assembler-syntax}
 @subsection syntax
 
 This is a character string consisting of raw characters and operands.

@@ -128,6 +128,9 @@ first newline).}.
 @item Everything is case sensitive.@footnote{??? This is true in RTL,
 though some apps add symbols and convert case that can cause collisions.}
 @item While "_" is a valid character to use in symbols, "-" is preferred
+@item Hex numbers are written using Scheme's notation.
+Write 255 in hex as #xff, not 0xff.
+One can also use #bNNN to write boolean values.  E.g. #b111 == 7.
 @item Except for the @samp{comment} and @samp{attrs} fields and unless
 otherwise specified all fields must be present.
 @item Symbols used to be allowed anywhere a string can be used.

@@ -1326,7 +1326,7 @@ rather than, say, char if the specified mode was @code{QI}).
 @subsection encode
 An expression to apply to convert from usable values to raw field
 values.  The syntax is @code{(encode (value pc) expression)} or more
-specifically @code{(encode ((<mode1> value) (IAI pc)) <expression>)},
+generally @code{(encode ((<mode1> value) (IAI pc)) <expression>)},
 where @code{<mode1>} is the mode of the ``incoming'' value, and
 @code{<expression>} is an rtx to convert @code{value} to something that
 can be stored in the field.
@@ -1351,9 +1351,9 @@ or the generator could determine a `switch' statement is more appropriate.
 
 An expression to apply to convert from raw field values to usable
 values.  The syntax is @code{(decode (value pc) expression)} or more
-specifically @code{(decode ((WI value) (IAI pc)) <expression>)}, where
-@code{<expression>} is an rtx to convert @code{value} to something
-usable.
+generally @code{(decode ((<mode1> value) (IAI pc)) <expression>)},
+where @code{<mode1>} is the mode of the ``incoming'' value, and
+@code{<expression>} is an rtx to convert @code{value} to something usable.
 
 Example:
 

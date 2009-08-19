@@ -1,5 +1,8 @@
 2009-08-19  Doug Evans  <dje@sebabeach.org>
 
+	* pmacros.scm (.sll, .srl, .sra): Fix thinko.
+	* testsuite/pmacros-1.test: Ditto.  Add better tests.
+
 	* doc/rtl.texi (Instructions): Improve docs of when ${...} is needed
 	in assembler syntax.
 

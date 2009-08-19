@@ -1179,9 +1179,7 @@
 (define (-pmacro-builtin-sll x n)
   (-pmacro-verify-integer ".sll" x)
   (-pmacro-verify-non-negative-integer ".sll" n)
-  (if (= n 0)
-      x
-      (* x n 2))
+  (ash x n)
 )
 
 ; (.srl x n) - shift right logical
@@ -1192,9 +1190,7 @@
 (define (-pmacro-builtin-srl x n)
   (-pmacro-verify-non-negative-integer ".srl" x)
   (-pmacro-verify-non-negative-integer ".srl" n)
-  (if (= n 0)
-      x
-      (quotient x (* n 2)))
+  (ash x (- n))
 )
 
 ; (.sra x n) - shift right arithmetic
@@ -1202,9 +1198,7 @@
 (define (-pmacro-builtin-sra x n)
   (-pmacro-verify-integer ".sra" x)
   (-pmacro-verify-non-negative-integer ".sra" n)
-  (cond ((= n 0) x)
-	((= x -1) -1)
-	(else (quotient x (* n 2))))
+  (ash x (- n))
 )
 
 ; (.and x y) - bitwise and

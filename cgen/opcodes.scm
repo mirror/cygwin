@@ -111,9 +111,13 @@
 	  "")
       (if encode
 	  (string-append "        value = "
+			 ;; NOTE: ENCODE is either, e.g.,
+			 ;; ((value pc) (sra DI value 1))
+			 ;; or
+			 ;; (((<mode> value) (<mode> pc)) (sra DI value 1))
 			 (let ((expr (cadr encode))
-			       (value (caar encode))
-			       (pc (cadar encode)))
+			       (value (if (symbol? (caar encode)) (caar encode) (cadr (caar encode))))
+			       (pc (if (symbol? (cadar encode)) (cadar encode) (cadr (cadar encode)))))
 			   (rtl-c DFLT expr
 				  (list (list value (obj:name (ifld-encode-mode self)) "value")
 					(list pc 'IAI "pc"))))
@@ -190,9 +194,13 @@
       ");\n"
       (if decode
 	  (string-append "        value = "
+			 ;; NOTE: DECODE is either, e.g.,
+			 ;; ((value pc) (sll DI value 1))
+			 ;; or
+			 ;; (((<mode> value) (<mode> pc)) (sll DI value 1))
 			 (let ((expr (cadr decode))
-			       (value (caar decode))
-			       (pc (cadar decode)))
+			       (value (if (symbol? (caar decode)) (caar decode) (cadr (caar decode))))
+			       (pc (if (symbol? (cadar decode)) (cadar decode) (cadr (cadar decode)))))
 			   (rtl-c DFLT expr
 				  (list (list value (obj:name (ifld-decode-mode self)) "value")
 					(list pc 'IAI "pc"))))

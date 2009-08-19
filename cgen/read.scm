@@ -313,7 +313,7 @@
 (define (parse-error context message expr . maybe-help-text)
   (if (not context)
       (set! context (make <context> (current-reader-location) #f)))
-  (let* ((loc (context-location context))
+  (let* ((loc (or (context-location context) (unspecified-location)))
 	 (top-sloc (location-top loc))
 	 (prefix (context-prefix context)))
     (error

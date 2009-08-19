@@ -82,6 +82,8 @@
 (define (ifld-encode-mode f)
   (if (ifld-decode f)
       ; cadr/cadr gets WI in ((value pc) (sra WI ...))
+      ; FIXME: That's wrong for a fully canonical expression like
+      ; ((value pc) (sra () WI ...)).
       (mode:lookup (cadr (cadr (ifld-decode f))))
       (ifld-mode f))
 )

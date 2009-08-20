@@ -1,5 +1,13 @@
 2009-08-20  Doug Evans  <dje@sebabeach.org>
 
+	* gas-test.scm (<keyword> test-data): Catch invalid requests,
+	flag a warning and compensate.
+	(<hw-address test-data): Tweak for readability.
+	(<hw-iaddress test-data): Ditto.
+	(cgen-build.sh): Convert symbols to strings before passing to
+	string-append.
+	(cgen-allinsn.exp): Ditto.
+
 	* doc/pmacros.texi (.splice): Add more text.
 
 2009-08-19  Doug Evans  <dje@sebabeach.org>
@@ -30,9 +38,9 @@
 2009-08-18  Doug Evans  <dje@sebabeach.org>
 
 	* ifield.scm (ifld-encode-mode): Add FIXME.
-	* opcodes.scm (<ifield> 'gen-insert): Handle encode parameters with
+	* opcodes.scm (<ifield> gen-insert): Handle encode parameters with
 	modes.
-	(<ifield> 'gen-extract): Similarly.
+	(<ifield> gen-extract): Similarly.
 
 	* read.scm (parse-error): Handle #f for context-location.
 	* utils-cgen.scm (unspecified-location): Fix building of

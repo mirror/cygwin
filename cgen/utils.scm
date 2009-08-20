@@ -52,8 +52,9 @@
 
 (define (verbose? level) (>= verbose-level level))
 
-; Print to stderr, takes an arbitrary number of strings, possibly nested.
-; ??? Audit callers, can we maybe just use "display" here.
+; Print to stderr, takes an arbitrary number of objects, possibly nested.
+; ??? Audit callers, can we maybe just use "display" here (except that
+; we still might want some control over the output).
 
 (define message
   (lambda args

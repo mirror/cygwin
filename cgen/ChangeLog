@@ -1,3 +1,7 @@
+2009-08-20  Doug Evans  <dje@sebabeach.org>
+
+	* doc/pmacros.texi (.splice): Add more text.
+
 2009-08-19  Doug Evans  <dje@sebabeach.org>
 
 	* configure.in (AM_INIT_AUTOMAKE): Change version to 1.1.50 to

@@ -480,10 +480,10 @@ Examples:
 Builtin macros for maninpulating lists.
 
 @menu
-* Creating lists::
+* Creating lists::                The @code{.list} builtin
 * List splicing::                 The @code{.splice} builtin
 * Referencing a list element::    The @code{.ref} builtin
-* List length::
+* List length::                   The @code{.length} builtin
 * Lists of repeated elements::    The @code{.replicate} builtin
 * Finding a subset of a list::    The @code{.find} builtin
 * car/cdr::                       car, cdr, etc. from Scheme/Lisp
@@ -503,6 +503,9 @@ It's somewhat redundant as lists can also be created simply writing
 @node List splicing
 @subsection List splicing
 @cindex .splice
+
+Syntax: @samp{(.splice [expr1] [expr2] [(.unsplice list1)]
+              [(.unsplice list2)] [expr3] ...)}
 
 It is often useful to splice a list into a "parent" list.
 This is best explained with an example.
@@ -580,7 +583,14 @@ and
 respectively, which is what @code{.splice} achieves.
 
 @code{.unsplice} is a special reserved symbol that is only recognized inside
-@code{.splice}.
+@code{.splice}.  There can be any number of @code{.unsplice} expressions
+in a @code{.splice} but they all must be at the ``top level''.
+
+I.e. this is not supported:
+@samp{(.splice 1 (2 3 (.unsplice (4 5))))}.
+
+Note that @code{.splice} without any @code{.unsplice} expressions
+behaves identically to @code{.list}.
 
 @node Referencing a list element
 @subsection Referencing a list element

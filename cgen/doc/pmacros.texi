@@ -1118,7 +1118,7 @@ Evaluate and print the supplied expressions.
 This is useful for debugging and logging messages.
 
 NOTE: Strings are printed with enclosing quotes.
-Use @code{dump} if you want to print strings without enclosing quotes.
+Use @code{print} if you want to print strings without enclosing quotes.
 
 The result is the empty list @code{()}.
 

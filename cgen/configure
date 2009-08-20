@@ -1620,7 +1620,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=cgen
- VERSION=1.1
+ VERSION=1.1.50
 
 
 cat >>confdefs.h <<_ACEOF

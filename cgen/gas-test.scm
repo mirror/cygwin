@@ -42,19 +42,41 @@
 )
 
 ; For a keyword operand, choose the appropriate keyword.
+; OPS is a list of values, e.g. from an ifield.
 
 (method-make!
  <keyword> 'test-data
  (lambda (self ops)
-   (let ((test-cases (elm-get self 'values))
-	 (prefix (elm-get self 'prefix)))
+   (let* ((test-cases (elm-get self 'values))
+	  (prefix (elm-get self 'prefix))
+	  (find-kw (lambda (val)
+		     (find-first (lambda (kw) (= (cadr kw) val)) test-cases))))
      (map (lambda (n)
-	    (string-append 
-	     (if (and (not (string=? prefix ""))
-		      (eq? (string-ref prefix 0) #\$))
-		 "\\" "")
-	     prefix
-	     (->string (car (list-ref test-cases n)))))
+	    ;; If an ifield has, e.g., 2 bits (values 0,1,2,3) and the keyword
+	    ;; only has two values, e.g. (foo 0) (bar 1), then we can get
+	    ;; invalid requests, i.e. for ifield values of 2 and 3.
+	    ;; It's not clear what to do here, but it seems like this is an
+	    ;; error in the description file.
+	    ;; So it seems like we should flag an error for invalid requests.
+	    ;; OTOH, we're just generating testcases.  So instead we just
+	    ;; flag a warning and cope by returning the first keyword in the
+	    ;; list.
+	    (let ((kw (find-kw n)))
+	      (if (not kw)
+		  (begin
+		    (message "WARNING: Invalid test data request for keyword "
+			     (obj:name self)
+			     ": "
+			     n
+			     ".\n"
+			     "         Compensating by picking a different value.\n")
+		    (set! kw (car test-cases))))
+	      (string-append 
+	       (if (and (not (string=? prefix ""))
+			(eq? (string-ref prefix 0) #\$))
+		   "\\" "")
+	       prefix
+	       (->string (car kw)))))
  	  ops)))
 )
 
@@ -62,8 +84,9 @@
  <hw-address> 'test-data
  (lambda (self ops)
    (let* ((test-cases '("foodata" "4" "footext" "-4"))
-	  (n (length ops))
-	  (selection (map (lambda (z) (random (length test-cases))) (iota n))))
+	  (nr-ops (length ops))
+	  (selection (map (lambda (z) (random (length test-cases)))
+			  (iota nr-ops))))
      (map (lambda (n) (list-ref test-cases n)) selection)))
 )
 
@@ -71,8 +94,9 @@
  <hw-iaddress> 'test-data
  (lambda (self ops)
    (let* ((test-cases '("footext" "4" "foodata" "-4"))
-	  (n (length ops))
-	  (selection (map (lambda (z) (random (length test-cases))) (iota n))))
+	  (nr-ops (length ops))
+	  (selection (map (lambda (z) (random (length test-cases)))
+			  (iota nr-ops))))
      (map (lambda (n) (list-ref test-cases n)) selection)))
 )
 
@@ -229,7 +253,7 @@
   (string-append
    "\
 #/bin/sh
-# Generate test result data for " (current-arch-name) " GAS testing.
+# Generate test result data for " (->string (current-arch-name)) " GAS testing.
 # This script is machine generated.
 # It is intended to be run in the testsuite source directory.
 #
@@ -297,9 +321,9 @@ footext:\n"
   (logit 1 "Generating allinsn.exp ...\n")
   (string-append
    "\
-# " (string-upcase (current-arch-name)) " assembler testsuite. -*- Tcl -*-
+# " (string-upcase (->string (current-arch-name))) " assembler testsuite. -*- Tcl -*-
 
-if [istarget " (current-arch-name) "*-*-*] {
+if [istarget " (->string (current-arch-name)) "*-*-*] {
     run_dump_test \"allinsn\"
 }\n"
    )

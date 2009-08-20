@@ -837,6 +837,7 @@ Pmacros for working with pmacros.
 * Passing pmacros as arguments::     Passing a pmacro to another pmacro
 * Defining a block of locals::       The @code{.let}, @code{.let*} builtins
 * A block of statements::            The @code{.begin} builtin
+* Testing if something is a pmacro:: The @code{.pmacro?} builtin
 @end menu
 
 @node Re-evaluating an expression
@@ -1056,6 +1057,33 @@ Syntax: @samp{(.begin [expr1 [expr2 ...]])}
 
 Each expression is evaluated in turn and the result is the result
 of the last expression.
+
+@node Testing if something is a pmacro
+@subsection Testing if something is a pmacro
+@cindex .pmacro?
+
+Sometimes one wishes to know if an argument is a pmacro or not.
+This is useful when one is writing a pmacro that has a parameter
+that is either a pmacro or is not (e.g., it could be an rtl function
+instead).  When the parameter is a pmacro one might like to @samp{.apply}
+it to another argument, and if not one might like to simply construct
+a list of it and the other argument.
+
+Syntax: @samp{(.pmacro? arg)}
+
+Example:
+
+@smallexample
+(define-pmacro (compare a b) (if (eq a b) 1 0))
+(define-pmacro (maybe-apply fun args)
+  (.if (.pmacro? fun)
+       (.apply fun args)
+       (.splice fun (.unsplice args))))
+(define-pmacro (gen-semantics semfun args)
+  (set dest (maybe-apply semfun args)))
+(gen-semantics add (op1 op2))) ;; ==> (set dest (add op1 op2))
+(gen-semantics compare (op1 op2))) ;; ==> (set dest (if (eq op1 op2) 1 0))
+@end smallexample
 
 @node Debugging utilities
 @section Debugging utilities

@@ -71,6 +71,7 @@
 ; (.exec expr)                        - execute expr immediately
 ; (.apply pmacro-name arg)
 ; (.pmacro (arg-list) expansion)      - akin go lambda in Scheme
+; (.pmacro? arg)
 ; (.let (var-list) expr1 . expr-rest) - akin to let in Scheme
 ; (.let* (var-list) expr1 . expr-rest) - akin to let* in Scheme
 ; (.if expr then [else])
@@ -856,6 +857,12 @@
 		(-pmacro-build-lambda loc env params expansion) "")
 )
 
+; (.pmacro? arg)
+
+(define (-pmacro-builtin-pmacro? arg)
+  (-pmacro? arg)
+)
+
 ; (.let (var-list) expr1 . expr-rest)
 ; NOTE: syntactic form
 
@@ -1330,6 +1337,7 @@
 	  (list '.exec '(expr) #f -pmacro-builtin-exec "execute expr immediately")
 	  (list '.apply '(pmacro arg-list) #f -pmacro-builtin-apply "apply a pmacro to a list of arguments")
 	  (list '.pmacro '(params expansion) #t -pmacro-builtin-pmacro "create a pmacro on-the-fly")
+	  (list '.pmacro? '(arg) #f -pmacro-builtin-pmacro? "return true if arg is a pmacro")
 	  (list '.let '(locals expr1 . rest) #t -pmacro-builtin-let "create a binding context, let-style")
 	  (list '.let* '(locals expr1 . rest) #t -pmacro-builtin-let* "create a binding context, let*-style")
 	  (list '.if '(expr then . else) #t -pmacro-builtin-if "if expr is true, process then, else else")

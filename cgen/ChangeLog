@@ -1,5 +1,11 @@
 2009-08-19  Doug Evans  <dje@sebabeach.org>
 
+	New builtin .pmacro?.
+	* pmacros.scm (-pmacro-builtin-pmacro?): New function.
+	(pmacros-init!): Add .pmacro?.
+	* doc/pmacros.text: Document .pmacro?.
+	* testsuite/pmacros-1.test: Test .pmacro?.
+
 	* pmacros.scm (scan-list1): Reorganize tracing so that the tracing
 	of a pmacro begins before its arguments are evaluated, improves
 	readability.

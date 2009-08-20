@@ -100,6 +100,16 @@ cat > ${cpu_file} <<EOF
 (print-match "ABC")
 (print-expr (.apply .upcase (abc)))
 
+(test-name ".pmacro?")
+(print-match "#t")
+(print-expr (.pmacro? .pmacro?))
+(print-match "#t")
+(print-expr (.pmacro? test-name))
+(print-match "#t")
+(print-expr (.pmacro? (.pmacro (a) (add a 1))))
+(print-match "#f")
+(print-expr (.pmacro? 42))
+
 (test-name ".eval")
 (print-match "(explicitly-undefined 42)")
 (define-pmacro (eval-test1 a) (explicitly-undefined a))

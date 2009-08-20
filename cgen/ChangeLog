@@ -1,5 +1,11 @@
 2009-08-19  Doug Evans  <dje@sebabeach.org>
 
+	* configure.in (AM_INIT_AUTOMAKE): Change version to 1.1.50 to
+	distinguish from 1.1.
+	* configure: Regenerate.
+	* read.scm (-CGEN-VERSION): Update.
+	* doc/version.texi: Update.
+
 	New builtin .pmacro?.
 	* pmacros.scm (-pmacro-builtin-pmacro?): New function.
 	(pmacros-init!): Add .pmacro?.

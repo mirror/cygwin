@@ -145,6 +145,10 @@
 (define (-smacro-set! name val) (hashq-set! -smacro-table name val))
 
 ; Marker to indicate a value is a pmacro.
+; NOTE: Naming this "<pmacro>" is intentional.  It makes them look like
+; objects of class <pmacro>.  However we don't use COS in part to avoid
+; a dependency on COS and in part because displaying COS objects isn't well
+; supported (displaying them in debugging dumps adds a lot of noise).
 (define -pmacro-marker '<pmacro>)
 
 ; Utilities to create and access pmacros.
@@ -358,48 +362,57 @@
     ;; Check for syntactic forms.
     ;; They are handled differently in that we leave it to the transformer
     ;; routine to evaluate the arguments.
+    ;; Note that we also don't support passing syntactic form functions
+    ;; as arguments: We look up (car exp) here, not its expansion.
     (let ((sform (-smacro-lookup (car exp))))
       (if sform
 	  (begin
 	    ;; ??? Is it useful to trace these?
 	    (-smacro-apply sform (cdr exp) env loc))
 	  ;; Not a syntactic form.
-	  ;; Evaluate all the arguments first.
-	  (let ((scanned-exp (map (lambda (e) (scan e loc))
-				  exp)))
-	    (let ((macro (check-pmacro scanned-exp)))
-	      (if macro
-		  (begin
-		    ;; Trace expansion here, we know we have a pmacro.
+	  ;; See if we have a pmacro.  Do this before evaluating all the
+	  ;; arguments (even though we will eventually evaluate all the
+	  ;; arguments before invoking the pmacro) so that tracing is more
+	  ;; legible (we print the expression we're about to evaluate *before*
+	  ;; we evaluate its arguments).
+	  (let ((scanned-car (scan (car exp) loc)))
+	    (if (-pmacro? scanned-car)
+		(begin
+		  ;; Trace expansion here, we know we have a pmacro.
+		  (if -pmacro-trace?
+		      (let ((src-props (source-properties exp))
+			    (indent (spaces (* 2 (length (location-list loc))))))
+			;; We use `write' to display `exp' to see strings quoted.
+			(display indent cep)
+			(display "Expanding: " cep)
+			(write exp cep)
+			(newline cep)
+			(display indent cep)
+			(display "      env: " cep)
+			(write env cep)
+			(newline cep)
+			(if (not (null? src-props))
+			    (begin
+			      (display indent cep)
+			      (display " location: " cep)
+			      (display (source-properties-location->string src-props) cep)
+			      (newline cep)))))
+		  ;; Evaluate all the arguments before invoking the pmacro.
+		  (let* ((scanned-args (map (lambda (e) (scan e loc))
+					    (cdr exp)))
+			 (result (if (procedure? (-pmacro-transformer scanned-car))
+				     (-pmacro-apply scanned-car scanned-args)
+				     (cons (-pmacro-transformer scanned-car) scanned-args))))
 		    (if -pmacro-trace?
-			(let ((src-props (source-properties exp))
-			      (indent (spaces (* 2 (length (location-list loc))))))
-			  ;; We use `write' to display `exp' to see strings quoted.
+			(let ((indent (spaces (* 2 (length (location-list loc))))))
 			  (display indent cep)
-			  (display "Expanding: " cep)
-			  (write exp cep)
-			  (newline cep)
-			  (display indent cep)
-			  (display "      env: " cep)
-			  (display env cep)
-			  (newline cep)
-			  (if (not (null? src-props))
-			      (begin
-				(display indent cep)
-				(display " location: " cep)
-				(display (source-properties-location->string src-props) cep)
-				(newline cep)))))
-		    (let ((result (if (procedure? (-pmacro-transformer macro))
-				      (-pmacro-apply macro (cdr scanned-exp))
-				      (cons (-pmacro-transformer macro) (cdr scanned-exp)))))
-		      (if -pmacro-trace?
-			  (let ((indent (spaces (* 2 (length (location-list loc))))))
-			    (display indent cep)
-			    (display "   result: " cep)
-			    (write result cep)
-			    (newline cep)))
-		      result))
-		  scanned-exp))))))
+			  (display "   result: " cep)
+			  (write result cep)
+			  (newline cep)))
+		    result))
+		;; Not a pmacro.
+		(cons scanned-car (map (lambda (e) (scan e loc))
+				       (cdr exp))))))))
 
   ;; Macro expand EXP which is known to be a non-null list.
   ;; LOC is the location stack thus far.

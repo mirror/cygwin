@@ -22,10 +22,44 @@
 
 	* utils.scm (message): Handle pairs.
 
+2009-07-08  DJ Delorie  <dj@redhat.com>
+
+	* cpu/mep-ivc2.cpu (cpmovtocsar0_C3, cpmovtocsar1_C3,
+	cpmovtocc_C3, cpmovtocsar0_P0S_P1, cpmovtocsar1_P0S_P1,
+	cpmovtocc_P0S_P1): Mark volatile.  Note which registers are
+	written to.
+
+2009-07-06  DJ Delorie  <dj@redhat.com>
+
+	* cpu/mep-core.cpu (fsft, ssarb): Mark as VOLATILE.
+	* cpu/mep-ivc2.cpu (many): Add VOLATILE to more insns that make
+	unspecified accesses to control registers.
+
+2009-07-01  DJ Delorie  <dj@redhat.com>
+
+	* cpu/mep-ivc2.cpu: Add VOLATILE to insns that make
+	unspecified accesses to control registers.
+
+	* cpu/mep-ivc2.cpu (cmov, cmovc, cmovh): Add intrinsic names to VLIW variants.
+	(ivc2rm, ivc2crn): Make data type consistent with non-VLIW variants.
+
 2009-06-24  Doug Evans  <dje@sebabeach.org>
 
 	* All *.scm files: Update copyright year.
 	* utils.scm (copyright-fsf, copyright-redhat): Ditto.
+
+2009-06-23  DJ Delorie  <dj@redhat.com>
+
+	* cpu/mep-core.cpu: Add CPTYPE and CRET attributes.
+	* cpu/mep-ivc2.cpu: Update all insns to include type information.
+	(h-cr-ivc2): Default to typeless.
+	(h-ccr-ivc2): Fix register width.
+	(SLOTS): Fix values and default.
+	(ivc2_*): Add control register names.
+	(crop, crqp, crpp, croc, crqc, crpc): Default to typeless.
+
+	* cpu/mep.opc (mep_cgen_insn_supported_asm): New, skip the short
+	version of BSR when assembling VLIW bundles.  Use it in mep-asm.c
 
 2009-06-20  Doug Evans  <dje@sebabeach.org>
 

@@ -270,7 +270,8 @@
   ; is more robust, internal calls get checked too.  Thus it's here.
   ; Ditto for all the other such tests in this file.
   (if (current-attr-lookup (obj:name a))
-      (parse-error "define-attr" "attribute already defined" (obj:name a)))
+      (parse-error (make-current-context "define-attr")
+		   "attribute already defined" (obj:name a)))
   (let ((adata (arch-attr-list CURRENT-ARCH)))
     ; Build list in normal order so we don't have to reverse it at the end
     ; (since our format is non-trivial).
@@ -294,7 +295,8 @@
 
 (define (current-enum-add! e)
   (if (current-enum-lookup (obj:name e))
-      (parse-error "define-enum" "enum already defined" (obj:name e)))
+      (parse-error (make-current-context "define-enum")
+		   "enum already defined" (obj:name e)))
   (arch-set-enum-list! CURRENT-ARCH (cons e (arch-enum-list CURRENT-ARCH)))
   *UNSPECIFIED*
 )
@@ -309,7 +311,8 @@
 
 (define (current-kw-add! kw)
   (if (current-kw-lookup (obj:name kw))
-      (parse-error "define-keyword" "keyword already defined" (obj:name kw)))
+      (parse-error (make-current-context "define-keyword")
+		   "keyword already defined" (obj:name kw)))
   (arch-set-kw-list! CURRENT-ARCH (cons kw (arch-kw-list CURRENT-ARCH)))
   *UNSPECIFIED*
 )
@@ -324,7 +327,8 @@
 
 (define (current-isa-add! i)
   (if (current-isa-lookup (obj:name i))
-      (parse-error "define-isa" "isa already defined" (obj:name i)))
+      (parse-error (make-current-context "define-isa")
+		   "isa already defined" (obj:name i)))
   (arch-set-isa-list! CURRENT-ARCH (cons i (arch-isa-list CURRENT-ARCH)))
   *UNSPECIFIED*
 )
@@ -339,7 +343,8 @@
 
 (define (current-cpu-add! c)
   (if (current-cpu-lookup (obj:name c))
-      (parse-error "define-cpu" "cpu already defined" (obj:name c)))
+      (parse-error (make-current-context "define-cpu")
+		   "cpu already defined" (obj:name c)))
   (arch-set-cpu-list! CURRENT-ARCH (cons c (arch-cpu-list CURRENT-ARCH)))
   *UNSPECIFIED*
 )
@@ -354,7 +359,8 @@
 
 (define (current-mach-add! m)
   (if (current-mach-lookup (obj:name m))
-      (parse-error "define-mach" "mach already defined" (obj:name m)))
+      (parse-error (make-current-context "define-mach")
+		   "mach already defined" (obj:name m)))
   (arch-set-mach-list! CURRENT-ARCH (cons m (arch-mach-list CURRENT-ARCH)))
   *UNSPECIFIED*
 )
@@ -369,7 +375,8 @@
 
 (define (current-model-add! m)
   (if (current-model-lookup (obj:name m))
-      (parse-error "define-model" "model already defined" (obj:name m)))
+      (parse-error (make-current-context "define-model")
+		   "model already defined" (obj:name m)))
   (arch-set-model-list! CURRENT-ARCH (cons m (arch-model-list CURRENT-ARCH)))
   *UNSPECIFIED*
 )
@@ -384,7 +391,8 @@
 
 (define (current-hw-add! hw)
   (if (current-hw-lookup (obj:name hw))
-      (parse-error "define-hardware" "hardware already defined" (obj:name hw)))
+      (parse-error (make-current-context "define-hardware")
+		   "hardware already defined" (obj:name hw)))
   (arch-set-hw-list! CURRENT-ARCH (cons hw (arch-hw-list CURRENT-ARCH)))
   *UNSPECIFIED*
 )
@@ -406,7 +414,8 @@
 
 (define (current-ifld-add! f)
   (if (-ifld-already-defined? f)
-      (parse-error "define-ifield" "ifield already defined" (obj:name f)))
+      (parse-error (make-obj-context f "define-ifield")
+		   "ifield already defined" (obj:name f)))
   (-ident-object-table-add! CURRENT-ARCH (arch-ifld-table CURRENT-ARCH)
 			    (obj:name f) f)
   *UNSPECIFIED*
@@ -464,7 +473,8 @@
 
 (define (current-op-add! op)
   (if (-op-already-defined? op)
-      (parse-error "define-operand" "operand already defined" (obj:name op)))
+      (parse-error (make-obj-context op "define-operand")
+		   "operand already defined" (obj:name op)))
   (-ident-object-table-add! CURRENT-ARCH (arch-op-table CURRENT-ARCH)
 			    (obj:name op) op)
   *UNSPECIFIED*
@@ -522,7 +532,8 @@
 
 (define (current-insn-add! i)
   (if (-insn-already-defined? i)
-      (parse-error "define-insn" "insn already defined" (obj:name i)))
+      (parse-error (make-obj-context i "define-insn")
+		   "insn already defined" (obj:name i)))
   (-ident-object-table-add! CURRENT-ARCH (arch-insn-table CURRENT-ARCH)
 			    (obj:name i) i)
   *UNSPECIFIED*
@@ -572,7 +583,8 @@
 
 (define (current-minsn-add! m)
   (if (-minsn-already-defined? m)
-      (parse-error "define-minsn" "macro-insn already defined" (obj:name m)))
+      (parse-error (make-obj-context m "define-minsn")
+		   "macro-insn already defined" (obj:name m)))
   (-ident-object-table-add! CURRENT-ARCH (arch-minsn-table CURRENT-ARCH)
 			    (obj:name m) m)
   *UNSPECIFIED*
@@ -620,7 +632,8 @@
 
 (define (current-subr-add! s)
   (if (current-subr-lookup (obj:name s))
-      (parse-error "define-subr" "subroutine already defined" (obj:name s)))
+      (parse-error (make-current-context "define-subr")
+		   "subroutine already defined" (obj:name s)))
   (arch-set-subr-list! CURRENT-ARCH
 		       (acons (obj:name s) s (arch-subr-list CURRENT-ARCH)))
   *UNSPECIFIED*

@@ -299,6 +299,12 @@
   (make <context> (current-reader-location) prefix)
 )
 
+; Create a <context> object from <source-ident> object OBJ.
+
+(define (make-obj-context obj prefix)
+  (make <context> (obj-location obj) prefix)
+)
+
 ; Create a new context from CONTEXT with TEXT appended to the prefix.
 
 (define (context-append context text)

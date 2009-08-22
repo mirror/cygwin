@@ -296,7 +296,7 @@
 	      (elm-xset! result 'mode-name new-mode-name)
 	      (elm-xset! result 'mode new-mode)
 	      result)
-	    (parse-error "op:new-mode"
+	    (parse-error (make-obj-context op "op:new-mode")
 			 (string-append "invalid mode for operand `"
 					(->string (obj:name op))
 					"'")

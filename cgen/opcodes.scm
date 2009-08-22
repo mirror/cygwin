@@ -18,6 +18,12 @@
   (set! -opc-file-path path)
 )
 
+; Return #t if the -OPC parameter was specified.
+
+(define (opc-file-provided?)
+  (and -opc-file-path #t)
+)
+
 ; Boolean indicating if we're to build the operand instance table.
 ; The default is no, since only the m32r uses it at present.
 ; ??? Simulator tracing support could use it.

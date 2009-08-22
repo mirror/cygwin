@@ -13,6 +13,9 @@ ARCHFILE = $(srcroot)/cpu/$(ARCH).cpu
 MACHS = all
 ISAS = all
 
+# file generation options
+OPTIONS =
+
 # for the html rule
 INSN_FILE_NAME = $(ARCH)-insn.html
 
@@ -40,12 +43,13 @@ stamp-cgen: $(CGENFILES)
 
 # Build the basic description support.
 # We just stuff them in tmp-* files.
-# Usage: make desc [ARCHFILE=<arch-file>] OPTIONS="<option list>"
+# Usage: make desc [ARCH=<arch>] [ARCHFILE=<arch-file>] OPTIONS="<option list>"
+#
+# -O tmp-opc.h -P tmp-opc.c -OPC $(dirname ${archfile})/${arch}.opc
 
 .PHONY: desc
-# FIXME: needs more dependencies
 desc: desc.scm
-	rm -f tmp-desc.h tmp-desc.c tmp-opinst.c
+	rm -f tmp-desc.h tmp-desc.c
 	$(GUILE) $(srcdir)/cgen-opc.scm \
 		-s $(srcdir) \
 		$(CGENFLAGS) \
@@ -54,6 +58,8 @@ desc: desc.scm
 		-i "$(ISAS)" \
 		-m "$(MACHS)" \
 		-H tmp-desc.h -C tmp-desc.c
+	$(SHELL) $(srcroot)/move-if-change tmp-desc.h $(ARCH)-desc.h
+	$(SHELL) $(srcroot)/move-if-change tmp-desc.c $(ARCH)-desc.c
 
 # Build the machine generated cpu documentation.
 # Usage: make html [ARCH=<arch>] [ARCHFILE=<arch-file>]
@@ -78,7 +84,6 @@ html: desc.scm html.scm cgen-doc.scm
 # Usage: make opcodes [ARCHFILE=<arch-file>] OPTIONS="<option list>"
 
 .PHONY: opcodes
-# FIXME: needs more dependencies
 opcodes: opcodes.scm
 	rm -f tmp-opc.h tmp-itab.c
 	rm -f tmp-asm.in tmp-dis.in tmp-ibld.h tmp-ibld.in
@@ -100,7 +105,6 @@ opcodes: opcodes.scm
 #          OPTIONS="<option list>"
 
 .PHONY: sim-arch sim-cpu
-# FIXME: needs more dependencies
 sim-arch: sim.scm
 	rm -f tmp-arch.h tmp-arch.c tmp-cpuall.h
 	$(GUILE) $(srcdir)/cgen-sim.scm \

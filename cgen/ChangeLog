@@ -5,7 +5,7 @@
 2009-07-12  Doug Evans  <dje@sebabeach.org>
 
 	Delete files that now live in ../cpu.
-	* cpu/iq20.cpu: Delete.
+	* cpu/iq10.cpu: Delete.
 	* cpu/iq2000.cpu: Delete.
 	* cpu/iq2000.opc: Delete.
 	* cpu/iq2000m.cpu: Delete.

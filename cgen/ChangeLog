@@ -1,5 +1,9 @@
 2009-08-22  Doug Evans  <dje@sebabeach.org>
 
+	* mach.scm (current-*-add!): Update calls to parse-error.
+	* operand.scm (op:new-mode): Update call to parse-error.
+	* utils-cgen.scm (make-obj-context): New function.
+
 	* NEWS: Copy over entries from 1.1 branch.
 
 2009-08-20  Doug Evans  <dje@sebabeach.org>

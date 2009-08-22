@@ -12,6 +12,10 @@ Major features in release 1.1:
 
     The mep port of GCC generates intrinsics from the description file.
 
+  * SID simulator cpu component generator
+
+    CGEN can generate the cpu component of the SID simulator.
+
 * New ports:
 
   * cris

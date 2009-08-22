@@ -1002,7 +1002,10 @@ init_tables (void)
    -gen-mach-table-decls
    gen-hw-table-decls
    "\n"
-   (lambda () (gen-extra-cpu.h (opc-file-path) (current-arch-name)))
+   (lambda ()
+     (if (opc-file-provided?)
+	 (gen-extra-cpu.h (opc-file-path) (current-arch-name))
+	 ""))
    "
 
 #endif /* @ARCH@_CPU_H */
@@ -1035,7 +1038,10 @@ init_tables (void)
 #include \"libiberty.h\"
 #include \"xregex.h\"
 \n"
-   (lambda () (gen-extra-cpu.c (opc-file-path) (current-arch-name)))
+   (lambda ()
+     (if (opc-file-provided?)
+	 (gen-extra-cpu.c (opc-file-path) (current-arch-name))
+	 ""))
    gen-attr-table-defns
    -gen-isa-table-defns
    -gen-mach-table-defns

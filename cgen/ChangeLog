@@ -1,5 +1,14 @@
 2009-08-22  Doug Evans  <dje@sebabeach.org>
 
+	* Makefile.am (OPTIONS): Define.
+	(desc): Just generate <arch>-desc.[ch] files.
+	* Makefile.in: Regenerate.
+	* desc-cpu.scm (cgen-desc.h): Skip call to gen-extra-cpu.h if there's
+	no .opc file.
+	(cgen-desc.c): Similarly.
+	* gen-all-desc: New file.
+	* opcodes.scm (opc-file-provided?): New function.
+
 	* mach.scm (current-*-add!): Update calls to parse-error.
 	* operand.scm (op:new-mode): Update call to parse-error.
 	* utils-cgen.scm (make-obj-context): New function.

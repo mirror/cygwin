@@ -436,10 +436,6 @@ This affects the numbering of field bits in words beyond the
 base instruction.
 @xref{Instruction fields}, for more information.
 
-??? There is currently no explicit way to specify a different instruction
-word bitsize for particular instructions, it is derived from the instruction
-field specs.
-
 @subsubsection default-insn-bitsize
 
 The default size of an instruction in bits. It is generally the size of

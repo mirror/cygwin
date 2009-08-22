@@ -11,8 +11,6 @@
 	* cpu/iq2000m.cpu: Delete.
 	* cpu/m32r.cpu: Delete.
 	* cpu/m32r.opc: Delete.
-	* cpu/xc16x.cpu: Delete.
-	* cpu/xc16x.opc: Delete.
 
 2009-07-09  Doug Evans  <dje@sebabeach.org>
 

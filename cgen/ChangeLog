@@ -1,3 +1,16 @@
+2009-08-23  Doug Evans  <dje@sebabeach.org>
+
+	Add define-rtl-version.
+	* read.scm (-CGEN-RTL-VERSION): Renamed from -CGEN-LANG-VERSION.
+	(cgen-rtl-major, cgen-rtl-minor): Similarly renamed.
+	(cgen-lang-fixlevel): Delete.
+	(-supported-rtl-versions): New variable.
+	(-cmd-define-rtl-version): New function.
+	(init-reader!): New command define-rtl-version.
+	(-cgen): Add rtl version to --version output.
+	* doc/rtl.texi: Document rtl version support.
+	* cpu/play.cpu: Add define-rtl-version.
+
 2009-08-22  Doug Evans  <dje@sebabeach.org>
 
 	* Makefile.am (OPTIONS): Define.

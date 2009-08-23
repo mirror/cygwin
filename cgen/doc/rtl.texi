@@ -14,6 +14,7 @@ its CPU description language.
 * RTL Introduction::            Introduction to CGEN's RTL
 * Trade-offs::                  Various trade-offs in the design
 * Rules and notes::             Rules and notes common to all entries
+* RTL Versions::                Supported versions and differences
 * Definitions::                 Definitions in the description file
 * Attributes::                  Random data associated with any entry
 * Architecture variants::       Specifying variations of a CPU
@@ -144,6 +145,58 @@ unless otherwise specified.  This is not necessary for
 but it is useful for @samp{define-*-foo} that take a fixed number
 of arguments.  E.g., @samp{define-normal-ifield}.
 Whether to use @samp{()} or @samp{#f} is largely a matter of style.
+@end itemize
+
+@node RTL Versions
+@section RTL Versions
+
+CGEN has minimal support for making changes to the language without
+breaking existing ports.  We do not put much effort into this because
+over time it can become unmaintainable, but for some changes it is
+useful to have a temporary window in which older versions are supported.
+
+@menu
+* Specifying the RTL version::
+* List of supported RTL versions::
+@end menu
+
+@node Specifying the RTL version
+@subsection Specifying the RTL version
+
+Specify the version of RTL that your cpu description was written to
+with @samp{define-rtl-version}.
+
+Syntax:
+
+@example
+(define-rtl-version major-version minor-version)
+@end example
+
+If the version is set multiple times the behavior is undefined.
+
+The current RTL version is 0.7:
+
+@example
+(define-rtl-version 0 7)
+@end example
+
+Every increment in major and minor versions is generally non-upward
+compatible (otherwise the version would not have been incremented -
+CGEN does not keep support for older versions long).
+
+@node List of supported RTL versions
+@subsection List of supported RTL versions
+
+CGEN currently supports the following RTL versions.
+
+@itemize @bullet
+
+@item 0.7 @code{(define-rtl-version 0 7)}
+
+This is the original RTL version.
+It is the default if no version is specified.
+It is supported by CGEN versions 1.0, 1.1, and the current development tree.
+
 @end itemize
 
 @node Definitions

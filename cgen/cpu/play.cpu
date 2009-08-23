@@ -6,6 +6,8 @@
 ; This file is for experimental purposes.  Don't expect it to be correct
 ; or up to date.
 
+(define-rtl-version 0 7)
+
 (include "simplify.inc")
 
 (define-arch

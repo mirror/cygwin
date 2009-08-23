@@ -69,12 +69,28 @@
 (define (cgen-minor) (cadr -CGEN-VERSION))
 (define (cgen-fixlevel) (caddr -CGEN-VERSION))
 
-; A list of three numbers designating the description language version.
+; A list of two numbers designating the description language version.
 ; Note that this is different from -CGEN-VERSION.
-(define -CGEN-LANG-VERSION '(0 7 2))
-(define (cgen-lang-major) (car -CGEN-LANG-VERSION))
-(define (cgen-lang-minor) (cadr -CGEN-LANG-VERSION))
-(define (cgen-lang-fixlevel) (caddr -CGEN-LANG-VERSION))
+; See section "RTL Versions" of the docs.
+(define -CGEN-RTL-VERSION '(0 7))
+(define (cgen-rtl-major) (car -CGEN-RTL-VERSION))
+(define (cgen-rtl-minor) (cadr -CGEN-RTL-VERSION))
+
+;; List of supported versions
+(define -supported-rtl-versions '((0 7)))
+
+(define (-cmd-define-rtl-version major minor)
+  (if (not (non-negative-integer? major))
+      (parse-error #f "Invalid major version number" major))
+  (if (not (non-negative-integer? minor))
+      (parse-error #f "Invalid minor version number" minor))
+
+  (let ((new-version (list major minor)))
+    (if (not (member new-version -supported-rtl-versions))
+	(parse-error #f "Unsupported/invalid rtl version" new-version))
+    (logit 1 "Setting RTL version to " major "." minor " ...\n")
+    (set! -CGEN-RTL-VERSION new-version))
+)
 
 ; Which application is in use (UNKNOWN, DESC, OPCODES, SIMULATOR, ???).
 ; This is mostly for descriptive purposes.
@@ -811,6 +827,10 @@
 (define (-init-reader!)
   (set! CURRENT-READER (new <reader>))
 
+  (reader-add-command! 'define-rtl-version
+		       "Specify the RTL version being used.\n"
+		       nil '(major minor) -cmd-define-rtl-version)
+
   (reader-add-command! 'include
 		       "Include a file.\n"
 		       nil '(file) -cmd-include)
@@ -1226,6 +1246,11 @@ Define a preprocessor-style macro.
 			(display (cgen-minor))
 			(display ".")
 			(display (cgen-fixlevel))
+			(newline)
+			(display "RTL version ")
+			(display (cgen-rtl-major))
+			(display ".")
+			(display (cgen-rtl-minor))
 			(newline)
 			(quit 0)
 			))

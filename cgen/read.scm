@@ -73,11 +73,12 @@
 ; Note that this is different from -CGEN-VERSION.
 ; See section "RTL Versions" of the docs.
 (define -CGEN-RTL-VERSION '(0 7))
+(define (cgen-rtl-version) -CGEN-RTL-VERSION)
 (define (cgen-rtl-major) (car -CGEN-RTL-VERSION))
 (define (cgen-rtl-minor) (cadr -CGEN-RTL-VERSION))
 
 ;; List of supported versions
-(define -supported-rtl-versions '((0 7)))
+(define -supported-rtl-versions '((0 7) (0 8)))
 
 (define (-cmd-define-rtl-version major minor)
   (if (not (non-negative-integer? major))

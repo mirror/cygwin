@@ -122,7 +122,7 @@ static const CGEN_ATTR_ENTRY bool_attr[] =
 		 (string-map (lambda (e)
 			       (string-append
 				"  { \""
-				(->string (elm-get self 'prefix))
+				(->string (elm-get self 'name-prefix))
 				(->string (car e)) ; operand name
 				"\", "
 				(if (string? (cadr e))

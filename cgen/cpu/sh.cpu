@@ -1,7 +1,9 @@
 ; Renesas / SuperH SH architecture description.  -*- Scheme -*-
-; Copyright (C) 2000, 2001, 2006 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2006, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
+
+(define-rtl-version 0 8)
 
 (include "simplify.inc")
 

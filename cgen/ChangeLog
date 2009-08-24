@@ -1,5 +1,40 @@
 2009-08-23  Doug Evans  <dje@sebabeach.org>
 
+	* hardware.scm (<keyword>): Rename member print-name -> enum-prefix.
+	Rename member prefix -> name-prefix.
+	(<keyword> getters): Update.
+	(-keyword-parse): Update.  Default enum-prefix to NAME-.
+	(-keyword-read): Update.  Don't compute default value for
+	enum-prefix here.
+	(define-keyword): Update.
+	(-hw-parse-keyword): Pass "UNUSED" for enum-prefix to -keyword-parse.
+	* read.scm (cgen-rtl-version): New function.
+	(-supported-rtl-versions): Add (0 8).
+	* desc-cpu.scm (-gen-hw-decl): Remove cruft.
+	* desc.scm (<keyword> gen-defn): prefix -> name-prefix.
+	* gas-test.scm (<keyword> test-data): prefix -> name-prefix.
+	* cpu/arm.cpu (gr-names, shift-type): Call define-rtl-version.
+	Update, print-name -> enum-prefix, make uppercase.
+	Remove unnecessary name-prefix spec.
+	* cpu/fr30.cpu (gr-names, cr-names, dr-names): Ditto.
+	* cpu/ip2k.cpu (register-names): Ditto.
+	* cpu/m68k.cpu (dr-names, ar-names): Ditto.
+	* cpu/sparc.cpu (gr-names): Ditto.
+	* cpu/xc16x.cpu (gr-names, ext-names,psw-names): Ditto.
+	(grb-names, conditioncode-names, extconditioncode-names): Ditto.
+	(grb8-names, r8-names, regmem8-names, regdiv8-names): Ditto.
+	(reg0-name, reg0-name1, regbmem8-names, memgr8-names): Ditto.
+	* cpu/ia32.cpu (gr8-names, gr16-names, gr-names): Call
+	define-rtl-version.  Update, print-name -> enum-prefix, make uppercase,
+	prefix -> name-prefix.
+	* cpu/sh64-compact.cpu (frc-names): Call define-rtl-version.
+	Update, print-name -> enum-prefix, make uppercase.
+	(drc-names, xf-names): Ditto.
+	* cpu/xstormy16.cpu (gr-names, gr-Rb-names): Ditto.
+	* doc/rtl.texi (Keywords): New section.
+	(hardware indices): Update text.
+	(rtl versions): Add 0.8.
+
 	Add define-rtl-version.
 	* read.scm (-CGEN-RTL-VERSION): Renamed from -CGEN-LANG-VERSION.
 	(cgen-rtl-major, cgen-rtl-minor): Similarly renamed.

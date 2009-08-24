@@ -229,11 +229,12 @@
 (define <keyword>
   (class-make '<keyword> '(<hw-asm>)
 	      '(
-		; Name to use in generated code, as a string.
-		print-name
+		; Prefix value to pass to the corresponding enum.
+		enum-prefix
 
 		; Prefix of each name in VALUES, as a string.
-		prefix
+		; This is *not* prepended to each name in the enum.
+		name-prefix
 
 		; Associative list of values.
 		; Each element is (name value [attrs]).
@@ -246,34 +247,43 @@
 
 ; Accessors
 
-(define kw-mode (elm-make-getter <keyword> 'mode))
-(define kw-print-name (elm-make-getter <keyword> 'print-name))
-(define kw-prefix (elm-make-getter <keyword> 'prefix))
-(define kw-values (elm-make-getter <keyword> 'values))
+(define-getters <keyword> kw (mode enum-prefix name-prefix values))
 
 ; Parse a keyword spec.
 ;
+; ENUM-PREFIX is for the corresponding enum.
 ; The syntax of VALUES is: (prefix ((name1 [value1 [(attr-list1)]]) ...))
-; PREFIX is a string prefix for each name.
+; NAME-PREFIX is a prefix added to each value's name in the generated
+; lookup table.
 ; Each value is a number of mode MODE.
 ; ??? We have no problem handling any kind of number, we're Scheme.
 ; However, it's not clear yet how applications will want to handle it, but
 ; that is left to the application.  Still, it might be preferable to impose
 ; some restrictions which can later be relaxed as necessary.
+; ??? It would be useful to have two names for each value: asm name, enum name.
 
-(define (-keyword-parse context name comment attrs mode print-name prefix values)
-  ; FIXME: parse values.
-  (let ((result (make <keyword>
-		  (parse-name context name)
-		  (parse-comment context comment)
-		  (atlist-parse context attrs "")
-		  (parse-mode-name (context-append context ": mode") mode)
-		  (parse-string (context-append context ": print-name")
-				print-name)
-		  (parse-string (context-append context ": prefix")
-				prefix)
-		  values)))
-    result)
+(define (-keyword-parse context name comment attrs mode enum-prefix
+			name-prefix values)
+  ;; Pick out name first to augment the error context.
+  (let* ((name (parse-name context name))
+	 (context (context-append-name context name))
+	 (enum-prefix (or enum-prefix
+			  (string-append ;; default to NAME-
+			   (string-upcase (->string name))
+			   "-"))))
+
+    ;; FIXME: parse values.
+    (let ((result (make <keyword>
+		    (parse-name context name)
+		    (parse-comment context comment)
+		    (atlist-parse context attrs "")
+		    (parse-mode-name (context-append context ": mode") mode)
+		    (parse-string (context-append context ": enum-prefix")
+				  enum-prefix)
+		    (parse-string (context-append context ": name-prefix")
+				  name-prefix)
+		    values)))
+      result))
 )
 
 ; Read a keyword description
@@ -289,8 +299,8 @@
 	(comment "")
 	(attrs nil)
 	(mode INT)
-	(print-name #f) ;; #f indicates "not set"
-	(prefix "")
+	(enum-prefix #f) ;; #f indicates "not set"
+	(name-prefix "")
 	(values nil)
 	)
 
@@ -305,16 +315,35 @@
 	      ((comment) (set! comment (cadr arg)))
 	      ((attrs) (set! attrs (cdr arg)))
 	      ((mode) (set! mode (cadr arg)))
-	      ((print-name) (set! print-name (cadr arg)))
-	      ((prefix) (set! prefix (cadr arg)))
+	      ((print-name)
+	       ;; Renamed to enum-prefix in rtl version 0.8.
+	       (if (not (equal? (cgen-rtl-version) '(0 7)))
+		   (parse-error context "print-name renamed to enum-prefix" arg))
+	       (set! enum-prefix (cadr arg)))
+	      ((enum-prefix)
+	       ;; enum-prefix added in rtl version 0.8.
+	       (if (and (= (cgen-rtl-major) 0)
+			(< (cgen-rtl-minor) 8))
+		   (parse-error context "invalid hardware arg" arg))
+	       (set! enum-prefix (cadr arg)))
+	      ((prefix)
+	       ;; Renamed to name-prefix in rtl version 0.8.
+	       (if (not (equal? (cgen-rtl-version) '(0 7)))
+		   (parse-error context "prefix renamed to name-prefix" arg))
+	       (set! name-prefix (cadr arg)))
+	      ((name-prefix)
+	       ;; name-prefix added in rtl version 0.8.
+	       (if (and (= (cgen-rtl-major) 0)
+			(< (cgen-rtl-minor) 8))
+		   (parse-error context "invalid hardware arg" arg))
+	       (set! name-prefix (cadr arg)))
 	      ((values) (set! values (cdr arg)))
 	      (else (parse-error context "invalid hardware arg" arg)))
 	    (loop (cdr arg-list)))))
 
     ; Now that we've identified the elements, build the object.
     (-keyword-parse context name comment attrs mode
-		    (or print-name name)
-		    prefix values))
+		    enum-prefix name-prefix values))
 )
 
 ; Define a keyword object, name/value pair list version.
@@ -329,9 +358,15 @@
 	    ; Define an enum so the values are usable everywhere.
 	    ; One use is giving names to register numbers and special constants
 	    ; to make periphery C/C++ code more legible.
+	    ; FIXME: Should pass on mode to enum.
 	    (define-full-enum (obj:name kw) (obj:comment kw)
 	      (atlist-source-form (obj-atlist kw))
-	      (string-upcase (string-append (kw-print-name kw) "-"))
+	      (if (and (= (cgen-rtl-major) 0)
+		       (< (cgen-rtl-minor) 8))
+		  ;; Prior to rtl version 0.8 we up-cased the prefix here
+		  ;; and added the trailing - ourselves.
+		  (string-upcase (string-append (kw-enum-prefix kw) "-"))
+		  (kw-enum-prefix kw))
 	      (kw-values kw))))
       kw))
 )
@@ -358,16 +393,17 @@
   (if (!= (length args) 2)
       (parse-error context "invalid keyword spec" args))
 
-  ; These are copied from our container object.
+  ; Name, comment, and attributes are copied from our container object.
   ; They're needed to output the table.
-  ; ??? This isn't quite right as the container may contain multiple keyword
-  ; instances.  To be fixed in time.
+  ; ??? This isn't quite right as some day a container may contain multiple
+  ; keyword instances.  To be fixed in time.
   (-keyword-parse context (obj:name container) (obj:comment container)
-		  ;; PRIVATE: keyword table is implicitly defined and made
-		  ;; "static" (in the C sense).
+		  ;; PRIVATE: keyword table is implicitly defined, it isn't
+		  ;; accessible with current-kw-lookup.
 		  (cons 'PRIVATE (atlist-source-form (obj-atlist container)))
 		  mode
-		  (obj:name container) ; print-name
+		  ;; This is unused, use a magic value to catch any uses.
+		  "UNUSED"
 		  (car args) ; prefix
 		  (cadr args)) ; value
 )

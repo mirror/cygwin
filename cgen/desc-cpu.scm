@@ -200,14 +200,10 @@ const CGEN_IFLD @arch@_cgen_ifld_table[] =
 
 (define (-gen-hw-decl hw)
   (string-append
-   (if (and (hw-indices hw)
-	    ; ??? Commented out as opcode changes are needed
-	    ) ; (not (obj-has-attr? (hw-indices hw) 'PRIVATE)))
+   (if (hw-indices hw)
        (gen-decl (hw-indices hw))
        "")
-   (if (and (hw-values hw)
-	    ; ??? Commented out as opcode changes are needed
-	    ) ; (not (obj-has-attr? (hw-values hw) 'PRIVATE)))
+   (if (hw-values hw)
        (gen-decl (hw-values hw))
        "")
    )

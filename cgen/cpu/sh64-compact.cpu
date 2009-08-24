@@ -61,7 +61,7 @@
 (define-keyword
   (name frc-names)
   (attrs (ISA compact))
-  (print-name h-frc)
+  (enum-prefix H-FRC-)
   (values (fr0   0) (fr1   1) (fr2   2) (fr3   3) (fr4   4) (fr5   5)
 	  (fr6   6) (fr7   7) (fr8   8) (fr9   9) (fr10 10) (fr11 11)
 	  (fr12 12) (fr13 13) (fr14 14) (fr15 15))
@@ -70,14 +70,14 @@
 (define-keyword
   (name drc-names)
   (attrs (ISA compact))
-  (print-name h-drc)
+  (enum-prefix H-DRC-)
   (values (dr0 0) (dr2 2) (dr4 4) (dr6 6) (dr8 8) (dr10 10) (dr12 12) (dr14 14))
 )
 
 (define-keyword
   (name xf-names)
   (attrs (ISA compact))
-  (print-name h-xf)
+  (enum-prefix H-XF-)
   (values (xf0   0) (xf1   1) (xf2   2) (xf3   3) (xf4   4) (xf5   5)
 	  (xf6   6) (xf7   7) (xf8   8) (xf9   9) (xf10 10) (xf11 11)
 	  (xf12 12) (xf13 13) (xf14 14) (xf15 15))

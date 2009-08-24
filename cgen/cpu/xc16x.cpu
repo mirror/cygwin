@@ -1,6 +1,6 @@
 ; Infineon XC16X CPU description.  -*- Scheme -*-
 ;
-; Copyright 2006 Free Software Foundation, Inc.
+; Copyright 2006, 2009 Free Software Foundation, Inc.
 ;
 ; Contributed by KPIT Cummins Infosystems Ltd.; developed under contract 
 ; from Infineon Systems, GMBH , Germany.
@@ -21,6 +21,8 @@
 ; along with this program; if not, write to the Free Software
 ; Foundation, 51 Franklin Street - Fifth Floor, Boston, MA
 ; 02110-1301, USA.
+
+(define-rtl-version 0 8)
 
 (include "simplify.inc")
 
@@ -226,8 +228,7 @@
 
 (define-keyword
   (name gr-names)
-  (print-name h-gr)
-  (prefix "")
+  (enum-prefix H-GR-)
   (values (r0 0) (r1 1) (r2 2) (r3 3) (r4 4) (r5 5) (r6 6) (r7 7)
 	  (r8 8) (r9 9) (r10 10) (r11 11) (r12 12) (r13 13) (r14 14) (r15 15))
 
@@ -242,8 +243,7 @@
 
 (define-keyword
   (name ext-names)
-  (print-name h-ext)
-  (prefix "")
+  (enum-prefix H-EXT-)
   (values (0x1 0) (0x2 1) (0x3 2) (0x4 3)
           ("1" 0) ("2" 1) ("3" 2) ("4" 3))
 
@@ -259,8 +259,7 @@
 
 (define-keyword
   (name psw-names)
-  (print-name h-psw)
-  (prefix "")
+  (enum-prefix H-PSW-)
   (values ("IEN" 136) ("r0.11" 240) ("r1.11" 241) ("r2.11" 242) ("r3.11" 243) ("r4.11" 244)
                       ("r5.11" 245) ("r6.11" 246) ("r7.11" 247) ("r8.11" 248)
                       ("r9.11" 249) ("r10.11" 250) ("r11.11" 251) ("r12.11" 252)
@@ -277,8 +276,7 @@
 
 (define-keyword
   (name grb-names)
-  (print-name h-grb)
-  (prefix "")
+  (enum-prefix H-GRB-)
   (values (rl0 0) (rh0 1) (rl1 2) (rh1 3) (rl2 4) (rh2 5) (rl3 6) (rh3 7) 
           (rl4 8) (rh4 9) (rl5 10) (rh5 11) (rl6 12) (rh6 13) (rl7 14) (rh7 15))
 )
@@ -293,8 +291,7 @@
 
 (define-keyword
   (name conditioncode-names)
-  (print-name h-cc)
-  (prefix "")
+  (enum-prefix H-CC-)
   (values (cc_UC 0) (cc_NET 1) (cc_Z 2) (cc_EQ 2) (cc_NZ 3) (cc_NE 3) (cc_V 4) (cc_NV 5) (cc_N 6)  (cc_NN 7) (cc_ULT 8)  (cc_UGE 9) 
 	  (cc_C 8) (cc_NC 9) (cc_SGT 10) (cc_SLE 11) (cc_SLT 12) (cc_SGE 13) (cc_UGT 14) 
           (cc_ULE 15))
@@ -309,8 +306,7 @@
 
 (define-keyword
   (name extconditioncode-names)
-  (print-name h-ecc)
-  (prefix "")
+  (enum-prefix H-ECC-)
   (values(cc_UC 0) (cc_NET 2) (cc_Z 4) (cc_EQ 4) (cc_NZ 6) (cc_NE 6) (cc_V 8) (cc_NV 10) (cc_N 12)  (cc_NN 14) (cc_ULT 16)  (cc_UGE 18) (cc_C 16) (cc_NC 18) (cc_SGT 20) 
          (cc_SLE 22) (cc_SLT 24) (cc_SGE 26) (cc_UGT 28) (cc_ULE 30) (cc_nusr0 1) 
          (cc_nusr1 3) (cc_usr0 5) (cc_usr1 7))
@@ -325,8 +321,7 @@
 
 (define-keyword
   (name grb8-names)
-  (print-name h-grb8)
-  (prefix "")
+  (enum-prefix H-GRB8-)
   (values (dpp0 0)  (dpp1 1)  (dpp2 2)  (dpp3 3)
 	  (psw 136)   (cp 8)    (mdl 7)   (mdh  6)
 	  (mdc 135)   (sp 9)    (csp 4)  (vecseg 137)
@@ -346,8 +341,7 @@
 
 (define-keyword
   (name r8-names)
-  (print-name h-r8)
-  (prefix "")
+  (enum-prefix H-R8-)
   (values (dpp0 0)  (dpp1 1)  (dpp2 2)  (dpp3 3)
 	  (psw 136)   (cp 8)    (mdl 7)   (mdh  6)
 	  (mdc 135)   (sp 9)    (csp 4)  (vecseg 137)
@@ -367,8 +361,7 @@
 
 (define-keyword
   (name regmem8-names)
-  (print-name h-regmem8)
-  (prefix "")
+  (enum-prefix H-REGMEM8-)
   (values (dpp0 0)  (dpp1 1)  (dpp2 2)  (dpp3 3)
 	  (psw 136)   (cp 8)    (mdl 7)   (mdh  6)
 	  (mdc 135)   (sp 9)    (csp 4)  (vecseg 137)
@@ -388,8 +381,7 @@
 
 (define-keyword
   (name regdiv8-names)
-  (print-name h-regdiv8)
-  (prefix "")
+  (enum-prefix H-REGDIV8-)
   (values (r0 0) (r1 17) (r2 34) (r3 51) (r4 68) (r5 85) (r6 102) (r7 119)
 	  (r8 136) (r9 153) (r10 170) (r11 187) (r12 204) (r13 221) (r14 238) (r15 255))
 )
@@ -404,8 +396,7 @@
 
 (define-keyword
   (name reg0-name)
-  (print-name h-reg0)
-  (prefix "")
+  (enum-prefix H-REG0-)
   (values (0x1 1) (0x2 2) (0x3 3) (0x4 4) (0x5 5) (0x6 6) (0x7 7) (0x8 8) (0x9 9) (0xa 10) (0xb 11) 
           (0xc 12) (0xd 13) (0xe 14) (0xf 15)
           ("1" 1) ("2" 2) ("3" 3) ("4" 4) ("5" 5) ("6" 6) ("7" 7) ("8" 8) ("9" 9) ("10" 10) ("11" 11) 
@@ -422,8 +413,7 @@
 
 (define-keyword
   (name reg0-name1)
-  (print-name h-reg01)
-  (prefix "")
+  (enum-prefix H-REG01-)
   (values (0x1 1) (0x2 2) (0x3 3) (0x4 4) (0x5 5) (0x6 6) (0x7 7)
           ("1" 1) ("2" 2) ("3" 3) ("4" 4) ("5" 5) ("6" 6) ("7" 7))
 )
@@ -438,8 +428,7 @@
 
 (define-keyword
   (name regbmem8-names)
-  (print-name h-regbmem8)
-  (prefix "")
+  (enum-prefix H-REGBMEM8-)
   (values (dpp0 0)  (dpp1 1)  (dpp2 2)  (dpp3 3)
 	  (psw 136)   (cp 8)    (mdl 7)   (mdh  6)
 	  (mdc 135)   (sp 9)    (csp 4)  (vecseg 137)
@@ -459,8 +448,7 @@
 
 (define-keyword
   (name memgr8-names)
-  (print-name h-memgr8)
-  (prefix "")
+  (enum-prefix H-MEMGR8-)
   (values (dpp0 65024)  (dpp1 65026)  (dpp2 65028)  (dpp3 65030)
 	  (psw 65296)   (cp 65040)    (mdl 65038)   (mdh  65036)
 	  (mdc 65294)   (sp 65042)    (csp 65032)  (vecseg 65298)

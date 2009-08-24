@@ -1,7 +1,9 @@
 ; xstormy16 CPU core description. -*- Scheme -*-
-; Copyright (C) 2001, 2002, 2003, 2006 Red Hat, Inc.
+; Copyright (C) 2001, 2002, 2003, 2006, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
+
+(define-rtl-version 0 8)
 
 (include "simplify.inc")
 
@@ -78,7 +80,7 @@
 
 (define-keyword
   (name gr-names)
-  (print-name h-gr)
+  (enum-prefix H-GR-)
   (values (r0 0) (r1 1) (r2 2) (r3 3)
 	  (r4 4) (r5 5) (r6 6) (r7 7)
 	  (r8 8) (r9 9) (r10 10) (r11 11)
@@ -87,7 +89,7 @@
 
 (define-keyword
   (name gr-Rb-names)
-  (print-name h-Rbj)
+  (enum-prefix H-RBJ-)
   (values (r8 0) (r9 1) (r10 2) (r11 3)
 	  (r12 4) (r13 5) (r14 6) (r15 7)
 	  (psw 6) (sp 7)))

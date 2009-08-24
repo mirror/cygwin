@@ -1,7 +1,9 @@
 ; ARM CPU description.  -*- Scheme -*-
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
+
+(define-rtl-version 0 8)
 
 (include "simplify.inc")
 
@@ -141,7 +143,7 @@
 
 (define-keyword
   (name gr-names)
-  (print-name h-gr)
+  (enum-prefix H-GR-)
   (values (pc 15) ; put this first so it is prefered over r15
 	  (r0 0) (r1 1) (r2 2) (r3 3) (r4 4) (r5 5) (r6 6) (r7 7) 
 	  (r8 8) (r9 9) (r10 10) (r11 11) (r12 12) (r13 13) (r14 14) (r15 15)
@@ -353,7 +355,6 @@
 (define-keyword
   (name shift-type)
   (comment "operand 2 shift type")
-  (prefix "")
   (values (lsl 0) (asl 0) (lsr 1) (asr 2) (ror 3))
 )
 

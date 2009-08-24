@@ -1,8 +1,10 @@
 ; Ubicom IP2K CPU description.  -*- Scheme -*-
 ; Copyright (C) 2000, 2001 Red Hat, Inc.
-; Copyright (C) 2002 Free Software Foundation, Inc.
+; Copyright (C) 2002, 2009 Free Software Foundation, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
+
+(define-rtl-version 0 8)
 
 (include "simplify.inc")
 
@@ -177,8 +179,7 @@
 
 (define-keyword
   (name register-names)
-  (print-name h-registers)
-  (prefix "")
+  (enum-prefix H-REGISTERS-)
   (values
    ; These are the "Special Purpose Registers" that are not reserved
    ("ADDRSEL" #x2) ("ADDRX" #x3)

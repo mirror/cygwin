@@ -1,7 +1,9 @@
 ; Motorola M68000 family CPU description.  -*- Scheme -*-
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
+
+(define-rtl-version 0 8)
 
 ; NOTE: this file is still strictly WORK-IN-PROGRESS.
 
@@ -55,15 +57,13 @@
 
 (define-keyword
   (name dr-names)
-  (print-name h-dr)
-  (prefix "")
-  (values (d0 0)  (d1 1) (d2 2)  (d3 3)  (d4 4)  (d5 5)  (d6 6)  (d7 7))
+  (enum-prefix H-DR-)
+  (values (d0 0) (d1 1) (d2 2) (d3 3) (d4 4) (d5 5) (d6 6) (d7 7))
 )
 
 (define-keyword
   (name ar-names)
-  (print-name h-ar)
-  (prefix "")
+  (enum-prefix H-AR-)
   (values (a0 0) (a1 1) (a2 2) (a3 3) (a4 4) (a5 5) (a6 6) (a7 7)
 	  (sp 7))
 )

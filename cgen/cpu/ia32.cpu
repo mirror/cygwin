@@ -1,11 +1,13 @@
 ; Intel IA32 CPU description.  -*- Scheme -*-
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2009 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 ;
 ; References:
 ;
 ; Intel486 Processor Family, Programmer's Reference Manual, Intel
+
+(define-rtl-version 0 8)
 
 (include "simplify.inc")
 
@@ -150,8 +152,8 @@
 
 (define-keyword
   (name gr8-names)
-  (print-name h-gr8)
-  (prefix "%")
+  (enum-prefix H-GR8-)
+  (name-prefix "%")
   (values (al 0) (cl 1) (dl 2) (bl 3) (ah 4) (ch 5) (dh 6) (bh 7))
 )
 
@@ -173,8 +175,8 @@
 
 (define-keyword
   (name gr16-names)
-  (print-name h-gr16)
-  (prefix "%")
+  (enum-prefix H-GR16-)
+  (name-prefix "%")
   (values (ax 0) (cx 1) (dx 2) (bx 3) (sp 4) (bp 5) (si 6) (di 7))
 )
 
@@ -190,8 +192,8 @@
 
 (define-keyword
   (name gr-names)
-  (print-name h-gr)
-  (prefix "%")
+  (enum-prefix H-GR-)
+  (name-prefix "%")
   (values (eax 0) (ecx 1) (edx 2) (ebx 3) (esp 4) (ebp 5) (esi 6) (edi 7))
 )
 

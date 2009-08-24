@@ -48,7 +48,7 @@
  <keyword> 'test-data
  (lambda (self ops)
    (let* ((test-cases (elm-get self 'values))
-	  (prefix (elm-get self 'prefix))
+	  (prefix (elm-get self 'name-prefix))
 	  (find-kw (lambda (val)
 		     (find-first (lambda (kw) (= (cadr kw) val)) test-cases))))
      (map (lambda (n)

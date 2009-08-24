@@ -22,6 +22,7 @@ its CPU description language.
 * Hardware elements::           Elements of a CPU
 * Instruction fields::          Fields of an instruction
 * Enumerated constants::        Assigning useful names to important numbers
+* Keywords::                    Like enums, plus string table
 * Instruction operands::        Operands of instructions
 * Derived operands::            Operands for CISC-like architectures
 * Instructions::                Instructions
@@ -174,10 +175,12 @@ Syntax:
 
 If the version is set multiple times the behavior is undefined.
 
-The current RTL version is 0.7:
+The default RTL version, if @samp{define-rtl-version} is elided, is 0.7.
+
+The latest RTL version is 0.8:
 
 @example
-(define-rtl-version 0 7)
+(define-rtl-version 0 8)
 @end example
 
 Every increment in major and minor versions is generally non-upward
@@ -196,6 +199,41 @@ CGEN currently supports the following RTL versions.
 This is the original RTL version.
 It is the default if no version is specified.
 It is supported by CGEN versions 1.0, 1.1, and the current development tree.
+Support for it will probably be removed for the CGEN 1.2 release.
+
+@item 0.8 @code{(define-rtl-version 0 8)}
+
+This version changed the syntax for defining keywords.
+The @samp{print-name} field was renamed to @samp{enum-prefix}
+and the @samp{prefix} field was renamed to @samp{name-prefix}.
+
+Previous syntax:
+
+@smallexample
+(define-keyword
+  (name keyword-name)
+  (comment "description")
+  (attrs attribute-list)
+  (mode mode-name)
+  (print-name "prefix-for-enum-values")
+  (prefix "prefix-for-names-in-string-table")
+  (values value-list)
+)
+@end smallexample
+
+New syntax:
+
+@smallexample
+(define-keyword
+  (name keyword-name)
+  (comment "description")
+  (attrs attribute-list)
+  (mode mode-name)
+  (enum-prefix "prefix-for-enum-values")
+  (name-prefix "prefix-for-names-in-string-table")
+  (values value-list)
+)
+@end smallexample
 
 @end itemize
 
@@ -962,24 +1000,30 @@ The syntax is:
 where @samp{index-type} specifies the kind of index and @samp{arg1 arg2 ...}
 are arguments to @samp{index-type}.
 
-The are two supported values for @samp{index-type}: @code{keyword}
+There are two supported values for @samp{index-type}: @code{keyword}
 and @code{extern-keyword}.  The difference is that indices defined with
 @code{keyword} are kept internal to the hardware element's definition
 and are not usable elsewhere, whereas @code{extern-keyword} specifies
-a set of indices defined elsewhere.
+a set of indices defined elsewhere with @code{define-keyword}.
 
 @subsubsection keyword
 
 @example
-@code{(indices keyword "prefix" ((name1 value1) (name2 value2) ...))}
+@code{(indices keyword name-prefix ((name1 value1) (name2 value2) ...))}
 @end example
 
-@samp{prefix} is the common prefix for each of the index names.
+@samp{name-prefix} is the assembler prefix common to each of the index names,
+and is added to name in the generated lookup table.
 For example, SPARC registers usually begin with @samp{"%"}.
 
 Each @samp{(name value)} pair maps a name with an index number.
 An index can be specified multiple times, for example, when a register
 has multiple names.
+
+There may be gaps in the index list, e.g. for invalid/reserved registers.
+
+No enum is defined for keywords defined this way.
+If you want an enum use @samp{define-keyword} and @samp{extern-keyword}.
 
 Example from Thumb:
 
@@ -1002,13 +1046,18 @@ Example from Thumb:
 @code{(indices extern-keyword keyword-name)}
 @end example
 
+Often one wants to make the keywords available for general use,
+i.e. to arbitrary tools.
+@xref{Keywords}.
+When the collection of indices is defined with @samp{define-keyword}
+refer to it in the @samp{indices} field with @samp{extern-keyword}.
+
 Example from M32R:
 
 @example
 (define-keyword
   (name gr-names)
-  (print-name h-gr)
-  (prefix "")
+  (enum-prefix H-GR-)
   (values (fp 13) (lr 14) (sp 15)
 	  (r0 0) (r1 1) (r2 2) (r3 3) (r4 4) (r5 5) (r6 6) (r7 7)
 	  (r8 8) (r9 9) (r10 10) (r11 11) (r12 12) (r13 13) (r14 14) (r15 15))
@@ -1574,11 +1623,19 @@ use define-normal-insn-enum instead}.
 Convention requires each enum value to be prefixed with the same text.
 Rather than specifying the prefix in each entry, it is specified once, here.
 Convention requires @samp{prefix} not contain any lowercase characters.
+You generally want to end @samp{prefix} with @samp{-} or @samp{_}
+as the complete name of each enum value is @samp{prefix} + @samp{value-name}.
+The convention is to use @samp{-}, though this convention is not
+adhered to as well as the other conventions.
+@c FIXME
+
+The default value is @samp{""}.
 
 @subsection ifield
 The name of the instruction field that the enum is intended for.  This
 must be a simple ifield, not a multi-ifield.
 
+@anchor{a-enum-values}
 @subsection values
 A list of possible values.  Each element has one of the following forms:
 
@@ -1592,6 +1649,8 @@ A list of possible values.  Each element has one of the following forms:
 
 The syntax for numbers is Scheme's, so hex numbers are @code{#xnnnn}.
 A value of @code{-} means use the next value (previous value plus 1).
+
+Enum values currently always have mode @samp{INT}.
 
 Example:
 
@@ -1628,7 +1687,76 @@ Example:
 @end example
 
 This defines an instruction enum for field @samp{f-op1} with values
-OP1_0, OP1_1, ..., OP1_15.
+OP1_0, OP1_1, ..., OP1_15.  These values can be directly used in
+instruction format specs.  This applies to ``instruction enums'' only.
+One can use normal enums in instruction format specs but one needs to
+explicitly specify the ifield, e.g. (f-op1 OP1_0).
+
+@node Keywords
+@section Keywords
+@cindex Keywords
+
+Keywords are like enums, @xref{Enumerated constants},
+but they also cause a table of names of each value to be generated.
+This is useful for things like registers where you want
+arbitrary tools to have access to the table of names.
+
+Syntax:
+
+@example
+(define-keyword
+  (name keyword-name)
+  (comment "description")
+  (attrs attribute-list)
+  (mode mode-name)
+  (enum-prefix "prefix-for-enum-values")
+  (name-prefix "prefix-for-names-in-string-table")
+  (values value-list)
+)
+@end example
+
+@subsection mode
+
+This is the mode to reference and record the keyword's value in.
+The default is @samp{INT}.  It is normally not necessary to use
+something else.
+
+@subsection enum-prefix
+
+This value is passed as the @samp{prefix} parameter when defining the
+corresponding enum.  @xref{Enumerated constants}.
+Convention requires @samp{enum-prefix} not contain any lowercase characters.
+
+The default value is the keyword's name in uppercase + @samp{-}.
+
+@subsection name-prefix
+
+@samp{name-prefix} is the assembler prefix common to each of the index names,
+and is added to name in the generated lookup table.
+For example, SPARC registers usually begin with @samp{"%"}.
+It is @emph{not} added to the corresponding enum value names.
+
+The default value is @samp{""}.
+
+@subsection values
+
+The @samp{values} field has the same syntax as the @samp{values}
+field of @samp{define-enum}.  @xref{a-enum-values, Enum Values}.
+
+Example from M32R:
+
+@smallexample
+(define-keyword
+  (name gr-names)
+  (enum-prefix H-GR-)
+  (values (fp 13) (lr 14) (sp 15)
+	  (r0 0) (r1 1) (r2 2) (r3 3) (r4 4) (r5 5) (r6 6) (r7 7)
+	  (r8 8) (r9 9) (r10 10) (r11 11) (r12 12) (r13 13) (r14 14) (r15 15))
+)
+@end smallexample
+
+Referencing enum values from this keyword in the .cpu file would use
+@samp{H-GR-} + @samp{register-name}.  E.g., H-GR-r12.
 
 @node Instruction operands
 @section Instruction operands

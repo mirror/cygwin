@@ -749,6 +749,8 @@
 			 (rtx-make-ifield expr)
 			 expected mode parent-expr op-pos tstate appstuff))
 		       ((enum-lookup-val expr)
+			;; ??? If enums could have modes other than INT,
+			;; we'd want to propagate that mode here.
 			(-rtx-traverse
 			 (rtx-make-enum 'INT expr)
 			 expected mode parent-expr op-pos tstate appstuff))

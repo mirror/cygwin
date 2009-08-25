@@ -333,13 +333,13 @@ static void\n"
   CPU_PC_FETCH (cpu) = " (gen-sym (mach-cpu mach)) "_h_pc_get;
   CPU_PC_STORE (cpu) = " (gen-sym (mach-cpu mach)) "_h_pc_set;
   CPU_GET_IDATA (cpu) = @cpu@_get_idata;
-  CPU_MAX_INSNS (cpu) = @CPU@_INSN__MAX;
+  CPU_MAX_INSNS (cpu) = @PREFIX@_INSN__MAX;
   CPU_INSN_NAME (cpu) = cgen_insn_name;
-  CPU_FULL_ENGINE_FN (cpu) = @cpu@_engine_run_full;
+  CPU_FULL_ENGINE_FN (cpu) = @prefix@_engine_run_full;
 #if WITH_FAST
-  CPU_FAST_ENGINE_FN (cpu) = @cpu@_engine_run_fast;
+  CPU_FAST_ENGINE_FN (cpu) = @prefix@_engine_run_fast;
 #else
-  CPU_FAST_ENGINE_FN (cpu) = @cpu@_engine_run_full;
+  CPU_FAST_ENGINE_FN (cpu) = @prefix@_engine_run_full;
 #endif
 }
 

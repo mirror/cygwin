@@ -1,5 +1,11 @@
 2009-08-25  Doug Evans  <dje@sebabeach.org>
 
+	* sim-model.scm (-gen-mach-defns): Use @PREFIX@_INSN__MAX instead of
+	@CPU@_INSN__MAX.  Use @prefix@ instead of @cpu@ for engine_run
+	routines.
+
+2009-08-25  Doug Evans  <dje@sebabeach.org>
+
 	* doc/pmacros.texi (pmacro default argument values): Add text.
 
 2009-08-23  Doug Evans  <dje@sebabeach.org>

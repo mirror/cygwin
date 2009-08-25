@@ -1,3 +1,7 @@
+2009-08-25  Doug Evans  <dje@sebabeach.org>
+
+	* doc/pmacros.texi (pmacro default argument values): Add text.
+
 2009-08-23  Doug Evans  <dje@sebabeach.org>
 
 	* hardware.scm (<keyword>): Rename member print-name -> enum-prefix.

@@ -281,7 +281,7 @@ Specify default values with the following syntax.
 )
 @end smallexample
 
-To invoke a pmacro with default values for some (or all)
+To invoke a pmacro with default values for some, or all,
 arguments, you @emph{must} specify arguments by name.
 
 Example:

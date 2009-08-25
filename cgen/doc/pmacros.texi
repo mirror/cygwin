@@ -281,6 +281,9 @@ Specify default values with the following syntax.
 )
 @end smallexample
 
+To invoke a pmacro with default values for some (or all)
+arguments, you @emph{must} specify arguments by name.
+
 Example:
 
 @smallexample
@@ -288,7 +291,9 @@ Example:
   (bar arg1 arg2)
 )
 
-(foo #:arg2 33) ==> (bar 1 33)
+(foo #:arg1 4) ==> (bar 4 2)
+
+(foo 4) ==> ERROR, must invoke pmacro by specifying arguments by name
 @end smallexample
 
 @node Multiple result statements

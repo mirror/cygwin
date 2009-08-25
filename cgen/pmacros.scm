@@ -311,7 +311,7 @@
 )
 
 ; Invoke a syntactic-form pmacro.
-; ENV is handed down from -pmacro-expand.
+; ENV, LOC are handed down from -pmacro-expand.
 
 (define (-smacro-apply macro args env loc)
   (apply (-pmacro-transformer macro)

@@ -1,4 +1,4 @@
-2009-08-25  Doug Evans  <dje@sebabeach.org>
+2009-08-25  Dave Korn  <dave.korn.cygwin@googlemail.com>
 
 	* sim-model.scm (-gen-mach-defns): Use @PREFIX@_INSN__MAX instead of
 	@CPU@_INSN__MAX.  Use @prefix@ instead of @cpu@ for engine_run

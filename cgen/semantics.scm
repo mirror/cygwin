@@ -186,7 +186,8 @@
 
 	  (cadr existing-op)
 
-	  (let ((xop (make <operand> f-name f-name
+	  (let ((xop (make <operand> (obj-location f)
+			   f-name f-name
 			   (atlist-cons (bool-attr-make 'SEM-ONLY #t)
 					(obj-atlist f))
 			   (obj:name (ifld-hw-type f))
@@ -230,7 +231,8 @@
 
 	      (cadr existing-op)
 
-	      (let ((xop (make <operand> f-name f-name
+	      (let ((xop (make <operand> (if (source-ident? f) (obj-location f) #f)
+			       f-name f-name
 			       (atlist-cons (bool-attr-make 'SEM-ONLY #t)
 					    (obj-atlist f))
 			       (obj:name (ifld-hw-type f))

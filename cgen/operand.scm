@@ -102,7 +102,9 @@
 
 (method-make!
  <operand> 'make!
- (lambda (self name comment attrs hw-name mode-name index handlers getter setter)
+ (lambda (self location name comment attrs
+	       hw-name mode-name index handlers getter setter)
+   (elm-set! self 'location location)
    (elm-set! self 'name name)
    (elm-set! self 'sem-name name)
    (elm-set! self 'pretty-sem-name hw-name)
@@ -249,7 +251,7 @@
 (method-make!
  <pc> 'make!
  (lambda (self)
-   (send-next self 'make! 'pc "program counter"
+   (send-next self 'make! (builtin-location) 'pc "program counter"
 	      (atlist-parse (make-prefix-context "make! of pc")
 			    '(SEM-ONLY) "cgen_operand")
 	      'h-pc
@@ -592,6 +594,7 @@
 			  (make <hw-index> (symbol-append 'i- name)
 				'ifield 'UINT ifld-val)))))
 	    (make <operand>
+	      (context-location context)
 	      name
 	      (parse-comment context comment)
 	      ; Copy FLD's attributes so one needn't duplicate attrs like

@@ -1,5 +1,15 @@
 2009-08-26  Doug Evans  <dje@sebabeach.org>
 
+	* ifield.scm (<ifield> constructor): New arg `location',
+	all callers updated.
+	* insn.scm (<insn> constructor): Ditto.
+	(<multi-insn> constructor): Ditto.
+	* minsn.scm (<macro-insn> constructor): Ditto.
+	* operand.scm (<operand> constructor): Ditto.
+	* utils-cgen.scm (builtin-location): New function.
+	(<source-ident>): Fix default value of member `location'.
+	(source-ident?): New function.
+
 	* rtl-traverse.scm (estate-new-env): Rename arg state -> estate.
 	(estate-push-env, estate-with-modifiers): Ditto.
 	(estate-deepen): New function.

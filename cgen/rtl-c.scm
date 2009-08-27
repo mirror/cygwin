@@ -1280,7 +1280,7 @@
       (cx:make 'UINT (gen-c-symbol ifld-name))
       (cx:make 'UINT (string-append "FLD (" (gen-c-symbol ifld-name) ")")))
 ;  (let ((f (current-ifld-lookup ifld-name)))
-;    (make <operand> ifld-name ifld-name
+;    (make <operand> (obj-location f) ifld-name ifld-name
 ;	  (atlist-cons (bool-attr-make 'SEM-ONLY #t)
 ;		       (obj-atlist f))
 ;	  (obj:name (ifld-hw-type f))

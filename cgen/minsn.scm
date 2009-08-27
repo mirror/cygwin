@@ -34,7 +34,8 @@
 	      nil)
 )
 
-(method-make-make! <macro-insn> '(name comment attrs syntax expansions))
+(method-make-make! <macro-insn>
+		   '(location name comment attrs syntax expansions))
 
 ; Accessor fns
 
@@ -89,6 +90,7 @@
     (if (keep-atlist? atlist-obj #f)
 
 	(let ((result (make <macro-insn>
+			(context-location context)
 			name
 			(parse-comment context comment)
 			atlist-obj
@@ -223,6 +225,7 @@
 	(parse-error context "unknown real insn in expansion" minsn))
 
     (let ((i (make <insn>
+		   (context-location context)
 		   (obj:name minsn)
 		   (obj:comment minsn)
 		   (obj-atlist minsn)

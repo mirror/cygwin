@@ -180,6 +180,12 @@
   (make <location> (list (make-single-location "unspecified" 0 0 #f)))
 )
 
+;;; Return a location denoting a builtin object.
+
+(define (builtin-location)
+  (make <location> (list (make-single-location "builtin" 0 0 #f)))
+)
+
 ;;; Return a <location> object for the current input port.
 ;;; END? is true if the location marks the end of the expression.
 
@@ -246,7 +252,7 @@
   (class-make '<source-ident> '(<ident>)
 	      '(
 		;; A <location> object.
-		(location . ())
+		(location . #f)
 		;; #f for ordinal means "unassigned"
 		(ordinal . #f)
 		)
@@ -265,6 +271,10 @@
 	      (lambda (self newval) (elm-set! self 'ordinal newval)))
 (define (obj-ordinal obj) (send obj 'get-ordinal))
 (define (obj-set-ordinal! obj ordinal) (send obj 'set-ordinal! ordinal))
+
+; Return a boolean indicating if X is a <source-ident>.
+
+(define (source-ident? x) (class-instance? <source-ident> x))
 
 ; Parsing utilities
 

@@ -59,7 +59,8 @@
       (OPTIONS DFLTMODE SYMBOL) (NA NA NA)
       ARG
       (let ((f (current-ifld-lookup ifld-name)))
-	(make <operand> ifld-name (string-append ifld-name " used as operand")
+	(make <operand> (obj-location f)
+	      ifld-name (string-append ifld-name " used as operand")
 	      (atlist-cons (bool-attr-make 'SEM-ONLY #t)
 			   (obj-atlist f))
 	      (obj:name (ifld-hw-type f))
@@ -188,7 +189,8 @@
       (let* ((operand (rtx-eval-with-estate op-rtx 'DFLT *estate*))
 	     (f (hw-index:value (op:index operand)))
 	     (f-name (obj:name f)))
-	(make <operand> f-name f-name
+	(make <operand> (if (source-ident? f) (obj-location f) #f)
+	      f-name f-name
 	      (atlist-cons (bool-attr-make 'SEM-ONLY #t)
 			   (obj-atlist f))
 	      (obj:name (ifld-hw-type f))

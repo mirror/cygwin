@@ -1,3 +1,9 @@
+2009-08-26  Doug Evans  <dje@sebabeach.org>
+
+	* rtl-traverse.scm (estate-new-env): Rename arg state -> estate.
+	(estate-push-env, estate-with-modifiers): Ditto.
+	(estate-deepen): New function.
+
 2009-08-25  Dave Korn  <dave.korn.cygwin@googlemail.com>
 
 	* sim-model.scm (-gen-mach-defns): Use @PREFIX@_INSN__MAX instead of

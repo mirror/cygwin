@@ -1134,8 +1134,8 @@ The mode of the result must be the mode of the register.
 
 @code{index} is the name of the index as it appears in @code{expression}.
 
-At present, @code{sequence}, @code{parallel}, and @code{case} expressions
-are not allowed here.
+At present, @code{sequence}, @code{parallel}, @code{do-count}
+and @code{case} expressions are not allowed here.
 
 @subsection set
 
@@ -2533,8 +2533,17 @@ mode of the result, which is defined to be that of the last expression.
 @item (parallel mode empty expr1 ...)
 Execute @samp{expr1}, @samp{expr2}, etc. in parallel. All inputs are
 read before any output is written.  @samp{empty} must be @samp{()} and
-is present for consistency with @samp{sequence}. @samp{mode} must be
-@samp{VOID} (void mode).
+is present for consistency with @samp{sequence}.
+@samp{mode} must be @samp{VOID} (void mode), or it can be elided.
+
+@item (do-count mode number-of-iterations iteration-variable expr1 ...)
+Execute @samp{expr1}, @samp{expr2}, etc. the specified number of times.
+@samp{iteration-variable} will contain the iteration number and is
+available for use in expressions.  It has mode @samp{INT}.
+It's value will be 0 ... @samp{number-of-iterations} - 1.
+@samp{number-of-iterations} must (currently) be a constant non-negative
+integer.
+@samp{mode} must be @samp{VOID} (void mode), or it can be elided.
 
 @item (unop mode operand)
 Perform a unary arithmetic operation. @samp{unop} is one of @code{neg},
@@ -2730,6 +2739,7 @@ Operands can be any of:
 @item a memory reference, created with (mem mode address)
 @item a constant, created with (const mode value)
 @item a `sequence' local variable
+@item a `do-count' iteration variable
 @item another expression
 @end itemize
 

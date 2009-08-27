@@ -328,23 +328,72 @@
   (context-append context (stringsym-append ":" name))
 )
 
-; Call this to issue an error message.
+; Call this to issue an error message when all you have is a context.
 ; CONTEXT is a <context> object or #f if there is none.
-; ARG is the value that had the error if there is one.
+; INTRO is a general introduction to what cgen was doing.
+; ERRMSG is, yes, you guessed it, the error message.
+; EXPR is the value that had the error if there is one.
 
-(define (context-error context errmsg . arg)
-  (cond ((and context (context-location context))
-	 (let ((msg (string-append
-		     "@ "
-		     (location->string (context-location context))
-		     ": "
-		     (context-prefix context) ": "
-		     errmsg ": ")))
-	   (apply error (cons msg arg))))
-	(context (let ((msg (string-append (context-prefix context) ": "
-					   errmsg ": ")))
-		   (apply error (cons msg arg))))
-	(else (apply error (cons (string-append errmsg ": ") arg))))
+(define (context-error context intro errmsg . expr)
+  (apply context-owner-error
+	 (cons context
+	       (cons #f
+		     (cons intro
+			   (cons errmsg expr)))))
+)
+
+; Call this to issue an error message when you have a context and an
+; <ident> or <source-ident> object (we call the "owner").
+; CONTEXT is a <context> object or #f if there is none.
+; OWNER is an <ident> or <source-ident> object or #f if there is none.
+; INTRO is a general introduction to what cgen was doing.
+;   If OWNER is non-#f, the text " of <object-name>" is appended.
+; ERRMSG is, yes, you guessed it, the error message.
+; EXPR is the value that had the error if there is one.
+
+(define (context-owner-error context owner intro errmsg . expr)
+  ;; If we don't have a context, look at the owner to try to find one.
+  ;; We want to include the source location in the error if we can.
+  (if (and (not context)
+	   owner
+	   (source-ident? owner))
+      (set! context (make-obj-context owner #f)))
+  (if (not context)
+      (set! context (make-prefix-context #f)))
+
+  (let* ((loc (context-location context))
+	 (top-sloc (and loc (location-top loc)))
+	 (intro (string-append intro
+			       (if owner
+				   (string-append " of "
+						  (obj:str-name owner))
+				   "")))
+	 (prefix (or (context-prefix context) "Error"))
+	 (text (if prefix
+		   (string-append prefix ": " errmsg)
+		   errmsg)))
+
+    (if loc
+
+	(apply error
+	       (cons
+		(simple-format
+		 #f
+		 "\n~A:\n@ ~A:\n\n~A: ~A:"
+		 intro
+		 (location->string loc)
+		 (single-location->simple-string top-sloc)
+		 text)
+		expr))
+
+	(apply error
+	       (cons
+		(simple-format
+		 #f
+		 "\n~A:\n~A:"
+		 intro
+		 text)
+		expr))))
 )
 
 ; Parse an object name.

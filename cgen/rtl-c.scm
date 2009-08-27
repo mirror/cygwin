@@ -422,11 +422,14 @@
 		 ((-rtx-mode-compatible? mode (cx:mode src))
 		  (cx-new-mode mode src))
 		 (else
-		  (error (string-append "incompatible mode for "
-					"(" (obj:name (cx:mode src)) " vs " (obj:name mode) ") in "
-					"\"" (cx:c src) "\""
-					": ")
-			 (obj:name mode)))))
+		  (estate-error
+		   estate
+		   (string-append "incompatible mode for "
+				  "(" (obj:name (cx:mode src)) " vs "
+				  (obj:name mode) ") in "
+				  "\"" (cx:c src) "\""
+				  ": ")
+		   (obj:name mode)))))
 
 	  ; The recursive call to -rtl-c-get is in case the result of rtx-eval
 	  ; is a hardware object, rtx-func object, or another rtl expression.
@@ -449,9 +452,11 @@
 		    (let ((mode (-rtx-lazy-sem-mode mode)))
 		      (send src 'cxmake-get estate mode #f #f)))
 		   (else
-		    (error (string-append "operand " (obj:str-name src)
-					  " referenced in incompatible mode: ")
-			   (obj:name mode))))))
+		    (estate-error
+		     estate
+		     (string-append "operand " (obj:str-name src)
+				    " referenced in incompatible mode: ")
+		     (obj:name mode))))))
 
 	  ((or (and (symbol? src) (rtx-temp-lookup (estate-env estate) src))
 	       (rtx-temp? src))
@@ -463,9 +468,11 @@
 		   ((-rtx-mode-compatible? mode (rtx-temp-mode src))
 		    (let ((mode (-rtx-lazy-sem-mode mode)))
 		      (send src 'cxmake-get estate mode #f #f)))
-		   (else (error (string-append "sequence temp " (rtx-temp-name src)
-					       " referenced in incompatible mode: ")
-				(obj:name mode))))))
+		   (else (estate-error
+			  estate
+			  (string-append "sequence temp " (rtx-temp-name src)
+					 " referenced in incompatible mode: ")
+			  (obj:name mode))))))
 
 	  ((integer? src)
 	   ; Default mode of string argument is INT.
@@ -479,7 +486,7 @@
 	       (cx:make INT src)
 	       (cx:make mode src)))
 
-	  (else (error "-rtl-c-get: invalid argument:" src))))
+	  (else (estate-error estate "-rtl-c-get: invalid argument:" src))))
 )
 
 (define (rtl-c-get estate mode src)
@@ -507,9 +514,11 @@
 		     ((rtx? dest)
 		      (rtx-eval-with-estate dest mode estate))
 		     (else
-		      (error "rtl-c-set-quiet: invalid dest:" dest)))))
+		      (estate-error estate
+				    "rtl-c-set-quiet: invalid dest:"
+				    dest)))))
     (if (not (object? xdest))
-	(error "rtl-c-set-quiet: invalid dest:" dest))
+	(estate-error estate "rtl-c-set-quiet: invalid dest:" dest))
     (let ((mode (if (mode:eq? 'DFLT mode)
 		    (-rtx-obj-mode xdest)
 		    (-rtx-lazy-sem-mode mode))))
@@ -532,9 +541,11 @@
 		     ((rtx? dest)
 		      (rtx-eval-with-estate dest mode estate))
 		     (else
-		      (error "rtl-c-set-trace: invalid dest:" dest)))))
+		      (estate-error estate
+				    "rtl-c-set-trace: invalid dest:"
+				    dest)))))
     (if (not (object? xdest))
-	(error "rtl-c-set-trace: invalid dest:" dest))
+	(estate-error estate "rtl-c-set-trace: invalid dest:" dest))
     (let ((mode (if (mode:eq? 'DFLT mode)
 		    (-rtx-obj-mode xdest) ; FIXME: internal routines
 		    (-rtx-lazy-sem-mode mode))))
@@ -861,7 +872,7 @@
 
 (define (s-if estate mode cond then . else)
   (if (> (length else) 1)
-      (error "if: too many elements in `else' part" else))
+      (estate-error estate "if: too many elements in `else' part" else))
   (let ()
     (if (or (mode:eq? 'DFLT mode)
 	    (mode:eq? 'VOID mode))
@@ -883,7 +894,7 @@
 				    ") : ("
 				    (cx:c (rtl-c-get estate mode (car else)))
 				    "))"))
-	    (error "non-VoidMode `if' must have `else' part"))))
+	    (estate-error estate "non-void-mode `if' must have `else' part"))))
 )
 
 ; A multiway `if'.
@@ -900,7 +911,7 @@
 (define (s-cond estate mode . cond-code-list)
   (let ((vm? (or (mode:eq? 'DFLT mode) (mode:eq? 'VOID mode))))
     (if (null? cond-code-list)
-	(error "empty `cond'"))
+	(estate-error estate "empty `cond'"))
     (let ((if-part (if vm?  "if (" "("))
 	  (then-part (if vm? ") " ") ? "))
 	  (elseif-part (if vm? " else if (" " : ("))
@@ -995,10 +1006,11 @@
 			  ((symbol? (car cases))
 			   (if (enum-lookup-val (car cases))
 			       (rtx-make 'enum mode (car cases))
-			       (context-error (estate-context estate)
-					      "symbol not an enum"
-					      (car cases))))
-			  (else (error "invalid case" (car cases))))))
+			       (estate-error estate
+					     "symbol not an enum"
+					     (car cases))))
+			  (else
+			   (estate-error estate "invalid case" (car cases))))))
 	  (loop (string-append
 		 result
 		 (if (= (string-length result) 0)
@@ -1298,12 +1310,10 @@
 	((symbol? object-or-name)
 	 (let ((object (current-op-lookup object-or-name)))
 	   (if (not object)
-	       (context-error (estate-context estate)
-			      "undefined operand" object-or-name))
+	       (estate-error estate "undefined operand" object-or-name))
 	   object))
 	(else
-	 (context-error (estate-context estate)
-			"bad arg to `operand'" object-or-name)))
+	 (estate-error estate "bad arg to `operand'" object-or-name)))
 )
 
 (define-fn xop (estate options mode object) 
@@ -1330,12 +1340,10 @@
 	((symbol? object-or-name)
 	 (let ((object (rtx-temp-lookup (estate-env estate) object-or-name)))
 	   (if (not object)
-	       (context-error (estate-context estate)
-			      "undefined local" object-or-name))
+	       (estate-error estate "undefined local" object-or-name))
 	   object))
 	(else
-	 (context-error (estate-context estate)
-			"bad arg to `local'" object-or-name)))
+	 (estate-error estate "bad arg to `local'" object-or-name)))
 )
 
 (define-fn reg (estate options mode hw-elm . indx-sel)
@@ -1363,7 +1371,8 @@
 
 (define-fn ref (estate options mode name)
   (if (not (insn? (estate-owner estate)))
-      (error "ref: not processing an insn"))
+      (estate-error estate "ref: not processing an insn"
+		    (obj:name (estate-owner estate))))
   (cx:make 'UINT
 	   (string-append
 	    "(referenced & (1 << "
@@ -1396,15 +1405,14 @@
 			  ((xop) (op:type (rtx-xop-obj rtx)))
 			  (else #f))))		    	       
 	       (not (and hw (or (pc? hw) (memory? hw) (register? hw)))))
-	     (context-error 
-	      (estate-context estate) 
-	      (string-append 
-	       "(delay ...) rtx applied to wrong type of operand '" (car rtx) "'. should be pc, register or memory")))
+	     (estate-error 
+	      estate
+	      "(delay ...) rtx applied to wrong type of operand, should be pc, register or memory"
+	       (car rtx)))
 	 ;; signal an error if we're delayed and not in a "parallel-insns" CPU
 	 (if (not (with-parallel?)) 
-	     (context-error 	      
-	      (estate-context estate) 
-	      "delayed operand in a non-parallel cpu"))
+	     (estate-error estate "delayed operand in a non-parallel cpu"
+			   (car rtx)))
 	 ;; update cpu-global pipeline bound
 	 (cpu-set-max-delay! (current-cpu) (max (cpu-max-delay (current-cpu)) new-delay))      
 	 ;; pass along new delay to embedded rtx
@@ -1437,7 +1445,8 @@
   (cond ((equal? owner '(current-insn () DFLT))
 	 (s-c-raw-call estate 'INT "GET_ATTR"
 		       (string-upcase (gen-c-symbol attr-name))))
-	(else (error "attr: unsupported object type:" owner)))
+	(else
+	 (estate-error estate "attr: unsupported object type:" owner)))
 )
 
 (define-fn const (estate options mode c)
@@ -1768,5 +1777,7 @@
 )
 
 ; The result is the rtl->c generator table.
+
 table
+
 )) ; End of rtl-c-build-table

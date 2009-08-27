@@ -397,10 +397,16 @@
 ;	 (rtx-lvalue-mode-name estate (rtx-opspec-hw-ref x))
 ;	 (rtx-opspec-mode x)))
 ;    ((reg mem) (cadr x))
-;    ((local) (obj:name (rtx-temp-mode (rtx-temp-lookup (estate-env estate)
-;						       (cadr x)))))
+    ((local) ;; (local options mode name)
+     (let* ((name (cadddr x))
+	    (temp (rtx-temp-lookup (estate-env estate) name)))
+       (if (not temp)
+	   (estate-error estate "unknown local" name))
+       (obj:name (rtx-temp-mode temp))))
     (else
-     (error "rtx-lvalue-mode-name: not an operand or hardware reference:" x)))
+     (estate-error error
+		   "rtx-lvalue-mode-name: not an operand or hardware reference:"
+		   x)))
 )
 
 ; Lookup the mode to use for semantic operations (unsigned modes aren't
@@ -498,7 +504,8 @@
 )
 
 ; Create an initial environment with local variables.
-; VAR-LIST is a list of (mode-name name) elements (the argument to `sequence').
+; VAR-LIST is a list of (mode-name name) elements, i.e. the locals argument to
+; `sequence' or equivalent thereof.
 
 (define (rtx-env-make-locals var-list)
   ; Convert VAR-LIST to an associative list of <rtx-temp> objects.
@@ -515,6 +522,10 @@
 (define (rtx-env-push env-stack env)
   (cons env env-stack)
 )
+
+; Lookup variable NAME in environment ENV.
+; The result is the <rtx-temp> object.
+; ??? Should environments only have rtx-temps?
 
 (define (rtx-temp-lookup env name)
   ;(display "looking up:") (display name) (newline)
@@ -1027,7 +1038,7 @@
 
 (define (e-if estate mode cond then . else)
   (if (> (length else) 1)
-      (error "if: too many elements in `else' part" else))
+      (estate-error estate "if: too many elements in `else' part" else))
   (if (null? else)
       (if cond then)
       (if cond then (car else)))

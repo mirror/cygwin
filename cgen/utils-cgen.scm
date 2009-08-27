@@ -369,9 +369,7 @@
 						  (obj:str-name owner))
 				   "")))
 	 (prefix (or (context-prefix context) "Error"))
-	 (text (if prefix
-		   (string-append prefix ": " errmsg)
-		   errmsg)))
+	 (text (string-append prefix ": " errmsg)))
 
     (if loc
 

@@ -516,6 +516,12 @@
        var-list)
 )
 
+; Create an environment with the iteration local variable of `do-count'.
+
+(define (rtx-env-make-iteration-locals iter-var)
+  (rtx-env-make-locals (list (list 'INT iter-var)))
+)
+
 ; Push environment ENV onto the front of environment stack ENV-STACK,
 ; returning a new object.  ENV-STACK is not modified.
 

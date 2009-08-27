@@ -998,7 +998,7 @@
      #f
 )
 
-; Parallels and Sequences
+; parallel, sequence, do-count
 
 ; This has to be a syntax node as we don't want EXPRS to be pre-evaluated.
 ; All semantic ops must have a mode, though here it must be VOID.
@@ -1017,6 +1017,15 @@
 
 (drsn (sequence &options &mode locals expr . exprs)
       (OPTIONS ANYMODE LOCALS RTX . RTX) (NA NA NA OP0 . OP0)
+      SEQUENCE
+      #f
+)
+
+; This has to be a syntax node to handle iter-var properly: it's not defined
+; yet and thus pre-evaluating the expressions doesn't work.
+
+(drsn (do-count &options &mode nr-times iter-var expr . exprs)
+      (OPTIONS VOIDMODE NUMBER ITERATION RTX . RTX) (NA NA NA NA VOID . VOID)
       SEQUENCE
       #f
 )

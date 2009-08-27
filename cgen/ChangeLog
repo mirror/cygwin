@@ -1,5 +1,26 @@
 2009-08-26  Doug Evans  <dje@sebabeach.org>
 
+	* read.scm (parse-error): Change error message output format
+	to match context-owner-error.
+	* rtl-c.scm (-rtl-c-get): Call estate-error instead of error.
+	(rtl-c-set-quiet, rtl-c-set-trace): Ditto.
+	(s-if, s-cond, -gen-non-vm-case-test): Ditto.
+	(operand): Call estate-error instead of context-error.
+	(local, delay): Ditto.
+	(ref, attr): Call estate-error instead of error.
+	* rtl-traverse.scm (tstate-error): New function.
+	(-rtx-traverse-error): Call tstate-error instead of context-error.
+	(-rtx-traverse-operands, -rtx-traverse): Ditto.
+	(estate-error): New function.
+	* rtl.scm (rtx-lvalue-mode-name): Handle locals.  Call estate-error
+	instead of error.
+	(e-if): Call estate-error instead of error.
+	* rtx-funcs.scm (error): Call estate-error instead of context-error.
+	(member): Ditto.
+	* utils-cgen.scm (context-error): New arg `intro', all callers updated.
+	Rewrite to call context-owner-error.
+	(context-owner-error): New function.
+
 	* ifield.scm (<ifield> constructor): New arg `location',
 	all callers updated.
 	* insn.scm (<insn> constructor): Ditto.

@@ -148,6 +148,16 @@
 (define (tstate-decr-depth! tstate)
   (tstate-set-depth! tstate (1- (tstate-depth tstate)))
 )
+
+; Issue an error given a tstate.
+
+(define (tstate-error tstate errmsg . expr)
+  (apply context-owner-error
+	 (cons (tstate-context tstate)
+	       (cons (tstate-owner tstate)
+		     (cons "During rtx traversal"
+			   (cons errmsg expr)))))
+)
 
 ; Traversal/compilation support.
 
@@ -172,16 +182,14 @@
        rtx-list)
 )
 
-; Cover-fn to context-error for signalling an error during rtx traversal.
+; Cover-fn to tstate-error for signalling an error during rtx traversal
+; of operand OP-NUM.
+; RTL-EXPR must be an rtl expression.
 
-(define (-rtx-traverse-error tstate errmsg expr op-num)
-;  (parse-error (tstate-context context)
-;               (string-append errmsg ", operand number "
-;                              (number->string op-num))
-;               (rtx-dump expr))
-  (context-error (tstate-context tstate)
-		 (string-append errmsg ", operand #" (number->string op-num))
-		 (rtx-strdump expr))
+(define (-rtx-traverse-error tstate errmsg rtl-expr op-num)
+  (tstate-error tstate
+		(string-append errmsg ", operand #" (number->string op-num))
+		(rtx-strdump rtl-expr))
 )
 
 ; Rtx traversers.
@@ -513,12 +521,10 @@
 	     (if (or (null? arg-types)
 		     varargs?)
 		 (reverse! result)
-		 (context-error (tstate-context tstate)
-				"missing operands" (rtx-strdump expr))))
+		 (tstate-error tstate "missing operands" (rtx-strdump expr))))
 
 	    ((null? arg-types)
-	     (context-error (tstate-context tstate)
-			    "too many operands" (rtx-strdump expr)))
+	     (tstate-error tstate "too many operands" (rtx-strdump expr)))
 
 	    (else
 	     (let ((type (if varargs? arg-types (car arg-types)))
@@ -726,8 +732,7 @@
 		     (if rtx-obj
 			 (-rtx-traverse (-rtx-macro-expand expr rtx-evaluator)
 					expected mode parent-expr op-pos tstate appstuff)
-			 (context-error (tstate-context tstate) "unknown rtx function"
-					expr))))))
+			 (tstate-error tstate "unknown rtx function" expr))))))
 	  (tstate-decr-depth! tstate)
 	  result))
 
@@ -755,20 +760,15 @@
 			 (rtx-make-enum 'INT expr)
 			 expected mode parent-expr op-pos tstate appstuff))
 		       (else
-			(context-error (tstate-context tstate)
-				       "unknown operand" expr))))
+			(tstate-error tstate "unknown operand" expr))))
 		((integer? expr)
 		 (-rtx-traverse (rtx-make-const 'INT expr)
 				expected mode parent-expr op-pos tstate appstuff))
 		(else
-		 (context-error (tstate-context tstate)
-				"unexpected operand"
-				expr)))
+		 (tstate-error tstate "unexpected operand" expr)))
 
 	  ; Not expecting RTX or SETRTX.
-	  (context-error (tstate-context tstate)
-			 "unexpected operand"
-			 expr)))
+	  (tstate-error tstate "unexpected operand" expr)))
 )
 
 ; User visible procedures to traverse an rtl expression.
@@ -981,6 +981,16 @@
   (vmake <eval-state>
 	 #:context (tstate-context t)
 	 #:env (tstate-env t))
+)
+
+; Issue an error given an estate.
+
+(define (estate-error estate errmsg . expr)
+  (apply context-owner-error
+	 (cons (estate-context estate)
+	       (cons (estate-owner estate)
+		     (cons "During rtx evalution"
+			   (cons errmsg expr)))))
 )
 
 ; RTL expression evaluation.

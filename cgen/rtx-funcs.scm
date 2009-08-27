@@ -36,7 +36,7 @@
 (drn (error &options &mode message)
      (OPTIONS ANYMODE STRING) (NA NA NA)
      MISC
-     (context-error (estate-context *estate*) message)
+     (estate-error *estate* "error in rtl" message)
 )
 
 ; Enums
@@ -955,9 +955,11 @@
      MISC
      (begin
        (if (not (rtx-constant? value))
-	   (context-error (estate-context *estate*) "value is not a constant" value))
+	   (estate-error *estate* "`member rtx'"
+			 "value is not a constant" value))
        (if (not (rtx-kind? 'number-list set))
-	   (context-error (estate-context *estate*) "set is not a `number-list' rtx" set))
+	   (estate-error *estate* "`member' rtx"
+			 "set is not a `number-list' rtx" set))
        (if (memq (rtx-constant-value value) (rtx-number-list-values set))
 	   (rtx-true)
 	   (rtx-false)))
@@ -1001,7 +1003,7 @@
 ; This has to be a syntax node as we don't want EXPRS to be pre-evaluated.
 ; All semantic ops must have a mode, though here it must be VOID.
 ; IGNORE is for consistency with sequence.  ??? Delete some day.
-; ??? There's no real need for mode either.
+; ??? There's no real need for mode either, but convention requires it.
 
 (drsn (parallel &options &mode ignore expr . exprs)
       (OPTIONS VOIDMODE LOCALS RTX . RTX) (NA NA NA VOID . VOID)

@@ -76,7 +76,9 @@
 		       (current-mach-list))))
       ; Ensure at least one mach is selected.
       (if (null? values)
-	  (context-error context "rtx simplification, no machs selected"
+	  (context-error context
+			 "While simplifying rtl"
+			 "no machs selected"
 			 (rtx-strdump rtx)))
       ; All values equal to the first one?
       (if (all-true? (map (lambda (val)
@@ -103,6 +105,7 @@
 	(value (rtx-eq-attr-value rtx)))
     (if (not (insn? insn))
 	(context-error context
+		       "While simplifying rtl"
 		       "No current insn for `(current-insn)'"
 		       (rtx-strdump rtx)))
     (let ((attr-value (obj-attr-value insn attr)))
@@ -395,11 +398,17 @@
 	 (let ((op (current-op-lookup expr)))
 	   (if op
 	       (rtx-make-operand expr)
-	       (context-error context "can't canonicalize" expr))))
+	       (context-error context
+			      "While canonicalizing rtl"
+			      "can't canonicalize"
+			      expr))))
 	((pair? expr)
 	 expr)
 	(else
-	 (context-error context "can't canonicalize" expr)))
+	 (context-error context
+			"While canonicalizing rtl"
+			"can't canonicalize"
+			expr)))
 )
 
 ;; rtx-compile (and supporting cast)

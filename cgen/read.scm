@@ -333,15 +333,18 @@
       (set! context (make <context> (current-reader-location) #f)))
   (let* ((loc (or (context-location context) (unspecified-location)))
 	 (top-sloc (location-top loc))
-	 (prefix (context-prefix context)))
+	 (intro "While reading description")
+	 (prefix (context-prefix context))
+	 (text (if prefix
+		   (string-append prefix ": " message)
+		   message)))
     (error
      (simple-format
       #f
-      "While reading description:\n~A: ~A:\n  ~S\nReference chain:\n~A~A"
+      "\n~A:\n~A: ~A: ~S\n\nReference chain:\n~A~A"
+      intro
       (single-location->simple-string top-sloc)
-      (if prefix
-	  (string-append prefix ": " message)
-	  message)
+      text
       expr
       (location->string loc)
       (if (null? maybe-help-text)

@@ -1,3 +1,15 @@
+2009-08-27  Doug Evans  <dje@sebabeach.org>
+
+	Add do-count rtl function.
+	* rtl-c.scm (s-do-count): New function.
+	(do-count): New rtl handler.
+	* rtl-traverse.scm (-rtx-traverse-iteration): New function.
+	(-rtx-make-traverser-table): Add ITERATION.
+	* rtl.scm (rtx-env-make-iteration-locals): New function.
+	* rtx-funcs.scm (do-count): New rtl function.
+	* cpu/play.cpu: Add do-count-test insn.
+	* doc/rtl.texi: Add docs on do-count.
+
 2009-08-26  Doug Evans  <dje@sebabeach.org>
 
 	* read.scm (parse-error): Change error message output format

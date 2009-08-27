@@ -200,7 +200,7 @@
      (+ OP1_4 OP2_1 dr sr)
      (sequence ((WI tmp1))
 	       (parallel ()
-			 (set tmp1 (add dr sr))
+			 (set (local DFLT tmp1) (add dr sr))
 			 (set vbit (add-oflag dr sr (const 0)))
 			 (set cbit (add-cflag dr sr (const 0))))
 	       (set zbit (zflag tmp1))
@@ -351,3 +351,11 @@
 (load-op h OP2_10 HI ext-expr)
 (load-op ub OP2_9 QI zext-expr)
 (load-op uh OP2_11 HI zext-expr)
+
+(dni do-count-test "do-count-test"
+     ()
+     "do-count-test $dr,$sr"
+     (+ OP1_7 OP2_0 dr sr)
+     (do-count VOID 4 iter (set dr (add sr iter)))
+     ()
+)

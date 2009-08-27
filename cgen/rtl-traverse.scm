@@ -378,6 +378,14 @@
     (cons val (tstate-push-env tstate env)))
 )
 
+(define (-rtx-traverse-iteration val mode expr op-num tstate appstuff)
+  (if (not (symbol? val))
+      (-rtx-traverse-error tstate "bad iteration variable name"
+			   expr op-num))
+  (let ((env (rtx-env-make-iteration-locals val)))
+    (cons val (tstate-push-env tstate env)))
+)
+
 (define (-rtx-traverse-env val mode expr op-num tstate appstuff)
   ; VAL is an environment stack.
   (if (not (list? val))
@@ -457,6 +465,7 @@
 	  (cons 'CONDRTX (/fastcall-make -rtx-traverse-condrtx))
 	  (cons 'CASERTX (/fastcall-make -rtx-traverse-casertx))
 	  (cons 'LOCALS (/fastcall-make -rtx-traverse-locals))
+	  (cons 'ITERATION (/fastcall-make -rtx-traverse-iteration))
 	  (cons 'ENV (/fastcall-make -rtx-traverse-env))
 	  (cons 'ATTRS (/fastcall-make -rtx-traverse-attrs))
 	  (cons 'SYMBOL (/fastcall-make -rtx-traverse-symbol))

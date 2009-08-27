@@ -331,25 +331,25 @@
 (define (parse-error context message expr . maybe-help-text)
   (if (not context)
       (set! context (make <context> (current-reader-location) #f)))
+
   (let* ((loc (or (context-location context) (unspecified-location)))
 	 (top-sloc (location-top loc))
 	 (intro "While reading description")
-	 (prefix (context-prefix context))
-	 (text (if prefix
-		   (string-append prefix ": " message)
-		   message)))
+	 (prefix (or (context-prefix context) "Error"))
+	 (text (string-append prefix ": " message)))
+
     (error
      (simple-format
       #f
-      "\n~A:\n~A: ~A: ~S\n\nReference chain:\n~A~A"
+      "\n~A:\n@ ~A:\n\n~A: ~A: ~S~A"
       intro
+      (location->string loc)
       (single-location->simple-string top-sloc)
       text
       expr
-      (location->string loc)
       (if (null? maybe-help-text)
 	  ""
-	  (string-append "\n" (car maybe-help-text))))))
+	  (string-append "\n\n" (car maybe-help-text))))))
 )
 
 ; Return the current source location.

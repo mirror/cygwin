@@ -1240,6 +1240,28 @@
 				exprs))
 		  (if (rtx-env-empty? env) ")" "; })")))))
 )
+
+; Return a <c-expr> node for a `do-count'.
+
+(define (s-do-count estate nr-times iter-var . exprs)
+  (let* ((env (rtx-env-make-iteration-locals iter-var))
+	 (estate (estate-push-env estate env))
+	 (c-iter-var (rtx-temp-value (rtx-temp-lookup (estate-env estate) iter-var))))
+    (cx:make VOID
+	     (string-append
+	      "{\n"
+	      (gen-temp-defs estate env)
+	      "  for (" c-iter-var " = 0;\n"
+	      "       " c-iter-var " < " (number->string nr-times) ";\n"
+	      "       ++" c-iter-var ")\n"
+	      "  {\n"
+	      (string-map (lambda (e)
+			    (rtl-c-with-estate estate DFLT e))
+			  exprs)
+	      "  }\n"
+	      "}\n"))
+    )
+)
 
 ; *****************************************************************************
 ;
@@ -1769,6 +1791,11 @@
 (define-fn sequence (estate options mode locals expr . exprs)
   (apply s-sequence
 	 (cons estate (cons mode (cons locals (cons expr exprs)))))
+)
+
+(define-fn do-count (estate options mode nr-times iter-var expr . exprs)
+  (apply s-do-count
+	 (cons estate (cons nr-times (cons iter-var (cons expr exprs)))))
 )
 
 (define-fn closure (estate options mode expr env)

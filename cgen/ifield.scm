@@ -61,7 +61,8 @@
 ; {value},{follows} are missing on purpose.
 ; {value} is handled specially.
 ; {follows} is rarely used
-(method-make-make! <ifield> '(name comment attrs mode bitrange encode decode))
+(method-make-make! <ifield>
+		   '(location name comment attrs mode bitrange encode decode))
 
 ; Accessor fns
 ; ??? `value' is treated specially, needed anymore?
@@ -488,6 +489,7 @@
 
 	    (let ((result
 		   (make <ifield>
+			 (context-location context)
 			 name
 			 (parse-comment context comment)
 			 atlist
@@ -1188,18 +1190,20 @@ Define an instruction multi-field, all arguments specified.
     '(comment "value is unsigned"))
   ; Also (defined elsewhere): VIRTUAL
 
-  (set! f-nil (make <ifield> 'f-nil "empty ifield"
+  (set! f-nil (make <ifield> (builtin-location)
+		    'f-nil "empty ifield"
 		    (atlist-cons (all-isas-attr) nil)
 		    UINT
 		    (make <bitrange> 0 0 0 0 #f)
 		    #f #f)) ; encode/decode
   (current-ifld-add! f-nil)
 
-  (set! f-anyof (make <ifield> 'f-anyof "placeholder for anyof operands"
-		    (atlist-cons (all-isas-attr) nil)
-		    UINT
-		    (make <bitrange> 0 0 0 0 #f)
-		    #f #f)) ; encode/decode
+  (set! f-anyof (make <ifield> (builtin-location)
+		      'f-anyof "placeholder for anyof operands"
+		      (atlist-cons (all-isas-attr) nil)
+		      UINT
+		      (make <bitrange> 0 0 0 0 #f)
+		      #f #f)) ; encode/decode
   (current-ifld-add! f-anyof)
 
   *UNSPECIFIED*

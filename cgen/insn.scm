@@ -81,8 +81,8 @@
 )
 
 (method-make-make! <insn>
-		   '(name comment attrs syntax iflds ifield-assertion
-			  semantics timing)
+		   '(location name comment attrs syntax iflds ifield-assertion
+		     semantics timing)
 )
 
 ; Accessor fns
@@ -182,8 +182,8 @@
 )
 
 (method-make-make! <multi-insn>
-		   '(name comment attrs syntax iflds ifield-assertion
-			  semantics timing)
+		   '(location name comment attrs syntax iflds ifield-assertion
+		     semantics timing)
 )
 
 (define-getters <multi-insn> multi-insn (sub-insns))
@@ -294,6 +294,7 @@
 
 	(let ((sub-insn
 	       (make <insn>
+		     (obj-location insn)
 		     (apply symbol-append
 			    (cons (obj:name insn)
 				  (map (lambda (anyof)
@@ -418,6 +419,7 @@
 	  (if (anyof-operand-format? format)
 
 	      (make <multi-insn>
+		(context-location context)
 		name comment atlist-obj
 		syntax
 		format
@@ -426,6 +428,7 @@
 		timing)
 
 	      (make <insn>
+		(context-location context)
 		name comment atlist-obj
 		syntax
 		format

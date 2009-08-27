@@ -940,29 +940,37 @@
   (object-copy-top estate)
 )
 
-; Create a copy of STATE with a new environment ENV.
+; Create a copy of ESTATE with a new environment ENV.
 
-(define (estate-new-env state env)
-  (let ((result (estate-copy state)))
+(define (estate-new-env estate env)
+  (let ((result (estate-copy estate)))
     (estate-set-env! result env)
     result)
 )
 
-; Create a copy of STATE with environment ENV pushed onto the existing
+; Create a copy of ESTATE with environment ENV pushed onto the existing
 ; environment list.
 ; There's no routine to pop the environment list as there's no current
 ; need for it: we make a copy of the state when we push.
 
-(define (estate-push-env state env)
-  (let ((result (estate-copy state)))
+(define (estate-push-env estate env)
+  (let ((result (estate-copy estate)))
     (estate-set-env! result (cons env (estate-env result)))
     result)
 )
 
-; Create a copy of STATE with modifiers MODS.
+; Create a copy of ESTATE with the depth incremented by one.
 
-(define (estate-with-modifiers state mods)
-  (let ((result (estate-copy state)))
+(define (estate-deepen estate)
+  (let ((result (estate-copy estate)))
+    (estate-set-depth! result (1+ (estate-depth estate)))
+    result)
+)
+
+; Create a copy of ESTATE with modifiers MODS.
+
+(define (estate-with-modifiers estate mods)
+  (let ((result (estate-copy estate)))
     (estate-set-modifiers! result (append mods (estate-modifiers result)))
     result)
 )

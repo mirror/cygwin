@@ -38,8 +38,6 @@ cpu/sparc.cpu
 cpu/xstormy16.cpu
 "
 
-archs="$archs cpu/cyclops2.cpu"
-
 if [ ! -f opcodes.scm ]
 then
     echo "Not in the src/cgen directory." >& 2

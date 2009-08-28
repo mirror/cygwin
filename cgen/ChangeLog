@@ -5,7 +5,8 @@
 	(do-count): New rtl handler.
 	* rtl-traverse.scm (-rtx-traverse-iteration): New function.
 	(-rtx-make-traverser-table): Add ITERATION.
-	* rtl.scm (rtx-env-make-iteration-locals): New function.
+	* rtl.scm (rtx-make-iteration-limit-var): New function.
+	(rtx-env-make-iteration-locals): New function.
 	* rtx-funcs.scm (do-count): New rtl function.
 	* cpu/play.cpu: Add do-count-test insn.
 	* doc/rtl.texi: Add docs on do-count.

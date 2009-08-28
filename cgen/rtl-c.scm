@@ -1243,16 +1243,23 @@
 
 ; Return a <c-expr> node for a `do-count'.
 
-(define (s-do-count estate nr-times iter-var . exprs)
-  (let* ((env (rtx-env-make-iteration-locals iter-var))
+(define (s-do-count estate iter-var nr-times . exprs)
+  (let* ((limit-var (rtx-make-iteration-limit-var iter-var))
+	 (env (rtx-env-make-iteration-locals iter-var))
 	 (estate (estate-push-env estate env))
-	 (c-iter-var (rtx-temp-value (rtx-temp-lookup (estate-env estate) iter-var))))
+	 (temp-iter (rtx-temp-lookup (estate-env estate) iter-var))
+	 (temp-limit (rtx-temp-lookup (estate-env estate) limit-var))
+	 (c-iter-var (rtx-temp-value temp-iter))
+	 (c-limit-var (rtx-temp-value temp-limit)))
     (cx:make VOID
 	     (string-append
 	      "{\n"
 	      (gen-temp-defs estate env)
+	      "  " c-limit-var " = "
+	      (cx:c (rtl-c-get estate (rtx-temp-mode temp-limit) nr-times))
+	      ";\n"
 	      "  for (" c-iter-var " = 0;\n"
-	      "       " c-iter-var " < " (number->string nr-times) ";\n"
+	      "       " c-iter-var " < " c-limit-var ";\n"
 	      "       ++" c-iter-var ")\n"
 	      "  {\n"
 	      (string-map (lambda (e)
@@ -1793,9 +1800,9 @@
 	 (cons estate (cons mode (cons locals (cons expr exprs)))))
 )
 
-(define-fn do-count (estate options mode nr-times iter-var expr . exprs)
+(define-fn do-count (estate options mode iter-var nr-times expr . exprs)
   (apply s-do-count
-	 (cons estate (cons nr-times (cons iter-var (cons expr exprs)))))
+	 (cons estate (cons iter-var (cons nr-times (cons expr exprs)))))
 )
 
 (define-fn closure (estate options mode expr env)

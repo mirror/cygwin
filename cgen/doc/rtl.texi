@@ -2536,7 +2536,7 @@ read before any output is written.  @samp{empty} must be @samp{()} and
 is present for consistency with @samp{sequence}.
 @samp{mode} must be @samp{VOID} (void mode), or it can be elided.
 
-@item (do-count mode number-of-iterations iteration-variable expr1 ...)
+@item (do-count mode iteration-variable number-of-iterations expr1 ...)
 Execute @samp{expr1}, @samp{expr2}, etc. the specified number of times.
 @samp{iteration-variable} will contain the iteration number and is
 available for use in expressions.  It has mode @samp{INT}.

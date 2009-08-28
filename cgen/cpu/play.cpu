@@ -356,6 +356,9 @@
      ()
      "do-count-test $dr,$sr"
      (+ OP1_7 OP2_0 dr sr)
-     (do-count VOID 4 iter (set dr (add sr iter)))
+     (sequence ()
+	       (do-count VOID iter 4 (set dr (add sr iter)))
+	       (do-count iter (and sr 7) (set dr (add sr iter)))
+	       )
      ()
 )

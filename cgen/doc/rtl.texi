@@ -2527,7 +2527,7 @@ Each argument is interpreted in mode @samp{in-mode}.
 
 @item (sequence mode ((mode1 local1) ...) expr1 ...)
 Execute @samp{expr1}, @samp{expr2}, etc. sequentially.
-At least one expression must be specified, even if the resulting
+At least one expression must be specified, even if the result
 mode is @samp{VOID}.
 
 The result, if non-void-mode, is the value of the last expression.

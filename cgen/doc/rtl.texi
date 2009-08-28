@@ -2525,24 +2525,41 @@ Each argument is interpreted in mode @samp{in-mode}.
 @c ??? Endianness issues have yet to be decided.
 @c Blech.  Time to decide them.
 
-@item (sequence mode ((mode1 local1) ...) expr1 expr2 ...)
-Execute @samp{expr1}, @samp{expr2}, etc. sequentially. @samp{mode} is the
-mode of the result, which is defined to be that of the last expression.
+@item (sequence mode ((mode1 local1) ...) expr1 ...)
+Execute @samp{expr1}, @samp{expr2}, etc. sequentially.
+At least one expression must be specified, even if the resulting
+mode is @samp{VOID}.
+
+The result, if non-void-mode, is the value of the last expression.
+
+@samp{mode} is the mode of the result.
+If @samp{mode} is elided it is set to @samp{VOID} (void mode).
+
 `@code{((mode1 local1) ...)}' is a set of local variables.
 
 @item (parallel mode empty expr1 ...)
 Execute @samp{expr1}, @samp{expr2}, etc. in parallel. All inputs are
-read before any output is written.  @samp{empty} must be @samp{()} and
+read before any output is written.
+At least one expression must be specified.
+
+@samp{empty} must be @samp{()} and
 is present for consistency with @samp{sequence}.
+
 @samp{mode} must be @samp{VOID} (void mode), or it can be elided.
 
 @item (do-count mode iteration-variable number-of-iterations expr1 ...)
+This is a simple looping operation.
 Execute @samp{expr1}, @samp{expr2}, etc. the specified number of times.
+At least one expression must be specified.
+
 @samp{iteration-variable} will contain the iteration number and is
 available for use in expressions.  It has mode @samp{INT}.
 It's value will be 0 ... @samp{number-of-iterations} - 1.
+
 @samp{number-of-iterations} is an rtl expression of mode INT
-(or a compatible mode).
+(or a compatible mode).  It is computed once and may not be modified
+inside the loop.
+
 @samp{mode} must be @samp{VOID} (void mode), or it can be elided.
 
 @item (unop mode operand)

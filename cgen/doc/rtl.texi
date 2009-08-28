@@ -2541,8 +2541,8 @@ Execute @samp{expr1}, @samp{expr2}, etc. the specified number of times.
 @samp{iteration-variable} will contain the iteration number and is
 available for use in expressions.  It has mode @samp{INT}.
 It's value will be 0 ... @samp{number-of-iterations} - 1.
-@samp{number-of-iterations} must (currently) be a constant non-negative
-integer.
+@samp{number-of-iterations} is an rtl expression of mode INT
+(or a compatible mode).
 @samp{mode} must be @samp{VOID} (void mode), or it can be elided.
 
 @item (unop mode operand)

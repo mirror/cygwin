@@ -1024,8 +1024,8 @@
 ; This has to be a syntax node to handle iter-var properly: it's not defined
 ; yet and thus pre-evaluating the expressions doesn't work.
 
-(drsn (do-count &options &mode nr-times iter-var expr . exprs)
-      (OPTIONS VOIDMODE NUMBER ITERATION RTX . RTX) (NA NA NA NA VOID . VOID)
+(drsn (do-count &options &mode iter-var nr-times expr . exprs)
+      (OPTIONS VOIDMODE ITERATION RTX RTX . RTX) (NA NA NA INT VOID . VOID)
       SEQUENCE
       #f
 )

@@ -516,10 +516,19 @@
        var-list)
 )
 
-; Create an environment with the iteration local variable of `do-count'.
+; Return the symbol name of the limit variable of `do-count'
+; given iteration-variable ITER-VAR.
+; ??? We don't publish that this variable is available to use, but we could.
+
+(define (rtx-make-iteration-limit-var iter-var)
+  (symbol-append iter-var '-limit)
+)
+
+; Create an environment with the iteration local variables of `do-count'.
 
 (define (rtx-env-make-iteration-locals iter-var)
-  (rtx-env-make-locals (list (list 'INT iter-var)))
+  (rtx-env-make-locals (list (list 'INT iter-var)
+			     (list 'INT (rtx-make-iteration-limit-var iter-var))))
 )
 
 ; Push environment ENV onto the front of environment stack ENV-STACK,

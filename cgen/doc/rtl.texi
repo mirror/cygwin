@@ -173,7 +173,13 @@ Syntax:
 (define-rtl-version major-version minor-version)
 @end example
 
-If the version is set multiple times the behavior is undefined.
+When setting the RTL version, it must be the first thing done
+in the description file or the behaviour is undefined.
+After the RTL version is set, if it is changed the behavior is undefined.
+
+Note that one can still set it to the same version multiple times.
+This is useful when the description is spread among several files,
+and one is debugging/testing files individually.
 
 The default RTL version, if @samp{define-rtl-version} is elided, is 0.7.
 
@@ -204,6 +210,7 @@ Support for it will probably be removed for the CGEN 1.2 release.
 @item 0.8 @code{(define-rtl-version 0 8)}
 
 This version changed the syntax for defining keywords.
+@xref{Keywords}.
 The @samp{print-name} field was renamed to @samp{enum-prefix}
 and the @samp{prefix} field was renamed to @samp{name-prefix}.
 
@@ -215,7 +222,7 @@ Previous syntax:
   (comment "description")
   (attrs attribute-list)
   (mode mode-name)
-  (print-name "prefix-for-enum-values")
+  (print-name "prefix-for-enum-values-with-trailing-dash")
   (prefix "prefix-for-names-in-string-table")
   (values value-list)
 )
@@ -234,6 +241,15 @@ New syntax:
   (values value-list)
 )
 @end smallexample
+
+Note that @samp{print-name} has been replaced with @samp{enum-prefix}
+and @samp{prefix} has been replaced with @samp{name-prefix}.
+
+Furthermore, there is also a difference between the behavior of
+@samp{print-name} and @samp{enum-prefix}.
+When computing complete enum names with @samp{print-name},
+CGEN adds a @samp{-} between the prefix and the enum name.
+CGEN does not insert a @samp{-} with @samp{enum-prefix}.
 
 @end itemize
 
@@ -1701,7 +1717,24 @@ but they also cause a table of names of each value to be generated.
 This is useful for things like registers where you want
 arbitrary tools to have access to the table of names.
 
-Syntax:
+The syntax for defining keywords changed from RTL version 0.7 to
+RTL version 0.8.  @xref{RTL Versions}.
+
+RTL version 0.7 syntax:
+
+@example
+(define-keyword
+  (name keyword-name)
+  (comment "description")
+  (attrs attribute-list)
+  (mode mode-name)
+  (print-name "prefix-for-enum-values-without-trailing-dash")
+  (prefix "prefix-for-names-in-string-table")
+  (values value-list)
+)
+@end example
+
+RTL version 0.8 syntax:
 
 @example
 (define-keyword
@@ -1715,21 +1748,62 @@ Syntax:
 )
 @end example
 
+Note that @samp{print-name} has been replaced with @samp{enum-prefix}
+and @samp{prefix} has been replaced with @samp{name-prefix}.
+
+Furthermore, there is also a difference between the behavior of
+@samp{print-name} and @samp{enum-prefix}.
+When computing complete enum names with @samp{print-name},
+CGEN adds a @samp{-} between the prefix and the enum name.
+CGEN does not insert a @samp{-} with @samp{enum-prefix}.
+
 @subsection mode
 
 This is the mode to reference and record the keyword's value in.
 The default is @samp{INT}.  It is normally not necessary to use
 something else.
 
+@subsection print-name
+
+@emph{NOTE: This is for RTL version 0.7 only.}
+
+This value plus a trailing @samp{-} is passed as the @samp{prefix}
+parameter when defining the corresponding enum.  @xref{Enumerated constants}.
+
+Convention requires @samp{print-name} not contain any lowercase characters.
+
+The default value is the keyword's name in uppercase.
+
+@subsection prefix
+
+@emph{NOTE: This is for RTL version 0.7 only.}
+
+@samp{prefix} is the assembler prefix common to each of the index names,
+and is added to name in the generated lookup table.
+For example, SPARC registers usually begin with @samp{"%"}.
+It is @emph{not} added to the corresponding enum value names.
+
+The default value is @samp{""}.
+
 @subsection enum-prefix
+
+@emph{NOTE: This is for RTL version 0.8 and higher.
+You must specify the RTL version at the top of the description file.}
 
 This value is passed as the @samp{prefix} parameter when defining the
 corresponding enum.  @xref{Enumerated constants}.
+
+@emph{NOTE:} Unlike @samp{print-name} in RTL version @samp{0.7},
+@samp{-} is not appended when defining the corresponding enum.
+
 Convention requires @samp{enum-prefix} not contain any lowercase characters.
 
 The default value is the keyword's name in uppercase + @samp{-}.
 
 @subsection name-prefix
+
+@emph{NOTE: This is for RTL version 0.8 and higher.
+You must specify the RTL version at the top of the description file.}
 
 @samp{name-prefix} is the assembler prefix common to each of the index names,
 and is added to name in the generated lookup table.

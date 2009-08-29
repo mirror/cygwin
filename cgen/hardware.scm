@@ -268,9 +268,11 @@
   (let* ((name (parse-name context name))
 	 (context (context-append-name context name))
 	 (enum-prefix (or enum-prefix
-			  (string-append ;; default to NAME-
-			   (string-upcase (->string name))
-			   "-"))))
+			  (if (equal? (cgen-rtl-version) '(0 7))
+			      (string-upcase (->string name))
+			      (string-append ;; default to NAME-
+			       (string-upcase (->string name))
+			       "-")))))
 
     ;; FIXME: parse values.
     (let ((result (make <keyword>

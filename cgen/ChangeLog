@@ -1,3 +1,9 @@
+2009-08-29  Doug Evans  <dje@sebabeach.org>
+
+	* hardware.scm (-keyword-parse): Fix `enum-prefix' default for
+	rtl version 0.7.
+	* doc/rtl.texi: Improve docs on rtl 0.7 vs 0.8 differences.
+
 2009-08-27  Doug Evans  <dje@sebabeach.org>
 
 	Add do-count rtl function.

@@ -978,15 +978,15 @@ that is similar to the new port) and use it as a template.
 @item @code{(load "dev.scm")}. This loads in a set of interactive
 development routines.
 @item @code{(load-opc)}. Load the opcodes support.
-@item Edit your @file{cpu/<arch>.cpu} and @file{cpu/<arch>.opc} files.
+@item Edit your @file{cpu/$arch.cpu} and @file{cpu/$arch.opc} files.
         @itemize @bullet
         @item The @file{.cpu} file is the main description file.
 	@item The @file{.opc} file provides additional C support code.
         @end itemize
-@c We don't use @code, etc. here because texi2html doesn't
-@c properly escape <> instead double-quotes inside @code, etc.
-@item (cload #:arch "cpu/<arch>.cpu")
-@item (set-opc-file-path! "cpu/<arch>.opc")
+@c We use $arch instead of <arch> here because texi2html doesn't
+@c properly escape <> instead double-quotes (with or without @code).
+@item @code{(cload #:arch "cpu/$arch.cpu")}
+@item @code{(set-opc-file-path! "cpu/$arch.opc")}
 @item Run each of:
         @itemize @bullet
         @item @code{(cgen-desc.h)}
@@ -1155,10 +1155,10 @@ The same basic procedure for opcodes porting applies here.
 @item Run @code{guile}.
 @item @code{(load "dev.scm")}
 @item @code{(load-sim)}
-@item Edit your @file{cpu/<arch>.cpu} file.
-@c We don't use @code, etc. here because texi2html doesn't
-@c properly escape <> instead double-quotes inside @code, etc.
-@item (cload #:arch "cpu/<arch>.cpu")
+@item Edit your @file{cpu/$arch.cpu} file.
+@c We use $arch instead of <arch> here because texi2html doesn't
+@c properly escape <> instead double-quotes (with or without @code).
+@item @code{(cload #:arch "cpu/$arch.cpu")}
 @item Run each of:
         @itemize @bullet
 	@item @code{(cgen-arch.h)}
@@ -1167,9 +1167,9 @@ The same basic procedure for opcodes porting applies here.
         @end itemize
 @item Repeat steps 4,5,6 until the output looks reasonable.
 @item Edit your @file{cpu/<arch>.cpu} file.
-@c We don't use @code, etc. here because texi2html doesn't
-@c properly escape <> instead double-quotes inside @code, etc.
-@item (cload #:arch "cpu/<arch>.cpu" #:machs "mach1[,mach2[,...]]")
+@c We use $arch instead of <arch> here because texi2html doesn't
+@c properly escape <> instead double-quotes (with or without @code).
+@item @code{(cload #:arch "cpu/$arch.cpu" #:machs "mach1[,mach2[,...]]")}
 @item Run each of:
         @itemize @bullet
 	@item @code{(cgen-cpu.h)}

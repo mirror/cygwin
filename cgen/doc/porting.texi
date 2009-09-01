@@ -983,10 +983,10 @@ development routines.
         @item The @file{.cpu} file is the main description file.
 	@item The @file{.opc} file provides additional C support code.
         @end itemize
-@c We use @samp instead of @code here because texi2html doesn't
-@c properly escape <> instead double-quotes inside @code.
-@item @samp{(cload #:arch "cpu/<arch>.cpu")}
-@item @samp{(set-opc-file-path! "cpu/<arch>.opc")}
+@c We don't use @code, etc. here because texi2html doesn't
+@c properly escape <> instead double-quotes inside @code, etc.
+@item (cload #:arch "cpu/<arch>.cpu")
+@item (set-opc-file-path! "cpu/<arch>.opc")
 @item Run each of:
         @itemize @bullet
         @item @code{(cgen-desc.h)}
@@ -1156,9 +1156,9 @@ The same basic procedure for opcodes porting applies here.
 @item @code{(load "dev.scm")}
 @item @code{(load-sim)}
 @item Edit your @file{cpu/<arch>.cpu} file.
-@c We use @samp instead of @code here because texi2html doesn't
-@c properly escape <> instead double-quotes inside @code.
-@item @samp{(cload #:arch "cpu/<arch>.cpu")}
+@c We don't use @code, etc. here because texi2html doesn't
+@c properly escape <> instead double-quotes inside @code, etc.
+@item (cload #:arch "cpu/<arch>.cpu")
 @item Run each of:
         @itemize @bullet
 	@item @code{(cgen-arch.h)}
@@ -1167,9 +1167,9 @@ The same basic procedure for opcodes porting applies here.
         @end itemize
 @item Repeat steps 4,5,6 until the output looks reasonable.
 @item Edit your @file{cpu/<arch>.cpu} file.
-@c We use @samp instead of @code here because texi2html doesn't
-@c properly escape <> instead double-quotes inside @code.
-@item @samp{(cload #:arch "cpu/<arch>.cpu" #:machs "mach1[,mach2[,...]]")}
+@c We don't use @code, etc. here because texi2html doesn't
+@c properly escape <> instead double-quotes inside @code, etc.
+@item (cload #:arch "cpu/<arch>.cpu" #:machs "mach1[,mach2[,...]]")
 @item Run each of:
         @itemize @bullet
 	@item @code{(cgen-cpu.h)}

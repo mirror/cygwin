@@ -1,5 +1,12 @@
 2009-09-01  Doug Evans  <dje@sebabeach.org>
 
+	Pmacro .equals -> .equal?
+	* pmacros.scm (-pmacro-builtin-equal?): Renamed from
+	-pmacro-builtin-equals.  All callers updated.
+	(pmacros-init!): Rename .equals to .equal?.
+	* doc/pmacros.texi: Update.
+	* testsuite/pmacros-1.test: Update.
+
 	* doc/porting.texi: Work around texi2html bug where it doesn't
 	properly escape <> inside double-quotes inside @code.
 

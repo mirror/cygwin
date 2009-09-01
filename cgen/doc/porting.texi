@@ -984,6 +984,7 @@ development routines.
 	@item The @file{.opc} file provides additional C support code.
         @end itemize
 @item @code{(cload #:arch "cpu/<arch>.cpu")}
+@item @code{(set-opc-file-path! "cpu/<arch>.opc")}
 @item Run each of:
         @itemize @bullet
         @item @code{(cgen-desc.h)}

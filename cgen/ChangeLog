@@ -1,3 +1,8 @@
+2009-09-01  Doug Evans  <dje@sebabeach.org>
+
+	* doc/porting.texi (Doing an opcodes port): Add step to specify
+	the .opc file.
+
 2009-08-29  Doug Evans  <dje@sebabeach.org>
 
 	* hardware.scm (-keyword-parse): Fix `enum-prefix' default for

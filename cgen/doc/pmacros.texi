@@ -1156,7 +1156,7 @@ In CGEN ``true'' is represented by @code{#t}
 and ``false'' is represented by @code{#f}.
 
 @menu
-* .equals::      Deep comparison
+* .equal?::      Deep comparison
 * .andif::       && in C
 * .orif::        || in C
 * .not::         ! in C
@@ -1168,11 +1168,11 @@ and ``false'' is represented by @code{#f}.
 * .ge::          Greater than or equal to
 @end menu
 
-@node .equals
-@subsection .equals
-@cindex .equals
+@node .equal?
+@subsection .equal?
+@cindex .equal?
 
-Syntax: @samp{(.equals x y)}
+Syntax: @samp{(.equal? x y)}
 
 Return #t if @code{x} is equal to @code{y}, otherwise #f.
 
@@ -1183,9 +1183,9 @@ are recursively compared
 Examples:
 
 @smallexample
-(.equals "abc" "abc") --> #t
-(.equals symbol1 symbol1) --> #t
-(.equals ((1 2 3) (4 5 6)) ((1 2 3) (4 5 6))) --> #t
+(.equal? "abc" "abc") --> #t
+(.equal? symbol1 symbol1) --> #t
+(.equal? ((1 2 3) (4 5 6)) ((1 2 3) (4 5 6))) --> #t
 @end smallexample
 
 @node .andif

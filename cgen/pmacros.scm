@@ -86,7 +86,7 @@
 ; (.length x)                         - length of symbol, string, or list
 ; (.replicate n expr)                 - return list of expr replicated n times
 ; (.find pred l)                      - return elements of list l matching pred
-; (.equals x y)                       - deep comparison
+; (.equal? x y)                       - deep comparison
 ; (.andif expr . rest)                - && in C
 ; (.orif expr . rest)                 - || in C
 ; (.not expr)                         - ! in C
@@ -1033,9 +1033,9 @@
     (find transformer l))
 )
 
-; (.equals x y)
+; (.equal? x y)
 
-(define (-pmacro-builtin-equals x y)
+(define (-pmacro-builtin-equal? x y)
   (equal? x y)
 )
 
@@ -1352,7 +1352,7 @@
 	  (list '.length '(x) #f -pmacro-builtin-length "return length of symbol, string, or list")
 	  (list '.replicate '(n expr) #f -pmacro-builtin-replicate "return list of expr replicated n times")
 	  (list '.find '(pred l) #f -pmacro-builtin-find "return elements of list l matching pred")
-	  (list '.equals '(x y) #f -pmacro-builtin-equals "deep comparison of x and y")
+	  (list '.equal? '(x y) #f -pmacro-builtin-equal? "deep comparison of x and y")
 	  (list '.andif 'rest #t -pmacro-builtin-andif "return first #f element, otherwise return last element")
 	  (list '.orif 'rest #t -pmacro-builtin-orif "return first non-#f element found, otherwise #f")
 	  (list '.not '(x) #f -pmacro-builtin-not "return !x")

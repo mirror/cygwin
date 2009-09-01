@@ -25,8 +25,8 @@ cat > ${cpu_file} <<EOF
 (.print list-const "\n")
 
 (test-name ".ref, .car")
-(.if (.not (.equals (.ref (.car list-const) 2) 1))
-     (.print "FAIL (.not (.equals (.ref (.car list-const) 2) 1))\n"))
+(.if (.not (.equal? (.ref (.car list-const) 2) 1))
+     (.print "FAIL (.not (.equal? (.ref (.car list-const) 2) 1))\n"))
 
 (test-name ".for-each, nested .pmacros")
 (print-match "adgbehcfi")
@@ -173,11 +173,11 @@ cat > ${cpu_file} <<EOF
 (print-match "(0 1)")
 (print-expr (.find (.pmacro (n) (.lt n 2)) (.iota 4)))
 
-(test-name ".equals")
+(test-name ".equal?")
 (print-match "#t")
-(print-expr (.equals (yo yo) (yo yo)))
+(print-expr (.equal? (yo yo) (yo yo)))
 (print-match "#f")
-(print-expr (.equals (yo yo) (yo x)))
+(print-expr (.equal? (yo yo) (yo x)))
 
 (test-name ".andif")
 (print-match "andif")

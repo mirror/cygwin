@@ -1,5 +1,8 @@
 2009-09-01  Doug Evans  <dje@sebabeach.org>
 
+	* doc/porting.texi: Work around texi2html bug where it doesn't
+	properly escape <> inside double-quotes inside @code.
+
 	* doc/porting.texi (Doing an opcodes port): Add step to specify
 	the .opc file.
 

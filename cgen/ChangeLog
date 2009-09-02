@@ -1,3 +1,10 @@
+2009-09-01  DJ Delorie  <dj@redhat.com>
+
+	* cpu/mep.opc (parse_signed16_range): Mark as potentially unused.
+	(parse_unsigned16_range): Likewise.
+	(mep_cgen_insn_supported_asm): Make BSR12 check dependent on VLIW
+	isa.
+
 2009-09-01  Doug Evans  <dje@sebabeach.org>
 
 	Pmacro .equals -> .equal?

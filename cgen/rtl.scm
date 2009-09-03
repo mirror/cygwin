@@ -753,9 +753,9 @@
 	((xop) (symbol->string (obj:name (rtx-xop-obj rtx))))
 	(else
 	 (if (null? (cdr rtx))
-	     (car rtx)
+	     (rtx-pretty-name (car rtx))
 	     (apply stringsym-append
-		    (cons (car rtx)
+		    (cons (rtx-pretty-name (car rtx))
 			  (map (lambda (elm)
 				 (string-append "-" (rtx-pretty-name elm)))
 			       (cdr rtx)))))))

@@ -138,10 +138,10 @@
 
 (define-getters <sformat-argbuf> sbuf (sfmts elms))
 
-; Subroutine of -sfmt-contents to return an ifield element.
+; Subroutine of /sfmt-contents to return an ifield element.
 ; The result is ("var-name" "C-type" bitsize).
 
-(define (-sfmt-ifld-elm f sfmt)
+(define (/sfmt-ifld-elm f sfmt)
   (let ((real-mode (mode-real-mode (ifld-decode-mode f))))
     (list (gen-sym f)
 	  (mode:c-type real-mode)
@@ -192,7 +192,7 @@
 	 64))
 )
 
-; Subroutine of -sfmt-contents to return an operand element.
+; Subroutine of /sfmt-contents to return an operand element.
 ; These are in addition (or instead of) the actual ifields.
 ; This is also used to compute definitions of local vars needed in the
 ; !with-scache case.
@@ -209,7 +209,7 @@
 ; and is sorted by decreasing size, then C type, then variable name
 ; (as <sformat-argbuf> wants it).
 
-(define (-sfmt-contents sfmt)
+(define (/sfmt-contents sfmt)
   (let ((needed-iflds (sfmt-needed-iflds sfmt))
 	(extracted-ops (sfmt-extracted-operands sfmt))
 	(in-ops (sfmt-in-ops sfmt))
@@ -230,7 +230,7 @@
 			    #f))))
 	)
     (logit 4 
-	   "-sfmt-contents sfmt=" (obj:name sfmt) 
+	   "/sfmt-contents sfmt=" (obj:name sfmt) 
 	   " needed-iflds=" (string-map obj:str-name needed-iflds)
 	   " extracted-ops=" (string-map obj:str-name extracted-ops)
 	   " in-ops=" (string-map obj:str-name in-ops)
@@ -244,7 +244,7 @@
 		   x)
 		 (append
 		  (map (lambda (f)
-			 (-sfmt-ifld-elm f sfmt))
+			 (/sfmt-ifld-elm f sfmt))
 		       needed-iflds)
 		  (map (lambda (op)
 			 (sfmt-op-sbuf-elm op sfmt))
@@ -266,7 +266,7 @@
 ; Return #t if ELM-LIST is a subset of SBUF.
 ; SBUF is an <sformat-argbuf> object.
 
-(define (-sbuf-subset? elm-list sbuf)
+(define (/sbuf-subset? elm-list sbuf)
   ; We take advantage of the fact that elements in each are already sorted.
   ; FIXME: Can speed up.
   (let loop ((elm-list elm-list) (sbuf-elm-list (sbuf-elms sbuf)))
@@ -287,11 +287,11 @@
 ; SBUF-LIST is a list of <sformat-argbuf> objects.
 ; ELM-LIST is (elm1 elm2 ...).
 
-(define (-sbuf-lookup elm-list sbuf-list)
+(define (/sbuf-lookup elm-list sbuf-list)
   (let loop ((sbuf-list sbuf-list))
     (cond ((null? sbuf-list)
 	   #f)
-	  ((-sbuf-subset? elm-list (car sbuf-list))
+	  ((/sbuf-subset? elm-list (car sbuf-list))
 	   (car sbuf-list))
 	  (else
 	   (loop (cdr sbuf-list)))))
@@ -316,7 +316,7 @@
 	 ; Sort by descending length.  This helps building the result: while
 	 ; iterating over each element, its sbuf is either a subset of a
 	 ; previous entry or requires a new entry.
-	 (sort (map -sfmt-contents sfmt-list)
+	 (sort (map /sfmt-contents sfmt-list)
 	       (lambda (a b)
 		 (> (length a) (length b)))))
 	; Build an <sformat-argbuf> object.
@@ -344,7 +344,7 @@
 	    (let ((sfmt-data (car sfmt-contents)))
 	      (if (null? (cdr sfmt-data))
 		  (sfmt-set-sbuf! (car sfmt-data) empty-sbuf)
-		  (let ((sbuf (-sbuf-lookup (cdr sfmt-data) nub-sbufs)))
+		  (let ((sbuf (/sbuf-lookup (cdr sfmt-data) nub-sbufs)))
 		    (if (not sbuf)
 			(begin
 			  (set! sbuf (build-sbuf sfmt-data))
@@ -429,7 +429,7 @@
 	     (send (op:type self) 'sbuf-profile-data))))
 )
 
-; Subroutine of -sfmt-contents to return an operand's profile element.
+; Subroutine of /sfmt-contents to return an operand's profile element.
 ; The result is (var-name "C-type" approx-bitsize) or #f if unneeded.
 
 (define (sfmt-op-profile-elm op sfmt out?)
@@ -504,11 +504,11 @@
 
 ; Main procedure call tree:
 ; cgen-decode.{c,cxx}
-;     -gen-decode-fn
+;     /gen-decode-fn
 ;         gen-decoder [our entry point]
 ;             decode-build-table
-;             -gen-decoder-switch
-;                 -gen-decoder-switch
+;             /gen-decoder-switch
+;                 /gen-decoder-switch
 ;
 ; decode-build-table is called to construct a tree of "table-guts" elements
 ; (??? Need better name obviously),
@@ -524,11 +524,11 @@
 ; ENTIRE-VAL is passed as a hack for cgen 1.1 which would previously generate
 ; negative shifts.  FIXME: Revisit for 1.2.
 ;
-; e.g. (-gen-decode-bits '(0 1 2 3 8 9 10 11) 0 16 "insn" #f)
+; e.g. (/gen-decode-bits '(0 1 2 3 8 9 10 11) 0 16 "insn" #f)
 ; --> "(((insn >> 8) & 0xf0) | ((insn >> 4) & 0xf))"
 ; FIXME: The generated code has some inefficiencies in edge cases.  Later.
 
-(define (-gen-decode-bits bitnums start size val entire-val lsb0?)
+(define (/gen-decode-bits bitnums start size val entire-val lsb0?)
 
   ; Compute a list of lists of three numbers:
   ; (first bitnum in group, position in result (0=LSB), bits in result)
@@ -591,7 +591,7 @@
 
 ; Return code for the default entry of each switch table
 ;
-(define (-gen-decode-default-entry indent invalid-insn fn?)
+(define (/gen-decode-default-entry indent invalid-insn fn?)
   (string-append
    "itype = "
    (gen-cpu-insn-enum (current-cpu) invalid-insn)
@@ -607,7 +607,7 @@
 ; Return code for one insn entry.
 ; REST is the remaining entries.
 
-(define (-gen-decode-insn-entry entry rest indent invalid-insn fn?)
+(define (/gen-decode-insn-entry entry rest indent invalid-insn fn?)
   (assert (eq? 'insn (dtable-entry-type entry)))
   (logit 3 "Generating decode insn entry for " (obj:name (dtable-entry-value entry)) " ...\n")
 
@@ -656,14 +656,14 @@
 			     (string-append " goto extract_" fmt-name ";"))
 			 " goto done;")
 		     " }\n"
-		     indent "    " (-gen-decode-default-entry indent invalid-insn fn?)))))
+		     indent "    " (/gen-decode-default-entry indent invalid-insn fn?)))))
 )
 
-; Subroutine of -decode-expr-ifield-tracking.
+; Subroutine of /decode-expr-ifield-tracking.
 ; Return a list of all possible values for ifield IFLD-NAME.
 ; FIXME: Quick-n-dirty implementation.  Should use bit arrays.
 
-(define (-decode-expr-ifield-values ifld-name)
+(define (/decode-expr-ifield-values ifld-name)
   (let* ((ifld (current-ifld-lookup ifld-name))
 	 (bits (ifld-length ifld)))
     (if (mode-unsigned? (ifld-mode ifld))
@@ -671,45 +671,45 @@
 	(iota (logsll 1 bits) (- (logsll 1 (- bits 1))))))
 )
 
-; Subroutine of -decode-expr-ifield-tracking,-decode-expr-ifield-mark-used.
+; Subroutine of /decode-expr-ifield-tracking,/decode-expr-ifield-mark-used.
 ; Create the search key for tracking table lookup.
 
-(define (-decode-expr-ifield-tracking-key insn ifld-name)
+(define (/decode-expr-ifield-tracking-key insn ifld-name)
   (symbol-append (obj:name (insn-ifmt insn)) '-x- ifld-name)
 )
 
-; Subroutine of -gen-decode-expr-entry.
+; Subroutine of /gen-decode-expr-entry.
 ; Return a table to track used ifield values.
 ; The table is an associative list of (key . value-list).
 ; KEY is "iformat-name-x-ifield-name".
 ; VALUE-LIST is a list of the unused values.
 
-(define (-decode-expr-ifield-tracking expr-list)
+(define (/decode-expr-ifield-tracking expr-list)
   (let ((table1
 	 (apply append
 		(map (lambda (entry)
 		       (map (lambda (ifld-name)
 			      (cons (exprtable-entry-insn entry)
 				    (cons ifld-name
-					  (-decode-expr-ifield-values ifld-name))))
+					  (/decode-expr-ifield-values ifld-name))))
 			    (exprtable-entry-iflds entry)))
 		     expr-list))))
     ; TABLE1 is a list of (insn ifld-name value1 value2 ...).
     (nub (map (lambda (elm)
 		(cons
-		 (-decode-expr-ifield-tracking-key (car elm) (cadr elm))
+		 (/decode-expr-ifield-tracking-key (car elm) (cadr elm))
 		 (cddr elm)))
 	      table1)
 	 car))
 )
 
-; Subroutine of -decode-expr-ifield-mark-used!.
+; Subroutine of /decode-expr-ifield-mark-used!.
 ; Return list of values completely used for ifield IFLD-NAME in EXPR.
 ; "completely used" here means the value won't appear elsewhere.
 ; e.g. in (andif (eq f-rd 15) (eq f-rx 14)) we don't know what happens
 ; for the (ne f-rx 14) case.
 
-(define (-decode-expr-ifield-values-used ifld-name expr)
+(define (/decode-expr-ifield-values-used ifld-name expr)
   (case (rtx-name expr)
     ((eq)
      (if (and (rtx-kind? 'ifield (rtx-cmp-op-arg expr 0))
@@ -724,18 +724,18 @@
     (else nil))
 )
 
-; Subroutine of -gen-decode-expr-entry.
+; Subroutine of /gen-decode-expr-entry.
 ; Mark ifield values used by EXPR-ENTRY in TRACKING-TABLE.
 
-(define (-decode-expr-ifield-mark-used! tracking-table expr-entry)
+(define (/decode-expr-ifield-mark-used! tracking-table expr-entry)
   (let ((insn (exprtable-entry-insn expr-entry))
 	(expr (exprtable-entry-expr expr-entry))
 	(ifld-names (exprtable-entry-iflds expr-entry)))
     (for-each (lambda (ifld-name)
 		(let ((table-entry
-		       (assq (-decode-expr-ifield-tracking-key insn ifld-name)
+		       (assq (/decode-expr-ifield-tracking-key insn ifld-name)
 			     tracking-table))
-		      (used (-decode-expr-ifield-values-used ifld-name expr)))
+		      (used (/decode-expr-ifield-values-used ifld-name expr)))
 		  (for-each (lambda (value)
 			      (delq! value table-entry))
 			    used)
@@ -744,10 +744,10 @@
   *UNSPECIFIED*
 )
 
-; Subroutine of -gen-decode-expr-entry.
+; Subroutine of /gen-decode-expr-entry.
 ; Return code to set `itype' and branch to the extraction phase.
 
-(define (-gen-decode-expr-set-itype indent insn-enum fmt-name fn?)
+(define (/gen-decode-expr-set-itype indent insn-enum fmt-name fn?)
   (string-append
    indent
    "{ itype = "
@@ -765,7 +765,7 @@
 ; Generate code to decode the expression table in ENTRY.
 ; INVALID-INSN is the <insn> object of the pseudo insn to handle invalid ones.
 
-(define (-gen-decode-expr-entry entry indent invalid-insn fn?)
+(define (/gen-decode-expr-entry entry indent invalid-insn fn?)
   (assert (eq? 'expr (dtable-entry-type entry)))
   (logit 3 "Generating decode expr entry for " (exprtable-name (dtable-entry-value entry)) " ...\n")
 
@@ -775,7 +775,7 @@
      (number->string (dtable-entry-index entry))
      " :\n"
 
-     (let ((iflds-tracking (-decode-expr-ifield-tracking expr-list))
+     (let ((iflds-tracking (/decode-expr-ifield-tracking expr-list))
 	   (indent (string-append indent "    ")))
 
        (let loop ((expr-list expr-list) (code nil))
@@ -789,7 +789,7 @@
 		 code
 		 (append! code
 			  (list
-			   (-gen-decode-expr-set-itype
+			   (/gen-decode-expr-set-itype
 			    indent
 			    (gen-cpu-insn-enum (current-cpu) invalid-insn)
 			    "sfmt_empty"
@@ -804,7 +804,7 @@
 	       ; Mark of those ifield values we use first.
 	       ; If there are none left afterwards, we can unconditionally
 	       ; choose this insn.
-	       (-decode-expr-ifield-mark-used! iflds-tracking (car expr-list))
+	       (/decode-expr-ifield-mark-used! iflds-tracking (car expr-list))
 
 	       (let ((next-code
 		      ; If this is the last expression, and it uses up all
@@ -815,7 +815,7 @@
 
 			  ; Need this in a list for a later append!.
 			  (string-list
-			   (-gen-decode-expr-set-itype
+			   (/gen-decode-expr-set-itype
 			    indent
 			    (gen-cpu-insn-enum (current-cpu) insn)
 			    (gen-sym (insn-sfmt insn))
@@ -836,7 +836,7 @@
 			      indent "  if ("
 			      (rtl-c 'BI expr nil #:ifield-var? #t)
 			      ")\n"
-			      (-gen-decode-expr-set-itype
+			      (/gen-decode-expr-set-itype
 			       (string-append indent "    ")
 			       (gen-cpu-insn-enum (current-cpu) insn)
 			       (gen-sym (insn-sfmt insn))
@@ -851,9 +851,9 @@
 ; Generate code to decode TABLE.
 ; REST is the remaining entries.
 ; SWITCH-NUM, STARTBIT, DECODE-BITSIZE, INDENT, LSB0?, INVALID-INSN are same
-; as for -gen-decoder-switch.
+; as for /gen-decoder-switch.
 
-(define (-gen-decode-table-entry table rest switch-num startbit decode-bitsize indent lsb0? invalid-insn fn?)
+(define (/gen-decode-table-entry table rest switch-num startbit decode-bitsize indent lsb0? invalid-insn fn?)
   (assert (eq? 'table (dtable-entry-type table)))
   (logit 3 "Generating decode table entry for case " (dtable-entry-index table) " ...\n")
 
@@ -872,7 +872,7 @@
        " /* fall through */\n"
        (string-list
 	"\n"
-	(-gen-decoder-switch switch-num
+	(/gen-decoder-switch switch-num
 			     startbit
 			     decode-bitsize
 			     (subdtable-table (dtable-entry-value table))
@@ -882,10 +882,10 @@
 			     fn?))))
 )
 
-; Subroutine of -decode-sort-entries.
+; Subroutine of /decode-sort-entries.
 ; Return a boolean indicating if A,B are equivalent entries.
 
-(define (-decode-equiv-entries? a b)
+(define (/decode-equiv-entries? a b)
   (let ((a-type (dtable-entry-type a))
 	(b-type (dtable-entry-type b)))
     (if (eq? a-type b-type)
@@ -905,13 +905,13 @@
 	#f))
 )
 
-; Subroutine of -gen-decoder-switch, sort ENTRIES according to desired
+; Subroutine of /gen-decoder-switch, sort ENTRIES according to desired
 ; print order (maximizes amount of fall-throughs, but maintains numerical
 ; order as much as possible).
 ; ??? This is an O(n^2) algorithm.  An O(n Log(n)) algorithm can be done
 ; but it seemed more complicated than necessary for now.
 
-(define (-decode-sort-entries entries)
+(define (/decode-sort-entries entries)
   (let ((find-equiv!
 	 ; Return list of entries in non-empty list L that have the same decode
 	 ; entry as the first entry.  Entries found are marked with #f so
@@ -923,7 +923,7 @@
 	     (let loop ((l (cdr l)) (result (cons first nil)))
 	       (if (null? l)
 		   (reverse! result)
-		   (if (and (car l) (-decode-equiv-entries? first (car l)))
+		   (if (and (car l) (/decode-equiv-entries? first (car l)))
 		       (let ((lval (car l)))
 			 (set-car! l #f)
 			 (loop (cdr l) (cons lval result)))
@@ -955,7 +955,7 @@
 ; else {}
 ; may well be less stressful on the compiler to optimize than small switch() stmts.
 
-(define (-gen-decoder-switch switch-num startbit decode-bitsize table-guts
+(define (/gen-decoder-switch switch-num startbit decode-bitsize table-guts
 			     indent lsb0? invalid-insn fn?)
   ; For entries that are a single insn, we're done, otherwise recurse.
 
@@ -974,7 +974,7 @@
 			";\n"
 			indent "  val = "))
        (string-append indent "  unsigned int val = "))
-   (-gen-decode-bits (dtable-guts-bitnums table-guts)
+   (/gen-decode-bits (dtable-guts-bitnums table-guts)
 		     (dtable-guts-startbit table-guts)
 		     (dtable-guts-bitsize table-guts)
 		     "insn" "entire_insn" lsb0?)
@@ -985,10 +985,10 @@
    ; The code is more readable, and icache use is improved, if we collapse
    ; common code into one case and use "fall throughs" for all but the last of
    ; a set of common cases.
-   ; FIXME: We currently rely on -gen-decode-foo-entry to recognize the fall
+   ; FIXME: We currently rely on /gen-decode-foo-entry to recognize the fall
    ; through.  We should take care of it ourselves.
 
-   (let loop ((entries (-decode-sort-entries (dtable-guts-entries table-guts)))
+   (let loop ((entries (/decode-sort-entries (dtable-guts-entries table-guts)))
 	      (result nil))
      (if (null? entries)
 	 (reverse! result)
@@ -996,11 +996,11 @@
 	  (cdr entries)
 	  (cons (case (dtable-entry-type (car entries))
 		  ((insn)
-		   (-gen-decode-insn-entry (car entries) (cdr entries) indent invalid-insn fn?))
+		   (/gen-decode-insn-entry (car entries) (cdr entries) indent invalid-insn fn?))
 		  ((expr)
-		   (-gen-decode-expr-entry (car entries) indent invalid-insn fn?))
+		   (/gen-decode-expr-entry (car entries) indent invalid-insn fn?))
 		  ((table)
-		   (-gen-decode-table-entry (car entries) (cdr entries)
+		   (/gen-decode-table-entry (car entries) (cdr entries)
 					    switch-num startbit decode-bitsize
 					    indent lsb0? invalid-insn fn?))
 		  )
@@ -1008,7 +1008,7 @@
 
    ; ??? Can delete if all cases are present.
    indent "  default : "
-   (-gen-decode-default-entry indent invalid-insn fn?)
+   (/gen-decode-default-entry indent invalid-insn fn?)
    indent "  }\n"
    indent "}\n"
    )
@@ -1038,7 +1038,7 @@
 
     ; Now print it out.
 
-    (-gen-decoder-switch "0" 0 decode-bitsize table-guts indent lsb0?
+    (/gen-decoder-switch "0" 0 decode-bitsize table-guts indent lsb0?
 			 invalid-insn fn?)
     )
 )

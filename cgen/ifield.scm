@@ -72,10 +72,10 @@
 (define-setters <ifield> ifld (follows))
 
 ; internal fn
-(define -ifld-bitrange (elm-make-getter <ifield> 'bitrange))
+(define /ifld-bitrange (elm-make-getter <ifield> 'bitrange))
 
-(define (ifld-word-offset f) (bitrange-word-offset (-ifld-bitrange f)))
-(define (ifld-word-length f) (bitrange-word-length (-ifld-bitrange f)))
+(define (ifld-word-offset f) (bitrange-word-offset (/ifld-bitrange f)))
+(define (ifld-word-length f) (bitrange-word-length (/ifld-bitrange f)))
 
 ; Return the mode of the value passed to the encode rtl.
 ; This is the mode of the result of the decode rtl.
@@ -99,7 +99,7 @@
 (method-make-virtual!
  <ifield> 'field-start
  (lambda (self word-len)
-   (bitrange-start (-ifld-bitrange self)))
+   (bitrange-start (/ifld-bitrange self)))
 )
 
 (define (ifld-start ifld word-len)
@@ -206,8 +206,8 @@
 (method-make!
  <ifield> 'field-mask
  (lambda (self base-len container)
-   (let* ((container (or container (-ifld-bitrange self)))
-	  (bitrange (-ifld-bitrange self))
+   (let* ((container (or container (/ifld-bitrange self)))
+	  (bitrange (/ifld-bitrange self))
 	  (recorded-word-length (bitrange-word-length bitrange))
 	  (word-offset (bitrange-word-offset bitrange)))
      (let ((lsb0? (bitrange-lsb0? bitrange))
@@ -245,7 +245,7 @@
 (method-make!
  <ifield> 'field-value
  (lambda (self base-len value)
-   (let* ((bitrange (-ifld-bitrange self))
+   (let* ((bitrange (/ifld-bitrange self))
 	  (recorded-word-length (bitrange-word-length bitrange))
 	  (word-offset (bitrange-word-offset bitrange))
 	  (word-length (or (and (= word-offset 0) base-len)
@@ -303,7 +303,7 @@
 (method-make!
  <ifield> 'field-lsb0?
  (lambda (self)
-   (bitrange-lsb0? (-ifld-bitrange self)))
+   (bitrange-lsb0? (/ifld-bitrange self)))
 )
 
 (define (ifld-lsb0? f) (send f 'field-lsb0?))
@@ -344,7 +344,7 @@
 (method-make!
  <ifield> 'set-word-offset!
  (lambda (self word-offset)
-   (let ((bitrange (object-copy-top (-ifld-bitrange self))))
+   (let ((bitrange (object-copy-top (/ifld-bitrange self))))
      (bitrange-set-word-offset! bitrange word-offset)
      (elm-set! self 'bitrange bitrange)
      *UNSPECIFIED*))
@@ -367,7 +367,7 @@
 (method-make!
  <ifield> 'next-word
  (lambda (self)
-  (let ((br (-ifld-bitrange f)))
+  (let ((br (/ifld-bitrange f)))
     (bitrange-next-word br)))
 )
 
@@ -378,8 +378,8 @@
 ; different handling.
 
 (define (ifld-precedes? f1 f2)
-  (let ((br1 (-ifld-bitrange f1))
-	(br2 (-ifld-bitrange f2)))
+  (let ((br1 (/ifld-bitrange f1))
+	(br2 (/ifld-bitrange f2)))
     (cond ((< (bitrange-word-offset br1) (bitrange-word-offset br2))
 	   #t)
 	  ((= (bitrange-word-offset br1) (bitrange-word-offset br2))
@@ -424,7 +424,7 @@
 ;
 ; FIXME: More error checking.
 
-(define (-ifield-parse context name comment attrs
+(define (/ifield-parse context name comment attrs
 		       word-offset word-length start flength follows
 		       mode encode decode)
   (logit 2 "Processing ifield " name " ...\n")
@@ -456,7 +456,7 @@
 	      (flength (parse-number context flength '(0 . 127)))
 	      (lsb0? (current-arch-insn-lsb0?))
 	      (mode-obj (parse-mode-name context mode))
-	      (follows-obj (-ifld-parse-follows context follows))
+	      (follows-obj (/ifld-parse-follows context follows))
 	      )
 
 	  ; Calculate the <bitrange> object.
@@ -475,8 +475,8 @@
 		     ; One can certainly argue the choice of the term
 		     ; "RISC-like" is inaccurate.  Perhaps.
 		     (let* ((diwb (isa-default-insn-word-bitsize isa))
-			    (word-offset (-get-ifld-word-offset start flength diwb lsb0?))
-			    (word-length (-get-ifld-word-length start flength diwb lsb0?))
+			    (word-offset (/get-ifld-word-offset start flength diwb lsb0?))
+			    (word-length (/get-ifld-word-length start flength diwb lsb0?))
 			    (start (- start word-offset))
 			    )
 		       (make <bitrange>
@@ -495,8 +495,8 @@
 			 atlist
 			 mode-obj
 			 bitrange
-			 (-ifld-parse-encode context encode)
-			 (-ifld-parse-decode context decode))))
+			 (/ifld-parse-encode context encode)
+			 (/ifld-parse-decode context decode))))
 	      (if follows-obj
 		  (ifld-set-follows! result follows-obj))
 	      result)))
@@ -507,7 +507,7 @@
 	  #f)))
 )
 
-; Subroutine of -ifield-parse to simplify it.
+; Subroutine of /ifield-parse to simplify it.
 ; Given START,FLENGTH, return the "best" choice for the offset to the word
 ; containing the ifield.
 ; This is easy to visualize, hard to put into words.
@@ -519,7 +519,7 @@
 ; particular architecture.  For those where this isn't correct, the ifield
 ; must be fully specified (i.e. word-offset,word-length explicitly specified).
 
-(define (-get-ifld-word-offset start flength diwb lsb0?)
+(define (/get-ifld-word-offset start flength diwb lsb0?)
   (if lsb0?
       ; Convert to non-lsb0 case, then it's easy.
       ; NOTE: The conversion is seemingly wrong because `start' is misnamed.
@@ -528,13 +528,13 @@
   (- start (remainder start diwb))
 )
 
-; Subroutine of -ifield-parse to simplify it.
+; Subroutine of /ifield-parse to simplify it.
 ; Given START,FLENGTH, return the "best" choice for the length of the word
 ; containing the ifield.
 ; DIWB = default insn word bitsize
 ; See -get-ifld-word-offset for more info.
 
-(define (-get-ifld-word-length start flength diwb lsb0?)
+(define (/get-ifld-word-length start flength diwb lsb0?)
   (if lsb0?
       ; Convert to non-lsb0 case, then it's easy.
       ; NOTE: The conversion is seemingly wrong because `start' is misnamed.
@@ -549,9 +549,9 @@
 ; This is the main routine for analyzing instruction fields in the .cpu file.
 ; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
-; -ifield-parse is invoked to create the <ifield> object.
+; /ifield-parse is invoked to create the <ifield> object.
 
-(define (-ifield-read context . arg-list)
+(define (/ifield-read context . arg-list)
   (let (
 	(name #f)
 	(comment "")
@@ -601,14 +601,14 @@
 	(set! decode #f))
 
     ; Now that we've identified the elements, build the object.
-    (-ifield-parse context name comment attrs
+    (/ifield-parse context name comment attrs
 		   word-offset word-length start length- follows
 		   mode encode decode))
 )
 
 ; Parse a `follows' spec.
 
-(define (-ifld-parse-follows context follows)
+(define (/ifld-parse-follows context follows)
   (if follows
       (let ((follows-obj (current-op-lookup follows)))
 	(if (not follows-obj)
@@ -619,7 +619,7 @@
 
 ; Do common parts of <ifield> encode/decode processing.
 
-(define (-ifld-parse-encode-decode context which value)
+(define (/ifld-parse-encode-decode context which value)
   (if value
       (begin
 	(if (or (not (list? value))
@@ -640,21 +640,21 @@
 
 ; Parse an <ifield> encode spec.
 
-(define (-ifld-parse-encode context encode)
-  (-ifld-parse-encode-decode context "encode" encode)
+(define (/ifld-parse-encode context encode)
+  (/ifld-parse-encode-decode context "encode" encode)
 )
 
 ; Parse an <ifield> decode spec.
 
-(define (-ifld-parse-decode context decode)
-  (-ifld-parse-encode-decode context "decode" decode)
+(define (/ifld-parse-decode context decode)
+  (/ifld-parse-encode-decode context "decode" decode)
 )
 
 ; Define an instruction field object, name/value pair list version.
 
 (define define-ifield
   (lambda arg-list
-    (let ((f (apply -ifield-read (cons (make-current-context "define-ifield")
+    (let ((f (apply /ifield-read (cons (make-current-context "define-ifield")
 				       arg-list))))
       (if f
 	  (current-ifld-add! f))
@@ -666,7 +666,7 @@
 ; FIXME: Eventually this should be fixed to take *all* arguments.
 
 (define (define-full-ifield name comment attrs start length mode encode decode)
-  (let ((f (-ifield-parse (make-current-context "define-full-ifield")
+  (let ((f (/ifield-parse (make-current-context "define-full-ifield")
 			  name comment attrs
 			  #f #f start length #f mode encode decode)))
     (if f
@@ -674,7 +674,7 @@
     f)
 )
 
-(define (-ifield-add-commands!)
+(define (/ifield-add-commands!)
   (reader-add-command! 'define-ifield
 		       "\
 Define an instruction field, name/value pair list version.
@@ -763,7 +763,7 @@ Define an instruction multi-field, all arguments specified.
  <multi-ifield> 'next-word
  (lambda (self)
    (apply max (map (lambda (f)
-		     (bitrange-next-word (-ifld-bitrange f)))
+		     (bitrange-next-word (/ifld-bitrange f)))
 		   (multi-ifld-subfields self))))
 )
 
@@ -830,9 +830,9 @@ Define an instruction multi-field, all arguments specified.
 
 ; Multi-ifield parsing.
 
-; Subroutine of -multi-ifield-parse to build the default insert expression.
+; Subroutine of /multi-ifield-parse to build the default insert expression.
 
-(define (-multi-ifield-make-default-insert container-name subfields)
+(define (/multi-ifield-make-default-insert container-name subfields)
   (let* ((lengths (map ifld-length subfields))
 	 (shifts (list-tail-drop 1 (plus-scan (cons 0 lengths)))))
     ; Build RTL expression to shift and mask each ifield into right spot.
@@ -848,9 +848,9 @@ Define an instruction multi-field, all arguments specified.
 				       subfields exprs))))))
 )
 
-; Subroutine of -multi-ifield-parse to build the default extract expression.
+; Subroutine of /multi-ifield-parse to build the default extract expression.
 
-(define (-multi-ifield-make-default-extract container-name subfields)
+(define (/multi-ifield-make-default-extract container-name subfields)
   (let* ((lengths (map ifld-length subfields))
 	 (shifts (list-tail-drop 1 (plus-scan (cons 0 lengths)))))
     ; Build RTL expression to shift and mask each ifield into right spot.
@@ -869,7 +869,7 @@ Define an instruction multi-field, all arguments specified.
 ; All arguments are in raw (non-evaluated) form.
 ; The result is the parsed object or #f if object isn't for selected mach(s).
 
-(define (-multi-ifield-parse context name comment attrs mode
+(define (/multi-ifield-parse context name comment attrs mode
 			     subfields insert extract encode decode)
   (logit 2 "Processing multi-ifield element " name " ...\n")
 
@@ -905,16 +905,16 @@ Define an instruction multi-field, all arguments specified.
 		       (atlist-parse context (cons 'VIRTUAL attrs)
 				     "multi-ifield"))
 	    (elm-xset! result 'mode (parse-mode-name context mode))
-	    (elm-xset! result 'encode (-ifld-parse-encode context encode))
-	    (elm-xset! result 'decode (-ifld-parse-encode context decode))
+	    (elm-xset! result 'encode (/ifld-parse-encode context encode))
+	    (elm-xset! result 'decode (/ifld-parse-encode context decode))
 	    (if insert
 		(elm-xset! result 'insert insert)
 		(elm-xset! result 'insert
-			   (-multi-ifield-make-default-insert name subfields)))
+			   (/multi-ifield-make-default-insert name subfields)))
 	    (if extract
 		(elm-xset! result 'extract extract)
 		(elm-xset! result 'extract
-			   (-multi-ifield-make-default-extract name subfields)))
+			   (/multi-ifield-make-default-extract name subfields)))
 	    (elm-xset! result 'subfields subfields)
 	    result))
 
@@ -926,9 +926,9 @@ Define an instruction multi-field, all arguments specified.
 ; This is the main routine for analyzing multi-ifields in the .cpu file.
 ; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
-; -multi-ifield-parse is invoked to create the `multi-ifield' object.
+; /multi-ifield-parse is invoked to create the `multi-ifield' object.
 
-(define (-multi-ifield-read context . arg-list)
+(define (/multi-ifield-read context . arg-list)
   (let (
 	(name nil)
 	(comment "")
@@ -961,7 +961,7 @@ Define an instruction multi-field, all arguments specified.
 	    (loop (cdr arg-list)))))
 
     ; Now that we've identified the elements, build the object.
-    (-multi-ifield-parse context name comment attrs mode subflds
+    (/multi-ifield-parse context name comment attrs mode subflds
 			 insert extract encode decode))
 )
 
@@ -969,7 +969,7 @@ Define an instruction multi-field, all arguments specified.
 
 (define define-multi-ifield
   (lambda arg-list
-    (let ((f (apply -multi-ifield-read (cons (make-current-context "define-multi-ifield")
+    (let ((f (apply /multi-ifield-read (cons (make-current-context "define-multi-ifield")
 					     arg-list))))
       (if f
 	  (current-ifld-add! f))
@@ -980,7 +980,7 @@ Define an instruction multi-field, all arguments specified.
 ; FIXME: encode/decode arguments are missing.
 
 (define (define-full-multi-ifield name comment attrs mode subflds insert extract)
-  (let ((f (-multi-ifield-parse (make-current-context "define-full-multi-ifield")
+  (let ((f (/multi-ifield-parse (make-current-context "define-full-multi-ifield")
 				name comment attrs
 				mode subflds insert extract #f #f)))
     (current-ifld-add! f)
@@ -1060,7 +1060,7 @@ Define an instruction multi-field, all arguments specified.
  <derived-ifield> 'next-word
  (lambda (self)
    (apply max (map (lambda (f)
-		     (bitrange-next-word (-ifld-bitrange f)))
+		     (bitrange-next-word (/ifld-bitrange f)))
 		   (derived-ifield-subfields self))))
 )
 
@@ -1165,7 +1165,7 @@ Define an instruction multi-field, all arguments specified.
 ; Called before loading the .cpu file to initialize.
 
 (define (ifield-init!)
-  (-ifield-add-commands!)
+  (/ifield-add-commands!)
 
   *UNSPECIFIED*
 )

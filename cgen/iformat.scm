@@ -143,7 +143,7 @@
 ; INSN is passed so that we can include its sanytize attribute, if present,
 ; so sanytized sources work (needed formats don't disappear).
 
-(define (-ifmt-search-key insn sorted-ifld-list)
+(define (/ifmt-search-key insn sorted-ifld-list)
   (string-map (lambda (ifld)
 		(string-append " ("
 			       (or (->string (obj-attr-value insn 'sanitize))
@@ -264,7 +264,7 @@
 ; the generated code smaller (and sometimes faster - more usable common
 ; fragments in pbb simulators).  Don't cause spurious differences.
 
-(define (-sfmt-search-key insn cti? sorted-used-iflds sem-in-ops sem-out-ops)
+(define (/sfmt-search-key insn cti? sorted-used-iflds sem-in-ops sem-out-ops)
   (let ((op-key (lambda (op)
 		  (string-append " ("
 				 (or (->string (obj-attr-value insn 'sanitize))
@@ -326,7 +326,7 @@
 
 ; Sort IFLDS by dependencies and then by starting bit number.
 
-(define (-sfmt-order-iflds iflds)
+(define (/sfmt-order-iflds iflds)
   (let ((up? 
 	 ; ??? Something like this is preferable.
 	 ;(not (ifld-lsb0? (car ifld-list)))
@@ -347,13 +347,13 @@
 ; The important points are to help distinguish sformat's by the ifields used
 ; and to put ifields that others depend on first.
 
-(define (-sfmt-used-iflds in-ops out-ops)
+(define (/sfmt-used-iflds in-ops out-ops)
   (let ((in-iflds (map op-iflds-used in-ops))
 	(out-iflds (map op-iflds-used out-ops)))
     (let ((all-iflds (nub (append (apply append in-iflds)
 				  (apply append out-iflds))
 			  obj:name)))
-      (-sfmt-order-iflds all-iflds)))
+      (/sfmt-order-iflds all-iflds)))
 )
 
 ; The format descriptor is used to sort formats.
@@ -442,7 +442,7 @@
 	    (list (make <fmt-desc>
 		    cti? sorted-ifields in-ops out-ops
 		    (if (and in-ops out-ops)
-			(-sfmt-used-iflds in-ops out-ops)
+			(/sfmt-used-iflds in-ops out-ops)
 			#f)
 		    attrs)
 		  compiled-sem
@@ -454,8 +454,8 @@
 ; FMT-DESC is INSN's <fmt-desc> object.
 ; IFMT-LIST is append!'d to and the found iformat is stored in INSN.
 
-(define (-ifmt-lookup-ifmt! insn fmt-desc ifmt-list)
-  (let* ((search-key (-ifmt-search-key insn (-fmt-desc-iflds fmt-desc)))
+(define (/ifmt-lookup-ifmt! insn fmt-desc ifmt-list)
+  (let* ((search-key (/ifmt-search-key insn (-fmt-desc-iflds fmt-desc)))
 	 (ifmt (find-first (lambda (elm)
 			     (equal? (ifmt-key elm) search-key))
 			   ifmt-list)))
@@ -488,8 +488,8 @@
 ;
 ; We assume INSN's <iformat> has already been recorded.
 
-(define (-ifmt-lookup-sfmt! insn fmt-desc sfmt-list)
-  (let* ((search-key (-sfmt-search-key insn (-fmt-desc-cti? fmt-desc)
+(define (/ifmt-lookup-sfmt! insn fmt-desc sfmt-list)
+  (let* ((search-key (/sfmt-search-key insn (-fmt-desc-cti? fmt-desc)
 				       (-fmt-desc-used-iflds fmt-desc)
 				       (-fmt-desc-in-ops fmt-desc)
 				       (-fmt-desc-out-ops fmt-desc)))
@@ -607,9 +607,9 @@
 		      (begin
 			; Must compute <iformat> before <sformat>, the latter
 			; needs the former.
-			(-ifmt-lookup-ifmt! insn fmt-desc ifmt-list)
+			(/ifmt-lookup-ifmt! insn fmt-desc ifmt-list)
 			(if compute-sformat?
-			    (-ifmt-lookup-sfmt! insn fmt-desc sfmt-list)))
+			    (/ifmt-lookup-sfmt! insn fmt-desc sfmt-list)))
 
 		      ; No field list present, use empty format.
 		      (begin

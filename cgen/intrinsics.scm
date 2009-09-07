@@ -387,10 +387,10 @@
 
 ;; Helper functions for getting the values of certain mep-specific gcc
 ;; attributes.  In each case INSN is a cgen instruction (not an md-insn).
-(define (-may-trap-attribute insn)
+(define (/may-trap-attribute insn)
   (if (obj-has-attr? insn 'MAY_TRAP) "yes" "no"))
 
-(define (-slot-attribute insn)
+(define (/slot-attribute insn)
   (if (exists? (lambda (isa)
 		 (or (equal? isa 'mep)
 		     (equal? (string-take 8 (st isa)) "ext_core")))
@@ -398,18 +398,18 @@
       "core"
       "cop"))
 
-(define (-latency-attribute insn)
+(define (/latency-attribute insn)
   (if (obj-attr-value insn 'LATENCY)
       (st (obj-attr-value insn 'LATENCY))
       "0"))
 
-(define (-length-attribute insn)
+(define (/length-attribute insn)
   (st (/ (insn-length insn) 8)))
 
-(define (-stall-attribute insn)
+(define (/stall-attribute insn)
   (string-downcase (st (obj-attr-value insn 'STALL))))
 
-(define (-slots-attribute insn)
+(define (/slots-attribute insn)
   (let ((slots (obj-attr-value insn 'SLOTS)))
     (if slots
 	(string-downcase (gen-c-symbol (st slots)))
@@ -419,14 +419,14 @@
 ;; pairs.
 (define (target:attributes insn)
   (let ((cgen-insn (md-insn:cgen-insn insn)))
-    (list (cons 'may_trap (-may-trap-attribute cgen-insn))
-	  (cons 'latency (-latency-attribute cgen-insn))
-	  (cons 'length (-length-attribute cgen-insn))
-	  (cons 'slot (-slot-attribute cgen-insn))
-	  (cons 'slots (-slots-attribute cgen-insn))
+    (list (cons 'may_trap (/may-trap-attribute cgen-insn))
+	  (cons 'latency (/latency-attribute cgen-insn))
+	  (cons 'length (/length-attribute cgen-insn))
+	  (cons 'slot (/slot-attribute cgen-insn))
+	  (cons 'slots (/slots-attribute cgen-insn))
 	  (if (eq? (obj-attr-value cgen-insn 'STALL) 'SHIFTI)
 	      (cons 'shiftop "operand2")
-	      (cons 'stall (-stall-attribute cgen-insn))))))
+	      (cons 'stall (/stall-attribute cgen-insn))))))
 
 ;; Define target-specific fields of cgen_insn.  In the MeP case, we want
 ;; to record how long the intruction is.
@@ -438,7 +438,7 @@
 ;; Initialize the fields described above.
 (define (target:initialize-fields insn)
   (comma-line-break)
-  (string-write (-length-attribute (md-insn:cgen-insn insn))))
+  (string-write (/length-attribute (md-insn:cgen-insn insn))))
 
 ;; Use WELL-KNOWN-INTRINSIC to define the names of builtins that
 ;; gcc might treat specially.

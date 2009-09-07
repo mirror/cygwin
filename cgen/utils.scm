@@ -350,7 +350,7 @@
 ; Extension to the current-output-port.
 ; Only valid inside string-write.
 
-(define -current-print-state #f)
+(define /current-print-state #f)
 
 ; Create a print-state object.
 ; This is written in portable Scheme so we don't use COS objects, etc.
@@ -406,21 +406,21 @@
 (define string-write
   (lambda strings
     (let ((pstate (make-print-state)))
-      (set! -current-print-state pstate)
-      (for-each (lambda (elm) (-string-write pstate elm))
+      (set! /current-print-state pstate)
+      (for-each (lambda (elm) (/string-write pstate elm))
 		strings)
-      (set! -current-print-state #f)
+      (set! /current-print-state #f)
       ""))
 )
 
 ; Subroutine of string-write and string-write-map.
 
-(define (-string-write pstate expr)
+(define (/string-write pstate expr)
   (cond ((string? expr) (display expr)) ; not write, we want raw text
 	((symbol? expr) (display expr))
-	((procedure? expr) (-string-write pstate (expr)))
+	((procedure? expr) (/string-write pstate (expr)))
 	((pstate-cmd? expr) (display (pstate-cmd-do pstate expr)))
-	((list? expr) (for-each (lambda (x) (-string-write pstate x)) expr))
+	((list? expr) (for-each (lambda (x) (/string-write pstate x)) expr))
 	(else (error "string-write: bad arg:" expr)))
   *UNSPECIFIED*
 )
@@ -428,8 +428,8 @@
 ; Combination of string-map and string-write.
 
 (define (string-write-map proc arglist)
-  (let ((pstate -current-print-state))
-    (for-each (lambda (arg) (-string-write pstate (proc arg)))
+  (let ((pstate /current-print-state))
+    (for-each (lambda (arg) (/string-write pstate (proc arg)))
 	      arglist))
   ""
 )
@@ -439,16 +439,16 @@
 (define string-list list)
 (define string-list-map map)
 
-; Subroutine of string-list->string.  Does same thing -string-write does.
+; Subroutine of string-list->string.  Does same thing /string-write does.
 
-(define (-string-list-flatten pstate strlist)
+(define (/string-list-flatten pstate strlist)
   (cond ((string? strlist) strlist)
 	((symbol? strlist) strlist)
-	((procedure? strlist) (-string-list-flatten pstate (strlist)))
+	((procedure? strlist) (/string-list-flatten pstate (strlist)))
 	((pstate-cmd? strlist) (pstate-cmd-do pstate strlist))
 	((list? strlist) (apply string-append
 				(map (lambda (str)
-				       (-string-list-flatten pstate str))
+				       (/string-list-flatten pstate str))
 				     strlist)))
 	(else (error "string-list->string: bad arg:" strlist)))
 )
@@ -456,7 +456,7 @@
 ; Flatten out a string list.
 
 (define (string-list->string strlist)
-  (-string-list-flatten (make-print-state) strlist)
+  (/string-list-flatten (make-print-state) strlist)
 )
 
 ; Prefix CHARS, a string of characters, with backslash in STR.

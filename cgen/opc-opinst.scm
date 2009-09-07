@@ -5,7 +5,7 @@
 ; Return C code to define one instance of operand object OP.
 ; TYPE is one of "INPUT" or "OUTPUT".
 
-(define (-gen-operand-instance op type)
+(define (/gen-operand-instance op type)
   (let ((index (op:index op)))
     (string-append "  { "
 		   type ", "
@@ -41,7 +41,7 @@
 ; which register(s) the next instruction operates on), this will need
 ; additional support.
 
-(define (-gen-operand-instance-table sfmt)
+(define (/gen-operand-instance-table sfmt)
   (let ((ins (sfmt-in-ops sfmt))
 	(outs (sfmt-out-ops sfmt)))
     ; This used to exclude outputing anything if there were no ins or outs.
@@ -50,14 +50,14 @@
      (string-append
       "static const CGEN_OPINST "
       (gen-sym sfmt) "_ops[] ATTRIBUTE_UNUSED = {\n"
-      (string-map (lambda (op) (-gen-operand-instance op "INPUT"))
+      (string-map (lambda (op) (/gen-operand-instance op "INPUT"))
 		  ins)
-      (string-map (lambda (op)  (-gen-operand-instance op "OUTPUT"))
+      (string-map (lambda (op)  (/gen-operand-instance op "OUTPUT"))
 		  outs)
       "  { END, (const char *)0, (enum cgen_hw_type)0, (enum cgen_mode)0, (enum cgen_operand_type)0, 0, 0 }\n};\n\n")))
 )
 
-(define (-gen-operand-instance-tables)
+(define (/gen-operand-instance-tables)
   (string-write
    "\
 /* Operand references.  */
@@ -71,7 +71,7 @@
 #define COND_REF CGEN_OPINST_COND_REF
 
 "
-   (lambda () (string-write-map -gen-operand-instance-table (current-sfmt-list)))
+   (lambda () (string-write-map /gen-operand-instance-table (current-sfmt-list)))
    "\
 #undef OP_ENT
 #undef INPUT
@@ -96,7 +96,7 @@
 
 ; Return C code to define a table to lookup an insn's operand instance table.
 
-(define (-gen-insn-opinst-lookup-table)
+(define (/gen-insn-opinst-lookup-table)
   (string-list
    "/* Operand instance lookup table.  */\n\n"
    "static const CGEN_OPINST *@arch@_cgen_opinst_table[MAX_INSNS] = {\n"
@@ -129,7 +129,7 @@ void
 ; If not generating the operand instance table, use a heuristic.
 
 (define (max-operand-instances)
-  (if -opcodes-build-operand-instance-table?
+  (if /opcodes-build-operand-instance-table?
       (apply max
 	     (map (lambda (insn)
 		    (+ (length (sfmt-in-ops (insn-sfmt insn)))
@@ -150,7 +150,7 @@ void
 	(logit 1 "Doing so now ...\n")
 	(arch-analyze-insns! CURRENT-ARCH
 			     #t ; include aliases
-			     #t) ; -opcodes-build-operand-instance-table?
+			     #t) ; /opcodes-build-operand-instance-table?
 	))
 
   (string-write
@@ -164,7 +164,7 @@ void
 #include \"@prefix@-desc.h\"
 #include \"@prefix@-opc.h\"
 \n"
-   -gen-operand-instance-tables
-   -gen-insn-opinst-lookup-table
+   /gen-operand-instance-tables
+   /gen-insn-opinst-lookup-table
    )
 )

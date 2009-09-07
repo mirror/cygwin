@@ -222,7 +222,7 @@
 ; This is the main routine for building a mode object.
 ; All arguments are in raw (non-evaluated) form.
 
-(define (-mode-parse context name comment attrs class bits bytes
+(define (/mode-parse context name comment attrs class bits bytes
 		     non-mode-c-type printf-type sem-mode ptr-to host?)
   (logit 2 "Processing mode " name " ...\n")
 
@@ -245,7 +245,7 @@
 
 (define (define-full-mode name comment attrs class bits bytes
 	  non-mode-c-type printf-type sem-mode ptr-to host?)
-  (let ((m (-mode-parse (make-current-context "define-full-mode")
+  (let ((m (/mode-parse (make-current-context "define-full-mode")
 			name comment attrs
 			class bits bytes
 			non-mode-c-type printf-type sem-mode ptr-to host?)))
@@ -388,7 +388,7 @@
 ; Kind of word size handling wanted.
 ; BIGGEST: pick the largest word size
 ; IDENTICAL: all word sizes must be identical
-(define -mode-word-sizes-kind #f)
+(define /mode-word-sizes-kind #f)
 
 ; Called when a cpu-family is read in to set the word sizes.
 
@@ -405,7 +405,7 @@
     ; Enforce word size kind.
     (if (!= current-word-bitsize 0)
 	; word size already set
-	(case -mode-word-sizes-kind
+	(case /mode-word-sizes-kind
 	  ((IDENTICAL)
 	   (if (!= current-word-bitsize (mode:bits word-mode))
 	       (error "app requires all selected cpu families to have same word size"))
@@ -435,7 +435,7 @@
 ; Must be called before loading .cpu files.
 
 (define (mode-set-identical-word-bitsizes!)
-  (set! -mode-word-sizes-kind 'IDENTICAL)
+  (set! /mode-word-sizes-kind 'IDENTICAL)
 )
 
 ; Called by apps to indicate using the biggest cpu:word-bitsize of all
@@ -443,7 +443,7 @@
 ; Must be called before loading .cpu files.
 
 (define (mode-set-biggest-word-bitsizes!)
-  (set! -mode-word-sizes-kind 'BIGGEST)
+  (set! /mode-word-sizes-kind 'BIGGEST)
 )
 
 ; Ensure word sizes have been defined.
@@ -470,7 +470,7 @@
 (define UINT #f)
 
 (define (mode-init!)
-  (set! -mode-word-sizes-kind 'IDENTICAL)
+  (set! /mode-word-sizes-kind 'IDENTICAL)
 
   (reader-add-command! 'define-full-mode
 		       "\

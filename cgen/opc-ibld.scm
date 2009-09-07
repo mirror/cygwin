@@ -4,7 +4,7 @@
 
 ; Instruction field support.
 
-(define (-gen-fget-switch)
+(define (/gen-fget-switch)
   (logit 2 "Generating field get switch ...\n")
   (string-list
    "\
@@ -62,7 +62,7 @@ bfd_vma
 \n")
 )
 
-(define (-gen-fset-switch)
+(define (/gen-fset-switch)
   (logit 2 "Generating field set switch ...\n")
   (string-list
    "\
@@ -159,7 +159,7 @@ void
 
 ; Generate the C code for dealing with operands.
 
-(define (-gen-insert-switch)
+(define (/gen-insert-switch)
   (logit 2 "Generating insert switch ...\n")
   (string-list
    "\
@@ -206,7 +206,7 @@ const char *
 }\n\n")
 )
 
-(define (-gen-extract-switch)
+(define (/gen-extract-switch)
   (logit 2 "Generating extract switch ...\n")
   (string-list
    "\
@@ -260,7 +260,7 @@ int
 
 ; Emit a function to call to initialize the ibld tables.
 
-(define (-gen-ibld-init-fn)
+(define (/gen-ibld-init-fn)
   (string-write
    "\
 /* Function to call before using the instruction builder tables.  */
@@ -311,12 +311,12 @@ void
   (string-write
    ; No need for copyright, appended to file with one.
    "\n"
-   -gen-insert-switch
-   -gen-extract-switch
+   /gen-insert-switch
+   /gen-extract-switch
    (lambda () (gen-handler-table "insert" opc-insert-handlers))
    (lambda () (gen-handler-table "extract" opc-extract-handlers))
-   -gen-fget-switch
-   -gen-fset-switch
-   -gen-ibld-init-fn
+   /gen-fget-switch
+   /gen-fset-switch
+   /gen-ibld-init-fn
    )
 )

@@ -4,7 +4,7 @@
 
 ; ISA support code.
 
-(define (-gen-isa-table-defns)
+(define (/gen-isa-table-defns)
   (logit 2 "Generating isa table defns ...\n")
 
   (string-list
@@ -50,12 +50,12 @@ static const CGEN_ISA @arch@_cgen_isa_table[] = {
 ;			(map (lambda (elm) (list (obj:name elm) (mach-number elm)))
 ;			     (current-mach-list))))
 
-(define (-gen-mach-table-decls)
+(define (/gen-mach-table-decls)
   (logit 2 "Generating machine table decls ...\n")
   "" ; (gen-decl mach-table)
 )
 
-(define (-gen-mach-table-defns)
+(define (/gen-mach-table-defns)
   (logit 2 "Generating machine table defns ...\n")
 
   (string-list
@@ -85,7 +85,7 @@ static const CGEN_MACH @arch@_cgen_mach_table[] = {
 
 ; Return C code to describe the various attributes.
 
-(define (-gen-attr-table-decls)
+(define (/gen-attr-table-decls)
   (logit 2 "Generating attribute table decls ...\n")
   (string-append
    "/* Attributes.  */\n"
@@ -114,7 +114,7 @@ static const CGEN_MACH @arch@_cgen_mach_table[] = {
    "/* Ifield support.  */\n\n"
    "/* Ifield attribute indices.  */\n\n"
    (gen-attr-enum-decl "cgen_ifld" (current-ifld-attr-list))
-   (-gen-attr-accessors "cgen_ifld" (current-ifld-attr-list))
+   (gen-attr-accessors "cgen_ifld" (current-ifld-attr-list))
    (gen-enum-decl 'ifield_type "@arch@ ifield types"
 		  "@ARCH@_"
 		  (append (gen-obj-list-enums (non-derived-ifields (current-ifld-list)))
@@ -181,7 +181,7 @@ const CGEN_IFLD @arch@_cgen_ifld_table[] =
   (string-list
    "/* Hardware attribute indices.  */\n\n"
    (gen-attr-enum-decl "cgen_hw" (current-hw-attr-list))
-   (-gen-attr-accessors "cgen_hw" (current-hw-attr-list))
+   (gen-attr-accessors "cgen_hw" (current-hw-attr-list))
    (gen-enum-decl 'cgen_hw_type "@arch@ hardware types"
 		  "HW_" ; FIXME: @ARCH@_
 		  (append (nub (map (lambda (hw)
@@ -198,7 +198,7 @@ const CGEN_IFLD @arch@_cgen_ifld_table[] =
 
 ; Return declarations of variables tables used by HW.
 
-(define (-gen-hw-decl hw)
+(define (/gen-hw-decl hw)
   (string-append
    (if (hw-indices hw)
        (gen-decl (hw-indices hw))
@@ -216,7 +216,7 @@ const CGEN_IFLD @arch@_cgen_ifld_table[] =
   (logit 2 "Generating hardware table decls ...\n")
   (string-list
    "/* Hardware decls.  */\n\n"
-   (string-map -gen-hw-decl (current-hw-list))
+   (string-map /gen-hw-decl (current-hw-list))
    "\n"
    "extern const CGEN_HW_ENTRY @arch@_cgen_hw_table[];\n"
    )
@@ -225,7 +225,7 @@ const CGEN_IFLD @arch@_cgen_ifld_table[] =
 ; Return definitions of variables tables used by HW.
 ; Only do this for `PRIVATE' elements.  Public ones are emitted elsewhere.
 
-(define (-gen-hw-defn hw)
+(define (/gen-hw-defn hw)
   (string-append
    (if (and (hw-indices hw)
 	    (obj-has-attr? (hw-indices hw) 'PRIVATE))
@@ -250,7 +250,7 @@ const CGEN_IFLD @arch@_cgen_ifld_table[] =
 	 (num-non-bools (attr-count-non-bools all-attrs)))
     (string-list
      (string-list-map gen-defn (current-kw-list))
-     (string-list-map -gen-hw-defn (current-hw-list))
+     (string-list-map /gen-hw-defn (current-hw-list))
      "
 /* The hardware table.  */
 
@@ -293,7 +293,7 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
 ; Return #define's of several constants.
 ; FIXME: Some of these to be moved into table of structs, one per cpu family.
 
-(define (-gen-hash-defines)
+(define (/gen-hash-defines)
   (logit 2 "Generating #define's ...\n")
   (string-list
    "#include \"opcode/cgen-bitset.h\"\n"
@@ -365,7 +365,7 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
   (string-list
    "/* Operand attribute indices.  */\n\n"
    (gen-attr-enum-decl "cgen_operand" (current-op-attr-list))
-   (-gen-attr-accessors "cgen_operand" (current-op-attr-list))
+   (gen-attr-accessors "cgen_operand" (current-op-attr-list))
    (gen-enum-decl 'cgen_operand_type "@arch@ operand types"
 		  "@ARCH@_OPERAND_"
 		  (nub (append (gen-obj-list-enums (current-op-list))
@@ -495,7 +495,7 @@ const CGEN_OPERAND @arch@_cgen_operand_table[] =
   (string-list
    "/* Insn attribute indices.  */\n\n"
    (gen-attr-enum-decl "cgen_insn" (current-insn-attr-list))
-   (-gen-attr-accessors "cgen_insn" (current-insn-attr-list))
+   (gen-attr-accessors "cgen_insn" (current-insn-attr-list))
    )
 )
 
@@ -586,7 +586,7 @@ static const CGEN_IBASE @arch@_cgen_insn_table[MAX_INSNS] =
 ; and opcodes/cgen.sh modified to insert the generated part into the middle
 ; of the file like is done for assembler/disassembler support.
 
-(define (-gen-cpu-open)
+(define (/gen-cpu-open)
   (string-append
    "\
 static const CGEN_MACH * lookup_mach_via_bfd_name (const CGEN_MACH *, const char *);
@@ -930,9 +930,9 @@ void
 ; General initialization C code
 ; Code is appended during processing.
 
-(define -cputab-init-code "")
+(define /cputab-init-code "")
 (define (cputab-add-init! code)
-  (set! -cputab-init-code (string-append -cputab-init-code code))
+  (set! /cputab-init-code (string-append /cputab-init-code code))
 )
 
 ; Return the C code to define the various initialization functions.
@@ -950,7 +950,7 @@ void
 static void
 init_tables (void)
 {\n"
-   -cputab-init-code
+   /cputab-init-code
    "}\n\n"
   )
 )
@@ -970,7 +970,7 @@ init_tables (void)
 #define @ARCH@_CPU_H
 
 "
-   -gen-hash-defines
+   /gen-hash-defines
    ; This is defined in arch.h.  It's not defined here as there is yet to
    ; be a need for it in the assembler/disassembler.
    ;(gen-enum-decl 'model_type "model types"
@@ -994,8 +994,8 @@ init_tables (void)
    "/* cgen.h uses things we just defined.  */\n"
    "#include \"opcode/cgen.h\"\n\n"
    "extern const struct cgen_ifld @arch@_cgen_ifld_table[];\n\n"
-   -gen-attr-table-decls
-   -gen-mach-table-decls
+   /gen-attr-table-decls
+   /gen-mach-table-decls
    gen-hw-table-decls
    "\n"
    (lambda ()
@@ -1039,14 +1039,14 @@ init_tables (void)
 	 (gen-extra-cpu.c (opc-file-path) (current-arch-name))
 	 ""))
    gen-attr-table-defns
-   -gen-isa-table-defns
-   -gen-mach-table-defns
+   /gen-isa-table-defns
+   /gen-mach-table-defns
    gen-hw-table-defns
    gen-ifld-defns
    gen-multi-ifield-nodes
    gen-operand-table
    gen-insn-table
    gen-init-fns
-   -gen-cpu-open
+   /gen-cpu-open
    )
 )

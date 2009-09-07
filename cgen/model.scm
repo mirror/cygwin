@@ -108,13 +108,13 @@
 
 ; Parse a `prefetch' spec.
 
-(define (-prefetch-parse context expr)
+(define (/prefetch-parse context expr)
   nil
 )
 
 ; Parse a `retire' spec.
 
-(define (-retire-parse context expr)
+(define (/retire-parse context expr)
   nil
 )
 
@@ -122,7 +122,7 @@
 ; ??? Perhaps we should also use name/value pairs here, but that's an
 ; unnecessary complication at this point in time.
 
-(define (-pipeline-parse context model-name spec) ; name comments attrs elements)
+(define (/pipeline-parse context model-name spec) ; name comments attrs elements)
   (if (not (= (length spec) 4))
       (parse-error context "pipeline spec not `name comment attrs elements'" spec))
   (apply make (cons <pipeline> spec))
@@ -132,7 +132,7 @@
 ; ??? Perhaps we should also use name/value pairs here, but that's an
 ; unnecessary complication at this point in time.
 
-(define (-unit-parse context model-name spec) ; name comments attrs elements)
+(define (/unit-parse context model-name spec) ; name comments attrs elements)
   (if (not (= (length spec) 9))
       (parse-error context "unit spec not `name comment attrs issue done state inputs outputs profile'" spec))
   (apply make (append (cons <unit> spec) (list model-name)))
@@ -143,7 +143,7 @@
 ; description in the .cpu file.
 ; All arguments are in raw (non-evaluated) form.
 
-(define (-model-parse context name comment attrs mach-name prefetch retire pipelines state units)
+(define (/model-parse context name comment attrs mach-name prefetch retire pipelines state units)
   (logit 2 "Processing model " name " ...\n")
 
   ;; Pick out name first to augment the error context.
@@ -161,11 +161,11 @@
 		     (parse-comment context comment)
 		     (atlist-parse context attrs "cpu")
 		     mach
-		     (-prefetch-parse context prefetch)
-		     (-retire-parse context retire)
-		     (map (lambda (p) (-pipeline-parse context name p)) pipelines)
+		     (/prefetch-parse context prefetch)
+		     (/retire-parse context retire)
+		     (map (lambda (p) (/pipeline-parse context name p)) pipelines)
 		     state
-		     (map (lambda (u) (-unit-parse context name u)) units))))
+		     (map (lambda (u) (/unit-parse context name u)) units))))
 	  model-obj)
 
 	(begin
@@ -178,9 +178,9 @@
 ; This is the main routine for analyzing models in the .cpu file.
 ; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
-; -model-parse is invoked to create the `model' object.
+; /model-parse is invoked to create the `model' object.
 
-(define (-model-read context . arg-list)
+(define (/model-read context . arg-list)
   (let (
 	(name nil)      ; name of model
 	(comment nil)   ; description of model
@@ -212,14 +212,14 @@
 	    (loop (cdr arg-list)))))
 
     ; Now that we've identified the elements, build the object.
-    (-model-parse context name comment attrs mach prefetch retire pipelines state units))
+    (/model-parse context name comment attrs mach prefetch retire pipelines state units))
 )
 
 ; Define a cpu model object, name/value pair list version.
 
 (define define-model
   (lambda arg-list
-    (let ((m (apply -model-read (cons (make-current-context "define-model")
+    (let ((m (apply /model-read (cons (make-current-context "define-model")
 				      arg-list))))
       (if m
 	  (current-model-add! m))
@@ -253,7 +253,7 @@
 ; Subroutine of parse-insn-timing to parse the timing spec for MODEL.
 ; The result is a <timing> object.
 
-(define (-insn-timing-parse-model context model spec)
+(define (/insn-timing-parse-model context model spec)
   (make <timing> model
 	(map (lambda (unit-timing-desc)
 	       (let ((type (car unit-timing-desc))
@@ -285,7 +285,7 @@
 		(model (current-model-lookup model-name)))
 	   (cons model-name
 		 (if model
-		     (-insn-timing-parse-model context model
+		     (/insn-timing-parse-model context model
 					       (cdr model-timing-desc))
 		     '()))))
        insn-timing-desc)

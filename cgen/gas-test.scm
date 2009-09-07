@@ -180,11 +180,11 @@
 ; ((r0 r1 r2) (r3 r4 r5) (2 3 8)) => ((r0 r3 2) (r1 r4 3) (r2 r5 8))
 ; L is a list of lists.  All elements must have the same length.
 
-(define (-collate-test-set L)
+(define (/collate-test-set L)
   (if (= (length (car L)) 0)
       '()
       (cons (map car L)
-	    (-collate-test-set (map cdr L))))
+	    (/collate-test-set (map cdr L))))
 )
 
 ; Given a list of operands for an instruction, return the test set
@@ -196,7 +196,7 @@
   (let ((test-data (map (lambda (op) (operand-test-data op n)) op-list))
 	(len (length op-list)))
     (cond ((= len 0) (list (list)))
-	  (else (-collate-test-set test-data))))
+	  (else (/collate-test-set test-data))))
 )
 
 ; Given an assembler expression and a set of operands build a testcase.

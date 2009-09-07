@@ -12,7 +12,7 @@
 ; Two modes are equivalent if they're equal, or if their sem-mode fields
 ; are equal.
 
-(define (-rtx-mode-equiv? m1 m2)
+(define (/rtx-mode-equiv? m1 m2)
   (or (eq? m1 m2)
       (let ((mode1 (mode:lookup m1))
 	    (mode2 (mode:lookup m2)))
@@ -27,13 +27,13 @@
 ; TYPE is one of -op- reg mem.
 ; EXPR is the constructed `xop' rtx expression for the operand,
 ;   ignored in the search.
-; MODE must match, as defined by -rtx-mode-equiv?.
+; MODE must match, as defined by /rtx-mode-equiv?.
 ; NAME is the hardware element name, ifield name, or '-op-'.
 ; INDX-SEL must match if present in either.
 ;
 ; ??? Does this need to take "conditionally-referenced" into account?
 
-(define (-rtx-find-op op op-list)
+(define (/rtx-find-op op op-list)
   (let ((type (car op))
 	(mode (caddr op))
 	(name (cadddr op))
@@ -44,7 +44,7 @@
 	    ((eq? type (caar op-list))
 	     (let ((try (car op-list)))
 	       (if (and (eq? name (cadddr try))
-			(-rtx-mode-equiv? mode (caddr try))
+			(/rtx-mode-equiv? mode (caddr try))
 			(equal? indx-sel (car (cddddr try))))
 		   try
 		   (loop (cdr op-list)))))
@@ -56,7 +56,7 @@
 ; The result is one of 'use, 'set, 'set-quiet.
 ; "use" means "input operand".
 
-(define (-rtx-ref-type expr op-pos)
+(define (/rtx-ref-type expr op-pos)
   ; operand 0 is the option list, operand 1 is the mode
   ; (if you want to complain, fine, it's not like it would be unexpected)
   (if (= op-pos 2)
@@ -73,14 +73,14 @@
 ; REF-TYPE is one of 'use, 'set, 'set-quiet.
 ; Adds COND-CTI/UNCOND-CTI to SEM-ATTRS if the operand is a set of the pc.
 
-(define (-build-operand! op-name op mode tstate ref-type op-list sem-attrs)
+(define (/build-operand! op-name op mode tstate ref-type op-list sem-attrs)
   ;(display (list op-name mode ref-type)) (newline) (force-output)
   (let* ((mode (mode-real-name (if (eq? mode 'DFLT)
 				   (op:mode op)
 				   mode)))
          ; The first #f is a placeholder for the object.
 	 (try (list '-op- #f mode op-name #f))
-	 (existing-op (-rtx-find-op try op-list)))
+	 (existing-op (/rtx-find-op try op-list)))
 
     (if (and (pc? op)
 	     (memq ref-type '(set set-quiet)))
@@ -108,7 +108,7 @@
 
 ; Subroutine of semantic-compile:process-expr!, to simplify it.
 
-(define (-build-reg-operand! expr tstate op-list)
+(define (/build-reg-operand! expr tstate op-list)
   (let* ((hw-name (rtx-reg-name expr))
 	 (hw (current-hw-sem-lookup-1 hw-name)))
 
@@ -120,7 +120,7 @@
 	       (indx-sel (rtx-reg-index-sel expr))
 	       ; #f is a place-holder for the object (filled in later)
 	       (try (list 'reg #f mode hw-name indx-sel))
-	       (existing-op (-rtx-find-op try op-list)))
+	       (existing-op (/rtx-find-op try op-list)))
 
 	  ; If already present, return the object, otherwise add it.
 	  (if existing-op
@@ -142,7 +142,7 @@
 
 ; Subroutine of semantic-compile:process-expr!, to simplify it.
 
-(define (-build-mem-operand! expr tstate op-list)
+(define (/build-mem-operand! expr tstate op-list)
   (let ((mode (rtx-mode expr))
 	(indx-sel (rtx-mem-index-sel expr)))
 
@@ -151,7 +151,7 @@
 		     "memory must have explicit mode" expr))
 
     (let* ((try (list 'mem #f mode 'h-memory indx-sel))
-	   (existing-op (-rtx-find-op try op-list)))
+	   (existing-op (/rtx-find-op try op-list)))
 
       ; If already present, return the object, otherwise add it.
       (if existing-op
@@ -170,7 +170,7 @@
 
 ; Subroutine of semantic-compile:process-expr!, to simplify it.
 
-(define (-build-ifield-operand! expr tstate op-list)
+(define (/build-ifield-operand! expr tstate op-list)
   (let* ((f-name (rtx-ifield-name expr))
 	 (f (current-ifld-lookup f-name)))
 
@@ -179,7 +179,7 @@
 
     (let* ((mode (obj:name (ifld-mode f)))
 	   (try (list '-op- #f mode f-name #f))
-	   (existing-op (-rtx-find-op try op-list)))
+	   (existing-op (/rtx-find-op try op-list)))
 
       ; If already present, return the object, otherwise add it.
       (if existing-op
@@ -206,7 +206,7 @@
 ; spent in semantic code) that can be done on code that uses index-of
 ; (see i960's movq insn).  Later.
 
-(define (-build-index-of-operand! expr tstate op-list)
+(define (/build-index-of-operand! expr tstate op-list)
   (if (not (and (rtx? (rtx-index-of-value expr))
 		(rtx-kind? 'operand (rtx-index-of-value expr))))
       (parse-error (tstate-context tstate)
@@ -221,10 +221,10 @@
 		       expr))
       (let* ((f (hw-index:value indx))
 	     (f-name (obj:name f)))
-	; The rest of this is identical to -build-ifield-operand!.
+	; The rest of this is identical to /build-ifield-operand!.
 	(let* ((mode (obj:name (ifld-mode f)))
 	       (try (list '-op- #f mode f-name #f))
-	       (existing-op (-rtx-find-op try op-list)))
+	       (existing-op (/rtx-find-op try op-list)))
 
 	  ; If already present, return the object, otherwise add it.
 	  (if existing-op
@@ -340,7 +340,7 @@
 	  (case (car expr)
 
 	    ; Registers.
-	    ((reg) (let ((ref-type (-rtx-ref-type parent-expr op-pos))
+	    ((reg) (let ((ref-type (/rtx-ref-type parent-expr op-pos))
 			 ; ??? could verify reg is a scalar
 			 (regno (or (rtx-reg-number expr) 0)))
 		     ; The register number is either a number or an
@@ -355,30 +355,30 @@
 			   (else (parse-error (tstate-context tstate)
 					      "invalid register number"
 					      regno)))
-		     (-build-reg-operand! expr tstate
+		     (/build-reg-operand! expr tstate
 					  (if (eq? ref-type 'use)
 					      in-ops
 					      out-ops))))
 
 	    ; Memory.
-	    ((mem) (let ((ref-type (-rtx-ref-type parent-expr op-pos)))
+	    ((mem) (let ((ref-type (/rtx-ref-type parent-expr op-pos)))
 		     (rtx-traverse-operands rtx-obj expr tstate appstuff)
-		     (-build-mem-operand! expr tstate
+		     (/build-mem-operand! expr tstate
 					  (if (eq? ref-type 'use)
 					      in-ops
 					      out-ops))))
 
 	    ; Operands.
 	    ((operand) (let ((op (rtx-operand-obj expr))
-			     (ref-type (-rtx-ref-type parent-expr op-pos)))
-			 (-build-operand! (obj:name op) op mode tstate ref-type
+			     (ref-type (/rtx-ref-type parent-expr op-pos)))
+			 (/build-operand! (obj:name op) op mode tstate ref-type
 					  (if (eq? ref-type 'use)
 					      in-ops
 					      out-ops)
 					  sem-attrs)))
 
 	    ; Give operand new name.
-	    ((name) (let ((result (-rtx-traverse (caddr expr) 'RTX mode
+	    ((name) (let ((result (/rtx-traverse (caddr expr) 'RTX mode
 						 parent-expr op-pos tstate appstuff)))
 		      (if (not (operand? result))
 			  (error "name: invalid argument:" expr result))
@@ -390,21 +390,21 @@
 	    ((local) expr) ; nothing to do
 
 	    ; Instruction fields.
-	    ((ifield) (let ((ref-type (-rtx-ref-type parent-expr op-pos)))
+	    ((ifield) (let ((ref-type (/rtx-ref-type parent-expr op-pos)))
 			(if (not (eq? ref-type 'use))
 			    (parse-error (tstate-context tstate)
 					 "can't set an `ifield'" expr))
-			(-build-ifield-operand! expr tstate in-ops)))
+			(/build-ifield-operand! expr tstate in-ops)))
 
 	    ; Hardware indices.
 	    ; For registers this is the register number.
 	    ; For memory this is the address.
 	    ; For constants, this is the constant.
-	    ((index-of) (let ((ref-type (-rtx-ref-type parent-expr op-pos)))
+	    ((index-of) (let ((ref-type (/rtx-ref-type parent-expr op-pos)))
 			  (if (not (eq? ref-type 'use))
 			      (parse-error (tstate-context tstate)
 					   "can't set an `index-of'" expr))
-			  (-build-index-of-operand! expr tstate in-ops)))
+			  (/build-index-of-operand! expr tstate in-ops)))
 
 	    ; Machine generate the SKIP-CTI attribute.
 	    ((skip) (append! sem-attrs (list 'SKIP-CTI)) #f)
@@ -510,7 +510,7 @@
 	  (case (car expr)
 
 	    ((operand) (if (and (eq? 'pc (obj:name (rtx-operand-obj expr)))
-				(memq (-rtx-ref-type parent-expr op-pos)
+				(memq (/rtx-ref-type parent-expr op-pos)
 				      '(set set-quiet)))
 			   (append! sem-attrs
 				    (if (tstate-cond? tstate)

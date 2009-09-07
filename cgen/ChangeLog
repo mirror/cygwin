@@ -1,3 +1,13 @@
+2009-09-07  Doug Evans  <dje@sebabeach.org>
+
+	* read.scm (rtl-version-equal?): New function.
+	(rtl-version-at-least?, rtl-version-older?): New functions.
+
+	* *.scm: Use / to prefix "local" vars/fns, for r6rs compliance.
+	* pmacros.scm (/pmacro-builtin-splice): Refer to $unsplice for
+	rtl versions >= 0.9.
+	(pmacros-init!): Tweak to prepare for $<pmacro> for builtin pmacros.
+
 2009-09-03  Doug Evans  <dje@sebabeach.org>
 
 	* rtl.scm (rtx-pretty-name): Fix thinko, don't assume (car rtx)

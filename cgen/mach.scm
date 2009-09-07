@@ -82,24 +82,24 @@
 ; ??? All elements should really be assumed to be a black-box table.
 
 (define (arch-ifld-list arch)
-  (-ident-object-table->list (arch-ifld-table arch))
+  (/ident-object-table->list (arch-ifld-table arch))
 )
 
 (define (arch-op-list arch)
-  (-ident-object-table->list (arch-op-table arch))
+  (/ident-object-table->list (arch-op-table arch))
 )
 
 (define (arch-insn-list arch)
-  (-ident-object-table->list (arch-insn-table arch))
+  (/ident-object-table->list (arch-insn-table arch))
 )
 
 (define (arch-minsn-list arch)
-  (-ident-object-table->list (arch-minsn-table arch))
+  (/ident-object-table->list (arch-minsn-table arch))
 )
 
 ;; Get the next ordinal and increment it for the next time.
 
-(define (-get-next-ordinal! arch)
+(define (/get-next-ordinal! arch)
   (let ((ordinal (arch-next-ordinal arch)))
     (arch-set-next-ordinal! arch (+ ordinal 1))
     ordinal)
@@ -108,9 +108,9 @@
 ;; FIXME: temp hack for current-ifld-lookup, current-op-lookup.
 ;; Return the element of list L with the lowest ordinal.
 
-(define (-get-lowest-ordinal l)
+(define (/get-lowest-ordinal l)
   (let ((lowest-obj #f)
-	(lowest-ord (-get-next-ordinal! CURRENT-ARCH)))
+	(lowest-ord (/get-next-ordinal! CURRENT-ARCH)))
     (for-each (lambda (elm)
 		(if (< (obj-ordinal elm) lowest-ord)
 		    (begin
@@ -131,7 +131,7 @@
 ;; This relies on the ordinal element of <source-ident> objects to build the
 ;; ordered list.
 
-(define (-make-ident-object-table hash-size)
+(define (/make-ident-object-table hash-size)
   (cons (make-hash-table hash-size) #f)
 )
 
@@ -141,7 +141,7 @@
 ;; integer and (integer . integer) where the latter is a pair of
 ;; major-ordinal-number and minor-ordinal-number.
 
-(define (-ident-object-table->list iot)
+(define (/ident-object-table->list iot)
   (if (cdr iot)
       (cdr iot)
       (let ((unsorted (hash-fold (lambda (key value prior)
@@ -171,10 +171,10 @@
 
 ;; Add an entry to an ident-object-table.
 
-(define (-ident-object-table-add! arch iot key object)
+(define (/ident-object-table-add! arch iot key object)
   ;; Give OBJECT an ordinal if it doesn't have one already.
   (if (not (obj-ordinal object))
-      (obj-set-ordinal! object (-get-next-ordinal! arch)))
+      (obj-set-ordinal! object (/get-next-ordinal! arch)))
 
   ;; Remember: Elements in the hash table are lists of objects, this is because
   ;; multiple objects can have the same key if they come from different isas.
@@ -191,7 +191,7 @@
 
 ;; Look up KEY in an ident-object-table.
 
-(define (-ident-object-table-lookup iot key)
+(define (/ident-object-table-lookup iot key)
   (hashq-ref iot key)
 )
 
@@ -409,14 +409,14 @@
 ; Instruction fields.
 
 (define (current-ifld-list)
-  (-ident-object-table->list (arch-ifld-table CURRENT-ARCH))
+  (/ident-object-table->list (arch-ifld-table CURRENT-ARCH))
 )
 
 (define (current-ifld-add! f)
-  (if (-ifld-already-defined? f)
+  (if (/ifld-already-defined? f)
       (parse-error (make-obj-context f "define-ifield")
 		   "ifield already defined" (obj:name f)))
-  (-ident-object-table-add! CURRENT-ARCH (arch-ifld-table CURRENT-ARCH)
+  (/ident-object-table-add! CURRENT-ARCH (arch-ifld-table CURRENT-ARCH)
 			    (obj:name f) f)
   *UNSPECIFIED*
 )
@@ -433,7 +433,7 @@
 (define (current-ifld-lookup x)
   (if (ifield? x)
       x
-      (let ((f-list (-ident-object-table-lookup (car (arch-ifld-table CURRENT-ARCH))
+      (let ((f-list (/ident-object-table-lookup (car (arch-ifld-table CURRENT-ARCH))
 						x)))
 	(if f-list
 	    (if (= (length f-list) 1)
@@ -441,7 +441,7 @@
 		;; FIXME: For now just return the first one,
 		;; same behaviour as before.
 		;; Here "first one" means "first defined".
-		(-get-lowest-ordinal f-list))
+		(/get-lowest-ordinal f-list))
 	    #f)))
 )
 
@@ -449,8 +449,8 @@
 ; This is slightly complicated because multiple isas can have different
 ; ifields with the same name.
 
-(define (-ifld-already-defined? f)
-  (let ((iflds (-ident-object-table-lookup (car (arch-ifld-table CURRENT-ARCH))
+(define (/ifld-already-defined? f)
+  (let ((iflds (/ident-object-table-lookup (car (arch-ifld-table CURRENT-ARCH))
 					   (obj:name f))))
     ; We've got all the ifields with the same name,
     ; now see if any have the same ISA as F.
@@ -468,14 +468,14 @@
 ; Operands.
 
 (define (current-op-list)
-  (-ident-object-table->list (arch-op-table CURRENT-ARCH))
+  (/ident-object-table->list (arch-op-table CURRENT-ARCH))
 )
 
 (define (current-op-add! op)
-  (if (-op-already-defined? op)
+  (if (/op-already-defined? op)
       (parse-error (make-obj-context op "define-operand")
 		   "operand already defined" (obj:name op)))
-  (-ident-object-table-add! CURRENT-ARCH (arch-op-table CURRENT-ARCH)
+  (/ident-object-table-add! CURRENT-ARCH (arch-op-table CURRENT-ARCH)
 			    (obj:name op) op)
   *UNSPECIFIED*
 )
@@ -484,14 +484,14 @@
 ; for different isas.
 
 (define (current-op-lookup name)
-  (let ((op-list (-ident-object-table-lookup (car (arch-op-table CURRENT-ARCH))
+  (let ((op-list (/ident-object-table-lookup (car (arch-op-table CURRENT-ARCH))
 					     name)))
     (if op-list
 	(if (= (length op-list) 1)
 	    (car op-list)
 	    ;; FIXME: For now just return the first one, same behaviour as before.
 	    ;; Here "first one" means "first defined".
-	    (-get-lowest-ordinal op-list))
+	    (/get-lowest-ordinal op-list))
 	#f))
 )
 
@@ -499,8 +499,8 @@
 ; This is slightly complicated because multiple isas can have different
 ; operands with the same name.
 
-(define (-op-already-defined? op)
-  (let ((ops (-ident-object-table-lookup (car (arch-op-table CURRENT-ARCH))
+(define (/op-already-defined? op)
+  (let ((ops (/ident-object-table-lookup (car (arch-op-table CURRENT-ARCH))
 					 (obj:name op))))
     ; We've got all the operands with the same name,
     ; now see if any have the same ISA as OP.
@@ -527,14 +527,14 @@
 ; Instructions.
 
 (define (current-insn-list)
-  (-ident-object-table->list (arch-insn-table CURRENT-ARCH))
+  (/ident-object-table->list (arch-insn-table CURRENT-ARCH))
 )
 
 (define (current-insn-add! i)
-  (if (-insn-already-defined? i)
+  (if (/insn-already-defined? i)
       (parse-error (make-obj-context i "define-insn")
 		   "insn already defined" (obj:name i)))
-  (-ident-object-table-add! CURRENT-ARCH (arch-insn-table CURRENT-ARCH)
+  (/ident-object-table-add! CURRENT-ARCH (arch-insn-table CURRENT-ARCH)
 			    (obj:name i) i)
   *UNSPECIFIED*
 )
@@ -543,7 +543,7 @@
 ; for different isas.
 
 (define (current-insn-lookup name)
-  (let ((i (-ident-object-table-lookup (car (arch-insn-table CURRENT-ARCH))
+  (let ((i (/ident-object-table-lookup (car (arch-insn-table CURRENT-ARCH))
 				       name)))
     (if i
 	(begin
@@ -559,8 +559,8 @@
 ; This is slightly complicated because multiple isas can have different
 ; insns with the same name.
 
-(define (-insn-already-defined? insn)
-  (let ((insns (-ident-object-table-lookup (car (arch-insn-table CURRENT-ARCH))
+(define (/insn-already-defined? insn)
+  (let ((insns (/ident-object-table-lookup (car (arch-insn-table CURRENT-ARCH))
 					   (obj:name insn))))
     ; We've got all the insns with the same name,
     ; now see if any have the same ISA as INSN.
@@ -578,14 +578,14 @@
 ; Macro instructions.
 
 (define (current-minsn-list)
-  (-ident-object-table->list (arch-minsn-table CURRENT-ARCH))
+  (/ident-object-table->list (arch-minsn-table CURRENT-ARCH))
 )
 
 (define (current-minsn-add! m)
-  (if (-minsn-already-defined? m)
+  (if (/minsn-already-defined? m)
       (parse-error (make-obj-context m "define-minsn")
 		   "macro-insn already defined" (obj:name m)))
-  (-ident-object-table-add! CURRENT-ARCH (arch-minsn-table CURRENT-ARCH)
+  (/ident-object-table-add! CURRENT-ARCH (arch-minsn-table CURRENT-ARCH)
 			    (obj:name m) m)
   *UNSPECIFIED*
 )
@@ -594,7 +594,7 @@
 ; for different isas.
 
 (define (current-minsn-lookup name)
-  (let ((m (-ident-object-table-lookup (car (arch-minsn-table CURRENT-ARCH))
+  (let ((m (/ident-object-table-lookup (car (arch-minsn-table CURRENT-ARCH))
 				       name)))
     (if m
 	(begin
@@ -610,8 +610,8 @@
 ; This is slightly complicated because multiple isas can have different
 ; macro-insns with the same name.
 
-(define (-minsn-already-defined? m)
-  (let ((minsns (-ident-object-table-lookup (car (arch-minsn-table CURRENT-ARCH))
+(define (/minsn-already-defined? m)
+  (let ((minsns (/ident-object-table-lookup (car (arch-minsn-table CURRENT-ARCH))
 					    (obj:name m))))
     ; We've got all the macro-insns with the same name,
     ; now see if any have the same ISA as M.
@@ -647,7 +647,7 @@
 
 ; Parse an alignment spec.
 
-(define (-arch-parse-alignment context alignment)
+(define (/arch-parse-alignment context alignment)
   (if (memq alignment '(aligned unaligned forced))
       alignment
       (parse-error context "invalid alignment" alignment))
@@ -657,7 +657,7 @@
 ; The value is a list of mach names or (mach-name sanitize-key) elements.
 ; The result is a list of (mach-name . sanitize-key) elements.
 
-(define (-arch-parse-machs context machs)
+(define (/arch-parse-machs context machs)
   (for-each (lambda (m)
 	      (if (or (symbol? m)
 		      (and (list? m) (= (length m) 2)
@@ -676,7 +676,7 @@
 ; The value is a list of isa names or (isa-name sanitize-key) elements.
 ; The result is a list of (isa-name . sanitize-key) elements.
 
-(define (-arch-parse-isas context isas)
+(define (/arch-parse-isas context isas)
   (for-each (lambda (m)
 	      (if (or (symbol? m)
 		      (and (list? m) (= (length m) 2)
@@ -696,7 +696,7 @@
 ; description in the .cpu file.
 ; All arguments are in raw (non-evaluated) form.
 
-(define (-arch-parse context name comment attrs
+(define (/arch-parse context name comment attrs
 		     default-alignment insn-lsb0?
 		     machs isas)
   (logit 2 "Processing arch " name " ...\n")
@@ -704,10 +704,10 @@
     (parse-name context name)
     (parse-comment context comment)
     (atlist-parse context attrs "arch")
-    (-arch-parse-alignment context default-alignment)
+    (/arch-parse-alignment context default-alignment)
     (parse-boolean context insn-lsb0?)
-    (-arch-parse-machs context machs)
-    (-arch-parse-isas context isas))
+    (/arch-parse-machs context machs)
+    (/arch-parse-isas context isas))
 )
 
 ; Read an architecture description.
@@ -715,7 +715,7 @@
 ; ARG-LIST is an associative list of field name and field value.
 ; parse-arch is invoked to create the `arch' object.
 
-(define -arch-read
+(define /arch-read
   (lambda arg-list
     (let ((context "arch-read")
 	  ; <arch-data> object members and default values
@@ -749,7 +749,7 @@
       (if (not isas)
 	  (parse-error context "missing isas spec"))
       ; Now that we've identified the elements, build the object.
-      (-arch-parse context name comment attrs default-alignment insn-lsb0?
+      (/arch-parse context name comment attrs default-alignment insn-lsb0?
 		   machs isas)
       )
     )
@@ -759,7 +759,7 @@
 
 (define define-arch
   (lambda arg-list
-    (let ((a (apply -arch-read arg-list)))
+    (let ((a (apply /arch-read arg-list)))
       (arch-set-data! CURRENT-ARCH a)
       (def-mach-attr! (adata-machs a))
       (keep-mach-validate!)
@@ -1001,7 +1001,7 @@
 ; FIXME: All possible values must be specified.  Need an `else' clause.
 ; Ranges would also be useful.
 
-(define (-isa-parse-decode-split context spec)
+(define (/isa-parse-decode-split context spec)
   (if (!= (length spec) 3)
       (parse-error context "decode-split spec is (ifield-name constraint value-list)" spec))
 
@@ -1019,9 +1019,9 @@
 
 ; Parse a list of decode-split specs.
 
-(define (-isa-parse-decode-splits context spec-list)
+(define (/isa-parse-decode-splits context spec-list)
   (map (lambda (spec)
-	 (-isa-parse-decode-split context spec))
+	 (/isa-parse-decode-split context spec))
        spec-list)
 )
 
@@ -1137,7 +1137,7 @@
 ; `condition' here refers to the condition performed by architectures like
 ; ARM and ARC before each insn.
 
-(define (-isa-parse-condition context spec)
+(define (/isa-parse-condition context spec)
   (if (null? spec)
       #f
       (begin
@@ -1151,7 +1151,7 @@
 
 ; Parse a setup-semantics spec.
 
-(define (-isa-parse-setup-semantics context spec)
+(define (/isa-parse-setup-semantics context spec)
   (if (not (null? spec))
       spec
       #f)
@@ -1161,7 +1161,7 @@
 ; The result is the <isa> object.
 ; All arguments are in raw (non-evaluated) form.
 
-(define (-isa-parse context name comment attrs
+(define (/isa-parse context name comment attrs
 		    base-insn-bitsize default-insn-bitsize default-insn-word-bitsize
 		    decode-assist liw-insns parallel-insns condition
 		    setup-semantics decode-splits)
@@ -1194,16 +1194,16 @@
       decode-assist
       liw-insns
       parallel-insns
-      (-isa-parse-condition context condition)
-      (-isa-parse-setup-semantics context setup-semantics)
-      (-isa-parse-decode-splits context decode-splits)
+      (/isa-parse-condition context condition)
+      (/isa-parse-setup-semantics context setup-semantics)
+      (/isa-parse-decode-splits context decode-splits)
       ))
 )
 
 ; Read an isa entry.
 ; ARG-LIST is an associative list of field name and field value.
 
-(define (-isa-read context . arg-list)
+(define (/isa-read context . arg-list)
   (let (
 	(name #f)
 	(attrs nil)
@@ -1247,7 +1247,7 @@
 	    (loop (cdr arg-list)))))
 
     ;; Now that we've identified the elements, build the object.
-    (-isa-parse context name comment attrs
+    (/isa-parse context name comment attrs
 		base-insn-bitsize
 		(if default-insn-word-bitsize
 		    default-insn-word-bitsize
@@ -1263,7 +1263,7 @@
 
 (define define-isa
   (lambda arg-list
-    (let ((i (apply -isa-read (cons (make-current-context "define-isa")
+    (let ((i (apply /isa-read (cons (make-current-context "define-isa")
 				    arg-list))))
       (if i
 	  (current-isa-add! i))
@@ -1272,8 +1272,8 @@
 
 ; Subroutine of modify-isa to process one add-decode-split spec.
 
-(define (-isa-add-decode-split! context isa spec)
-  (let ((decode-split (-isa-parse-decode-split context spec)))
+(define (/isa-add-decode-split! context isa spec)
+  (let ((decode-split (/isa-parse-decode-split context spec)))
     (isa-set-decode-splits! (cons decode-split (isa-decode-splits isa)))
     *UNSPECIFIED*)
 )
@@ -1298,7 +1298,7 @@
 		(case (car arg-spec)
 		  ((name) #f) ; ignore, already processed
 		  ((add-decode-split)
-		   (-isa-add-decode-split! context isa (cdr arg-spec)))
+		   (/isa-add-decode-split! context isa (cdr arg-spec)))
 		  (else
 		   (parse-error context "invalid/unsupported option" (car arg-spec))))
 		(loop (cdr args)))))))
@@ -1411,7 +1411,7 @@
 ; description in the .cpu file.
 ; All arguments are in raw (non-evaluated) form.
 
-(define (-cpu-parse context name comment attrs
+(define (/cpu-parse context name comment attrs
 		    endian insn-endian data-endian float-endian
 		    word-bitsize insn-chunk-bitsize file-transform parallel-insns)
   (logit 2 "Processing cpu family " name " ...\n")
@@ -1441,9 +1441,9 @@
 ; This is the main routine for analyzing a cpu description in the .cpu file.
 ; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
-; -cpu-parse is invoked to create the <cpu> object.
+; /cpu-parse is invoked to create the <cpu> object.
 
-(define (-cpu-read context . arg-list)
+(define (/cpu-read context . arg-list)
   (let (
 	(name nil)
 	(comment nil)
@@ -1483,7 +1483,7 @@
 	    (loop (cdr arg-list)))))
 
     ;; Now that we've identified the elements, build the object.
-    (-cpu-parse context name comment attrs
+    (/cpu-parse context name comment attrs
 		endian insn-endian data-endian float-endian
 		word-bitsize insn-chunk-bitsize file-transform parallel-insns-))
 )
@@ -1492,7 +1492,7 @@
 
 (define define-cpu
   (lambda arg-list
-    (let ((c (apply -cpu-read (cons (make-current-context "define-cpu")
+    (let ((c (apply /cpu-read (cons (make-current-context "define-cpu")
 				    arg-list))))
       (if c
 	  (begin
@@ -1539,7 +1539,7 @@
 ; The result is a <mach> object or #f if the mach isn't to be kept.
 ; All arguments are in raw (non-evaluated) form.
 
-(define (-mach-parse context name comment attrs cpu bfd-name isas)
+(define (/mach-parse context name comment attrs cpu bfd-name isas)
   (logit 2 "Processing mach " name " ...\n")
 
   ;; Pick out name first to augment the error context.
@@ -1582,7 +1582,7 @@
 ; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
 
-(define (-mach-read context . arg-list)
+(define (/mach-read context . arg-list)
   (let (
 	(name nil)
 	(attrs nil)
@@ -1608,7 +1608,7 @@
 	    (loop (cdr arg-list)))))
 
     ;; Now that we've identified the elements, build the object.
-    (-mach-parse context name comment attrs cpu
+    (/mach-parse context name comment attrs cpu
 		 ;; Default bfd-name is same as object's name.
 		 (if bfd-name bfd-name (symbol->string name))
 		 ;; Default isa is the first one.
@@ -1619,7 +1619,7 @@
 
 (define define-mach
   (lambda arg-list
-    (let ((m (apply -mach-read (cons (make-current-context "define-mach")
+    (let ((m (apply /mach-read (cons (make-current-context "define-mach")
 				     arg-list))))
       (if m
 	  (current-mach-add! m))
@@ -1725,7 +1725,7 @@
 ; computation.
 ; Often this data isn't needed so we only computed it if we have to.
 
-(define (-adata-set-derived! arch)
+(define (/adata-set-derived! arch)
   ; Don't compute this data unless we need to.
   (arch-set-derived!
    arch
@@ -1852,10 +1852,10 @@ Define a cpu family, name/value pair list version.
 
 (define (mach-init!)
   (let ((arch CURRENT-ARCH))
-    (arch-set-ifld-table! arch (-make-ident-object-table 127))
-    (arch-set-op-table! arch (-make-ident-object-table 127))
-    (arch-set-insn-table! arch (-make-ident-object-table 509))
-    (arch-set-minsn-table! arch (-make-ident-object-table 127))
+    (arch-set-ifld-table! arch (/make-ident-object-table 127))
+    (arch-set-op-table! arch (/make-ident-object-table 127))
+    (arch-set-insn-table! arch (/make-ident-object-table 509))
+    (arch-set-minsn-table! arch (/make-ident-object-table 127))
     )
 
   (reader-add-command! 'define-mach
@@ -1893,7 +1893,7 @@ Define a machine, name/value pair list version.
 ; Called after .cpu file is read in.
 
 (define (mach-finish!)
-  (-adata-set-derived! CURRENT-ARCH)
+  (/adata-set-derived! CURRENT-ARCH)
 
   *UNSPECIFIED*
 )

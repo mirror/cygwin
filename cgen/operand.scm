@@ -483,10 +483,10 @@
 
 ; Parsing support.
 
-; Utility of -operand-parse-[gs]etter to build the expected syntax,
+; Utility of /operand-parse-[gs]etter to build the expected syntax,
 ; for use in error messages.
 
-(define (-operand-g/setter-syntax rank setter?)
+(define (/operand-g/setter-syntax rank setter?)
   (string-append "("
 		 (string-drop1
 		  (numbers->string (iota rank) " index"))
@@ -503,7 +503,7 @@
 ; Omit `index-names' for scalar objects.
 ; {rank} is the required number of elements in {index-names}.
 
-(define (-operand-parse-getter context getter rank)
+(define (/operand-parse-getter context getter rank)
   (if (null? getter)
       #f ; use default
       (let ()
@@ -513,7 +513,7 @@
 			  (= (length (car getter)) rank))))
 	    (parse-error context
 			 (string-append "invalid getter, should be "
-					(-operand-g/setter-syntax rank #f))
+					(/operand-g/setter-syntax rank #f))
 			 getter))
 	(if (not (rtx? (cadr getter)))
 	    (parse-error context "invalid rtx expression" getter))
@@ -525,7 +525,7 @@
 ; Omit `index-names' for scalar objects.
 ; {rank} is the required number of elements in {index-names}.
 
-(define (-operand-parse-setter context setter rank)
+(define (/operand-parse-setter context setter rank)
   (if (null? setter)
       #f ; use default
       (let ()
@@ -535,7 +535,7 @@
 			  (= (+ 1 (length (car setter)) rank)))))
 	    (parse-error context
 			 (string-append "invalid setter, should be "
-					(-operand-g/setter-syntax rank #t))
+					(/operand-g/setter-syntax rank #t))
 			 setter))
 	(if (not (rtx? (cadr setter)))
 	    (parse-error context "invalid rtx expression" setter))
@@ -550,7 +550,7 @@
 ; ??? This only takes insn fields as the index.  May need another proc (or an
 ; enhancement of this one) that takes other kinds of indices.
 
-(define (-operand-parse context name comment attrs hw mode ifld handlers getter setter)
+(define (/operand-parse context name comment attrs hw mode ifld handlers getter setter)
   (logit 2 "Processing operand " name " ...\n")
 
   ;; Pick out name first to augment the error context.
@@ -608,8 +608,8 @@
 	      mode ; ditto, this is a name, not an object
 	      hw-index
 	      (parse-handlers context '(parse print) handlers)
-	      (-operand-parse-getter context getter (if scalar? 0 1))
-	      (-operand-parse-setter context setter (if scalar? 0 1))
+	      (/operand-parse-getter context getter (if scalar? 0 1))
+	      (/operand-parse-setter context setter (if scalar? 0 1))
 	      )))
 
 	(begin
@@ -621,9 +621,9 @@
 ; This is the main routine for analyzing operands in the .cpu file.
 ; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
-; -operand-parse is invoked to create the <operand> object.
+; /operand-parse is invoked to create the <operand> object.
 
-(define (-operand-read context . arg-list)
+(define (/operand-read context . arg-list)
   (let (
 	(name nil)
 	(comment nil)
@@ -655,7 +655,7 @@
 	    (loop (cdr arg-list)))))
 
     ; Now that we've identified the elements, build the object.
-    (-operand-parse context name comment attrs type mode index handlers
+    (/operand-parse context name comment attrs type mode index handlers
 		    getter setter))
 )
 
@@ -663,7 +663,7 @@
 
 (define define-operand
   (lambda arg-list
-    (let ((op (apply -operand-read (cons (make-current-context "define-operand")
+    (let ((op (apply /operand-read (cons (make-current-context "define-operand")
 					 arg-list))))
       (if op
 	  (current-op-add! op))
@@ -673,7 +673,7 @@
 ; Define an operand object, all arguments specified.
 
 (define (define-full-operand name comment attrs type mode index handlers getter setter)
-  (let ((op (-operand-parse (make-current-context "define-full-operand")
+  (let ((op (/operand-parse (make-current-context "define-full-operand")
 			    name comment attrs
 			    type mode index handlers getter setter)))
     (if op
@@ -783,20 +783,20 @@
 
 ; Derived/Anyof parsing support.
 
-; Subroutine of -derived-operand-parse to parse the encoding.
+; Subroutine of /derived-operand-parse to parse the encoding.
 ; The result is a <derived-ifield> object.
 ; The {owner} member still needs to be set!
 
-(define (-derived-parse-encoding context operand-name encoding)
+(define (/derived-parse-encoding context operand-name encoding)
   (if (or (null? encoding)
 	  (not (list? encoding)))
       (parse-error context "encoding not a list" encoding))
   (if (not (eq? (car encoding) '+))
       (parse-error context "encoding must begin with `+'" encoding))
 
-  ; ??? Calling -parse-insn-format is a quick hack.
+  ; ??? Calling /parse-insn-format is a quick hack.
   ; It's an internal routine of some other file.
-  (let ((iflds (-parse-insn-format context encoding)))
+  (let ((iflds (/parse-insn-format context encoding)))
     (make <derived-ifield>
 	  operand-name
 	  'derived-ifield ; (string-append "<derived-ifield> for " operand-name)
@@ -806,13 +806,13 @@
 	  ))
 )
 
-; Subroutine of -derived-operand-parse to parse the ifield assertion.
+; Subroutine of /derived-operand-parse to parse the ifield assertion.
 ; The ifield assertion is either () or an RTL expression asserting something
 ; about the ifield values of the containing insn.
 ; Operands are specified by name, but what is used is their indices (there's
 ; an implicit `index-of' going on).
 
-(define (-derived-parse-ifield-assertion context args ifield-assertion)
+(define (/derived-parse-ifield-assertion context args ifield-assertion)
   ; FIXME: for now
   (if (null? ifield-assertion)
       #f
@@ -828,7 +828,7 @@
 ; ??? Currently no support for handlers(,???) found in normal operands.
 ; Later, when necessary.
 
-(define (-derived-operand-parse context name comment attrs mode
+(define (/derived-operand-parse context name comment attrs mode
 				args syntax
 				base-ifield encoding ifield-assertion
 				getter setter)
@@ -842,7 +842,7 @@
     (if (keep-atlist? atlist-obj #f)
 
 	(let ((mode-obj (parse-mode-name context mode))
-	      (parsed-encoding (-derived-parse-encoding context name encoding)))
+	      (parsed-encoding (/derived-parse-encoding context name encoding)))
 
 	  (if (not mode-obj)
 	      (parse-error context "unknown mode" mode))
@@ -864,16 +864,16 @@
 		       syntax
 		       base-ifield ; FIXME: validate
 		       parsed-encoding
-		       (-derived-parse-ifield-assertion context args ifield-assertion)
+		       (/derived-parse-ifield-assertion context args ifield-assertion)
 		       (if (null? getter)
 			   #f
-			   (-operand-parse-getter context
+			   (/operand-parse-getter context
 						  (list args
 							(rtx-canonicalize context getter))
 						  (length args)))
 		       (if (null? setter)
 			   #f
-			   (-operand-parse-setter context
+			   (/operand-parse-setter context
 						  (list (append args '(newval))
 							(rtx-canonicalize context setter))
 						  (length args)))
@@ -898,9 +898,9 @@
 ; This is the main routine for analyzing derived operands in the .cpu file.
 ; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
-; -derived-operand-parse is invoked to create the <derived-operand> object.
+; /derived-operand-parse is invoked to create the <derived-operand> object.
 
-(define (-derived-operand-read context . arg-list)
+(define (/derived-operand-read context . arg-list)
   (let (
 	(name nil)
 	(comment nil)
@@ -936,7 +936,7 @@
 	    (loop (cdr arg-list)))))
 
     ; Now that we've identified the elements, build the object.
-    (-derived-operand-parse context name comment attrs mode args
+    (/derived-operand-parse context name comment attrs mode args
 			    syntax base-ifield encoding ifield-assertion
 			    getter setter))
 )
@@ -945,7 +945,7 @@
 
 (define define-derived-operand
   (lambda arg-list
-    (let ((op (apply -derived-operand-read
+    (let ((op (apply /derived-operand-read
 		     (cons (make-current-context "define-derived-operand")
 			   arg-list))))
       (if op
@@ -957,7 +957,7 @@
 ; ??? Not supported (yet).
 ;
 ;(define (define-full-derived-operand name comment attrs mode ...)
-;  (let ((op (-derived-operand-parse (make-current-context "define-full-derived-operand")
+;  (let ((op (/derived-operand-parse (make-current-context "define-full-derived-operand")
 ;				    name comment attrs
 ;				    mode ...)))
 ;    (if op
@@ -968,7 +968,7 @@
 ; Parse an "anyof" choice, which is a derived-operand name.
 ; The result is {choice} unchanged.
 
-(define (-anyof-parse-choice context choice)
+(define (/anyof-parse-choice context choice)
   (if (not (symbol? choice))
       (parse-error context "anyof choice not a symbol" choice))
   (let ((op (current-op-lookup choice)))
@@ -986,7 +986,7 @@
 ; ??? Currently no support for handlers(,???) found in normal operands.
 ; Later, when necessary.
 
-(define (-anyof-operand-parse context name comment attrs mode
+(define (/anyof-operand-parse context name comment attrs mode
 			      base-ifield choices)
   (logit 2 "Processing anyof operand " name " ...\n")
 
@@ -1008,7 +1008,7 @@
 		mode
 		base-ifield
 		(map (lambda (c)
-		       (-anyof-parse-choice context c))
+		       (/anyof-parse-choice context c))
 		     choices)))
 
 	(begin
@@ -1020,9 +1020,9 @@
 ; This is the main routine for analyzing anyof operands in the .cpu file.
 ; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
-; -anyof-operand-parse is invoked to create the <anyof-operand> object.
+; /anyof-operand-parse is invoked to create the <anyof-operand> object.
 
-(define (-anyof-operand-read context . arg-list)
+(define (/anyof-operand-read context . arg-list)
   (let (
 	(name nil)
 	(comment nil)
@@ -1048,14 +1048,14 @@
 	    (loop (cdr arg-list)))))
 
     ; Now that we've identified the elements, build the object.
-    (-anyof-operand-parse context name comment attrs mode base-ifield choices))
+    (/anyof-operand-parse context name comment attrs mode base-ifield choices))
 )
 
 ; Define an anyof operand object, name/value pair list version.
 
 (define define-anyof-operand
   (lambda arg-list
-    (let ((op (apply -anyof-operand-read
+    (let ((op (apply /anyof-operand-read
 		     (cons (make-current-context "define-anyof-operand")
 			   arg-list))))
       (if op
@@ -1091,7 +1091,7 @@
 
 ; Return initial list of known ifield values in {anyof-instance}.
 
-(define (-anyof-initial-known anyof-instance)
+(define (/anyof-initial-known anyof-instance)
   (assert (derived-operand? anyof-instance))
   (let ((encoding (derived-encoding anyof-instance)))
     (assert (derived-ifield? encoding))
@@ -1112,22 +1112,22 @@
 	#t))
 )
 
-; Subroutine of -anyof-merge-subchoices.
+; Subroutine of /anyof-merge-subchoices.
 ; Merge syntaxes of VALUE-NAMES/VALUES into SYNTAX.
 ;
 ; Example:
 ; If SYNTAX is "$a+$b", and VALUE-NAMES is (b), and VALUES is
 ; ("$c+$d"-object), then return "$a+$c+$d".
 
-(define (-anyof-syntax anyof-instance)
+(define (/anyof-syntax anyof-instance)
   (elm-get anyof-instance 'syntax)
 )
 
-(define (-anyof-name anyof-instance)
+(define (/anyof-name anyof-instance)
   (elm-get anyof-instance 'name)
 )
 
-(define (-anyof-merge-syntax syntax value-names values)
+(define (/anyof-merge-syntax syntax value-names values)
   (let ((syntax-elements (syntax-break-out syntax)))
     (syntax-make (map (lambda (e)
 			(if (anyof-operand? e)
@@ -1136,12 +1136,12 @@
 			      (if (not indx)
 				(error "Name " name " not one of " values)
 				)
-			      (-anyof-syntax (list-ref values indx)))
+			      (/anyof-syntax (list-ref values indx)))
 			    e))
 		      syntax-elements)))
 )
 
-; Subroutine of -anyof-merge-subchoices.
+; Subroutine of /anyof-merge-subchoices.
 ; Merge syntaxes of {value-names}/{values} into <derived-ifield> {encoding}.
 ; The result is a new <derived-ifield> object with subfields matching
 ; {value-names} replaced with {values}.
@@ -1152,7 +1152,7 @@
 ; is (b), and {values} is (c-choice-of-b-object), then return
 ; (a-ifield-object c-choice-of-b-ifield-object).
 
-(define (-anyof-merge-encoding container encoding value-names values)
+(define (/anyof-merge-encoding container encoding value-names values)
   (assert (derived-ifield? encoding))
   (let ((subfields (derived-ifield-subfields encoding))
 	(result (object-copy-top encoding)))
@@ -1167,14 +1167,14 @@
     result)
 )
 
-; Subroutine of -anyof-merge-subchoices.
+; Subroutine of /anyof-merge-subchoices.
 ; Merge semantics of VALUE-NAMES/VALUES into GETTER.
 ;
 ; Example:
 ; If GETTER is (mem QI foo), and VALUE-NAMES is (foo), and VALUES is
 ; ((add a b)-object), then return (mem QI (add a b)).
 
-(define (-anyof-merge-getter getter value-names values)
+(define (/anyof-merge-getter getter value-names values)
   ;(debug-repl-env getter value-names values)
   ; ??? This implementation is a quick hack, intended to evolve or be replaced.
   (cond ((not getter)
@@ -1187,13 +1187,13 @@
 			     (op:getter (list-ref values indx))
 			     e)))
 		      ((pair? e) ; pair? -> cheap non-null-list?
-		       (-anyof-merge-getter e value-names values))
+		       (/anyof-merge-getter e value-names values))
 		      (else
 		       e)))
 	      getter)))
 )
 
-; Subroutine of -anyof-merge-subchoices.
+; Subroutine of /anyof-merge-subchoices.
 ; Merge semantics of VALUE-NAMES/VALUES into SETTER.
 ;
 ; Example:
@@ -1203,7 +1203,7 @@
 ;
 ; ??? `newval' in this context is a reserved word.
 
-(define (-anyof-merge-setter setter value-names values)
+(define (/anyof-merge-setter setter value-names values)
   ;(debug-repl-env setter value-names values)
   ; ??? This implementation is a quick hack, intended to evolve or be replaced.
   (cond ((not setter)
@@ -1216,13 +1216,13 @@
 	   (if (rtx-kind 'mem dest)
 	       (set! dest
 		     (rtx-change-address dest
-					 (-anyof-merge-getter
+					 (/anyof-merge-getter
 					  (rtx-mem-addr dest)
 					  value-names values))))
-	   (set! src (-anyof-merge-getter src value-names values))
+	   (set! src (/anyof-merge-getter src value-names values))
 	   (rtx-make 'set options mode dest src)))
 	(else
-	 (error "-anyof-merge-setter: unsupported form" (car setter))))
+	 (error "/anyof-merge-setter: unsupported form" (car setter))))
 )
 
 ; Subroutine of -sub-insn-make!.
@@ -1244,7 +1244,7 @@
 		       (cond ((symbol? e)
 			      (let ((indx (element-lookup-index e value-names 0)))
 				(if indx
-				    (-anyof-name (list-ref values indx))
+				    (/anyof-name (list-ref values indx))
 				    ; (op:sem-name (list-ref values indx))
 				    e)))
 			     ((pair? e) ; pair? -> cheap non-null-list?
@@ -1256,7 +1256,7 @@
     result)
 )
 
-; Subroutine of -anyof-merge-subchoices.
+; Subroutine of /anyof-merge-subchoices.
 ; Merge assertion of VALUE-NAMES/VALUES into ASSERTION.
 ;
 ; Example:
@@ -1267,7 +1267,7 @@
 ; FIXME: Perform simplification pass, based on combined set of known
 ; ifield values.
 
-(define (-anyof-merge-ifield-assertion assertion value-names values)
+(define (/anyof-merge-ifield-assertion assertion value-names values)
   (let ((assertions (find identity
 			  (cons assertion
 				(map derived-ifield-assertion values)))))
@@ -1276,7 +1276,7 @@
 	(rtx-combine 'andif assertions)))
 )
 
-; Subroutine of -anyof-all-subchoices.
+; Subroutine of /anyof-all-subchoices.
 ; Return a copy of <derived-operand> CHOICE with NEW-ARGS from ANYOF-ARGS
 ; merged in.  This is for when a derived operand is itself composed of
 ; anyof operands.
@@ -1285,12 +1285,12 @@
 ; element in ANYOF-ARGS.
 ; CONTAINER is the <anyof-operand> containing CHOICE.
 
-(define (-anyof-merge-subchoices container choice anyof-args new-args)
+(define (/anyof-merge-subchoices container choice anyof-args new-args)
   (assert (all-true? (map anyof-operand? anyof-args)))
   (assert (all-true? (map derived-operand? new-args)))
 
   (let* ((arg-names (map obj:name anyof-args))
-	 (encoding (-anyof-merge-encoding container (derived-encoding choice)
+	 (encoding (/anyof-merge-encoding container (derived-encoding choice)
 					  arg-names new-args))
 	 (result
 	  (make <anyof-instance>
@@ -1303,15 +1303,15 @@
 		(obj-atlist choice)
 		(op:mode choice)
 		(derived-args choice)
-		(-anyof-merge-syntax (derived-syntax choice)
+		(/anyof-merge-syntax (derived-syntax choice)
 				     arg-names new-args)
 		(derived-base-ifield choice)
 		encoding
-		(-anyof-merge-ifield-assertion (derived-ifield-assertion choice)
+		(/anyof-merge-ifield-assertion (derived-ifield-assertion choice)
 					       anyof-args new-args)
-		(-anyof-merge-getter (op:getter choice)
+		(/anyof-merge-getter (op:getter choice)
 				     arg-names new-args)
-		(-anyof-merge-setter (op:setter choice)
+		(/anyof-merge-setter (op:setter choice)
 				     arg-names new-args)
 		container)))
 
@@ -1321,12 +1321,12 @@
     result)
 )
 
-; Subroutine of -anyof-all-choices-1.
+; Subroutine of /anyof-all-choices-1.
 ; Return a list of all possible subchoices of <derived-operand> ANYOF-CHOICE,
 ; known to use <anyof-operand>'s itself.
 ; CONTAINER is the containing <anyof-operand>.
 
-(define (-anyof-all-subchoices container anyof-choice)
+(define (/anyof-all-subchoices container anyof-choice)
   ; Split args into anyof and non-anyof elements.
   (let* ((args (derived-args anyof-choice))
 	 (anyof-args (find anyof-operand? args)))
@@ -1342,10 +1342,10 @@
     ; ((1 a B) (1 a C) (2 a B) (2 a C) (3 a B) (3 a C)).
     ;
     ; Note that some of these values may be derived from nested
-    ; <anyof-operand>'s which is why we recursively call -anyof-all-choices-1.
-    ; ??? -anyof-all-choices-1 should cache the results.
+    ; <anyof-operand>'s which is why we recursively call /anyof-all-choices-1.
+    ; ??? /anyof-all-choices-1 should cache the results.
 
-    (let* ((todo (map -anyof-all-choices-1 anyof-args))
+    (let* ((todo (map /anyof-all-choices-1 anyof-args))
 	   (lengths (map length todo))
 	   (total (apply * lengths))
 	   (result nil))
@@ -1360,7 +1360,7 @@
 	      ;(display (map obj:name new-args) (current-error-port))
 	      ;(newline (current-error-port))
 	      (set! result
-		    (cons (-anyof-merge-subchoices container
+		    (cons (/anyof-merge-subchoices container
 						   anyof-choice
 						   anyof-args
 						   new-args)
@@ -1373,7 +1373,7 @@
 ; Return an <anyof-instance> object from <derived-operand> {derop}, which is a
 ; choice of {anyof-operand}.
 
-(define (-anyof-instance-from-derived anyof-operand derop)
+(define (/anyof-instance-from-derived anyof-operand derop)
   (let* ((encoding (object-copy-top (derived-encoding derop)))
 	 (result
 	  (make <anyof-instance>
@@ -1406,7 +1406,7 @@
 ; Derived operands are the first cut at it.  They'll evolve or be replaced
 ; (and it's the implementation of them that will evolve first).
 
-(define (-anyof-all-choices-1 anyof-operand)
+(define (/anyof-all-choices-1 anyof-operand)
   (assert (anyof-operand? anyof-operand))
 
   (let ((result nil))
@@ -1426,13 +1426,13 @@
 
 		; This operand has "anyof" operands so we need to turn this
 		; choice into a list of all possible subchoices.
-		(let ((subchoices (-anyof-all-subchoices anyof-operand this)))
+		(let ((subchoices (/anyof-all-subchoices anyof-operand this)))
 		  (set! result
 			(append subchoices result)))
 
 		; No <anyof-operand> arguments.
 		(set! result
-		      (cons (-anyof-instance-from-derived anyof-operand this)
+		      (cons (/anyof-instance-from-derived anyof-operand this)
 			    result)))
 
 	    (loop (cdr choices)))))
@@ -1441,15 +1441,15 @@
     result)
 )
 
-; Cover fn of -anyof-all-choices-1.
+; Cover fn of /anyof-all-choices-1.
 ; Return list of <anyof-instance> objects, one for each possible variant of
 ; ANYOF-OPERAND.
 ; We want to delete choices that fail their ifield assertions, but since
-; -anyof-all-choices-1 can recursively call itself, assertion checking is
+; /anyof-all-choices-1 can recursively call itself, assertion checking is
 ; defered until it returns.
 
 (define (anyof-all-choices anyof-operand)
-  (let ((all-choices (-anyof-all-choices-1 anyof-operand)))
+  (let ((all-choices (/anyof-all-choices-1 anyof-operand)))
 
     ; Delete ones that fail their ifield assertions.
     ; Sometimes there isn't enough information yet to completely do this.
@@ -1457,7 +1457,7 @@
     ; However, it is our responsibility to assert as much as we can.
     (find (lambda (op)
 	    (anyof-satisfies-assertions? op
-					 (-anyof-initial-known op)))
+					 (/anyof-initial-known op)))
 	  all-choices))
 )
 

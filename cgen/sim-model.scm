@@ -11,7 +11,7 @@
 			       (string-upcase (obj:str-name u))))
 )
 
-(define (-gen-cpu-imp-properties)
+(define (/gen-cpu-imp-properties)
   (string-list
    "\
 /* The properties of this cpu's implementation.  */
@@ -33,7 +33,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 ; Generate code to profile hardware elements.
 ; ??? Not currently used.
 
-(define (-gen-hw-profile-code)
+(define (/gen-hw-profile-code)
   ; Fetch profilable input and output operands of the semantic code.
   (let ((in-ops (find op-profilable? (sfmt-in-ops (insn-sfmt insn))))
 	(out-ops (find op-profilable? (sfmt-out-ops (insn-sfmt insn)))))
@@ -49,7 +49,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 ; Return decls of hardware element profilers.
 ; ??? Not currently used.
 
-(define (-gen-hw-profile-decls)
+(define (/gen-hw-profile-decls)
   (string-list
    "/* Hardware profiling handlers.  */\n\n"
    (string-list-map (lambda (hw)
@@ -93,7 +93,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 	)
 
     (string-list
-     ; -gen-hw-profile-decls
+     ; /gen-hw-profile-decls
      "/* Function unit handlers (user written).  */\n\n"
      (string-list-map
       (lambda (model)
@@ -118,17 +118,17 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 
 ; Return name of profile handler for INSN, MODEL.
 
-(define (-gen-model-insn-fn-name model insn)
+(define (/gen-model-insn-fn-name model insn)
   (string-append "model_" (gen-sym model) "_" (gen-sym insn))
 )
 
 ; Return function to model INSN.
 
-(define (-gen-model-insn-fn model insn)
+(define (/gen-model-insn-fn model insn)
   (logit 2 "Processing modeling for " (obj:name insn) ": \"" (insn-syntax insn) "\" ...\n")
   (string-list
    "static int\n"
-   (-gen-model-insn-fn-name model insn)
+   (/gen-model-insn-fn-name model insn)
    ; sem_arg is a void * to keep cgen specific stuff out of sim-model.h
    " (SIM_CPU *current_cpu, void *sem_arg)\n"
    "{\n"
@@ -165,13 +165,13 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 ; ??? Modelling of insns could be table driven, but that puts constraints on
 ; generality.
 
-(define (-gen-model-insn-fns)
+(define (/gen-model-insn-fns)
   (string-write
    "/* Model handlers for each insn.  */\n\n"
    (lambda () (string-write-map
 	       (lambda (model)
 		 (string-write-map
-		  (lambda (insn) (-gen-model-insn-fn model insn))
+		  (lambda (insn) (/gen-model-insn-fn model insn))
 		  (real-insns (current-insn-list))))
 	       (current-model-list)))
    )
@@ -181,7 +181,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 ; U is a <unit> object.
 ; ARGS is a list of overriding arguments from INSN.
 
-(define (-gen-insn-unit-timing model insn u args)
+(define (/gen-insn-unit-timing model insn u args)
   (string-append
    "{ "
    "(int) " (unit:enum u) ", "
@@ -196,7 +196,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 
 ; Generate timing table entry for MODEL for INSN.
 
-(define (-gen-insn-timing model insn)
+(define (/gen-insn-timing model insn)
   ; Instruction timing is stored as an associative list based on the model.
   (let ((timing (assq (obj:name model) (insn-timing insn))))
     ;(display timing) (newline)
@@ -206,15 +206,15 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
      ", "
      (if (obj-has-attr? insn 'VIRTUAL)
 	 "0"
-	 (-gen-model-insn-fn-name model insn))
+	 (/gen-model-insn-fn-name model insn))
      ", { "
      (string-drop
       -2
       (if (not timing)
-	  (-gen-insn-unit-timing model insn (model-default-unit model) nil)
+	  (/gen-insn-unit-timing model insn (model-default-unit model) nil)
 	  (let ((units (timing:units (cdr timing))))
 	    (string-map (lambda (iunit)
-			  (-gen-insn-unit-timing model insn
+			  (/gen-insn-unit-timing model insn
 						 (iunit:unit iunit)
 						 (iunit:args iunit)))
 			units))))
@@ -224,11 +224,11 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 
 ; Generate model timing table for MODEL.
 
-(define (-gen-model-timing-table model)
+(define (/gen-model-timing-table model)
   (string-write
    "/* Model timing data for `" (obj:str-name model) "'.  */\n\n"
    "static const INSN_TIMING " (gen-sym model) "_timing[] = {\n"
-   (lambda () (string-write-map (lambda (insn) (-gen-insn-timing model insn))
+   (lambda () (string-write-map (lambda (insn) (/gen-insn-timing model insn))
 				(non-alias-insns (current-insn-list))))
    "};\n\n"
    )
@@ -236,17 +236,17 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 
 ; Return C code to define model profiling support stuff.
 
-(define (-gen-model-profile-data)
+(define (/gen-model-profile-data)
   (string-write
    "/* We assume UNIT_NONE == 0 because the tables don't always terminate\n"
    "   entries with it.  */\n\n"
-   (lambda () (string-write-map -gen-model-timing-table (current-model-list)))
+   (lambda () (string-write-map /gen-model-timing-table (current-model-list)))
    )
 )
 
 ; Return C code to define the model table for MACH.
 
-(define (-gen-mach-model-table mach)
+(define (/gen-mach-model-table mach)
   (string-list
    "\
 static const MODEL " (gen-sym mach) "_models[] =\n{\n"
@@ -270,7 +270,7 @@ static const MODEL " (gen-sym mach) "_models[] =\n{\n"
 
 ; Return C code to define model init fn.
 
-(define (-gen-model-init-fn model)
+(define (/gen-model-init-fn model)
   (string-list "\
 static void\n"
 (gen-sym model) "_model_init (SIM_CPU *cpu)
@@ -284,21 +284,21 @@ static void\n"
 
 ; Return C code to define model data and support fns.
 
-(define (-gen-model-defns)
+(define (/gen-model-defns)
   (string-write
-   (lambda () (string-write-map -gen-model-init-fn (current-model-list)))
+   (lambda () (string-write-map /gen-model-init-fn (current-model-list)))
    "#if WITH_PROFILE_MODEL_P
 #define TIMING_DATA(td) td
 #else
 #define TIMING_DATA(td) 0
 #endif\n\n"
-   (lambda () (string-write-map -gen-mach-model-table (current-mach-list)))
+   (lambda () (string-write-map /gen-mach-model-table (current-mach-list)))
    )
 )
 
 ; Return C definitions for this cpu family variant.
 
-(define (-gen-cpu-defns)
+(define (/gen-cpu-defns)
   (string-list "\
 
 static void
@@ -319,7 +319,7 @@ static const CGEN_INSN *
 
 ; Return C code to define the machine data.
 
-(define (-gen-mach-defns)
+(define (/gen-mach-defns)
   (string-list-map
    (lambda (mach)
      (gen-obj-sanitize
@@ -389,13 +389,13 @@ const MACH " (gen-sym mach) "_mach =
 #if WITH_PROFILE_MODEL_P
 
 "
-   -gen-model-insn-fns
-   -gen-model-profile-data
+   /gen-model-insn-fns
+   /gen-model-profile-data
 "#endif /* WITH_PROFILE_MODEL_P */\n\n"
 
-   -gen-model-defns
-   -gen-cpu-imp-properties
-   -gen-cpu-defns
-   -gen-mach-defns
+   /gen-model-defns
+   /gen-cpu-imp-properties
+   /gen-cpu-defns
+   /gen-mach-defns
    )
 )

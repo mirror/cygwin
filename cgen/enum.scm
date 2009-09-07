@@ -99,9 +99,9 @@
 
 ; Parse an enum definition.
 
-; Utility of -enum-parse to parse the prefix.
+; Utility of /enum-parse to parse the prefix.
 
-(define (-enum-parse-prefix context prefix)
+(define (/enum-parse-prefix context prefix)
   (if (symbol? prefix)
       (set! prefix (symbol->string prefix)))
 
@@ -119,7 +119,7 @@
 ; description in the .cpu file.
 ; All arguments are in raw (non-evaluated) form.
 
-(define (-enum-parse context name comment attrs prefix vals)
+(define (/enum-parse context name comment attrs prefix vals)
   (logit 2 "Processing enum " name " ...\n")
 
   ;; Pick out name first to augment the error context.
@@ -130,7 +130,7 @@
 	  name
 	  (parse-comment context comment)
 	  (atlist-parse context attrs "enum")
-	  (-enum-parse-prefix context prefix)
+	  (/enum-parse-prefix context prefix)
 	  (parse-enum-vals context prefix vals)))
 )
 
@@ -138,9 +138,9 @@
 ; This is the main routine for analyzing enums in the .cpu file.
 ; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
-; -enum-parse is invoked to create the `enum' object.
+; /enum-parse is invoked to create the `enum' object.
 
-(define (-enum-read context . arg-list)
+(define (/enum-read context . arg-list)
   (let (
 	(name #f)
 	(comment "")
@@ -165,14 +165,14 @@
 	    (loop (cdr arg-list)))))
 
     ; Now that we've identified the elements, build the object.
-    (-enum-parse context name comment attrs prefix values))
+    (/enum-parse context name comment attrs prefix values))
 )
 
 ; Define an enum object, name/value pair list version.
 
 (define define-enum
   (lambda arg-list
-    (let ((e (apply -enum-read (cons (make-current-context "define-enum")
+    (let ((e (apply /enum-read (cons (make-current-context "define-enum")
 				     arg-list))))
       (current-enum-add! e)
       e))
@@ -181,7 +181,7 @@
 ; Define an enum object, all arguments specified.
 
 (define (define-full-enum name comment attrs prefix vals)
-  (let ((e (-enum-parse (make-current-context "define-full-enum")
+  (let ((e (/enum-parse (make-current-context "define-full-enum")
 			name comment attrs prefix vals)))
     (current-enum-add! e)
     e)
@@ -380,7 +380,7 @@
 		     (parse-name context name)
 		     (parse-comment context comment)
 		     atlist
-		     (-enum-parse-prefix context prefix)
+		     (/enum-parse-prefix context prefix)
 		     fld-obj
 		     (parse-enum-vals context prefix vals))))
 	    (current-enum-add! e)

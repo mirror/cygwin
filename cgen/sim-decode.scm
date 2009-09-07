@@ -12,7 +12,7 @@
 ; big array.  It doesn't matter too much (yet).  Generating one big array is
 ; simpler.
 
-(define (-gen-decode-insn-globals insn-list)
+(define (/gen-decode-insn-globals insn-list)
   ; Print the higher detailed stuff at higher verbosity.
   (logit 2 "Processing decode insn globals ...\n")
 
@@ -51,7 +51,7 @@ static const struct insn_sem @prefix@_insn_sem[] =
 	     (string-append "VIRTUAL_INSN_" (string-upcase name) ", ")
 	     (string-append "@ARCH@_INSN_" (string-upcase name) ", "))
          (string-append "@PREFIX@_INSN_" (string-upcase name) ", ")
-	 "@PREFIX@_" (-gen-fmt-enum (insn-sfmt insn))
+	 "@PREFIX@_" (/gen-fmt-enum (insn-sfmt insn))
 	 (if (and (with-parallel?) (not (with-parallel-only?)))
 	     (string-list
 	      (if (insn-parallel? insn)
@@ -83,13 +83,13 @@ static const struct insn_sem @prefix@_insn_sem_invalid = {
 
 ; Return enum name of format FMT.
 
-(define (-gen-fmt-enum fmt)
+(define (/gen-fmt-enum fmt)
   (string-upcase (gen-sym fmt))
 )
 
 ; Generate decls for the insn descriptor table type IDESC.
 
-(define (-gen-idesc-decls)
+(define (/gen-idesc-decls)
   (string-append "\
 extern const IDESC *@prefix@_decode (SIM_CPU *, IADDR,
                                   CGEN_INSN_INT,"
@@ -108,7 +108,7 @@ extern void @prefix@_semf_init_idesc_table (SIM_CPU *);
 ; @prefix@_init_idesc_table is defined here as it depends on with-parallel?
 ; and thus can't be defined in sim/common.
 
-(define (-gen-idesc-init-fn)
+(define (/gen-idesc-init-fn)
   (string-append "\
 /* Initialize an IDESC from the compile-time computable parts.  */
 
@@ -210,7 +210,7 @@ void
 ; Return C code to record <ifield> F for the semantic handler
 ; in a local variable rather than an ARGBUF struct.
 
-(define (-gen-record-argbuf-ifld f sfmt)
+(define (/gen-record-argbuf-ifld f sfmt)
   (string-append "  " (gen-ifld-argbuf-ref f)
 		 " = " (gen-extracted-ifld-value f) ";\n")
 )
@@ -219,7 +219,7 @@ void
 ; string argument to fprintf, character indicating type of third arg, value.
 ; The type is one of: x.
 
-(define (-gen-trace-argbuf-ifld f sfmt)
+(define (/gen-trace-argbuf-ifld f sfmt)
   (string-append
    ; FIXME: Add method to return fprintf format string.
    ", \"" (gen-sym f) " 0x%x\""
@@ -315,7 +315,7 @@ void
 ; the ARGBUF struct.
 ; ??? Later allow target to provide an `extract' expression.
 
-(define (-gen-op-extract op sfmt local?)
+(define (/gen-op-extract op sfmt local?)
   (send (op:type op) 'gen-extract op sfmt local?)
 )
 
@@ -323,7 +323,7 @@ void
 ; string argument to fprintf, character indicating type of third arg, value.
 ; The type is one of: x.
 
-(define (-gen-op-trace-extract op sfmt)
+(define (/gen-op-trace-extract op sfmt)
   (send (op:type op) 'gen-trace-extract op sfmt)
 )
 
@@ -354,7 +354,7 @@ void
 (define (gen-sfmt-op-argbuf-assigns sfmt)
   (let ((operands (sfmt-extracted-operands sfmt)))
     (string-list-map (lambda (op)
-		       (-gen-op-extract op sfmt #t))
+		       (/gen-op-extract op sfmt #t))
 		     operands))
 )
 
@@ -364,20 +364,20 @@ void
 ; Return C code to record insn field data for <sformat> SFMT.
 ; This is used when with-scache.
 
-(define (-gen-record-args sfmt)
+(define (/gen-record-args sfmt)
   (let ((operands (sfmt-extracted-operands sfmt))
 	(iflds (sfmt-needed-iflds sfmt)))
     (string-list
      "  /* Record the fields for the semantic handler.  */\n"
-     (string-list-map (lambda (f) (-gen-record-argbuf-ifld f sfmt))
+     (string-list-map (lambda (f) (/gen-record-argbuf-ifld f sfmt))
 		      iflds)
-     (string-list-map (lambda (op) (-gen-op-extract op sfmt #f))
+     (string-list-map (lambda (op) (/gen-op-extract op sfmt #f))
 		      operands)
      "  TRACE_EXTRACT (current_cpu, abuf, (current_cpu, pc, "
      "\"" (gen-sym sfmt) "\""
-     (string-list-map (lambda (f) (-gen-trace-argbuf-ifld f sfmt))
+     (string-list-map (lambda (f) (/gen-trace-argbuf-ifld f sfmt))
 		      iflds)
-     (string-list-map (lambda (op) (-gen-op-trace-extract op sfmt))
+     (string-list-map (lambda (op) (/gen-op-trace-extract op sfmt))
 		      operands)
      ", (char *) 0));\n"
      ))
@@ -400,7 +400,7 @@ void
 ; is kept to the extraction phase.  If someone wants to put forth some real
 ; data, this might then be changed (or at least noted).
 
-(define (-gen-record-profile-args sfmt)
+(define (/gen-record-profile-args sfmt)
   (let ((in-ops (find op-profilable? (sfmt-in-ops sfmt)))
 	(out-ops (find op-profilable? (sfmt-out-ops sfmt)))
 	)
@@ -427,7 +427,7 @@ void
 ; by the semantic code.  This is currently done by recording this information
 ; with the format.
 
-(define (-gen-extract-case sfmt)
+(define (/gen-extract-case sfmt)
   (logit 2 "Processing extractor for \"" (sfmt-key sfmt) "\" ...\n")
   (string-list
    " extract_" (gen-sym sfmt) ":\n"
@@ -445,9 +445,9 @@ void
    "\n"
    (gen-extract-ifields (sfmt-iflds sfmt) (sfmt-length sfmt) "    " #f)
    "\n"
-   (-gen-record-args sfmt)
+   (/gen-record-args sfmt)
    "\n"
-   (-gen-record-profile-args sfmt)
+   (/gen-record-profile-args sfmt)
    (gen-undef-field-macro sfmt)
    "    return idesc;\n"
    "  }\n\n"
@@ -456,9 +456,9 @@ void
 
 ; For each format, return its extraction function.
 
-(define (-gen-all-extractors)
+(define (/gen-all-extractors)
   (logit 2 "Processing extractors ...\n")
-  (string-list-map -gen-extract-case (current-sfmt-list))
+  (string-list-map /gen-extract-case (current-sfmt-list))
 )
 
 ; Generate top level decoder.
@@ -467,7 +467,7 @@ void
 ; ourselves.
 ; LSB0? is non-#f if bit number 0 is the least significant bit.
 
-(define (-gen-decode-fn insn-list initial-bitnums lsb0?)
+(define (/gen-decode-fn insn-list initial-bitnums lsb0?)
 
   ; Compute the initial DECODE-BITSIZE as the minimum of all insn lengths.
   ; The caller of @prefix@_decode must fetch and pass exactly this number of bits
@@ -521,7 +521,7 @@ const IDESC *
        (if (with-scache?)
            (string-list "\
   /* The instruction has been decoded, now extract the fields.  */\n\n"
-            -gen-all-extractors)
+            /gen-all-extractors)
 	   ; Without the scache, extraction is defered until the semantic code.
 	   (string-list "\
   /* Extraction is defered until the semantic code.  */
@@ -552,7 +552,7 @@ const IDESC *
 #define @PREFIX@_DECODE_H
 
 "
-   -gen-idesc-decls
+   /gen-idesc-decls
    (lambda () (gen-cpu-insn-enum-decl (current-cpu)
 				      (non-multi-insns (non-alias-insns (current-insn-list)))))
    (lambda () (gen-sfmt-enum-decl (current-sfmt-list)))
@@ -584,9 +584,9 @@ const IDESC *
 #include \"sim-main.h\"
 #include \"sim-assert.h\"\n\n"
 
-   (lambda () (-gen-decode-insn-globals (non-multi-insns (non-alias-insns (current-insn-list)))))
-   -gen-idesc-init-fn
-   (lambda () (-gen-decode-fn (non-multi-insns (real-insns (current-insn-list)))
+   (lambda () (/gen-decode-insn-globals (non-multi-insns (non-alias-insns (current-insn-list)))))
+   /gen-idesc-init-fn
+   (lambda () (/gen-decode-fn (non-multi-insns (real-insns (current-insn-list)))
 			      (state-decode-assist)
 			      (current-arch-insn-lsb0?)))
    )

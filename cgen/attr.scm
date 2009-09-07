@@ -199,7 +199,7 @@
 ;;; RIGHT-TYPE? is a procedure that verifies the value is the right type.
 ;;; MESSAGE is printed if there is an error.
 
-(define (-parse-simple-attribute right-type? message)
+(define (/parse-simple-attribute right-type? message)
   (lambda (self context val)
     (if (and (not (null? val))
 	     (right-type? (car val))
@@ -212,12 +212,12 @@
 
 (method-make!
  <boolean-attribute> 'parse-value
- (-parse-simple-attribute boolean? "boolean attribute not one of #f/#t")
+ (/parse-simple-attribute boolean? "boolean attribute not one of #f/#t")
 )
 
 (method-make!
  <string-attribute> 'parse-value
- (-parse-simple-attribute string? "invalid argument to string attribute"))
+ (/parse-simple-attribute string? "invalid argument to string attribute"))
 
 ; A bitset attribute's value is a comma separated list of elements.
 ; We don't validate the values.  In the case of the MACH attribute,
@@ -231,7 +231,7 @@
 
 (method-make!
  <bitset-attribute> 'parse-value
- (-parse-simple-attribute (lambda (x) (or (symbol? x) (string? x)))
+ (/parse-simple-attribute (lambda (x) (or (symbol? x) (string? x)))
 			  "improper bitset attribute")
 )
 
@@ -240,7 +240,7 @@
 
 (method-make!
  <integer-attribute> 'parse-value
- (-parse-simple-attribute (lambda (x) (or (number? x) (symbol? x)))
+ (/parse-simple-attribute (lambda (x) (or (number? x) (symbol? x)))
 			  "improper integer attribute")
 )
 
@@ -248,7 +248,7 @@
 
 (method-make!
  <enum-attribute> 'parse-value
- (-parse-simple-attribute (lambda (x) (or (symbol? x) (string? x)))
+ (/parse-simple-attribute (lambda (x) (or (symbol? x) (string? x)))
 			  "improper enum attribute")
 )
 
@@ -318,7 +318,7 @@
 ; If DEFAULT is #f, use the first value.
 ; ??? Allowable values for integer attributes is wip.
 
-(define (-attr-parse context type-class name comment attrs for default values)
+(define (/attr-parse context type-class name comment attrs for default values)
   (logit 2 "Processing attribute " name " ...\n")
 
   ;; Pick out name first to augment the error context.
@@ -365,9 +365,9 @@
 ; This is the main routine for analyzing attributes in the .cpu file.
 ; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
-; -attr-parse is invoked to create the attribute object.
+; /attr-parse is invoked to create the attribute object.
 
-(define (-attr-read context . arg-list)
+(define (/attr-read context . arg-list)
   (let (
 	(type-class 'not-set) ; attribute type
 	(name #f)
@@ -436,14 +436,14 @@
       )
 
     ; Now that we've identified the elements, build the object.
-    (-attr-parse context type-class name comment attrs for default values))
+    (/attr-parse context type-class name comment attrs for default values))
 )
 
 ; Main routines for defining attributes in .cpu files.
 
 (define define-attr
   (lambda arg-list
-    (let ((a (apply -attr-read (cons (make-current-context "define-attr")
+    (let ((a (apply /attr-read (cons (make-current-context "define-attr")
 				     arg-list))))
       (current-attr-add! a)
       a))
@@ -493,13 +493,13 @@
 ; OWNER is needed if an attribute is defined in terms of other attributes.
 ; If it's #f obviously ATVAL can't be defined in terms of others.
 
-(define (-attr-eval atval owner)
+(define (/attr-eval atval owner)
   (let* ((estate (estate-make-for-eval #f owner))
 	 (expr (rtx-compile #f (rtx-simplify #f owner atval nil) nil))
 	 (value (rtx-eval-with-estate expr 'DFLT estate)))
     (cond ((symbol? value) value)
 	  ((number? value) value)
-	  (error "-attr-eval: internal error, unsupported result:" value)))
+	  (error "/attr-eval: internal error, unsupported result:" value)))
 )
 
 ; Return value of ATTR in attribute alist ALIST.
@@ -510,7 +510,7 @@
   (let ((a (assq-ref alist attr)))
     (if a
 	(if (pair? a) ; pair? -> cheap non-null-list?
-	    (-attr-eval a owner)
+	    (/attr-eval a owner)
 	    a)
 	(attr-lookup-default attr owner)))
 )
@@ -528,7 +528,7 @@
   (let ((a (assq-ref (atlist-attrs atlist) attr)))
     (if a
 	(if (pair? a) ; pair? -> cheap non-null-list?
-	    (-attr-eval a owner)
+	    (/attr-eval a owner)
 	    a)
 	nil))
 )
@@ -546,7 +546,7 @@
 	    (let ((deflt (attr-default at)))
 	      (if deflt
 		  (if (pair? deflt) ; pair? -> cheap non-null-list?
-		      (-attr-eval deflt owner)
+		      (/attr-eval deflt owner)
 		      deflt)
 		  ; If no default was provided, use the first value.
 		  (caar (attr-values at)))))
@@ -708,7 +708,7 @@
 ; ATTR-OBJ-LIST is a list of <attribute> objects (always subclassed of course).
 
 (define (attr-list-enum-list attr-obj-list)
-  (let ((sorted-attrs (-attr-sort (attr-remove-meta-attrs attr-obj-list))))
+  (let ((sorted-attrs (/attr-sort (attr-remove-meta-attrs attr-obj-list))))
     (assert (<= (length (car sorted-attrs)) 32))
     (append!
      (map (lambda (bool-attr)
@@ -731,7 +731,7 @@
 ; Boolean attributes appear as (NAME . #t/#f), non-boolean ones appear as
 ; (NAME . VALUE).  Attributes of the same type are sorted by name.
 
-(define (-attr-sort-alist alist)
+(define (/attr-sort-alist alist)
   (sort alist
 	(lambda (a b)
 	  ;(display (list a b "\n"))
@@ -755,7 +755,7 @@
 ; FIXME: Record index number with the INDEX attribute and sort on it.
 ; At present it's just a boolean.
 
-(define (-attr-sort attr-list)
+(define (/attr-sort attr-list)
   (let loop ((fixed-non-bools nil)
 	     (non-fixed-non-bools nil)
 	     (fixed-bools nil)
@@ -941,7 +941,7 @@
   (let ((accessor (lambda (elm) (atlist-attrs (accessor elm)))))
     (attr-remove-meta-attrs-alist
      (attr-nub
-      (-attr-sort-alist
+      (/attr-sort-alist
        (append
 	(apply append
 	       (map (lambda (table-elm)
@@ -959,7 +959,7 @@
 ; FIXME: The output shouldn't be required to be sorted.
 
 (define (current-attr-list-for type)
-  (let ((sorted (-attr-sort (find (lambda (a)
+  (let ((sorted (/attr-sort (find (lambda (a)
 				    (if (atlist-for a)
 					(memq type (atlist-for a))
 					#t))

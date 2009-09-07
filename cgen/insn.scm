@@ -192,12 +192,12 @@
 
 (define (multi-insn? x) (class-instance? <multi-insn> x))
 
-; Subroutine of -sub-insn-make! to create the ifield list.
+; Subroutine of /sub-insn-make! to create the ifield list.
 ; Return encoding of {insn} with each element of {anyof-operands} replaced
 ; with {new-values}.
 ; {value-names} is a list of names of {anyof-operands}.
 
-(define (-sub-insn-ifields insn anyof-operands value-names new-values)
+(define (/sub-insn-ifields insn anyof-operands value-names new-values)
   ; (debug-repl-env insn anyof-operands value-names new-values)
 
   ; Delete ifields of {anyof-operands} and add those for {new-values}.
@@ -263,7 +263,7 @@
 ; NEW-VALUES is a list of the value to use for each corresponding element in
 ; ANYOF-OPERANDS.  Each element is a <derived-operand>.
 
-(define (-sub-insn-make! insn anyof-operands new-values)
+(define (/sub-insn-make! insn anyof-operands new-values)
   ;(debug-repl-env insn anyof-operands new-values)
   (assert (= (length anyof-operands) (length new-values)))
   (assert (all-true? (map anyof-operand? anyof-operands)))
@@ -284,7 +284,7 @@
 ;      (debug-repl-env insn anyof-operands new-values))
 
   (let* ((value-names (map obj:name anyof-operands))
-	 (ifields (-sub-insn-ifields insn anyof-operands value-names new-values))
+	 (ifields (/sub-insn-ifields insn anyof-operands value-names new-values))
 	 (known-values (ifld-known-values ifields)))
 
     ; Don't create insn if ifield assertions fail.
@@ -302,7 +302,7 @@
 				       new-values)))
 		     (obj:comment insn)
 		     (obj-atlist insn)
-		     (-anyof-merge-syntax (insn-syntax insn)
+		     (/anyof-merge-syntax (insn-syntax insn)
 					  value-names new-values)
 		     ifields
 		     (insn-ifield-assertion insn) ; FIXME
@@ -374,7 +374,7 @@
 	      (let* ((indices (split-value lengths i))
 		     (anyof-instances (map list-ref todo indices)))
 		(logit 4 "Derived: " (map obj:name anyof-instances) "\n")
-		(-sub-insn-make! multi-insn anyof-operands anyof-instances)
+		(/sub-insn-make! multi-insn anyof-operands anyof-instances)
 		(loop (+ i 1))))))))
 
   *UNSPECIFIED*
@@ -386,7 +386,7 @@
 ; All arguments are in raw (non-evaluated) form.
 ; The result is the parsed object or #f if insn isn't for selected mach(s).
 
-(define (-insn-parse context name comment attrs syntax fmt ifield-assertion
+(define (/insn-parse context name comment attrs syntax fmt ifield-assertion
 		     semantics timing)
   (logit 2 "Processing insn " name " ...\n")
 
@@ -403,7 +403,7 @@
 	      (semantics (if (not (null? semantics))
 			     semantics
 			     #f))
-	      (format (-parse-insn-format (context-append context " format")
+	      (format (/parse-insn-format (context-append context " format")
 					  fmt))
 	      (comment (parse-comment context comment))
 	      ; If there are no semantics, mark this as an alias.
@@ -446,7 +446,7 @@
 ; This is also used to create virtual insns by apps like simulators.
 ; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
-; -insn-parse is invoked to create the <insn> object.
+; /insn-parse is invoked to create the <insn> object.
 
 (define (insn-read context . arg-list)
   (let (
@@ -479,7 +479,7 @@
 	    (loop (cdr arg-list)))))
 
     ; Now that we've identified the elements, build the object.
-    (-insn-parse context name comment attrs syntax fmt ifield-assertion
+    (/insn-parse context name comment attrs syntax fmt ifield-assertion
 		 semantics timing))
 )
 
@@ -498,7 +498,7 @@
 
 (define (define-full-insn name comment attrs syntax fmt ifield-assertion
 	  semantics timing)
-  (let ((i (-insn-parse (make-current-context "define-full-insn")
+  (let ((i (/insn-parse (make-current-context "define-full-insn")
 			name comment attrs
 			syntax fmt ifield-assertion
 			semantics timing)))
@@ -522,9 +522,9 @@
 	(else (parse-error context "improper syntax" syntax)))
 )
 
-; Subroutine of -parse-insn-format to parse a symbol ifield spec.
+; Subroutine of /parse-insn-format to parse a symbol ifield spec.
 
-(define (-parse-insn-format-symbol context sym)
+(define (/parse-insn-format-symbol context sym)
   ;(debug-repl-env sym)
   (let ((op (current-op-lookup sym)))
     (if op
@@ -546,7 +546,7 @@
 	      (parse-error context "bad format element, expecting symbol to be operand or insn enum" sym)))))
 )
 
-; Subroutine of -parse-insn-format to parse an (ifield-name value) ifield spec.
+; Subroutine of /parse-insn-format to parse an (ifield-name value) ifield spec.
 ;
 ; The last element is the ifield's value.  It must be an integer.
 ; ??? Whether it can be negative is still unspecified.
@@ -558,7 +558,7 @@
 ;
 ; ??? Error messages need improvement, but that's generally true of cgen.
 
-(define (-parse-insn-format-ifield-spec context ifld ifld-spec)
+(define (/parse-insn-format-ifield-spec context ifld ifld-spec)
   (if (!= (length ifld-spec) 2)
       (parse-error context "bad ifield format, should be (ifield-name value)" ifld-spec))
 
@@ -577,15 +577,15 @@
 	   (parse-error context "ifield value not an integer or enum" ifld-spec))))
 )
 
-; Subroutine of -parse-insn-format to parse an
+; Subroutine of /parse-insn-format to parse an
 ; (ifield-name value) ifield spec.
 ; ??? There is room for growth in the specification syntax here.
 ; Possibilities are (ifield-name|operand-name [options] [value]).
 
-(define (-parse-insn-format-list context spec)
+(define (/parse-insn-format-list context spec)
   (let ((ifld (current-ifld-lookup (car spec))))
     (if ifld
-	(-parse-insn-format-ifield-spec context ifld spec)
+	(/parse-insn-format-ifield-spec context ifld spec)
 	(parse-error context "unknown ifield" spec)))
 )
 
@@ -619,7 +619,7 @@
 ; It's called for each instruction, and is one of the more expensive routines
 ; in insn parsing.
 
-(define (-parse-insn-format context fld-list)
+(define (/parse-insn-format context fld-list)
   (if (null? fld-list)
       nil ; field list unspecified
       (case (car fld-list)
@@ -628,12 +628,12 @@
 				 (string->symbol fld)
 				 fld)))
 		      (cond ((symbol? f)
-			     (-parse-insn-format-symbol context f))
+			     (/parse-insn-format-symbol context f))
 			    ((and (list? f)
 				  ; ??? This use to allow <ifield> objects
 				  ; in the `car' position.  Checked for below.
 				  (symbol? (car f)))
-			     (-parse-insn-format-list context f))
+			     (/parse-insn-format-list context f))
 			    (else
 			     (if (and (list? f)
 				      (ifield? (car f)))

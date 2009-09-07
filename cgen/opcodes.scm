@@ -8,20 +8,20 @@
 (set! APPLICATION 'OPCODES)
 
 ; Records the -OPC arg which specifies the path to the .opc file.
-(define -opc-file-path #f)
+(define /opc-file-path #f)
 (define (opc-file-path)
-  (if -opc-file-path
-      -opc-file-path
+  (if /opc-file-path
+      /opc-file-path
       (error ".opc file unspecified, missing -OPC argument"))
 )
 (define (set-opc-file-path! path)
-  (set! -opc-file-path path)
+  (set! /opc-file-path path)
 )
 
 ; Return #t if the -OPC parameter was specified.
 
 (define (opc-file-provided?)
-  (and -opc-file-path #t)
+  (and /opc-file-path #t)
 )
 
 ; Boolean indicating if we're to build the operand instance table.
@@ -29,7 +29,8 @@
 ; ??? Simulator tracing support could use it.
 ; ??? Might be lazily built at runtime by parsing the semantic code
 ; (which would be recorded in the insn table).
-(define -opcodes-build-operand-instance-table? #f)
+; FIXME: Referenced outside this file in opc-opinst.scm.
+(define /opcodes-build-operand-instance-table? #f)
 
 ; String containing copyright text.
 (define CURRENT-COPYRIGHT #f)
@@ -40,7 +41,7 @@
 ; Initialize the options.
 
 (define (option-init!)
-  (set! -opcodes-build-operand-instance-table? #f)
+  (set! /opcodes-build-operand-instance-table? #f)
   (set! CURRENT-COPYRIGHT copyright-fsf)
   (set! CURRENT-PACKAGE package-gnu-binutils-gdb)
   *UNSPECIFIED*
@@ -50,7 +51,7 @@
 
 (define (option-set! name value)
   (case name
-    ((opinst) (set! -opcodes-build-operand-instance-table? #t))
+    ((opinst) (set! /opcodes-build-operand-instance-table? #t))
     ((copyright) (cond ((equal?  value '("fsf"))
 			(set! CURRENT-COPYRIGHT copyright-fsf))
 		       ((equal? value '("redhat"))
@@ -346,7 +347,7 @@
 ; PARSE-FN is the name of the function to call or #f to use the default.
 ; OP-ENUM is the enum of the operand.
 
-(define (-gen-parse-number mode parse-fn op-enum result-var-name)
+(define (/gen-parse-number mode parse-fn op-enum result-var-name)
   (string-append
    "      errmsg = "
    ; Use operand's special parse function if there is one, otherwise compute
@@ -377,7 +378,7 @@
 ; PARSE-FN is the name of the function to call or #f to use the default.
 ; OP-ENUM is the enum of the operand.
 
-(define (-gen-parse-address parse-fn op-enum result-var-name)
+(define (/gen-parse-address parse-fn op-enum result-var-name)
   (string-append
    "      {\n"
    "        bfd_vma value = 0;\n"
@@ -406,10 +407,10 @@
 	    ((ifield) (gen-operand-result-var (op-ifield operand)))
 	    (else "junk"))))
      (if (address? (op:type operand))
-	 (-gen-parse-address (send operand 'gen-function-name 'parse)
+	 (/gen-parse-address (send operand 'gen-function-name 'parse)
 			     (op-enum operand)
 			     result-var)
-	 (-gen-parse-number mode (send operand 'gen-function-name 'parse)
+	 (/gen-parse-number mode (send operand 'gen-function-name 'parse)
 			    (op-enum operand)
 			    result-var))))
 )
@@ -724,7 +725,7 @@
   ; Still need to traverse the semantics to derive machine computed attributes.
   (arch-analyze-insns! CURRENT-ARCH
 		       #t ; include aliases
-		       -opcodes-build-operand-instance-table?)
+		       /opcodes-build-operand-instance-table?)
 
   *UNSPECIFIED*
 )

@@ -13,12 +13,12 @@
 
 ;; rtx-simplify (and supporting cast)
 
-; Subroutine of -rtx-simplify-expr-fn to compare two values for equality.
+; Subroutine of /rtx-simplify-expr-fn to compare two values for equality.
 ; If both are constants and they're equal return #f/#t.
 ; INVERT? = #f -> return #t if equal, #t -> return #f if equal.
 ; Returns 'unknown if either argument is not a constant.
 
-(define (-rtx-const-equal arg0 arg1 invert?)
+(define (/rtx-const-equal arg0 arg1 invert?)
   (if (and (rtx-constant? arg0)
 	   (rtx-constant? arg1))
       (if invert?
@@ -29,7 +29,7 @@
       'unknown)
 )
 
-; Subroutine of -rtx-simplify-expr-fn to see if MAYBE-CONST is
+; Subroutine of /rtx-simplify-expr-fn to see if MAYBE-CONST is
 ; an element of NUMBER-LIST.
 ; NUMBER-LIST is a `number-list' rtx.
 ; INVERT? is #t if looking for non-membership.
@@ -45,7 +45,7 @@
 ; - return 'member if MAYBE-CONST is in NUMBER-LIST and it has many members
 ; - otherwise return 'unknown
 
-(define (-rtx-const-list-equal maybe-const number-list invert?)
+(define (/rtx-const-list-equal maybe-const number-list invert?)
   (assert (rtx-kind? 'number-list number-list))
   (if (rtx-constant? maybe-const)
       (let ((values (rtx-number-list-values number-list)))
@@ -63,10 +63,10 @@
       'unknown)
 )
 
-; Subroutine of -rtx-simplify-expr-fn to simplify an eq-attr of (current-mach).
+; Subroutine of /rtx-simplify-expr-fn to simplify an eq-attr of (current-mach).
 ; CONTEXT is a <context> object or #f if there is none.
 
-(define (-rtx-simplify-eq-attr-mach rtx context)
+(define (/rtx-simplify-eq-attr-mach rtx context)
   (let ((attr (rtx-eq-attr-attr rtx))
 	(value (rtx-eq-attr-value rtx)))
     ; If all currently selected machs will yield the same value
@@ -98,9 +98,9 @@
 	  rtx)))
 )
 
-; Subroutine of -rtx-simplify-expr-fn to simplify an eq-attr of (current-insn).
+; Subroutine of /rtx-simplify-expr-fn to simplify an eq-attr of (current-insn).
 
-(define (-rtx-simplify-eq-attr-insn rtx insn context)
+(define (/rtx-simplify-eq-attr-insn rtx insn context)
   (let ((attr (rtx-eq-attr-attr rtx))
 	(value (rtx-eq-attr-value rtx)))
     (if (not (insn? insn))
@@ -117,7 +117,7 @@
 ; Subroutine of rtx-simplify.
 ; This is the EXPR-FN argument to rtx-traverse.
 
-(define (-rtx-simplify-expr-fn rtx-obj expr mode parent-expr op-pos
+(define (/rtx-simplify-expr-fn rtx-obj expr mode parent-expr op-pos
 			       tstate appstuff)
 
   ;(display "Processing ") (display (rtx-dump expr)) (newline)
@@ -125,7 +125,7 @@
   (case (rtx-name expr)
 
     ((not)
-     (let* ((arg (-rtx-traverse (rtx-alu-op-arg expr 0)
+     (let* ((arg (/rtx-traverse (rtx-alu-op-arg expr 0)
 				'RTX
 				(rtx-alu-op-mode expr)
 				expr 1 tstate appstuff))
@@ -137,9 +137,9 @@
 	     (else (rtx-make 'not (rtx-alu-op-mode expr) arg)))))
 
     ((orif)
-     (let ((arg0 (-rtx-traverse (rtx-boolif-op-arg expr 0)
+     (let ((arg0 (/rtx-traverse (rtx-boolif-op-arg expr 0)
 				'RTX 'DFLT expr 0 tstate appstuff))
-	   (arg1 (-rtx-traverse (rtx-boolif-op-arg expr 1)
+	   (arg1 (/rtx-traverse (rtx-boolif-op-arg expr 1)
 				'RTX 'DFLT expr 1 tstate appstuff)))
        (let ((no-side-effects-0? (not (rtx-side-effects? arg0)))
 	     (no-side-effects-1? (not (rtx-side-effects? arg1))))
@@ -158,9 +158,9 @@
 		(rtx-make 'orif arg0 arg1))))))
 
     ((andif)
-     (let ((arg0 (-rtx-traverse (rtx-boolif-op-arg expr 0)
+     (let ((arg0 (/rtx-traverse (rtx-boolif-op-arg expr 0)
 				'RTX 'DFLT expr 0 tstate appstuff))
-	   (arg1 (-rtx-traverse (rtx-boolif-op-arg expr 1)
+	   (arg1 (/rtx-traverse (rtx-boolif-op-arg expr 1)
 				'RTX 'DFLT expr 1 tstate appstuff)))
        (let ((no-side-effects-0? (not (rtx-side-effects? arg0)))
 	     (no-side-effects-1? (not (rtx-side-effects? arg1))))
@@ -185,12 +185,12 @@
 	    ; ??? Was this but that calls rtx-traverse again which
 	    ; resets the temp stack!
 	    ; (rtx-simplify context (caddr expr))))
-	    (-rtx-traverse (rtx-if-test expr) 'RTX 'DFLT expr 1 tstate appstuff)))
+	    (/rtx-traverse (rtx-if-test expr) 'RTX 'DFLT expr 1 tstate appstuff)))
        (cond ((rtx-true? test)
-	      (-rtx-traverse (rtx-if-then expr) 'RTX mode expr 2 tstate appstuff))
+	      (/rtx-traverse (rtx-if-then expr) 'RTX mode expr 2 tstate appstuff))
 	     ((rtx-false? test)
 	      (if (rtx-if-else expr)
-		  (-rtx-traverse (rtx-if-else expr) 'RTX mode expr 3 tstate appstuff)
+		  (/rtx-traverse (rtx-if-else expr) 'RTX mode expr 3 tstate appstuff)
 		  ; Sanity check, mode must be VOID.
 		  (if (or (mode:eq? 'DFLT (rtx-mode expr))
 			  (mode:eq? 'VOID (rtx-mode expr)))
@@ -204,15 +204,15 @@
     ((eq ne)
      (let ((name (rtx-name expr))
 	   (cmp-mode (rtx-cmp-op-mode expr))
-	   (arg0 (-rtx-traverse (rtx-cmp-op-arg expr 0) 'RTX
+	   (arg0 (/rtx-traverse (rtx-cmp-op-arg expr 0) 'RTX
 				(rtx-cmp-op-mode expr)
 				expr 1 tstate appstuff))
-	   (arg1 (-rtx-traverse (rtx-cmp-op-arg expr 1) 'RTX
+	   (arg1 (/rtx-traverse (rtx-cmp-op-arg expr 1) 'RTX
 				(rtx-cmp-op-mode expr)
 				expr 2 tstate appstuff)))
        (if (or (rtx-side-effects? arg0) (rtx-side-effects? arg1))
 	   (rtx-make name cmp-mode arg0 arg1)
-	   (case (-rtx-const-equal arg0 arg1 (rtx-kind? 'ne expr))
+	   (case (/rtx-const-equal arg0 arg1 (rtx-kind? 'ne expr))
 	     ((#f) (rtx-false))
 	     ((#t) (rtx-true))
 	     (else
@@ -223,7 +223,7 @@
 		 (let ((known-val (tstate-known-lookup tstate
 						       (rtx-ifield-name arg0))))
 		   (if (and known-val (rtx-kind? 'number-list known-val))
-		       (case (-rtx-const-list-equal arg1 known-val (rtx-kind? 'ne expr))
+		       (case (/rtx-const-list-equal arg1 known-val (rtx-kind? 'ne expr))
 			 ((#f) (rtx-false))
 			 ((#t) (rtx-true))
 			 (else
@@ -233,7 +233,7 @@
 		 (let ((known-val (tstate-known-lookup tstate
 						       (rtx-operand-name arg0))))
 		   (if (and known-val (rtx-kind? 'number-list known-val))
-		       (case (-rtx-const-list-equal arg1 known-val (rtx-kind? 'ne expr))
+		       (case (/rtx-const-list-equal arg1 known-val (rtx-kind? 'ne expr))
 			 ((#f) (rtx-false))
 			 ((#t) (rtx-true))
 			 (else
@@ -245,9 +245,9 @@
     ; Recognize attribute requests of current-insn, current-mach.
     ((eq-attr)
      (cond ((rtx-kind? 'current-mach (rtx-eq-attr-owner expr))
-	    (-rtx-simplify-eq-attr-mach expr (tstate-context tstate)))
+	    (/rtx-simplify-eq-attr-mach expr (tstate-context tstate)))
 	   ((rtx-kind? 'current-insn (rtx-eq-attr-owner expr))
-	    (-rtx-simplify-eq-attr-insn expr (tstate-owner tstate) (tstate-context tstate)))
+	    (/rtx-simplify-eq-attr-insn expr (tstate-owner tstate) (tstate-context tstate)))
 	   (else expr)))
 
     ((ifield)
@@ -293,9 +293,9 @@
 ; ??? Will become more intelligent as needed.
 
 (define (rtx-simplify context owner expr known)
-  (-rtx-traverse expr #f 'DFLT #f 0
+  (/rtx-traverse expr #f 'DFLT #f 0
 		 (tstate-make context owner
-			      (/fastcall-make -rtx-simplify-expr-fn)
+			      (/fastcall-make /rtx-simplify-expr-fn)
 			      (rtx-env-empty-stack)
 			      #f #f known 0)
 		 #f)
@@ -321,7 +321,7 @@
 ; Subroutine of rtx-solve.
 ; This is the EXPR-FN argument to rtx-traverse.
 
-(define (-solve-expr-fn rtx-obj expr mode parent-expr op-pos tstate appstuff)
+(define (/solve-expr-fn rtx-obj expr mode parent-expr op-pos tstate appstuff)
   #f ; wip
 )
 
@@ -346,9 +346,9 @@
   (let* ((simplified-expr (rtx-simplify context owner expr known))
 	 (maybe-solved-expr
 	  simplified-expr) ; FIXME: for now
-;	  (-rtx-traverse simplified-expr #f 'DFLT #f 0
+;	  (/rtx-traverse simplified-expr #f 'DFLT #f 0
 ;			 (tstate-make context owner
-;				      (/fastcall-make -solve-expr-fn)
+;				      (/fastcall-make /solve-expr-fn)
 ;				      (rtx-env-empty-stack)
 ;				      #f #f known 0)
 ;			 #f))
@@ -369,7 +369,7 @@
 ; It is used for error message.
 ; RTX-OBJ is the <rtx-func> object of (car expr).
 
-(define (-rtx-canonicalize-expr context rtx-obj expr)
+(define (/rtx-canonicalize-expr context rtx-obj expr)
   #f
 )
 
@@ -426,7 +426,7 @@
 ; ??? In the future the compiled form may be the same as the source form
 ; except that all elements would be converted to their respective objects.
 
-(define (-compile-expr-fn rtx-obj expr mode parent-expr op-pos tstate appstuff)
+(define (/compile-expr-fn rtx-obj expr mode parent-expr op-pos tstate appstuff)
 ; (cond 
 ; The intent of this is to handle sequences/closures, but is it needed?
 ;  ((rtx-style-syntax? rtx-obj)
@@ -434,13 +434,13 @@
 ;			     parent-expr op-pos tstate))
 ;  (else
   (cons (car expr) ; rtx-obj
-	(-rtx-traverse-operands rtx-obj expr tstate appstuff))
+	(/rtx-traverse-operands rtx-obj expr tstate appstuff))
 )
 
 (define (rtx-compile context expr extra-vars-alist)
-  (-rtx-traverse expr #f 'DFLT #f 0
+  (/rtx-traverse expr #f 'DFLT #f 0
 		 (tstate-make context #f
-			      (/fastcall-make -compile-expr-fn)
+			      (/fastcall-make /compile-expr-fn)
 			      (rtx-env-init-stack1 extra-vars-alist)
 			      #f #f nil 0)
 		 #f)
@@ -450,10 +450,10 @@
 
 ; RTX trimming (removing fluff not normally needed for the human viewer).
 
-; Subroutine of -rtx-trim-for-doc to simplify it.
+; Subroutine of /rtx-trim-for-doc to simplify it.
 ; Trim all the arguments of rtx NAME.
 
-(define (-rtx-trim-args name args)
+(define (/rtx-trim-args name args)
   (let* ((rtx-obj (rtx-lookup name))
 	 (arg-types (rtx-arg-types rtx-obj)))
 
@@ -481,19 +481,19 @@
 	       #f) ; leave arg untouched
 
 	      ((RTX SETRTX TESTRTX)
-	       (set! new-arg (-rtx-trim-for-doc arg)))
+	       (set! new-arg (/rtx-trim-for-doc arg)))
 
 	      ((CONDRTX)
 	       (assert (= (length arg) 2))
 	       (if (eq? (car arg) 'else)
-		   (set! new-arg (cons 'else (-rtx-trim-for-doc (cadr arg))))
-		   (set! new-arg (list (-rtx-trim-for-doc (car arg))
-				       (-rtx-trim-for-doc (cadr arg)))))
+		   (set! new-arg (cons 'else (/rtx-trim-for-doc (cadr arg))))
+		   (set! new-arg (list (/rtx-trim-for-doc (car arg))
+				       (/rtx-trim-for-doc (cadr arg)))))
 	       )
 
 	      ((CASERTX)
 	       (assert (= (length arg) 2))
-	       (set! new-arg (list (car arg) (-rtx-trim-for-doc (cadr arg))))
+	       (set! new-arg (list (car arg) (/rtx-trim-for-doc (cadr arg))))
 	       )
 
 	      ((LOCALS)
@@ -529,7 +529,7 @@
 ; it isn't.  You need to keep separate the notions of simplifying "1+1" to "2"
 ; and trimming the clutter from "(const () BI 0)" yielding "0".
 
-(define (-rtx-trim-for-doc rtx)
+(define (/rtx-trim-for-doc rtx)
   (if (pair? rtx) ; ??? cheap rtx?
       (let ((name (car rtx))
 	    (options (cadr rtx))
@@ -550,7 +550,7 @@
 	  ((sequence parallel)
 	   ; No special support is needed, except it's nice to remove nop
 	   ; statements.  These can be created when an `if' get simplified.
-	   (let ((trimmed-args (-rtx-trim-args name rest))
+	   (let ((trimmed-args (/rtx-trim-args name rest))
 		 (result nil))
 	     (for-each (lambda (rtx)
 			 (if (equal? rtx '(nop))
@@ -564,7 +564,7 @@
 		 (cons name (cons options (cons mode (reverse result)))))))
 
 	  (else
-	   (let ((trimmed-args (-rtx-trim-args name rest)))
+	   (let ((trimmed-args (/rtx-trim-args name rest)))
 	     (if (null? options)
 		 (if (eq? mode 'DFLT)
 		     (cons name trimmed-args)
@@ -576,5 +576,5 @@
 )
 
 (define (rtx-trim-for-doc rtx)
-  (-rtx-trim-for-doc rtx)
+  (/rtx-trim-for-doc rtx)
 )

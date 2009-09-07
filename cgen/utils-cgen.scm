@@ -717,7 +717,7 @@
 ; combined into one int to save space.
 ; ??? We assume there is at least one bool.
 
-(define (-gen-attr-accessors prefix attrs)
+(define (gen-attr-accessors prefix attrs)
   (string-append
    "/* " prefix " attribute accessor macros.  */\n"
    (string-map (lambda (attr)

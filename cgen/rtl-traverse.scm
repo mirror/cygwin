@@ -10,7 +10,7 @@
 
 ; Set to #t to debug rtx traversal.
 
-(define -rtx-traverse-debug? #f)
+(define /rtx-traverse-debug? #f)
 
 ; Container to record the current state of traversal.
 ; This is initialized before traversal, and modified (in a copy) as the
@@ -163,22 +163,22 @@
 
 ; Return a boolean indicating if X is a mode.
 
-(define (-rtx-any-mode? x)
+(define (/rtx-any-mode? x)
   (->bool (mode:lookup x))
 )
 
 ; Return a boolean indicating if X is a symbol or rtx.
 
-(define (-rtx-symornum? x)
+(define (/rtx-symornum? x)
   (or (symbol? x) (number? x))
 )
 
 ; Traverse a list of rtx's.
 
-(define (-rtx-traverse-rtx-list rtx-list mode expr op-num tstate appstuff)
+(define (/rtx-traverse-rtx-list rtx-list mode expr op-num tstate appstuff)
   (map (lambda (rtx)
 	 ; ??? Shouldn't OP-NUM change for each element?
-	 (-rtx-traverse rtx 'RTX mode expr op-num tstate appstuff))
+	 (/rtx-traverse rtx 'RTX mode expr op-num tstate appstuff))
        rtx-list)
 )
 
@@ -186,7 +186,7 @@
 ; of operand OP-NUM.
 ; RTL-EXPR must be an rtl expression.
 
-(define (-rtx-traverse-error tstate errmsg rtl-expr op-num)
+(define (/rtx-traverse-error tstate errmsg rtl-expr op-num)
   (tstate-error tstate
 		(string-append errmsg ", operand #" (number->string op-num))
 		(rtx-strdump rtl-expr))
@@ -199,97 +199,97 @@
 ; The result is either a pair of the parsed VAL and new TSTATE,
 ; or #f meaning there is no change (saves lots of unnecessarying cons'ing).
 
-(define (-rtx-traverse-options val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-options val mode expr op-num tstate appstuff)
   #f
 )
 
-(define (-rtx-traverse-anymode val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-anymode val mode expr op-num tstate appstuff)
   (let ((val-obj (mode:lookup val)))
     (if (not val-obj)
-	(-rtx-traverse-error tstate "expecting a mode"
+	(/rtx-traverse-error tstate "expecting a mode"
 			     expr op-num))
     #f)
 )
 
-(define (-rtx-traverse-intmode val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-intmode val mode expr op-num tstate appstuff)
   (let ((val-obj (mode:lookup val)))
     (if (and val-obj
 	     (or (memq (mode:class val-obj) '(INT UINT))
 		 (eq? val 'DFLT)))
 	#f
-	(-rtx-traverse-error tstate "expecting an integer mode"
+	(/rtx-traverse-error tstate "expecting an integer mode"
 			     expr op-num)))
 )
 
-(define (-rtx-traverse-floatmode val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-floatmode val mode expr op-num tstate appstuff)
   (let ((val-obj (mode:lookup val)))
     (if (and val-obj
 	     (or (memq (mode:class val-obj) '(FLOAT))
 		 (eq? val 'DFLT)))
 	#f
-	(-rtx-traverse-error tstate "expecting a float mode"
+	(/rtx-traverse-error tstate "expecting a float mode"
 			     expr op-num)))
 )
 
-(define (-rtx-traverse-nummode val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-nummode val mode expr op-num tstate appstuff)
   (let ((val-obj (mode:lookup val)))
     (if (and val-obj
 	     (or (memq (mode:class val-obj) '(INT UINT FLOAT))
 		 (eq? val 'DFLT)))
 	#f
-	(-rtx-traverse-error tstate "expecting a numeric mode"
+	(/rtx-traverse-error tstate "expecting a numeric mode"
 			     expr op-num)))
 )
 
-(define (-rtx-traverse-explnummode val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-explnummode val mode expr op-num tstate appstuff)
   (let ((val-obj (mode:lookup val)))
     (if (not val-obj)
-	(-rtx-traverse-error tstate "expecting a mode"
+	(/rtx-traverse-error tstate "expecting a mode"
 			     expr op-num))
     (if (memq val '(DFLT VOID))
-	(-rtx-traverse-error tstate "DFLT and VOID not allowed here"
+	(/rtx-traverse-error tstate "DFLT and VOID not allowed here"
 			     expr op-num))
     #f)
 )
 
-(define (-rtx-traverse-nonvoidmode val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-nonvoidmode val mode expr op-num tstate appstuff)
   (if (eq? val 'VOID)
-      (-rtx-traverse-error tstate "mode can't be VOID"
+      (/rtx-traverse-error tstate "mode can't be VOID"
 			   expr op-num))
   #f
 )
 
-(define (-rtx-traverse-voidmode val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-voidmode val mode expr op-num tstate appstuff)
   (if (memq val '(DFLT VOID))
       #f
-      (-rtx-traverse-error tstate "expecting mode VOID"
+      (/rtx-traverse-error tstate "expecting mode VOID"
 			   expr op-num))
 )
 
-(define (-rtx-traverse-dfltmode val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-dfltmode val mode expr op-num tstate appstuff)
   (if (eq? val 'DFLT)
       #f
-      (-rtx-traverse-error tstate "expecting mode DFLT"
+      (/rtx-traverse-error tstate "expecting mode DFLT"
 			   expr op-num))
 )
 
-(define (-rtx-traverse-rtx val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-rtx val mode expr op-num tstate appstuff)
 ; Commented out 'cus it doesn't quite work yet.
 ; (if (not (rtx? val))
-;     (-rtx-traverse-error tstate "expecting an rtx"
+;     (/rtx-traverse-error tstate "expecting an rtx"
 ;			   expr op-num))
-  (cons (-rtx-traverse val 'RTX mode expr op-num tstate appstuff)
+  (cons (/rtx-traverse val 'RTX mode expr op-num tstate appstuff)
 	tstate)
 )
 
-(define (-rtx-traverse-setrtx val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-setrtx val mode expr op-num tstate appstuff)
   ; FIXME: Still need to turn it off for sub-exprs.
   ; e.g. (mem (reg ...))
 ; Commented out 'cus it doesn't quite work yet.
 ; (if (not (rtx? val))
-;     (-rtx-traverse-error tstate "expecting an rtx"
+;     (/rtx-traverse-error tstate "expecting an rtx"
 ;				  expr op-num))
-  (cons (-rtx-traverse val 'SETRTX mode expr op-num
+  (cons (/rtx-traverse val 'SETRTX mode expr op-num
 		       (tstate-new-set? tstate #t)
 		       appstuff)
 	tstate)
@@ -297,80 +297,80 @@
 
 ; This is the test of an `if'.
 
-(define (-rtx-traverse-testrtx val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-testrtx val mode expr op-num tstate appstuff)
 ; Commented out 'cus it doesn't quite work yet.
 ; (if (not (rtx? val))
-;     (-rtx-traverse-error tstate "expecting an rtx"
+;     (/rtx-traverse-error tstate "expecting an rtx"
 ;				  expr op-num))
-  (cons (-rtx-traverse val 'RTX mode expr op-num tstate appstuff)
+  (cons (/rtx-traverse val 'RTX mode expr op-num tstate appstuff)
 	(tstate-new-cond?
 	 tstate
 	 (not (rtx-compile-time-constant? val))))
 )
 
-(define (-rtx-traverse-condrtx val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-condrtx val mode expr op-num tstate appstuff)
   (if (not (pair? val))
-      (-rtx-traverse-error tstate "expecting an expression"
+      (/rtx-traverse-error tstate "expecting an expression"
 			   expr op-num))
   (if (eq? (car val) 'else)
       (begin
 	(if (!= (+ op-num 2) (length expr))
-	    (-rtx-traverse-error tstate
+	    (/rtx-traverse-error tstate
 				 "`else' clause not last"
 				 expr op-num))
 	(cons (cons 'else
-		    (-rtx-traverse-rtx-list
+		    (/rtx-traverse-rtx-list
 		     (cdr val) mode expr op-num
 		     (tstate-new-cond? tstate #t)
 		     appstuff))
 	      (tstate-new-cond? tstate #t)))
       (cons (cons
 	     ; ??? Entries after the first are conditional.
-	     (-rtx-traverse (car val) 'RTX 'ANY expr op-num tstate appstuff)
-	     (-rtx-traverse-rtx-list
+	     (/rtx-traverse (car val) 'RTX 'ANY expr op-num tstate appstuff)
+	     (/rtx-traverse-rtx-list
 	      (cdr val) mode expr op-num
 	      (tstate-new-cond? tstate #t)
 	      appstuff))
 	    (tstate-new-cond? tstate #t)))
 )
 
-(define (-rtx-traverse-casertx val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-casertx val mode expr op-num tstate appstuff)
   (if (or (not (list? val))
 	  (< (length val) 2))
-      (-rtx-traverse-error tstate
+      (/rtx-traverse-error tstate
 			   "invalid `case' expression"
 			   expr op-num))
   ; car is either 'else or list of symbols/numbers
   (if (not (or (eq? (car val) 'else)
 	       (and (list? (car val))
 		    (not (null? (car val)))
-		    (all-true? (map -rtx-symornum?
+		    (all-true? (map /rtx-symornum?
 				    (car val))))))
-      (-rtx-traverse-error tstate
+      (/rtx-traverse-error tstate
 			   "invalid `case' choice"
 			   expr op-num))
   (if (and (eq? (car val) 'else)
 	   (!= (+ op-num 2) (length expr)))
-      (-rtx-traverse-error tstate "`else' clause not last"
+      (/rtx-traverse-error tstate "`else' clause not last"
 			   expr op-num))
   (cons (cons (car val)
-	      (-rtx-traverse-rtx-list
+	      (/rtx-traverse-rtx-list
 	       (cdr val) mode expr op-num
 	       (tstate-new-cond? tstate #t)
 	       appstuff))
 	(tstate-new-cond? tstate #t))
 )
 
-(define (-rtx-traverse-locals val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-locals val mode expr op-num tstate appstuff)
   (if (not (list? val))
-      (-rtx-traverse-error tstate "bad locals list"
+      (/rtx-traverse-error tstate "bad locals list"
 			   expr op-num))
   (for-each (lambda (var)
 	      (if (or (not (list? var))
 		      (!= (length var) 2)
-		      (not (-rtx-any-mode? (car var)))
+		      (not (/rtx-any-mode? (car var)))
 		      (not (symbol? (cadr var))))
-		  (-rtx-traverse-error tstate
+		  (/rtx-traverse-error tstate
 				       "bad locals list"
 				       expr op-num)))
 	    val)
@@ -378,58 +378,58 @@
     (cons val (tstate-push-env tstate env)))
 )
 
-(define (-rtx-traverse-iteration val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-iteration val mode expr op-num tstate appstuff)
   (if (not (symbol? val))
-      (-rtx-traverse-error tstate "bad iteration variable name"
+      (/rtx-traverse-error tstate "bad iteration variable name"
 			   expr op-num))
   (let ((env (rtx-env-make-iteration-locals val)))
     (cons val (tstate-push-env tstate env)))
 )
 
-(define (-rtx-traverse-env val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-env val mode expr op-num tstate appstuff)
   ; VAL is an environment stack.
   (if (not (list? val))
-      (-rtx-traverse-error tstate "environment not a list"
+      (/rtx-traverse-error tstate "environment not a list"
 			   expr op-num))
   (cons val (tstate-new-env tstate val))
 )
 
-(define (-rtx-traverse-attrs val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-attrs val mode expr op-num tstate appstuff)
 ;  (cons val ; (atlist-source-form (atlist-parse (make-prefix-context "with-attr") val ""))
 ;	tstate)
   #f
 )
 
-(define (-rtx-traverse-symbol val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-symbol val mode expr op-num tstate appstuff)
   (if (not (symbol? val))
-      (-rtx-traverse-error tstate "expecting a symbol"
+      (/rtx-traverse-error tstate "expecting a symbol"
 			   expr op-num))
   #f
 )
 
-(define (-rtx-traverse-string val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-string val mode expr op-num tstate appstuff)
   (if (not (string? val))
-      (-rtx-traverse-error tstate "expecting a string"
+      (/rtx-traverse-error tstate "expecting a string"
 			   expr op-num))
   #f
 )
 
-(define (-rtx-traverse-number val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-number val mode expr op-num tstate appstuff)
   (if (not (number? val))
-      (-rtx-traverse-error tstate "expecting a number"
+      (/rtx-traverse-error tstate "expecting a number"
 			   expr op-num))
   #f
 )
 
-(define (-rtx-traverse-symornum val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-symornum val mode expr op-num tstate appstuff)
   (if (not (or (symbol? val) (number? val)))
-      (-rtx-traverse-error tstate
+      (/rtx-traverse-error tstate
 			   "expecting a symbol or number"
 			   expr op-num))
   #f
 )
 
-(define (-rtx-traverse-object val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-object val mode expr op-num tstate appstuff)
   #f
 )
 
@@ -437,42 +437,43 @@
 ; This is a vector of size rtx-max-num.
 ; Each entry is a list of (arg-type-name . traverser) elements
 ; for rtx-arg-types.
+; FIXME: Initialized in rtl.scm (i.e. outside this file).
 
-(define -rtx-traverser-table #f)
+(define /rtx-traverser-table #f)
 
 ; Return a hash table of standard operand traversers.
 ; The result of each traverser is a pair of the compiled form of `val' and
 ; a possibly new traversal state or #f if there is no change.
 
-(define (-rtx-make-traverser-table)
+(define (/rtx-make-traverser-table)
   (let ((hash-tab (make-hash-table 31))
 	(traversers
 	 (list
 	  ; /fastcall-make is recognized by Hobbit and handled specially.
 	  ; When not using Hobbit it is a macro that returns its argument.
-	  (cons 'OPTIONS (/fastcall-make -rtx-traverse-options))
-	  (cons 'ANYMODE (/fastcall-make -rtx-traverse-anymode))
-	  (cons 'INTMODE (/fastcall-make -rtx-traverse-intmode))
-	  (cons 'FLOATMODE (/fastcall-make -rtx-traverse-floatmode))
-	  (cons 'NUMMODE (/fastcall-make -rtx-traverse-nummode))
-	  (cons 'EXPLNUMMODE (/fastcall-make -rtx-traverse-explnummode))
-	  (cons 'NONVOIDMODE (/fastcall-make -rtx-traverse-nonvoidmode))
-	  (cons 'VOIDMODE (/fastcall-make -rtx-traverse-voidmode))
-	  (cons 'DFLTMODE (/fastcall-make -rtx-traverse-dfltmode))
-	  (cons 'RTX (/fastcall-make -rtx-traverse-rtx))
-	  (cons 'SETRTX (/fastcall-make -rtx-traverse-setrtx))
-	  (cons 'TESTRTX (/fastcall-make -rtx-traverse-testrtx))
-	  (cons 'CONDRTX (/fastcall-make -rtx-traverse-condrtx))
-	  (cons 'CASERTX (/fastcall-make -rtx-traverse-casertx))
-	  (cons 'LOCALS (/fastcall-make -rtx-traverse-locals))
-	  (cons 'ITERATION (/fastcall-make -rtx-traverse-iteration))
-	  (cons 'ENV (/fastcall-make -rtx-traverse-env))
-	  (cons 'ATTRS (/fastcall-make -rtx-traverse-attrs))
-	  (cons 'SYMBOL (/fastcall-make -rtx-traverse-symbol))
-	  (cons 'STRING (/fastcall-make -rtx-traverse-string))
-	  (cons 'NUMBER (/fastcall-make -rtx-traverse-number))
-	  (cons 'SYMORNUM (/fastcall-make -rtx-traverse-symornum))
-	  (cons 'OBJECT (/fastcall-make -rtx-traverse-object))
+	  (cons 'OPTIONS (/fastcall-make /rtx-traverse-options))
+	  (cons 'ANYMODE (/fastcall-make /rtx-traverse-anymode))
+	  (cons 'INTMODE (/fastcall-make /rtx-traverse-intmode))
+	  (cons 'FLOATMODE (/fastcall-make /rtx-traverse-floatmode))
+	  (cons 'NUMMODE (/fastcall-make /rtx-traverse-nummode))
+	  (cons 'EXPLNUMMODE (/fastcall-make /rtx-traverse-explnummode))
+	  (cons 'NONVOIDMODE (/fastcall-make /rtx-traverse-nonvoidmode))
+	  (cons 'VOIDMODE (/fastcall-make /rtx-traverse-voidmode))
+	  (cons 'DFLTMODE (/fastcall-make /rtx-traverse-dfltmode))
+	  (cons 'RTX (/fastcall-make /rtx-traverse-rtx))
+	  (cons 'SETRTX (/fastcall-make /rtx-traverse-setrtx))
+	  (cons 'TESTRTX (/fastcall-make /rtx-traverse-testrtx))
+	  (cons 'CONDRTX (/fastcall-make /rtx-traverse-condrtx))
+	  (cons 'CASERTX (/fastcall-make /rtx-traverse-casertx))
+	  (cons 'LOCALS (/fastcall-make /rtx-traverse-locals))
+	  (cons 'ITERATION (/fastcall-make /rtx-traverse-iteration))
+	  (cons 'ENV (/fastcall-make /rtx-traverse-env))
+	  (cons 'ATTRS (/fastcall-make /rtx-traverse-attrs))
+	  (cons 'SYMBOL (/fastcall-make /rtx-traverse-symbol))
+	  (cons 'STRING (/fastcall-make /rtx-traverse-string))
+	  (cons 'NUMBER (/fastcall-make /rtx-traverse-number))
+	  (cons 'SYMORNUM (/fastcall-make /rtx-traverse-symornum))
+	  (cons 'OBJECT (/fastcall-make /rtx-traverse-object))
 	  )))
 
     (for-each (lambda (traverser)
@@ -483,13 +484,13 @@
 )
 
 ; Traverse the operands of EXPR, a canonicalized RTL expression.
-; Here "canonicalized" means that -rtx-munge-mode&options has been called to
+; Here "canonicalized" means that /rtx-munge-mode&options has been called to
 ; insert an option list and mode if they were absent in the original
 ; expression.
 ; Note that this means that, yes, the options and mode are "traversed" too.
 
-(define (-rtx-traverse-operands rtx-obj expr tstate appstuff)
-  (if -rtx-traverse-debug?
+(define (/rtx-traverse-operands rtx-obj expr tstate appstuff)
+  (if /rtx-traverse-debug?
       (begin
 	(display (spaces (* 4 (tstate-depth tstate))))
 	(display "Traversing operands of: ")
@@ -501,14 +502,14 @@
 
   (let loop ((operands (cdr expr))
 	     (op-num 0)
-	     (arg-types (vector-ref -rtx-traverser-table (rtx-num rtx-obj)))
+	     (arg-types (vector-ref /rtx-traverser-table (rtx-num rtx-obj)))
 	     (arg-modes (rtx-arg-modes rtx-obj))
 	     (result nil)
 	     )
 
     (let ((varargs? (and (pair? arg-types) (symbol? (car arg-types)))))
 
-      (if -rtx-traverse-debug?
+      (if /rtx-traverse-debug?
 	  (begin
 	    (display (spaces (* 4 (tstate-depth tstate))))
 	    (if (null? operands)
@@ -579,29 +580,29 @@
 		     (cons val result)))))))
 )
 
-; Publically accessible version of -rtx-traverse-operands as EXPR-FN may
+; Publically accessible version of /rtx-traverse-operands as EXPR-FN may
 ; need to call it.
 
-(define rtx-traverse-operands -rtx-traverse-operands)
+(define rtx-traverse-operands /rtx-traverse-operands)
 
-; Subroutine of -rtx-munge-mode&options.
+; Subroutine of /rtx-munge-mode&options.
 ; Return boolean indicating if X is an rtx option.
 
-(define (-rtx-option? x)
+(define (/rtx-option? x)
   (and (symbol? x)
        (char=? (string-ref (symbol->string x) 0) #\:))
 )
 
-; Subroutine of -rtx-munge-mode&options.
+; Subroutine of /rtx-munge-mode&options.
 ; Return boolean indicating if X is an rtx option list.
 
-(define (-rtx-option-list? x)
+(define (/rtx-option-list? x)
   (or (null? x)
       (and (pair? x)
-	   (-rtx-option? (car x))))
+	   (/rtx-option? (car x))))
 )
 
-; Subroutine of -rtx-traverse-expr to fill in the mode if absent and to
+; Subroutine of /rtx-traverse-expr to fill in the mode if absent and to
 ; collect the options into one list.
 ;
 ; ARGS is the list of arguments to the rtx function
@@ -612,12 +613,12 @@
 ; list in `(sequence () foo bar)' is unambiguously recognized as the locals
 ; list.  Icky, sure, but less icky than the alternatives thus far.
 
-(define (-rtx-munge-mode&options args)
+(define (/rtx-munge-mode&options args)
   (let ((options nil)
 	(mode-name 'DFLT))
     ; Pick off the option list if present.
     (if (and (pair? args)
-	     (-rtx-option-list? (car args))
+	     (/rtx-option-list? (car args))
 	     ; Handle `(sequence () foo bar)'.  If empty list isn't followed
 	     ; by a mode, it is not an option list.
 	     (or (not (null? (car args)))
@@ -636,7 +637,7 @@
     (cons options (cons mode-name args)))
 )
 
-; Subroutine of -rtx-traverse to traverse an expression.
+; Subroutine of /rtx-traverse to traverse an expression.
 ;
 ; RTX-OBJ is the <rtx-func> object of the (outer) expression being traversed.
 ;
@@ -665,9 +666,9 @@
 ; This is for semantic-compile's sake and all traversal handlers are
 ; required to do this if the expr-fn returns #f.
 
-(define (-rtx-traverse-expr rtx-obj expr mode parent-expr op-pos tstate appstuff)
+(define (/rtx-traverse-expr rtx-obj expr mode parent-expr op-pos tstate appstuff)
   (let* ((expr2 (cons (car expr)
-		      (-rtx-munge-mode&options (cdr expr))))
+		      (/rtx-munge-mode&options (cdr expr))))
 	 (fn (fastcall7 (tstate-expr-fn tstate)
 			rtx-obj expr2 mode parent-expr op-pos tstate appstuff)))
     (if fn
@@ -675,10 +676,10 @@
 	    ; Don't traverse operands for syntax expressions.
 	    (if (rtx-style-syntax? rtx-obj)
 		(apply fn (cons tstate (cdr expr2)))
-		(let ((operands (-rtx-traverse-operands rtx-obj expr2 tstate appstuff)))
+		(let ((operands (/rtx-traverse-operands rtx-obj expr2 tstate appstuff)))
 		  (apply fn (cons tstate operands))))
 	    fn)
-	(let ((operands (-rtx-traverse-operands rtx-obj expr2 tstate appstuff)))
+	(let ((operands (/rtx-traverse-operands rtx-obj expr2 tstate appstuff)))
 	  (cons (car expr2) operands))))
 )
 
@@ -712,8 +713,8 @@
 ; - operands, ifields, and numbers appearing where an rtx is expected are
 ;   converted to use `operand', `ifield', or `const'.
 
-(define (-rtx-traverse expr expected mode parent-expr op-pos tstate appstuff)
-  (if -rtx-traverse-debug?
+(define (/rtx-traverse expr expected mode parent-expr op-pos tstate appstuff)
+  (if /rtx-traverse-debug?
       (begin
 	(display (spaces (* 4 (tstate-depth tstate))))
 	(display "Traversing expr: ")
@@ -736,10 +737,10 @@
 	(tstate-incr-depth! tstate)
 	(let ((result
 	       (if rtx-obj
-		   (-rtx-traverse-expr rtx-obj expr mode parent-expr op-pos tstate appstuff)
-		   (let ((rtx-obj (-rtx-macro-lookup (car expr))))
+		   (/rtx-traverse-expr rtx-obj expr mode parent-expr op-pos tstate appstuff)
+		   (let ((rtx-obj (/rtx-macro-lookup (car expr))))
 		     (if rtx-obj
-			 (-rtx-traverse (-rtx-macro-expand expr rtx-evaluator)
+			 (/rtx-traverse (/rtx-macro-expand expr rtx-evaluator)
 					expected mode parent-expr op-pos tstate appstuff)
 			 (tstate-error tstate "unknown rtx function" expr))))))
 	  (tstate-decr-depth! tstate)
@@ -751,27 +752,27 @@
 
 	  (cond ((symbol? expr)
 		 (cond ((current-op-lookup expr)
-			(-rtx-traverse
+			(/rtx-traverse
 			 (rtx-make-operand expr) ; (current-op-lookup expr))
 			 expected mode parent-expr op-pos tstate appstuff))
 		       ((rtx-temp-lookup (tstate-env tstate) expr)
-			(-rtx-traverse
+			(/rtx-traverse
 			 (rtx-make-local expr) ; (rtx-temp-lookup (tstate-env tstate) expr))
 			 expected mode parent-expr op-pos tstate appstuff))
 		       ((current-ifld-lookup expr)
-			(-rtx-traverse
+			(/rtx-traverse
 			 (rtx-make-ifield expr)
 			 expected mode parent-expr op-pos tstate appstuff))
 		       ((enum-lookup-val expr)
 			;; ??? If enums could have modes other than INT,
 			;; we'd want to propagate that mode here.
-			(-rtx-traverse
+			(/rtx-traverse
 			 (rtx-make-enum 'INT expr)
 			 expected mode parent-expr op-pos tstate appstuff))
 		       (else
 			(tstate-error tstate "unknown operand" expr))))
 		((integer? expr)
-		 (-rtx-traverse (rtx-make-const 'INT expr)
+		 (/rtx-traverse (rtx-make-const 'INT expr)
 				expected mode parent-expr op-pos tstate appstuff))
 		(else
 		 (tstate-error tstate "unexpected operand" expr)))
@@ -781,21 +782,21 @@
 )
 
 ; User visible procedures to traverse an rtl expression.
-; These calls -rtx-traverse to do most of the work.
+; These calls /rtx-traverse to do most of the work.
 ; See tstate-make for explanations of OWNER, EXPR-FN.
 ; CONTEXT is a <context> object or #f if there is none.
 ; LOCALS is a list of (mode . name) elements (the locals arg to `sequence').
 ; APPSTUFF is for application specific use.
 
 (define (rtx-traverse context owner expr expr-fn appstuff)
-  (-rtx-traverse expr #f 'DFLT #f 0
+  (/rtx-traverse expr #f 'DFLT #f 0
 		 (tstate-make context owner expr-fn (rtx-env-empty-stack)
 			      #f #f nil 0)
 		 appstuff)
 )
 
 (define (rtx-traverse-with-locals context owner expr expr-fn locals appstuff)
-  (-rtx-traverse expr #f 'DFLT #f 0
+  (/rtx-traverse expr #f 'DFLT #f 0
 		 (tstate-make context owner expr-fn
 			      (rtx-env-push (rtx-env-empty-stack)
 					    (rtx-env-make-locals locals))
@@ -1012,7 +1013,7 @@
 
 ; Set to #t to debug rtx evaluation.
 
-(define -rtx-eval-debug? #f)
+(define /rtx-eval-debug? #f)
 
 ; RTX expression evaluator.
 ;
@@ -1021,7 +1022,7 @@
 ; ESTATE is the current evaluation state.
 
 (define (rtx-eval-with-estate expr mode estate)
-  (if -rtx-eval-debug?
+  (if /rtx-eval-debug?
       (begin
 	(display "Traversing ")
 	(display expr)
@@ -1040,13 +1041,13 @@
 ;		(if (rtx-style-syntax? rtx-obj)
 ;		    (apply fn (cons estate (cdr expr)))
 ;		    (let ((operands
-;			   (-rtx-eval-operands rtx-obj expr estate)))
+;			   (/rtx-eval-operands rtx-obj expr estate)))
 ;		      (apply fn (cons estate operands))))
 		fn)
 	    ; Leave expr unchanged.
 	    expr))
 ;	    (let ((operands
-;		   (-rtx-traverse-operands rtx-obj expr estate)))
+;		   (/rtx-traverse-operands rtx-obj expr estate)))
 ;	      (cons rtx-obj operands))))
 
       ; EXPR is not a list

@@ -9,7 +9,7 @@
 
 ; Return C code to define cpu implementation properties.
 
-(define (-gen-cpu-imp-properties)
+(define (/gen-cpu-imp-properties)
   (string-list
    "\
 /* The properties of this cpu's implementation.  */
@@ -31,7 +31,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 ; Generate code to profile hardware elements.
 ; ??? Not currently used.
 
-(define (-gen-hw-profile-code)
+(define (/gen-hw-profile-code)
   ; Fetch profilable input and output operands of the semantic code.
   (let ((in-ops (find op-profilable? (sfmt-in-ops (insn-sfmt insn))))
 	(out-ops (find op-profilable? (sfmt-out-ops (insn-sfmt insn)))))
@@ -47,7 +47,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 ; Return decls of hardware element profilers.
 ; ??? Not currently used.
 
-(define (-gen-hw-profile-decls)
+(define (/gen-hw-profile-decls)
   (string-list
    "/* Hardware profiling handlers.  */\n\n"
    (string-list-map (lambda (hw)
@@ -126,44 +126,44 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 
 ; Return name of profile handler for INSN, MODEL.
 
-(define (-gen-model-insn-fn-name model insn when)
+(define (/gen-model-insn-fn-name model insn when)
   (string-append "model_" (gen-sym insn) "_" (symbol->string when))
 )
 
-(define (-gen-model-insn-qualified-fn-name model insn when)
-  (string-append (gen-model-class-name model) "::" (-gen-model-insn-fn-name model insn when))
+(define (/gen-model-insn-qualified-fn-name model insn when)
+  (string-append (gen-model-class-name model) "::" (/gen-model-insn-fn-name model insn when))
 )
 
 ; Return declaration of function to model INSN.
 
-(define (-gen-model-insn-fn-decl model insn when)
+(define (/gen-model-insn-fn-decl model insn when)
   (string-list
    "UINT "
-   (-gen-model-insn-fn-name model insn when)
+   (/gen-model-insn-fn-name model insn when)
    " (@cpu@_cpu *current_cpu, @prefix@_scache *sem);\n"
   )
 )
 
-(define (-gen-model-insn-fn-decls model)
+(define (/gen-model-insn-fn-decls model)
   (string-list
    "  // These methods call the appropriate unit modeller(s) for each insn.\n"
    (string-list-map
     (lambda (insn)
       (string-list
-       "  " (-gen-model-insn-fn-decl model insn 'before)
-       "  " (-gen-model-insn-fn-decl model insn 'after)))
+       "  " (/gen-model-insn-fn-decl model insn 'before)
+       "  " (/gen-model-insn-fn-decl model insn 'after)))
     (non-multi-insns (real-insns (current-insn-list))))
   )
 )
 
 ; Return function to model INSN.
 
-(define (-gen-model-insn-fn model insn when)
+(define (/gen-model-insn-fn model insn when)
   (logit 2 "Processing modeling for " (obj:name insn) ": \"" (insn-syntax insn) "\" ...\n")
   (let ((sfmt (insn-sfmt insn)))
     (string-list
      "UINT\n"
-     (-gen-model-insn-qualified-fn-name model insn when)
+     (/gen-model-insn-qualified-fn-name model insn when)
      " (@cpu@_cpu *current_cpu, @prefix@_scache *sem)\n"
      "{\n"
      (if (with-scache?)
@@ -200,7 +200,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 ; ??? Modelling of insns could be table driven, but that puts constraints on
 ; generality.
 
-(define (-gen-model-insn-fns)
+(define (/gen-model-insn-fns)
   (string-write
    "/* Model handlers for each insn.  */\n\n"
    (lambda () (string-write-map
@@ -215,14 +215,14 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 		 (string-write-map
 		  (lambda (insn)
 		    (string-list
-		     (-gen-model-insn-fn model insn 'before)
-		     (-gen-model-insn-fn model insn 'after)))
+		     (/gen-model-insn-fn model insn 'before)
+		     (/gen-model-insn-fn model insn 'after)))
 		  (non-multi-insns (real-insns (current-insn-list)))))
 	       (current-model-list)))
    )
 )
 
-(define (-gen-model-class-decls model)
+(define (/gen-model-class-decls model)
   (string-append
    "\n"
    "  "
@@ -294,8 +294,8 @@ public:
 
 protected:
 "
-   (-gen-model-insn-fn-decls model)
-   (-gen-model-class-decls model)
+   (/gen-model-insn-fn-decls model)
+   (/gen-model-class-decls model)
 "\
 
   typedef UINT (" (gen-model-class-name model) "::*model_function) (@cpu@_cpu* current_cpu, @prefix@_scache* sem);
@@ -330,7 +330,7 @@ protected:
 ; U is a <unit> object.
 ; ARGS is a list of overriding arguments from INSN.
 
-(define (-gen-insn-unit-timing model insn u args)
+(define (/gen-insn-unit-timing model insn u args)
   (string-append
    "{ "
    (gen-model-class-name model) "::" (unit:enum u) ", "
@@ -345,7 +345,7 @@ protected:
 
 ; Generate timing table entry for MODEL for INSN.
 
-(define (-gen-insn-timing model insn)
+(define (/gen-insn-timing model insn)
   ; Instruction timing is stored as an associative list based on the model.
   (let ((timing (assq (obj:name model) (insn-timing insn))))
     ;(display timing) (newline)
@@ -356,16 +356,16 @@ protected:
      (if (obj-has-attr? insn 'VIRTUAL)
 	 "0, 0"
 	 (string-append
-	  "& " (-gen-model-insn-qualified-fn-name model insn 'before) ", "
-	  "& " (-gen-model-insn-qualified-fn-name model insn 'after)))
+	  "& " (/gen-model-insn-qualified-fn-name model insn 'before) ", "
+	  "& " (/gen-model-insn-qualified-fn-name model insn 'after)))
      ", { "
      (string-drop
       -2
       (if (not timing)
-	  (-gen-insn-unit-timing model insn (model-default-unit model) nil)
+	  (/gen-insn-unit-timing model insn (model-default-unit model) nil)
 	  (let ((units (timing:units (cdr timing))))
 	    (string-map (lambda (iunit)
-			  (-gen-insn-unit-timing model insn
+			  (/gen-insn-unit-timing model insn
 						 (iunit:unit iunit)
 						 (iunit:args iunit)))
 			units))))
@@ -375,11 +375,11 @@ protected:
 
 ; Generate model timing table for MODEL.
 
-(define (-gen-model-timing-table model)
+(define (/gen-model-timing-table model)
   (string-write
    "/* Model timing data for `" (obj:name model) "'.  */\n\n"
    "const " (gen-model-class-name model) "::insn_timing " (gen-model-class-name model) "::timing[] = {\n"
-   (lambda () (string-write-map (lambda (insn) (-gen-insn-timing model insn))
+   (lambda () (string-write-map (lambda (insn) (/gen-insn-timing model insn))
 				(non-multi-insns (non-alias-insns (current-insn-list)))))
    "};\n\n"
    )
@@ -387,17 +387,17 @@ protected:
 
 ; Return C code to define model profiling support stuff.
 
-(define (-gen-model-profile-data)
+(define (/gen-model-profile-data)
   (string-write
    "/* We assume UNIT_NONE == 0 because the tables don't always terminate\n"
    "   entries with it.  */\n\n"
-   (lambda () (string-write-map -gen-model-timing-table (current-model-list)))
+   (lambda () (string-write-map /gen-model-timing-table (current-model-list)))
    )
 )
 
 ; Return C code to define the model table for MACH.
 
-(define (-gen-mach-model-table mach)
+(define (/gen-mach-model-table mach)
   (string-list
    "\
 static const MODEL " (gen-sym mach) "_models[] =\n{\n"
@@ -421,7 +421,7 @@ static const MODEL " (gen-sym mach) "_models[] =\n{\n"
 
 ; Return C code to define model init fn.
 
-(define (-gen-model-init-fn model)
+(define (/gen-model-init-fn model)
   (string-list "\
 static void\n"
 (gen-sym model) "_model_init (@cpu@_cpu *cpu)
@@ -433,27 +433,27 @@ static void\n"
 
 ; Return C code to define model data and support fns.
 
-(define (-gen-model-defns)
+(define (/gen-model-defns)
   (string-write
-   (lambda () (string-write-map -gen-model-init-fn (current-model-list)))
+   (lambda () (string-write-map /gen-model-init-fn (current-model-list)))
    "#if WITH_PROFILE_MODEL_P
 #define TIMING_DATA(td) td
 #else
 #define TIMING_DATA(td) 0
 #endif\n\n"
-   (lambda () (string-write-map -gen-mach-model-table (current-mach-list)))
+   (lambda () (string-write-map /gen-mach-model-table (current-mach-list)))
    )
 )
 
 ; Return C definitions for this cpu family variant.
 
-(define (-gen-cpu-defns)
+(define (/gen-cpu-defns)
   "" 
 )
 
 ; Return C code to define the machine data.
 
-(define (-gen-mach-defns)
+(define (/gen-mach-defns)
   (string-list-map
    (lambda (mach)
      (gen-obj-sanitize
@@ -509,13 +509,13 @@ using namespace @cpu@; // FIXME: namespace organization still wip
    mechanism.  After all, this is information for profiling.  */
 
 "
-   -gen-model-insn-fns
-   -gen-model-profile-data
+   /gen-model-insn-fns
+   /gen-model-profile-data
 ;  not adapted for sid yet
-;   -gen-model-defns
-;   -gen-cpu-imp-properties
-;   -gen-cpu-defns
-;   -gen-mach-defns
+;   /gen-model-defns
+;   /gen-cpu-imp-properties
+;   /gen-cpu-defns
+;   /gen-mach-defns
    )
 )
 

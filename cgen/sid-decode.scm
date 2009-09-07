@@ -7,7 +7,7 @@
 ; big array.  It doesn't matter too much (yet).  Generating one big array is
 ; simpler.
 
-(define (-gen-decode-insn-globals insn-list)
+(define (/gen-decode-insn-globals insn-list)
   ; Print the higher detailed stuff at higher verbosity.
   (logit 2 "Processing decode insn globals ...\n")
 
@@ -46,7 +46,7 @@ bool @prefix@_idesc::idesc_table_initialized_p = false;\n\n"
 	   (if (with-scache?)
 	       (if pbb?
 		   "0, "
-		   (string-append (-gen-sem-fn-name insn) ", "))
+		   (string-append (/gen-sem-fn-name insn) ", "))
 	       "") 
 	   "\"" (string-upcase name) "\", "
 	   (gen-cpu-insn-enum (current-cpu) insn)
@@ -61,7 +61,7 @@ bool @prefix@_idesc::idesc_table_initialized_p = false;\n\n"
 
 ; Return a function that lookups up virtual insns.
 
-(define (-gen-virtual-insn-finder)
+(define (/gen-virtual-insn-finder)
   (string-list
    "\
 // Given a canonical virtual insn id, return the target specific one.
@@ -101,26 +101,26 @@ bool @prefix@_idesc::idesc_table_initialized_p = false;\n\n"
 
 ; Return enum name of format FMT.
 
-(define (-gen-fmt-enum fmt)
+(define (/gen-fmt-enum fmt)
   (string-upcase (gen-sym fmt))
 )
 
 ; Return names of semantic fns for INSN.
 ; ??? Make global, call from gen-semantic-fn, blah blah blah.
 
-(define (-gen-sem-fn-name insn)
+(define (/gen-sem-fn-name insn)
   (string-append "@prefix@_sem_" (gen-sym insn))
 )
 
 ; Return decls of each semantic fn.
 
-(define (-gen-sem-fn-decls)
+(define (/gen-sem-fn-decls)
   (string-write
    "// Decls of each semantic fn.\n\n"
    "using @cpu@::@prefix@_sem_fn;\n"
    (string-list-map (lambda (insn)
 		      (string-list "extern @prefix@_sem_fn "
-				   (-gen-sem-fn-name insn)
+				   (/gen-sem-fn-name insn)
 				   ";\n"))
 		    (scache-engine-insns))
    "\n"
@@ -134,7 +134,7 @@ bool @prefix@_idesc::idesc_table_initialized_p = false;\n\n"
 
 ; Generate decls for the insn descriptor table type IDESC.
 
-(define (-gen-idesc-decls)
+(define (/gen-idesc-decls)
   (string-append 
    "
 // Forward decls.
@@ -189,10 +189,10 @@ struct @prefix@_idesc {
 ")
 )
 
-; Utility of -gen-argbuf-fields-union to generate the definition for
+; Utility of /gen-argbuf-fields-union to generate the definition for
 ; <sformat-abuf> SBUF.
 
-(define (-gen-argbuf-elm sbuf)
+(define (/gen-argbuf-elm sbuf)
   (logit 2 "Processing sbuf format " (obj:name sbuf) " ...\n")
   (string-list
    "  struct { /* " (obj:comment sbuf) " */\n"
@@ -209,15 +209,15 @@ struct @prefix@_idesc {
    "  } " (gen-sym sbuf) ";\n")
 )
 
-; Utility of -gen-scache-decls to generate the union of extracted ifields.
+; Utility of /gen-scache-decls to generate the union of extracted ifields.
 
-(define (-gen-argbuf-fields-union)
+(define (/gen-argbuf-fields-union)
   (string-list
    "\
 // Instruction argument buffer.
 
 union @prefix@_sem_fields {\n"
-   (string-list-map -gen-argbuf-elm (current-sbuf-list))
+   (string-list-map /gen-argbuf-elm (current-sbuf-list))
    "\
   // This one is for chain/cti-chain virtual insns.
   struct {
@@ -236,9 +236,9 @@ union @prefix@_sem_fields {\n"
    )
 )
 
-(define (-gen-scache-decls)
+(define (/gen-scache-decls)
   (string-list
-   (-gen-argbuf-fields-union)
+   (/gen-argbuf-fields-union)
    "\
 // Simulator instruction cache.
 
@@ -304,7 +304,7 @@ struct @prefix@_scache {
 ; Return C code to record <ifield> F for the semantic handler
 ; in a local variable rather than an ARGBUF struct.
 
-(define (-gen-record-argbuf-ifld f sfmt)
+(define (/gen-record-argbuf-ifld f sfmt)
   (string-append "  " (gen-ifld-argbuf-ref f)
 		 " = " (gen-extracted-ifld-value f) ";\n")
 )
@@ -313,7 +313,7 @@ struct @prefix@_scache {
 ; string argument to fprintf, character indicating type of third arg, value.
 ; The type is one of: x.
 
-(define (-gen-trace-argbuf-ifld f sfmt)
+(define (/gen-trace-argbuf-ifld f sfmt)
   (string-append
    ; FIXME: Add method to return fprintf format string.
    ", \"" (gen-sym f) " 0x%x\""
@@ -409,7 +409,7 @@ struct @prefix@_scache {
 ; the ARGBUF struct.
 ; ??? Later allow target to provide an `extract' expression.
 
-(define (-gen-op-extract op sfmt local?)
+(define (/gen-op-extract op sfmt local?)
   (send (op:type op) 'gen-extract op sfmt local?)
 )
 
@@ -417,7 +417,7 @@ struct @prefix@_scache {
 ; string argument to fprintf, character indicating type of third arg, value.
 ; The type is one of: x.
 
-(define (-gen-op-trace-extract op sfmt)
+(define (/gen-op-trace-extract op sfmt)
   (send (op:type op) 'gen-trace-extract op sfmt)
 )
 
@@ -449,7 +449,7 @@ struct @prefix@_scache {
 (define (gen-sfmt-op-argbuf-assigns sfmt)
   (let ((operands (sfmt-extracted-operands sfmt)))
     (string-list-map (lambda (op)
-		       (-gen-op-extract op sfmt #t))
+		       (/gen-op-extract op sfmt #t))
 		     operands))
 )
 
@@ -459,14 +459,14 @@ struct @prefix@_scache {
 ; Return C code to record insn field data for <sformat> SFMT.
 ; This is used when with-scache.
 
-(define (-gen-record-args sfmt)
+(define (/gen-record-args sfmt)
   (let ((operands (sfmt-extracted-operands sfmt))
 	(iflds (sfmt-needed-iflds sfmt)))
     (string-list
      "  /* Record the fields for the semantic handler.  */\n"
-     (string-list-map (lambda (f) (-gen-record-argbuf-ifld f sfmt))
+     (string-list-map (lambda (f) (/gen-record-argbuf-ifld f sfmt))
 		      iflds)
-     (string-list-map (lambda (op) (-gen-op-extract op sfmt #f))
+     (string-list-map (lambda (op) (/gen-op-extract op sfmt #f))
 		      operands)
      "  if (UNLIKELY(current_cpu->trace_extract_p))\n"
      "    {\n"
@@ -512,7 +512,7 @@ struct @prefix@_scache {
 ; is kept to the extraction phase.  If someone wants to put forth some real
 ; data, this might then be changed (or at least noted).
 
-(define (-gen-record-profile-args sfmt)
+(define (/gen-record-profile-args sfmt)
   (let ((in-ops (find op-profilable? (sfmt-in-ops sfmt)))
 	(out-ops (find op-profilable? (sfmt-out-ops sfmt)))
 	)
@@ -537,7 +537,7 @@ struct @prefix@_scache {
 ; by the semantic code.  This is currently done by recording this information
 ; with the format.
 
-(define (-gen-extract-fn sfmt)
+(define (/gen-extract-fn sfmt)
   (logit 2 "Processing extractor for \"" (sfmt-key sfmt) "\" ...\n")
   (string-list
    "void
@@ -552,9 +552,9 @@ struct @prefix@_scache {
    "\n"
    (gen-extract-ifields (sfmt-iflds sfmt) (sfmt-length sfmt) "    " #f)
    "\n"
-   (-gen-record-args sfmt)
+   (/gen-record-args sfmt)
    "\n"
-   (-gen-record-profile-args sfmt)
+   (/gen-record-profile-args sfmt)
    (gen-undef-field-macro sfmt)
    "}\n\n"
    )
@@ -562,12 +562,12 @@ struct @prefix@_scache {
 
 ; For each format, return its extraction function.
 
-(define (-define-all-extractor-fns)
+(define (/define-all-extractor-fns)
   (logit 2 "Processing extractor fn bodies ...\n")
-  (string-list-map -gen-extract-fn (current-sfmt-list))
+  (string-list-map /gen-extract-fn (current-sfmt-list))
 )
 
-(define (-declare-all-extractor-fns)
+(define (/declare-all-extractor-fns)
   (logit 2 "Processing extractor fn declarations ...\n")
   (string-map (lambda (sfmt)
 		(string-append "
@@ -583,7 +583,7 @@ static void
 ; ourselves.
 ; LSB0? is non-#f if bit number 0 is the least significant bit.
 
-(define (-gen-decode-fn insn-list initial-bitnums lsb0?)
+(define (/gen-decode-fn insn-list initial-bitnums lsb0?)
   (assert (with-scache?))
 
   ; Compute the initial DECODE-BITSIZE as the minimum of all insn lengths.
@@ -616,7 +616,7 @@ static void
        "
 // Declare extractor functions
 "
-       -declare-all-extractor-fns
+       /declare-all-extractor-fns
 
        "
 
@@ -660,7 +660,7 @@ void
 
 "
 
-       -define-all-extractor-fns
+       /define-all-extractor-fns
        )))
 )
 
@@ -702,8 +702,8 @@ typedef UINT @prefix@_insn_word;
 "
    (lambda () (gen-cpu-insn-enum-decl (current-cpu)
 				      (non-multi-insns (non-alias-insns (current-insn-list)))))
-   -gen-idesc-decls
-   -gen-scache-decls
+   /gen-idesc-decls
+   /gen-scache-decls
 
    "\
 } // end @cpu@ namespace
@@ -712,7 +712,7 @@ typedef UINT @prefix@_insn_word;
    ; ??? The semantic functions could go in the cpu's namespace.
    ; There's no pressing need for it though.
    (if (with-scache?)
-       -gen-sem-fn-decls
+       /gen-sem-fn-decls
        "")
 
    "\
@@ -746,9 +746,9 @@ typedef UINT @prefix@_insn_word;
 using namespace @cpu@; // FIXME: namespace organization still wip
 \n"
 
-   (lambda () (-gen-decode-insn-globals (non-multi-insns (non-alias-insns (current-insn-list)))))
-   -gen-virtual-insn-finder
-   (lambda () (-gen-decode-fn (non-multi-insns (real-insns (current-insn-list)))
+   (lambda () (/gen-decode-insn-globals (non-multi-insns (non-alias-insns (current-insn-list)))))
+   /gen-virtual-insn-finder
+   (lambda () (/gen-decode-fn (non-multi-insns (real-insns (current-insn-list)))
 			      (state-decode-assist)
 			      (current-arch-insn-lsb0?)))
    )

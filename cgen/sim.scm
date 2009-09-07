@@ -50,30 +50,30 @@
 ;	indicate the software package
 
 ; #t if the scache is being used
-(define -with-scache? #f)
-(define (with-scache?) -with-scache?)
+(define /with-scache? #f)
+(define (with-scache?) /with-scache?)
 
 ; #t if we're generating profiling code
 ; Each of the function and switch semantic code can have profiling.
-; The options as passed are stored in -with-profile-{fn,sw}?, and
-; -with-profile? is set at code generation time.
-(define -with-profile-fn? #f)
-(define -with-profile-sw? #f)
-(define -with-profile? #f)
-(define (with-profile?) -with-profile?)
-(define (with-any-profile?) (or -with-profile-fn? -with-profile-sw?))
+; The options as passed are stored in /with-profile-{fn,sw}?, and
+; /with-profile? is set at code generation time.
+(define /with-profile-fn? #f)
+(define /with-profile-sw? #f)
+(define /with-profile? #f)
+(define (with-profile?) /with-profile?)
+(define (with-any-profile?) (or /with-profile-fn? /with-profile-sw?))
 
 ; #t if multiple isa support is enabled
-(define -with-multiple-isa? #f)
-(define (with-multiple-isa?) -with-multiple-isa?)
+(define /with-multiple-isa? #f)
+(define (with-multiple-isa?) /with-multiple-isa?)
 
 ; Handle parallel execution with generic writeback pass.
-(define -with-generic-write? #f)
-(define (with-generic-write?) -with-generic-write?)
+(define /with-generic-write? #f)
+(define (with-generic-write?) /with-generic-write?)
 
 ; Only generate parallel versions of each insn.
-(define -with-parallel-only? #f)
-(define (with-parallel-only?) -with-parallel-only?)
+(define /with-parallel-only? #f)
+(define (with-parallel-only?) /with-parallel-only?)
 
 ; String containing copyright text.
 (define CURRENT-COPYRIGHT #f)
@@ -84,12 +84,12 @@
 ; Initialize the options.
 
 (define (option-init!)
-  (set! -with-scache? #f)
-  (set! -with-profile-fn? #f)
-  (set! -with-profile-sw? #f)
-  (set! -with-multiple-isa? #f)
-  (set! -with-generic-write? #f)
-  (set! -with-parallel-only? #f)
+  (set! /with-scache? #f)
+  (set! /with-profile-fn? #f)
+  (set! /with-profile-sw? #f)
+  (set! /with-multiple-isa? #f)
+  (set! /with-generic-write? #f)
+  (set! /with-parallel-only? #f)
   (set! CURRENT-COPYRIGHT copyright-fsf)
   (set! CURRENT-PACKAGE package-gnu-simulators)
   *UNSPECIFIED*
@@ -99,15 +99,15 @@
 
 (define (option-set! name value)
   (case name
-    ((with-scache) (set! -with-scache? #t))
+    ((with-scache) (set! /with-scache? #t))
     ((with-profile) (cond ((equal? value '("fn"))
-			   (set! -with-profile-fn? #t))
+			   (set! /with-profile-fn? #t))
 			  ((equal? value '("sw"))
-			   (set! -with-profile-sw? #t))
+			   (set! /with-profile-sw? #t))
 			  (else (error "invalid with-profile value" value))))
-    ((with-multiple-isa) (set! -with-multiple-isa? #t))
-    ((with-generic-write) (set! -with-generic-write? #t))
-    ((with-parallel-only) (set! -with-parallel-only? #t))
+    ((with-multiple-isa) (set! /with-multiple-isa? #t))
+    ((with-generic-write) (set! /with-generic-write? #t))
+    ((with-parallel-only) (set! /with-parallel-only? #t))
     ((copyright) (cond ((equal?  value '("fsf"))
 			(set! CURRENT-COPYRIGHT copyright-fsf))
 		       ((equal? value '("redhat"))
@@ -129,9 +129,9 @@
 ; While processing operand reading (or writing), parallel execution support
 ; needs to be turned off, so it is up to the appropriate cgen-foo.c proc to
 ; set-with-parallel?! appropriately.
-(define -with-parallel? #f)
-(define (with-parallel?) -with-parallel?)
-(define (set-with-parallel?! flag) (set! -with-parallel? flag))
+(define /with-parallel? #f)
+(define (with-parallel?) /with-parallel?)
+(define (set-with-parallel?! flag) (set! /with-parallel? flag))
 
 ; Kind of parallel support.
 ; If 'read, read pre-processing is done.
@@ -139,14 +139,14 @@
 ; ??? At present we always use write post-processing, though the previous
 ; version used read pre-processing.  Not sure supporting both is useful
 ; in the long run.
-(define -with-parallel-kind 'write)
+(define /with-parallel-kind 'write)
 ; #t if parallel support is provided by read pre-processing.
 (define (with-parallel-read?)
-  (and -with-parallel? (eq? -with-parallel-kind 'read))
+  (and /with-parallel? (eq? /with-parallel-kind 'read))
 )
 ; #t if parallel support is provided by write post-processing.
 (define (with-parallel-write?)
-  (and -with-parallel? (eq? -with-parallel-kind 'write))
+  (and /with-parallel? (eq? /with-parallel-kind 'write))
 )
 
 ; Misc. utilities.
@@ -182,7 +182,7 @@
 
 ; Return a <c-expr> object of the value of an ifield.
 
-(define (-cxmake-ifld-val mode f)
+(define (/cxmake-ifld-val mode f)
   (if (with-scache?)
       ; ??? Perhaps a better way would be to defer evaluating the src of a
       ; set until the method processing the dest.
@@ -285,7 +285,7 @@
  (lambda (self sym index estate)
    (let ((gen-index1 (lambda (idx)
 		       (string-append "["
-				      (-gen-hw-index idx estate)
+				      (/gen-hw-index idx estate)
 				      "]"))))
      (string-append sym
 		    (cond ((list? index) (string-map gen-index1 index))
@@ -385,7 +385,7 @@
  (lambda (self estate mode index selector)
    (if (not (eq? 'ifield (hw-index:type index)))
        (error "not an ifield hw-index" index))
-   (-cxmake-ifld-val mode (hw-index:value index)))
+   (/cxmake-ifld-val mode (hw-index:value index)))
 )
 
 ; Handle gen-get-macro/gen-set-macro.
@@ -412,10 +412,10 @@
 ; of rtx: that takes a variable number of named arguments.
 ; ??? Another way to get #:direct might be (raw-reg h-pc).
 
-(define (-hw-gen-set-quiet-pc self estate mode index selector newval . options)
+(define (/hw-gen-set-quiet-pc self estate mode index selector newval . options)
   (if (not (send self 'pc?)) (error "Not a PC:" self))
   (cond ((memq #:direct options)
-	 (-hw-gen-set-quiet self estate mode index selector newval))
+	 (/hw-gen-set-quiet self estate mode index selector newval))
 	((has-attr? newval 'CACHED)
 	 (string-append "SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, "
 			(cx:c newval)
@@ -426,7 +426,7 @@
 			", vpc);\n")))
 )
 
-(method-make! <hw-pc> 'gen-set-quiet -hw-gen-set-quiet-pc)
+(method-make! <hw-pc> 'gen-set-quiet /hw-gen-set-quiet-pc)
 
 ; Handle updates of the pc during parallel execution.
 ; This is done in a post-processing pass after semantic evaluation.
@@ -510,7 +510,7 @@
  <hw-register> 'gen-record-profile
  (lambda (self index sfmt estate)
    ; FIXME: Need to handle scalars.
-   (-gen-hw-index-raw index estate))
+   (/gen-hw-index-raw index estate))
 )
 
 (method-make!
@@ -558,7 +558,7 @@
 
 ; Utility to build a <c-expr> object to fetch the value of a register.
 
-(define (-hw-cxmake-get hw estate mode index selector)
+(define (/hw-cxmake-get hw estate mode index selector)
   (let ((mode (if (mode:eq? 'DFLT mode)
 		  (send hw 'get-mode)
 		  mode))
@@ -568,7 +568,7 @@
     (cx:make mode
 	     (cond (getter
 		    (let ((scalar? (hw-scalar? hw))
-			  (c-index (-gen-hw-index index estate)))
+			  (c-index (/gen-hw-index index estate)))
 		      (string-append "GET_"
 				     (string-upcase (gen-sym hw))
 				     " ("
@@ -585,7 +585,7 @@
 					    (gen-sym hw) index estate))))))
 )
 
-(method-make! <hw-register> 'cxmake-get -hw-cxmake-get)
+(method-make! <hw-register> 'cxmake-get /hw-cxmake-get)
 
 ; raw-reg: support
 ; ??? raw-reg: support is wip
@@ -602,11 +602,11 @@
 
 ; Utilities to generate C code to assign a variable to a register.
 
-(define (-hw-gen-set-quiet hw estate mode index selector newval)
+(define (/hw-gen-set-quiet hw estate mode index selector newval)
   (let ((setter (hw-setter hw)))
     (cond (setter
 	   (let ((scalar? (hw-scalar? hw))
-		 (c-index (-gen-hw-index index estate)))
+		 (c-index (/gen-hw-index index estate)))
 	     (string-append "SET_"
 			    (string-upcase (gen-sym hw))
 			    " ("
@@ -625,7 +625,7 @@
 			       " = " (cx:c newval) ";\n"))))
 )
 
-(method-make! <hw-register> 'gen-set-quiet -hw-gen-set-quiet)
+(method-make! <hw-register> 'gen-set-quiet /hw-gen-set-quiet)
 
 ; raw-reg: support
 ; ??? wip
@@ -710,11 +710,11 @@
 			     (if default-selector? "" "ASI")
 			     " ("
 			     "current_cpu, pc, "
-			     (-gen-hw-index index estate)
+			     (/gen-hw-index index estate)
 			     (if default-selector?
 				 ""
 				 (string-append ", "
-						(-gen-hw-selector selector)))
+						(/gen-hw-selector selector)))
 			     ")"))))
 )
 
@@ -729,11 +729,11 @@
 		    (if default-selector? "" "ASI")
 		    " ("
 		    "current_cpu, pc, "
-		    (-gen-hw-index index estate)
+		    (/gen-hw-index index estate)
 		    (if default-selector?
 			""
 			(string-append ", "
-				       (-gen-hw-selector selector)))
+				       (/gen-hw-selector selector)))
 		    ", " (cx:c newval) ");\n")))
 )
 
@@ -845,14 +845,14 @@
        (let ((index-mode (send hw 'get-index-mode)))
 	 (if index-mode
 	     (make <hw-index> 'anonymous 'str-expr index-mode
-		   (string-append access-macro " (" (-op-index-name op) ")"))
+		   (string-append access-macro " (" (/op-index-name op) ")"))
 	     (hw-index-scalar)))))
 )
 
 ; Return the name of the PAREXEC structure member holding a hardware index
 ; for operand OP.
 
-(define (-op-index-name op)
+(define (/op-index-name op)
   (string-append (gen-sym op) "_idx")
 )
 
@@ -861,7 +861,7 @@
 ; The result is a string of C code.
 ; FIXME:wip
 
-(define (-gen-hw-index-raw index estate)
+(define (/gen-hw-index-raw index estate)
   (let ((type (hw-index:type index))
 	(mode (hw-index:mode index))
 	(value (hw-index:value index)))
@@ -881,13 +881,13 @@
 		    (gen-extracted-ifld-value value)))
       ((operand) (cx:c (send value 'cxmake-get estate mode (op:index value)
 			     (op:selector value) #f)))
-      (else (error "-gen-hw-index-raw: invalid index:" index))))
+      (else (error "/gen-hw-index-raw: invalid index:" index))))
 )
 
-; Same as -gen-hw-index-raw except used where speedups are possible.
+; Same as /gen-hw-index-raw except used where speedups are possible.
 ; e.g. doing array index calcs at extraction time.
 
-(define (-gen-hw-index index estate)
+(define (/gen-hw-index index estate)
   (let ((type (hw-index:type index))
 	(mode (hw-index:mode index))
 	(value (hw-index:value index)))
@@ -900,15 +900,15 @@
       ((rtx) (rtl-c-with-estate estate mode value))
       ((ifield) (if (= (ifld-length value) 0)
 		    ""
-		    (cx:c (-cxmake-ifld-val mode value))))
+		    (cx:c (/cxmake-ifld-val mode value))))
       ((operand) (cx:c (send value 'cxmake-get estate mode (op:index value)
 			     (op:selector value))))
-      (else (error "-gen-hw-index: invalid index:" index))))
+      (else (error "/gen-hw-index: invalid index:" index))))
 )
 
 ; Return address where HW is stored.
 
-(define (-gen-hw-addr hw estate index)
+(define (/gen-hw-addr hw estate index)
   (let ((setter (hw-setter hw)))
     (cond ((and (hw-cache-addr? hw) ; FIXME: redo test
 		(eq? 'ifield (hw-index:type index)))
@@ -936,14 +936,14 @@
 		    (obj-cons-attr! xmode (bool-attr-make 'FORCE-C #t))
 		    xmode)
 		  mode)
-	      (-gen-hw-index self estate))))
+	      (/gen-hw-index self estate))))
 )
 
 ; Hardware selector support code.
 
 ; Generate C code for SEL.
 
-(define (-gen-hw-selector sel)
+(define (/gen-hw-selector sel)
   (rtl-c 'INT sel nil)
 )
 
@@ -1001,15 +1001,15 @@
 ;(method-make!
 ; <pc> 'gen-set-quiet
 ; (lambda (self estate mode index selector newval)
-;   (-op-gen-set-quiet self estate mode index selector newval)))
+;   (/op-gen-set-quiet self estate mode index selector newval)))
 ;(method-make!
 ; <pc> 'gen-set-trace
 ; (lambda (self estate mode index selector newval)
-;   (-op-gen-set-trace self estate mode index selector newval)))
+;   (/op-gen-set-trace self estate mode index selector newval)))
 
 ; Name of C macro to access parallel execution operand support.
 
-(define -par-operand-macro "OPRND")
+(define /par-operand-macro "OPRND")
 
 ; Return C code to fetch an operand's value and save it away for the
 ; semantic handler.  This is used to handle parallel execution of several
@@ -1019,7 +1019,7 @@
 
 (define (op:read op sfmt)
   (let ((estate (estate-make-for-normal-rtl-c nil nil)))
-    (send op 'gen-read estate sfmt -par-operand-macro))
+    (send op 'gen-read estate sfmt /par-operand-macro))
 )
 
 ; Return C code to write an operand's value.
@@ -1030,7 +1030,7 @@
 
 (define (op:write op sfmt)
   (let ((estate (estate-make-for-normal-rtl-c nil nil)))
-    (send op 'gen-write estate sfmt -par-operand-macro))
+    (send op 'gen-write estate sfmt /par-operand-macro))
 )
 
 ; Default gen-read method.
@@ -1095,7 +1095,7 @@
 	    (send (op:type self) 'cxmake-get-raw estate mode index selector))
 	   ((with-parallel-read?)
 	    (cx:make-with-atlist mode
-				 (string-append -par-operand-macro
+				 (string-append /par-operand-macro
 						" (" (gen-sym self) ")")
 				 nil)) ; FIXME: want CACHED attr if present
 	   ((op:getter self)
@@ -1112,14 +1112,14 @@
 
 ; Utilities to implement gen-set-quiet/gen-set-trace.
 
-(define (-op-gen-set-quiet op estate mode index selector newval)
+(define (/op-gen-set-quiet op estate mode index selector newval)
   (send (op:type op) 'gen-set-quiet estate mode index selector newval)
 )
 
 ; Return C code to call the appropriate queued-write handler.
 ; ??? wip
 
-(define (-op-gen-queued-write op estate mode index selector newval)
+(define (/op-gen-queued-write op estate mode index selector newval)
   (let* ((hw (op:type op))
 	 (setter (hw-setter hw))
 	 (sem-mode (mode:sem-mode mode)))
@@ -1155,31 +1155,31 @@
      (cond ((hw-scalar? hw)
 	    "")
 	   (setter
-	    (string-append ", " (-gen-hw-index index estate)))
+	    (string-append ", " (/gen-hw-index index estate)))
 	   ((memory? hw)
-	    (string-append ", " (-gen-hw-index index estate)))
+	    (string-append ", " (/gen-hw-index index estate)))
 	   (else
-	    (string-append ", " (-gen-hw-addr (op:type op) estate index))))
+	    (string-append ", " (/gen-hw-addr (op:type op) estate index))))
      ", "
      newval
      ");\n"))
 )
 
-(define (-op-gen-set-quiet-parallel op estate mode index selector newval)
+(define (/op-gen-set-quiet-parallel op estate mode index selector newval)
   (if (with-generic-write?)
-      (-op-gen-queued-write op estate mode index selector (cx:c newval))
+      (/op-gen-queued-write op estate mode index selector (cx:c newval))
       (string-append
        (if (op-save-index? op)
 	   (string-append "    "
-			  -par-operand-macro " (" (-op-index-name op) ")"
-			  " = " (-gen-hw-index index estate) ";\n")
+			  /par-operand-macro " (" (/op-index-name op) ")"
+			  " = " (/gen-hw-index index estate) ";\n")
 	   "")
        "    "
-       -par-operand-macro " (" (gen-sym op) ")"
+       /par-operand-macro " (" (gen-sym op) ")"
        " = " (cx:c newval) ";\n"))
 )
 
-(define (-op-gen-set-trace op estate mode index selector newval)
+(define (/op-gen-set-trace op estate mode index selector newval)
   (string-append
    "  {\n"
    "    " (mode:c-type mode) " opval = " (cx:c newval) ";\n"
@@ -1214,19 +1214,19 @@
    "  }\n")
 )
 
-(define (-op-gen-set-trace-parallel op estate mode index selector newval)
+(define (/op-gen-set-trace-parallel op estate mode index selector newval)
   (string-append
    "  {\n"
    "    " (mode:c-type mode) " opval = " (cx:c newval) ";\n"
    (if (with-generic-write?)
-       (-op-gen-queued-write op estate mode index selector "opval")
+       (/op-gen-queued-write op estate mode index selector "opval")
        (string-append
 	(if (op-save-index? op)
 	    (string-append "    "
-			   -par-operand-macro " (" (-op-index-name op) ")"
-			   " = " (-gen-hw-index index estate) ";\n")
+			   /par-operand-macro " (" (/op-index-name op) ")"
+			   " = " (/gen-hw-index index estate) ";\n")
 	    "")
-	"    " -par-operand-macro " (" (gen-sym op) ")"
+	"    " /par-operand-macro " (" (gen-sym op) ")"
 	" = opval;\n"))
    (if (op:cond? op)
        (string-append "    written |= (1 << "
@@ -1264,9 +1264,9 @@
      (cond ((obj-has-attr? self 'RAW)
 	    (send (op:type self) 'gen-set-quiet-raw estate mode index selector newval))
 	   ((with-parallel-write?)
-	    (-op-gen-set-quiet-parallel self estate mode index selector newval))
+	    (/op-gen-set-quiet-parallel self estate mode index selector newval))
 	   (else
-	    (-op-gen-set-quiet self estate mode index selector newval)))))
+	    (/op-gen-set-quiet self estate mode index selector newval)))))
 )
 
 ; Return C code to set the value of an operand and print TRACE_RESULT message.
@@ -1288,9 +1288,9 @@
      (cond ((obj-has-attr? self 'RAW)
 	    (send (op:type self) 'gen-set-quiet-raw estate mode index selector newval))
 	   ((with-parallel-write?)
-	    (-op-gen-set-trace-parallel self estate mode index selector newval))
+	    (/op-gen-set-trace-parallel self estate mode index selector newval))
 	   (else
-	    (-op-gen-set-trace self estate mode index selector newval)))))
+	    (/op-gen-set-trace self estate mode index selector newval)))))
 )
 
 ; Define and undefine C macros to tuck away details of instruction format used
@@ -1298,14 +1298,14 @@
 ; similar thing done for extraction/semantic functions.
 
 (define (gen-define-parallel-operand-macro sfmt)
-  (string-append "#define " -par-operand-macro "(f) "
+  (string-append "#define " /par-operand-macro "(f) "
 		 "par_exec->operands."
 		 (gen-sym sfmt)
 		 ".f\n")
 )
 
 (define (gen-undef-parallel-operand-macro sfmt)
-  (string-append "#undef " -par-operand-macro "\n")
+  (string-append "#undef " /par-operand-macro "\n")
 )
 
 ; Operand profiling and parallel execution support.
@@ -1406,7 +1406,7 @@
 
 ; Return C code to declare the machine data.
 
-(define (-gen-mach-decls)
+(define (/gen-mach-decls)
   (string-append
    (string-map (lambda (mach)
 		 (gen-obj-sanitize mach
@@ -1419,7 +1419,7 @@
 
 ; Return C code to define the machine data.
 
-(define (-gen-mach-data)
+(define (/gen-mach-data)
   (string-append
    "const MACH *sim_machs[] =\n{\n"
    (string-map (lambda (mach)
@@ -1437,7 +1437,7 @@
 ; Return C declarations of cpu model support stuff.
 ; ??? This goes in arch.h but a better place is each cpu.h.
 
-(define (-gen-arch-model-decls)
+(define (/gen-arch-model-decls)
   (string-append
    (gen-enum-decl 'model_type "model types"
 		  "MODEL_"
@@ -1702,10 +1702,10 @@
 ; ARGBUF support is put in cpuall.h, which doesn't depend on sim-cpu.scm,
 ; so this support is here.
 
-; Utility of -gen-argbuf-fields-union to generate the definition for
+; Utility of /gen-argbuf-fields-union to generate the definition for
 ; <sformat-abuf> SBUF.
 
-(define (-gen-argbuf-elm sbuf)
+(define (/gen-argbuf-elm sbuf)
   (logit 2 "Processing sbuf format " (obj:name sbuf) " ...\n")
   (string-list
    "  struct { /* " (obj:comment sbuf) " */\n"
@@ -1724,13 +1724,13 @@
 
 ; Utility of gen-argbuf-type to generate the union of extracted ifields.
 
-(define (-gen-argbuf-fields-union)
+(define (/gen-argbuf-fields-union)
   (string-list
    "\
 /* Instruction argument buffer.  */
 
 union sem_fields {\n"
-   (string-list-map -gen-argbuf-elm (current-sbuf-list))
+   (string-list-map /gen-argbuf-elm (current-sbuf-list))
    "\
 #if WITH_SCACHE_PBB
   /* Writeback handler.  */
@@ -1770,7 +1770,7 @@ union sem_fields {\n"
   (logit 2 "Generating ARGBUF type ...\n")
   (string-list
    (if (and cpu-data? (with-scache?))
-       (-gen-argbuf-fields-union)
+       (/gen-argbuf-fields-union)
        "")
    (if cpu-data? "" "#ifndef WANT_CPU\n")
    "\
@@ -1878,28 +1878,28 @@ struct scache {
 ; .cpu file loading support
 
 ; Only run sim-analyze-insns! once.
-(define -sim-insns-analyzed? #f)
+(define /sim-insns-analyzed? #f)
 
 ; List of computed sformat argument buffers.
-(define -sim-sformat-abuf-list #f)
-(define (current-sbuf-list) -sim-sformat-abuf-list)
+(define /sim-sformat-abuf-list #f)
+(define (current-sbuf-list) /sim-sformat-abuf-list)
 
 ; Called before/after the .cpu file has been read in.
 
 (define (sim-init!)
-  (set! -sim-insns-analyzed? #f)
-  (set! -sim-sformat-abuf-list #f)
+  (set! /sim-insns-analyzed? #f)
+  (set! /sim-sformat-abuf-list #f)
   *UNSPECIFIED*
 )
 
-;; Subroutine of -create-virtual-insns!.
+;; Subroutine of /create-virtual-insns!.
 ;; Add virtual insn INSN to the database.
 ;; We put virtual insns ahead of normal insns because they're kind of special,
 ;; and it helps to see them first in lists.
 ;; ORDINAL is a used to place the insn ahead of normal insns;
 ;; it is a pair so we can do the update for the next virtual insn here.
 
-(define (-virtual-insn-add! ordinal insn)
+(define (/virtual-insn-add! ordinal insn)
   (obj-set-ordinal! insn (cdr ordinal))
   (current-insn-add! insn)
   (set-cdr! ordinal (- (cdr ordinal) 1))
@@ -1907,13 +1907,13 @@ struct scache {
 
 ; Create the virtual insns.
 
-(define (-create-virtual-insns!)
+(define (/create-virtual-insns!)
   (let ((all (all-isas-attr-value))
 	(context (make-prefix-context "virtual insns"))
-	;; Record as a pair so -virtual-insn-add! can update it.
+	;; Record as a pair so /virtual-insn-add! can update it.
 	(ordinal (cons #f -1)))
 
-    (-virtual-insn-add!
+    (/virtual-insn-add!
      ordinal
      (insn-read context
 		'(name x-begin)
@@ -1939,7 +1939,7 @@ struct scache {
 "))
 		))
 
-    (-virtual-insn-add!
+    (/virtual-insn-add!
      ordinal
      (insn-read context
 		'(name x-chain)
@@ -1958,7 +1958,7 @@ struct scache {
 "))
 		))
 
-    (-virtual-insn-add!
+    (/virtual-insn-add!
      ordinal
      (insn-read context
 		'(name x-cti-chain)
@@ -1983,7 +1983,7 @@ struct scache {
 "))
 		))
 
-    (-virtual-insn-add!
+    (/virtual-insn-add!
      ordinal
      (insn-read context
 		'(name x-before)
@@ -1999,7 +1999,7 @@ struct scache {
 "))
 		))
 
-    (-virtual-insn-add!
+    (/virtual-insn-add!
      ordinal
      (insn-read context
 		'(name x-after)
@@ -2015,7 +2015,7 @@ struct scache {
 "))
 		))
 
-    (-virtual-insn-add!
+    (/virtual-insn-add!
      ordinal
      (insn-read context
 		'(name x-invalid)
@@ -2044,7 +2044,7 @@ struct scache {
   ; The code generators should first look for x-foo-@prefix@, then for x-foo.
   ; ??? This is good enough for the first pass.  Will eventually need to use
   ; less C and more RTL.
-  (-create-virtual-insns!)
+  (/create-virtual-insns!)
 
   *UNSPECIFIED*
 )
@@ -2066,7 +2066,7 @@ struct scache {
   ; This can only be done if one isa and one cpu family is being kept.
   (assert-keep-one)
 
-  (if (not -sim-insns-analyzed?)
+  (if (not /sim-insns-analyzed?)
 
       (begin
 	(arch-analyze-insns! CURRENT-ARCH
@@ -2074,9 +2074,9 @@ struct scache {
 			     #t) ; do analyze the semantics
 
 	; Compute the set of sformat argument buffers.
-	(set! -sim-sformat-abuf-list (compute-sformat-argbufs! (current-sfmt-list)))
+	(set! /sim-sformat-abuf-list (compute-sformat-argbufs! (current-sfmt-list)))
 
-	(set! -sim-insns-analyzed? #t)))
+	(set! /sim-insns-analyzed? #t)))
 
   ; Do our own error checking.
   (assert (current-insn-lookup 'x-invalid))

@@ -64,33 +64,48 @@
 
 ; A list of three numbers designating the cgen version: major minor fixlevel.
 ; The "50" is a generic indicator that we're between 1.1 and 1.2.
-(define -CGEN-VERSION '(1 1 50))
-(define (cgen-major) (car -CGEN-VERSION))
-(define (cgen-minor) (cadr -CGEN-VERSION))
-(define (cgen-fixlevel) (caddr -CGEN-VERSION))
+(define /CGEN-VERSION '(1 1 50))
+(define (cgen-major) (car /CGEN-VERSION))
+(define (cgen-minor) (cadr /CGEN-VERSION))
+(define (cgen-fixlevel) (caddr /CGEN-VERSION))
 
 ; A list of two numbers designating the description language version.
-; Note that this is different from -CGEN-VERSION.
+; Note that this is different from /CGEN-VERSION.
 ; See section "RTL Versions" of the docs.
-(define -CGEN-RTL-VERSION '(0 7))
-(define (cgen-rtl-version) -CGEN-RTL-VERSION)
-(define (cgen-rtl-major) (car -CGEN-RTL-VERSION))
-(define (cgen-rtl-minor) (cadr -CGEN-RTL-VERSION))
+(define /CGEN-RTL-VERSION '(0 7))
+(define (cgen-rtl-version) /CGEN-RTL-VERSION)
+(define (cgen-rtl-major) (car /CGEN-RTL-VERSION))
+(define (cgen-rtl-minor) (cadr /CGEN-RTL-VERSION))
+
+;; Utilities for testing the rtl version.
+(define (rtl-version-equal? major minor)
+  (equal? (cgen-rtl-version) (list major minor))
+)
+(define (rtl-version-at-least? major minor)
+  (let ((rmajor (cgen-rtl-major))
+	(rminor (cgen-rtl-major)))
+    (or (> rmajor major)
+	(and (= rmajor major)
+	     (>= rminor minor))))
+)
+(define (rtl-version-older? major minor)
+  (not (rtl-version-at-least? major minor))
+)
 
 ;; List of supported versions
-(define -supported-rtl-versions '((0 7) (0 8)))
+(define /supported-rtl-versions '((0 7) (0 8)))
 
-(define (-cmd-define-rtl-version major minor)
+(define (/cmd-define-rtl-version major minor)
   (if (not (non-negative-integer? major))
       (parse-error #f "Invalid major version number" major))
   (if (not (non-negative-integer? minor))
       (parse-error #f "Invalid minor version number" minor))
 
   (let ((new-version (list major minor)))
-    (if (not (member new-version -supported-rtl-versions))
+    (if (not (member new-version /supported-rtl-versions))
 	(parse-error #f "Unsupported/invalid rtl version" new-version))
     (logit 1 "Setting RTL version to " major "." minor " ...\n")
-    (set! -CGEN-RTL-VERSION new-version))
+    (set! /CGEN-RTL-VERSION new-version))
 )
 
 ; Which application is in use (UNKNOWN, DESC, OPCODES, SIMULATOR, ???).
@@ -122,21 +137,21 @@
 
 ; List of loaded files.
 
-(if (not (defined? '-loaded-file-list))
-    (define -loaded-file-list '()))
+(if (not (defined? '/loaded-file-list))
+    (define /loaded-file-list '()))
 
 ; Return non-zero if FILE was loaded last time through.
 
-(define (-loaded-file? file)
-  (->bool (memq (string->symbol file) -loaded-file-list))
+(define (/loaded-file? file)
+  (->bool (memq (string->symbol file) /loaded-file-list))
 )
 
 ; Record FILE as compiled in.
 
-(define (-loaded-file-record! file)
+(define (/loaded-file-record! file)
   (let ((file (string->symbol file)))
-    (if (not (memq file -loaded-file-list))
-	(set! -loaded-file-list (cons file -loaded-file-list))))
+    (if (not (memq file /loaded-file-list))
+	(set! /loaded-file-list (cons file /loaded-file-list))))
 )
 
 ; Load FILE if SYM is not compiled in.
@@ -156,8 +171,8 @@
 	   (display (string-append "Skipping " file ", dynamically loaded.\n")))
 	  ((or (not CHECK-LOADED?)
 	       (not (defined? sym))
-	       (-loaded-file? file))
-	   (-loaded-file-record! file)
+	       (/loaded-file? file))
+	   (/loaded-file-record! file)
 	   (load file))
 	  (else
 	   (display (string-append "Skipping " file ", already loaded.\n")))))
@@ -233,7 +248,7 @@
 ; A pair of two lists: machs to keep, machs to drop.
 ; The default is "keep all machs", "drop none".
 
-(define -keep-all-machs '((all)))
+(define /keep-all-machs '((all)))
 
 ; Main reader state class.
 
@@ -249,7 +264,7 @@
 	       ; variants in the architecture, it is the default value of the
 	       ; MACH attribute.  If `all' is present the drop list is still
 	       ; processed.
-	       (cons 'keep-mach -keep-all-machs)
+	       (cons 'keep-mach /keep-all-machs)
 
 	       ; Selected isas to keep or `all'.
 	       '(keep-isa . (all))
@@ -297,7 +312,7 @@
 			       (reader-commands CURRENT-READER)))
 )
 
-(define (-reader-lookup-command name)
+(define (/reader-lookup-command name)
   (assq-ref (reader-commands CURRENT-READER) name)
 )
 
@@ -308,7 +323,7 @@
 ; Return the current source location in readable form.
 ; FIXME: Currently unused, keep for reference for awhile.
 
-(define (-readable-current-location)
+(define (/readable-current-location)
   (let ((loc (current-reader-location)))
     (if loc
 	(location->string loc)
@@ -365,7 +380,7 @@
 
 ; Process a macro-expanded entry.
 
-(define (-reader-process-expanded-1! entry)
+(define (/reader-process-expanded-1! entry)
   (let ((location (location-property entry)))
 
     ;; Set the current source location for better diagnostics.
@@ -378,7 +393,7 @@
 		 "\n"
 		 (with-output-to-string (lambda () (pretty-print entry)))))
 
-    (let ((command (-reader-lookup-command (car entry)))
+    (let ((command (/reader-lookup-command (car entry)))
 	  (context (make-current-context #f)))
 
       (if command
@@ -417,7 +432,7 @@
 ;; ENTRY is expected to have a location-property object property.
 
 ;; NOTE: This is "public" so the .eval pmacro can use it.
-;; This is also used by -cmd-if.
+;; This is also used by /cmd-if.
 
 (define (reader-process-expanded! entry)
   ;; () is used to indicate a no-op
@@ -431,7 +446,7 @@
 	 (for-each reader-process-expanded!
 		   (cdr entry)))
 	(else
-	 (-reader-process-expanded-1! entry)))
+	 (/reader-process-expanded-1! entry)))
 
   *UNSPECIFIED*
 )
@@ -439,7 +454,7 @@
 ; Process file entry ENTRY.
 ; LOC is a <location> object for ENTRY.
 
-(define (-reader-process! entry loc)
+(define (/reader-process! entry loc)
   (if (not (form? entry))
       (parse-error loc "improperly formed entry" entry))
 
@@ -475,7 +490,7 @@
 			  ;; location (it's easier).
 			  ;; ??? Use source-properties of entry, and only if
 			  ;; not present fall back on current-input-location.
-			  (-reader-process! entry (current-input-location #t))
+			  (/reader-process! entry (current-input-location #t))
 			  (loop (read)))))))
 	)
 
@@ -512,7 +527,7 @@
 ; MACH-NAME-LIST is a comma separated string of machines to keep and drop
 ; (if prefixed with !).
 
-(define (-keep-mach-set! mach-name-list)
+(define (/keep-mach-set! mach-name-list)
   (let* ((mach-name-list (string-cut mach-name-list #\,))
 	 (keep (find (lambda (name) (not (char=? (string-ref name 0) #\!)))
 		     mach-name-list))
@@ -619,7 +634,7 @@
 ; Return a boolean indicating if everything is kept.
 
 (define (keep-all?)
-  (equal? (reader-keep-mach CURRENT-READER) -keep-all-machs)
+  (equal? (reader-keep-mach CURRENT-READER) /keep-all-machs)
 )
 
 ; Ensure all cpu families were kept, necessary for generating files that
@@ -649,7 +664,7 @@
 ; has to remember.  On the other hand, !drop support is moderately complicated,
 ; and it can be added in an upward compatible manner later.
 
-(define (-keep-isa-set! isa-name-list)
+(define (/keep-isa-set! isa-name-list)
   (let ((isa-name-list (map string->symbol (string-cut isa-name-list #\,))))
     (reader-set-keep-isa! CURRENT-READER isa-name-list)
     )
@@ -748,7 +763,7 @@
 ;;; [If we later need to support disabling some tracing, one way is to
 ;;; recognize an "-" in front of an option.]
 
-(define (-set-trace-options! trace-options)
+(define (/set-trace-options! trace-options)
   (let ((all (list "commands" "pmacros"))
 	(requests (string-cut trace-options #\,)))
     (if (member "all" requests)
@@ -805,17 +820,17 @@
 ; ??? Class local variables would provide a more efficient way to do this.
 ; Assuming one wants to continue on this route.
 
-(define -cpu-new-class-list nil)
+(define /cpu-new-class-list nil)
 
 (define (set-for-new! parent child)
-  (set! -cpu-new-class-list (acons parent child -cpu-new-class-list))
+  (set! /cpu-new-class-list (acons parent child /cpu-new-class-list))
 )
 
 ; Lookup the class registered with set-for-new!
 ; If none registered, return PARENT.
 
 (define (lookup-for-new parent)
-  (let ((child (assq-ref -cpu-new-class-list parent)))
+  (let ((child (assq-ref /cpu-new-class-list parent)))
     (if child
 	child
 	parent))
@@ -828,19 +843,19 @@
 ;; hardware, etc.) to add their own.
 ;; The "result" is stored in global CURRENT-READER.
 
-(define (-init-reader!)
+(define (/init-reader!)
   (set! CURRENT-READER (new <reader>))
 
   (reader-add-command! 'define-rtl-version
 		       "Specify the RTL version being used.\n"
-		       nil '(major minor) -cmd-define-rtl-version)
+		       nil '(major minor) /cmd-define-rtl-version)
 
   (reader-add-command! 'include
 		       "Include a file.\n"
-		       nil '(file) -cmd-include)
+		       nil '(file) /cmd-include)
   (reader-add-command! 'if
 		       "(if test then . else)\n"
-		       nil '(test then . else) -cmd-if)
+		       nil '(test then . else) /cmd-if)
 
   ; Rather than add cgen-internal specific stuff to pmacros.scm, we create
   ; the pmacro commands here.
@@ -861,12 +876,12 @@ Define a preprocessor-style macro.
 ; OPTIONS is a list of options to control code generation.
 ; The values are application dependent.
 
-(define (-init-parse-cpu! keep-mach keep-isa options)
-  (set! -cpu-new-class-list nil)
+(define (/init-parse-cpu! keep-mach keep-isa options)
+  (set! /cpu-new-class-list nil)
 
   (set! CURRENT-ARCH (new <arch>))
-  (-keep-mach-set! keep-mach)
-  (-keep-isa-set! keep-isa)
+  (/keep-mach-set! keep-mach)
+  (/keep-isa-set! keep-isa)
   (set-cgen-options! options)
 
   ; The order here is important.
@@ -911,7 +926,7 @@ Define a preprocessor-style macro.
 ; The lists get cons'd in reverse order.  One thing this does is change them
 ; back to file order, it makes things easier for the human viewer.
 
-(define (-finish-parse-cpu!)
+(define (/finish-parse-cpu!)
   ; The order here is generally the reverse of init-parse-cpu!.
   (rtl-finish!)
   (minsn-finish!)
@@ -932,7 +947,7 @@ Define a preprocessor-style macro.
 
 ; Perform a global error checking pass after the .cpu file has been read in.
 
-(define (-global-error-checks)
+(define (/global-error-checks)
   ; ??? None yet.
   ; TODO:
   ; - all hardware elements with same name must have same rank and
@@ -942,7 +957,7 @@ Define a preprocessor-style macro.
 
 ; .cpu file include mechanism
 
-(define (-cmd-include file)
+(define (/cmd-include file)
   (logit 1 "Including file " (string-append arch-path "/" file) " ...\n")
   (reader-read-file! (string-append arch-path "/" file))
   (logit 2 "Resuming previous file ...\n")
@@ -952,7 +967,7 @@ Define a preprocessor-style macro.
 ; This is a work-in-progress.  Its presence in the description file is ok,
 ; but the implementation will need to evolve.
 
-(define (-cmd-if test then . else)
+(define (/cmd-if test then . else)
   (if (> (length else) 1)
       (parse-error #f
 		   "wrong number of arguments to `if'"
@@ -1003,17 +1018,17 @@ Define a preprocessor-style macro.
 
 (define (cpu-load file keep-mach keep-isa options trace-options
 		  app-initer! app-finisher! analyzer!)
-  (-init-reader!)
-  (-init-parse-cpu! keep-mach keep-isa options)
-  (-set-trace-options! trace-options)
+  (/init-reader!)
+  (/init-parse-cpu! keep-mach keep-isa options)
+  (/set-trace-options! trace-options)
   (app-initer!)
   (logit 1 "Loading cpu description " file " ...\n")
   (set! arch-path (dirname file))
   (reader-read-file! file)
   (logit 2 "Processing cpu description " file " ...\n")
-  (-finish-parse-cpu!)
+  (/finish-parse-cpu!)
   (app-finisher!)
-  (-global-error-checks)
+  (/global-error-checks)
   (analyzer!)
   *UNSPECIFIED*
 )
@@ -1074,7 +1089,7 @@ Define a preprocessor-style macro.
 ; `help-text' is a string that is printed with the usage information.
 ; Elements beyond `help-text' are ignored.
 
-(define (-getopt argv opt-spec)
+(define (/getopt argv opt-spec)
   (if (null? argv)
       (cons (cons #f #f) #f)
       (let ((opt (assoc (car argv) opt-spec)))
@@ -1147,7 +1162,7 @@ Define a preprocessor-style macro.
 ; OPTION-HANDLER is either (lambda () ...) or (lambda (arg) ...) and
 ; processes the option.
 
-(define -cgen
+(define /cgen
   (lambda args
     (let ((app-name "unknown")
 	  (opt-spec nil)
@@ -1197,7 +1212,7 @@ Define a preprocessor-style macro.
 	    )
 
 	(let loop ((argv (cdr argv)))
-	  (let* ((new-argv (-getopt argv opt-spec))
+	  (let* ((new-argv (/getopt argv opt-spec))
 		 (opt (caar new-argv))
 		 (arg (cdar new-argv)))
 	    (case opt
@@ -1319,5 +1334,5 @@ Define a preprocessor-style macro.
 
 (define cgen
   (lambda args
-    (cgen-debugging-stack-start -cgen args))
+    (cgen-debugging-stack-start /cgen args))
 )

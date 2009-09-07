@@ -62,7 +62,7 @@
 ; Parse a macro-insn expansion description.
 ; ??? At present we only support unconditional simple expansion.
 
-(define (-minsn-parse-expansion context expn)
+(define (/minsn-parse-expansion context expn)
   (if (not (form? expn))
       (parse-error context "invalid macro expansion" expn))
   (if (not (eq? 'emit (car expn)))
@@ -76,7 +76,7 @@
 ; All arguments are in raw (non-evaluated) form.
 ; The result is the parsed object or #f if object isn't for selected mach(s).
 
-(define (-minsn-parse context name comment attrs syntax expansions)
+(define (/minsn-parse context name comment attrs syntax expansions)
   (logit 2 "Processing macro-insn " name " ...\n")
 
   (if (not (list? expansions))
@@ -95,7 +95,7 @@
 			(parse-comment context comment)
 			atlist-obj
 			(parse-syntax context syntax)
-			(map (lambda (e) (-minsn-parse-expansion context e))
+			(map (lambda (e) (/minsn-parse-expansion context e))
 			     expansions))))
 	  result)
 
@@ -108,9 +108,9 @@
 ; This is the main routine for analyzing macro-insns in the .cpu file.
 ; CONTEXT is a <context> object for error messages.
 ; ARG-LIST is an associative list of field name and field value.
-; -minsn-parse is invoked to create the `macro-insn' object.
+; /minsn-parse is invoked to create the `macro-insn' object.
 
-(define (-minsn-read context . arg-list)
+(define (/minsn-read context . arg-list)
   (let (
 	(name nil)
 	(comment "")
@@ -135,7 +135,7 @@
 	    (loop (cdr arg-list)))))
 
     ; Now that we've identified the elements, build the object.
-    (-minsn-parse context name comment attrs syntax expansions))
+    (/minsn-parse context name comment attrs syntax expansions))
 )
 
 ; Define a macro-insn object, name/value pair list version.
@@ -144,7 +144,7 @@
   (lambda arg-list
     (if (eq? APPLICATION 'SIMULATOR)
 	#f ; don't waste time if simulator
-	(let ((m (apply -minsn-read (cons (make-current-context "define-minsn")
+	(let ((m (apply /minsn-read (cons (make-current-context "define-minsn")
 					  arg-list))))
 	  (if m
 	      (current-minsn-add! m))
@@ -159,7 +159,7 @@
 (define (define-full-minsn name comment attrs syntax expansion)
   (if (eq? APPLICATION 'SIMULATOR)
       #f ; don't waste time if simulator
-      (let ((m (-minsn-parse (make-current-context "define-full-minsn")
+      (let ((m (/minsn-parse (make-current-context "define-full-minsn")
 			     name comment
 			     (cons 'ALIAS attrs)
 			     syntax (list expansion))))
@@ -172,7 +172,7 @@
 ; This involves making a copy of REAL-INSN's ifield list and assigning
 ; known quantities to operands that have fixed values in the macro-insn.
 
-(define (-minsn-compute-iflds context minsn-iflds real-insn)
+(define (/minsn-compute-iflds context minsn-iflds real-insn)
   (let* ((iflds (list-copy (insn-iflds real-insn)))
 	 ; List of "free variables", i.e. operands.
 	 (ifld-ops (find ifld-operand? iflds))
@@ -230,7 +230,7 @@
 		   (obj:comment minsn)
 		   (obj-atlist minsn)
 		   (minsn-syntax minsn)
-		   (-minsn-compute-iflds (context-append context
+		   (/minsn-compute-iflds (context-append context
 							 (string-append ": " (obj:str-name minsn)))
 					 (cddr expn) alias-of)
 		   #f ; ifield-assertion

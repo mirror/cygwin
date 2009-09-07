@@ -56,29 +56,29 @@
 
 ; Set to #t to collect various statistics.
 
-(define -stmt-stats? #f)
+(define /stmt-stats? #f)
 
-; Collection of computed stats.  Only set if -stmt-stats? = #t.
+; Collection of computed stats.  Only set if /stmt-stats? = #t.
 
-(define -stmt-stats #f)
+(define /stmt-stats #f)
 
-; Collection of computed statement data.  Only set if -stmt-stats? = #t.
+; Collection of computed statement data.  Only set if /stmt-stats? = #t.
 
-(define -stmt-stats-data #f)
+(define /stmt-stats-data #f)
 
 ; Create a structure recording data of all statements.
 ; A pair of (next-ordinal . table).
 
-(define (-stmt-data-make hash-size)
+(define (/stmt-data-make hash-size)
   (cons 0 (make-vector hash-size nil))
 )
 
 ; Accessors.
 
-(define (-stmt-data-table data) (cdr data))
-(define (-stmt-data-next-num data) (car data))
-(define (-stmt-data-set-next-num! data newval) (set-car! data newval))
-(define (-stmt-data-hash-size data) (vector-length (cdr data)))
+(define (/stmt-data-table data) (cdr data))
+(define (/stmt-data-next-num data) (car data))
+(define (/stmt-data-set-next-num! data newval) (set-car! data newval))
+(define (/stmt-data-hash-size data) (vector-length (cdr data)))
 
 ; A single statement.
 ; INSN semantics either consist of a single statement or a sequence of them.
@@ -128,13 +128,13 @@
 ;
 ; The user list is set to nil.
 
-(define (-stmt-make expr locals num speed-cost size-cost)
+(define (/stmt-make expr locals num speed-cost size-cost)
   (make <statement> expr locals num speed-cost size-cost nil)
 )
 
 ; Add a user of STMT.
 
-(define (-stmt-add-user! stmt user-num user-obj)
+(define (/stmt-add-user! stmt user-num user-obj)
   (-stmt-set-users! stmt (cons (cons user-num user-obj) (-stmt-users stmt)))
   *UNSPECIFIED*
 )
@@ -143,8 +143,8 @@
 ; CHAIN-NUM is an argument so it need only be computed once.
 ; The result is the found <statement> object or #f.
 
-(define (-frag-lookup-stmt data chain-num stmt)
-  (let ((table (-stmt-data-table data)))
+(define (/frag-lookup-stmt data chain-num stmt)
+  (let ((table (/stmt-data-table data)))
     (let loop ((stmts (vector-ref table chain-num)))
       (cond ((null? stmts)
 	     #f)
@@ -158,54 +158,54 @@
 ; Hash a statement.
 
 ; Computed hash value.
-; Global 'cus -frag-hash-compute! is defined globally so we can use
+; Global 'cus /frag-hash-compute! is defined globally so we can use
 ; /fastcall (FIXME: Need /fastcall to work on non-global procs).
 
-(define -frag-hash-value-tmp 0)
+(define /frag-hash-value-tmp 0)
 
-(define (-frag-hash-string str)
+(define (/frag-hash-string str)
   (let loop ((chars (map char->integer (string->list str))) (result 0))
     (if (null? chars)
 	result
 	(loop (cdr chars) (modulo (+ (* result 7) (car chars)) #xfffffff))))
 )
 
-(define (-frag-hash-compute! rtx-obj expr mode parent-expr op-pos tstate appstuff)
+(define (/frag-hash-compute! rtx-obj expr mode parent-expr op-pos tstate appstuff)
   (let ((h 0))
     (case (rtx-name expr)
       ((operand)
-       (set! h (-frag-hash-string (symbol->string (rtx-operand-name expr)))))
+       (set! h (/frag-hash-string (symbol->string (rtx-operand-name expr)))))
       ((local)
-       (set! h (-frag-hash-string (symbol->string (rtx-local-name expr)))))
+       (set! h (/frag-hash-string (symbol->string (rtx-local-name expr)))))
       ((const)
        (set! h (rtx-const-value expr)))
       (else
        (set! h (rtx-num rtx-obj))))
-    (set! -frag-hash-value-tmp
+    (set! /frag-hash-value-tmp
 	  ; Keep number small.
-	  (modulo (+ (* -frag-hash-value-tmp 3) h op-pos)
+	  (modulo (+ (* /frag-hash-value-tmp 3) h op-pos)
 		  #xfffffff)))
 
   ; #f -> "continue with normal traversing"
   #f
 )
 
-(define (-frag-hash-stmt stmt locals size)
-  (set! -frag-hash-value-tmp 0)
-  (rtx-traverse-with-locals #f #f stmt -frag-hash-compute! locals #f) ; FIXME: (/fastcall-make -frag-hash-compute!))
-  (modulo -frag-hash-value-tmp size)
+(define (/frag-hash-stmt stmt locals size)
+  (set! /frag-hash-value-tmp 0)
+  (rtx-traverse-with-locals #f #f stmt /frag-hash-compute! locals #f) ; FIXME: (/fastcall-make /frag-hash-compute!))
+  (modulo /frag-hash-value-tmp size)
 )
 
 ; Compute the speed/size costs of a statement.
 
 ; Compute speed/size costs.
-; Global 'cus -frag-cost-compute! is defined globally so we can use
+; Global 'cus /frag-cost-compute! is defined globally so we can use
 ; /fastcall (FIXME: Need /fastcall to work on non-global procs).
 
-(define -frag-speed-cost-tmp 0)
-(define -frag-size-cost-tmp 0)
+(define /frag-speed-cost-tmp 0)
+(define /frag-size-cost-tmp 0)
 
-(define (-frag-cost-compute! rtx-obj expr mode parent-expr op-pos tstate appstuff)
+(define (/frag-cost-compute! rtx-obj expr mode parent-expr op-pos tstate appstuff)
   ; FIXME: wip
   (let ((speed 0)
 	(size 0))
@@ -225,30 +225,30 @@
       (else
        (set! speed 4)
        (set! size 4)))
-    (set! -frag-speed-cost-tmp (+ -frag-speed-cost-tmp speed))
-    (set! -frag-size-cost-tmp (+ -frag-size-cost-tmp size)))
+    (set! /frag-speed-cost-tmp (+ /frag-speed-cost-tmp speed))
+    (set! /frag-size-cost-tmp (+ /frag-size-cost-tmp size)))
 
   ; #f -> "continue with normal traversing"
   #f
 )
 
-(define (-frag-stmt-cost stmt locals)
-  (set! -frag-speed-cost-tmp 0)
-  (set! -frag-size-cost-tmp 0)
-  (rtx-traverse-with-locals #f #f stmt -frag-cost-compute! locals #f) ; FIXME: (/fastcall-make -frag-cost-compute!))
-  (cons -frag-speed-cost-tmp -frag-size-cost-tmp)
+(define (/frag-stmt-cost stmt locals)
+  (set! /frag-speed-cost-tmp 0)
+  (set! /frag-size-cost-tmp 0)
+  (rtx-traverse-with-locals #f #f stmt /frag-cost-compute! locals #f) ; FIXME: (/fastcall-make /frag-cost-compute!))
+  (cons /frag-speed-cost-tmp /frag-size-cost-tmp)
 )
 
 ; Add STMT to statement table DATA.
 ; CHAIN-NUM is the chain in the hash table to add STMT to.
-; {SPEED,SIZE}-COST are passed through to -stmt-make.
+; {SPEED,SIZE}-COST are passed through to /stmt-make.
 ; The result is the newly created <statement> object.
 
-(define (-frag-add-stmt! data chain-num stmt locals speed-cost size-cost)
-  (let ((stmt (-stmt-make stmt locals (-stmt-data-next-num data) speed-cost size-cost))
-	(table (-stmt-data-table data)))
+(define (/frag-add-stmt! data chain-num stmt locals speed-cost size-cost)
+  (let ((stmt (/stmt-make stmt locals (/stmt-data-next-num data) speed-cost size-cost))
+	(table (/stmt-data-table data)))
     (vector-set! table chain-num (cons stmt (vector-ref table chain-num)))
-    (-stmt-data-set-next-num! data (+ 1 (-stmt-data-next-num data)))
+    (/stmt-data-set-next-num! data (+ 1 (/stmt-data-next-num data)))
     stmt)
 )
 
@@ -257,7 +257,7 @@
 ; Otherwise, return nil.
 ; The result is in assq'able form.
 
-(define (-frag-expr-locals expr)
+(define (/frag-expr-locals expr)
   (if (rtx-kind? 'sequence expr)
       (rtx-sequence-assq-locals expr)
       nil)
@@ -267,7 +267,7 @@
 ; If a sequence, return the sequence's expressions.
 ; Otherwise, return (list expr).
 
-(define (-frag-expr-stmts expr)
+(define (/frag-expr-stmts expr)
   (if (rtx-kind? 'sequence expr)
       (rtx-sequence-exprs expr)
       (list expr))
@@ -281,24 +281,24 @@
 ; USAGE-INDEX is the index of USAGE-TABLE to use.
 ; OWNER is the object of the owner of the statement.
 
-(define (-frag-analyze-expr-stmt! locals stmt stmt-data usage-table expr-num owner)
+(define (/frag-analyze-expr-stmt! locals stmt stmt-data usage-table expr-num owner)
   (logit 3 "Analyzing statement: " (rtx-strdump stmt) "\n")
   (let* ((chain-num
-	  (-frag-hash-stmt stmt locals (-stmt-data-hash-size stmt-data)))
-	 (stmt-obj (-frag-lookup-stmt stmt-data chain-num stmt)))
+	  (/frag-hash-stmt stmt locals (/stmt-data-hash-size stmt-data)))
+	 (stmt-obj (/frag-lookup-stmt stmt-data chain-num stmt)))
 
     (logit 3 "  chain #" chain-num  "\n")
 
     (if (not stmt-obj)
-	(let* ((costs (-frag-stmt-cost stmt locals))
+	(let* ((costs (/frag-stmt-cost stmt locals))
 	       (speed-cost (car costs))
 	       (size-cost (cdr costs)))
-	  (set! stmt-obj (-frag-add-stmt! stmt-data chain-num stmt locals
+	  (set! stmt-obj (/frag-add-stmt! stmt-data chain-num stmt locals
 					  speed-cost size-cost))
 	  (logit 3 "  new statement, #" (-stmt-num stmt-obj) "\n"))
 	(logit 3   "  existing statement, #" (-stmt-num stmt-obj) "\n"))
 
-    (-stmt-add-user! stmt-obj expr-num owner)
+    (/stmt-add-user! stmt-obj expr-num owner)
 
     ; If first entry, initialize list, otherwise append to existing list.
     (if (null? (vector-ref usage-table expr-num))
@@ -315,12 +315,12 @@
 ; USAGE-INDEX is the index of the USAGE-TABLE entry to use.
 ; As each statement's ordinal is computed it is added to the usage list.
 
-(define (-frag-analyze-expr! expr owner stmt-data usage-table usage-index)
+(define (/frag-analyze-expr! expr owner stmt-data usage-table usage-index)
   (logit 3 "Analyzing " (obj:name owner) ": " (rtx-strdump expr) "\n")
-  (let ((locals (-frag-expr-locals expr))
-	(stmt-list (-frag-expr-stmts expr)))
+  (let ((locals (/frag-expr-locals expr))
+	(stmt-list (/frag-expr-stmts expr)))
     (for-each (lambda (stmt)
-		(-frag-analyze-expr-stmt! locals stmt stmt-data
+		(/frag-analyze-expr-stmt! locals stmt stmt-data
 					  usage-table usage-index owner))
 	      stmt-list))
   *UNSPECIFIED*
@@ -338,7 +338,7 @@
 ; - vector of statements (the statement table of the previous item)
 ;   - each element is a <statement> object
 
-(define (-frag-compute-statements exprs owners)
+(define (/frag-compute-statements exprs owners)
   (logit 2 "Computing statement table ...\n")
   (let* ((num-exprs (length exprs))
 	 (hash-size
@@ -349,7 +349,7 @@
 		(else 127))))
 
     (let (; Hash table of expressions.
-	  (stmt-data (-stmt-data-make hash-size))
+	  (stmt-data (/stmt-data-make hash-size))
 	  ; Statement index lists for each expression.
 	  (usage-table (make-vector num-exprs nil)))
 
@@ -358,13 +358,13 @@
 	(if (not (null? exprs))
 	    (let ((expr (car exprs))
 		  (owner (vector-ref owners exprnum)))
-	      (-frag-analyze-expr! expr owner stmt-data usage-table exprnum)
+	      (/frag-analyze-expr! expr owner stmt-data usage-table exprnum)
 	      (loop (cdr exprs) (+ exprnum 1)))))
 
       ; Convert statement hash table to vector.
-      (let ((stmt-hash-table (-stmt-data-table stmt-data))
-	    (end (vector-length (-stmt-data-table stmt-data)))
-	    (stmt-table (make-vector (-stmt-data-next-num stmt-data) #f)))
+      (let ((stmt-hash-table (/stmt-data-table stmt-data))
+	    (end (vector-length (/stmt-data-table stmt-data)))
+	    (stmt-table (make-vector (/stmt-data-next-num stmt-data) #f)))
 	(let loop ((i 0))
 	  (if (< i end)
 	      (begin
@@ -374,16 +374,16 @@
 		(loop (+ i 1)))))
 
 	; All done.  Compute stats if asked to.
-	(if -stmt-stats?
+	(if /stmt-stats?
 	    (begin
 	      ; See how well the hashing worked.
-	      (set! -stmt-stats-data stmt-data)
-	      (set! -stmt-stats
+	      (set! /stmt-stats-data stmt-data)
+	      (set! /stmt-stats
 		    (make-vector (vector-length stmt-hash-table) #f))
 	      (let loop ((i 0))
 		(if (< i end)
 		    (begin
-		      (vector-set! -stmt-stats i
+		      (vector-set! /stmt-stats i
 				   (length (vector-ref stmt-hash-table i)))
 		      (loop (+ i 1)))))))
 
@@ -411,7 +411,7 @@
 
 		; List of statement numbers that make up `semantics'.
 		; Each element is an index into the stmt-table arg of
-		; -frag-pick-best.
+		; /frag-pick-best.
 		; This is #f if the sfrag wasn't derived from some set of
 		; statements.
 		stmt-numbers
@@ -448,7 +448,7 @@
 ; Sorter to merge common fragments together.
 ; A and B are lists of statement numbers.
 
-(define (-frag-sort a b)
+(define (/frag-sort a b)
   (cond ((null? a)
 	 (not (null? b)))
 	((null? b)
@@ -458,30 +458,30 @@
 	((> (car a) (car b))
 	 #f)
 	(else ; =
-	 (-frag-sort (cdr a) (cdr b))))
+	 (/frag-sort (cdr a) (cdr b))))
 )
 
 ; Return a boolean indicating if L1,L2 match in the first LEN elements.
 ; Each element is an integer.
 
-(define (-frag-list-match? l1 l2 len)
+(define (/frag-list-match? l1 l2 len)
   (cond ((= len 0)
 	 #t)
 	((or (null? l1) (null? l2))
 	 #f)
 	((= (car l1) (car l2))
-	 (-frag-list-match? (cdr l1) (cdr l2) (- len 1)))
+	 (/frag-list-match? (cdr l1) (cdr l2) (- len 1)))
 	(else
 	 #f))
 )
 
 ; Return the number of expressions that match in the first LEN statements.
 
-(define (-frag-find-matching expr-table indices stmt-list len)
+(define (/frag-find-matching expr-table indices stmt-list len)
   (let loop ((num-exprs 0) (indices indices))
     (cond ((null? indices)
 	   num-exprs)
-	  ((-frag-list-match? stmt-list
+	  ((/frag-list-match? stmt-list
 			      (vector-ref expr-table (car indices)) len)
 	   (loop (+ num-exprs 1) (cdr indices)))
 	  (else
@@ -493,12 +493,12 @@
 ; STMT-LIST is a list of statement numbers, indices into STMT-TABLE.
 ; NUM-EXPRS is the number of expressions with STMT-LIST in common.
 
-(define (-frag-merge-profitable? stmt-table stmt-list num-exprs)
+(define (/frag-merge-profitable? stmt-table stmt-list num-exprs)
   ; FIXME: wip
   (and (>= num-exprs 2)
        (or ; No need to include speed costs yet.
-	   ;(>= (-frag-list-speed-cost stmt-table stmt-list) 10)
-	   (>= (-frag-list-size-cost stmt-table stmt-list) 4)))
+	   ;(>= (/frag-list-speed-cost stmt-table stmt-list) 10)
+	   (>= (/frag-list-size-cost stmt-table stmt-list) 4)))
 )
 
 ; Return the cost of executing STMT-LIST.
@@ -507,14 +507,14 @@
 ; FIXME: The yardstick to use is wip.  Currently we measure things relative
 ; to a simple add insn which is given the value 1.
 
-(define (-frag-list-speed-cost stmt-table stmt-list)
+(define (/frag-list-speed-cost stmt-table stmt-list)
   ; FIXME: wip
   (apply + (map (lambda (stmt-num)
 		  (-stmt-speed-cost (vector-ref stmt-table stmt-num)))
 		stmt-list))
 )
 
-(define (-frag-list-size-cost stmt-table stmt-list)
+(define (/frag-list-size-cost stmt-table stmt-list)
   ; FIXME: wip
   (apply + (map (lambda (stmt-num)
 		  (-stmt-size-cost (vector-ref stmt-table stmt-num)))
@@ -539,14 +539,14 @@
 ; FIXME: Choosing a statement list should depend on whether there are existing
 ; chosen statement lists only slightly shorter.
 
-(define (-frag-longest-desired stmt-table stmt-usage-table indices)
+(define (/frag-longest-desired stmt-table stmt-usage-table indices)
   ; STMT-LIST is the list of statements in the first expression.
   (let ((stmt-list (vector-ref stmt-usage-table (car indices))))
 
     (let loop ((len 1) (prev-num-exprs 0))
 
       ; See how many subsequent expressions match at length LEN.
-      (let ((num-exprs (-frag-find-matching stmt-usage-table (cdr indices)
+      (let ((num-exprs (/frag-find-matching stmt-usage-table (cdr indices)
 					    stmt-list len)))
 	; If there aren't any, we're done.
 	; If LEN-1 is usable, return that.
@@ -554,7 +554,7 @@
 	(if (= num-exprs 0)
 
 	    (let ((matching-stmt-list (list-take (- len 1) stmt-list)))
-	      (if (-frag-merge-profitable? stmt-table matching-stmt-list
+	      (if (/frag-merge-profitable? stmt-table matching-stmt-list
 					   prev-num-exprs)
 		  (cons prev-num-exprs matching-stmt-list)
 		  #f))
@@ -572,7 +572,7 @@
 ; Insns are also distinguished by being a CTI insn vs a non-CTI insn.
 ; CTI insns require special handling in the semantics.
 
-(define (-frag-split-by-sbuf user-list)
+(define (/frag-split-by-sbuf user-list)
   ; Sanity check.
   (if (not (elm-bound? (cdar user-list) 'sfmt))
       (error "sformats not computed"))
@@ -620,7 +620,7 @@
 ; This works for trailing fragments too as we do the computation based on the
 ; reversed statement lists.
 
-(define (-frag-compute-desired-frags stmt-table stmt-usage-table owner-table kind)
+(define (/frag-compute-desired-frags stmt-table stmt-usage-table owner-table kind)
   (logit 2 "Computing desired " kind " frags ...\n")
 
   (let* (
@@ -630,7 +630,7 @@
 	      (map reverse (vector->list stmt-usage-table))))
 	 ; Sort STMT-USAGE-TABLE.  That will bring exprs with common fragments
 	 ; together.
-	 (sorted-indices (sort-grade stmt-usage-list -frag-sort))
+	 (sorted-indices (sort-grade stmt-usage-list /frag-sort))
 	 ; List of statement lists that together yield the fragment to create,
 	 ; plus associated users.
 	 (desired-frags nil)
@@ -642,7 +642,7 @@
     (let loop ((indices sorted-indices) (iteration 1))
       (logit 3 "Iteration " iteration "\n")
       (if (not (null? indices))
-	  (let ((longest (-frag-longest-desired stmt-table stmt-usage-table indices)))
+	  (let ((longest (/frag-longest-desired stmt-table stmt-usage-table indices)))
 
 	    (if longest
 
@@ -655,7 +655,7 @@
 		       (picked-indices (list-take num-exprs indices))
 		       ; Need one copy of the frag for each sbuf, as structure
 		       ; offsets will be different in generated C/C++ code.
-		       (sfmt-users (-frag-split-by-sbuf
+		       (sfmt-users (/frag-split-by-sbuf
 				    (map (lambda (expr-num)
 					   (cons expr-num
 						 (vector-ref owner-table
@@ -734,7 +734,7 @@
 ; It's kept as one big function so we can compute each expression's sfrag list
 ; as we go.  Though it's not much extra expense to not do this.
 
-(define (-frag-pick-best stmt-table stmt-usage-table owner-table)
+(define (/frag-pick-best stmt-table stmt-usage-table owner-table)
   (let (
 	(num-stmts (vector-length stmt-table))
 	(num-exprs (vector-length stmt-usage-table))
@@ -754,7 +754,7 @@
 
     ; Compute desired headers.
     (set! desired-header-frags
-	  (-frag-compute-desired-frags stmt-table stmt-usage-table owner-table
+	  (/frag-compute-desired-frags stmt-table stmt-usage-table owner-table
 				       'header))
 
     ; Compute the header used by each expression.
@@ -775,7 +775,7 @@
       (let ((expr-hdrs (vector->list expr-hdrs-v)))
 
 	(set! desired-trailer-frags
-	      (-frag-compute-desired-frags
+	      (/frag-compute-desired-frags
 	       stmt-table
 	       ; FIXME: Shouldn't have to use list->vector.
 	       ; [still pass a vector, but use vector-map here instead of map]
@@ -885,7 +885,7 @@
 ; ??? This can be done later, with an appropriate enhancement to rtx-equal?
 ; ??? cse can be improved by ignoring local variable name (of course).
 
-(define (-frag-compute-locals! expr-list)
+(define (/frag-compute-locals! expr-list)
   (logit 2 "Computing common locals ...\n")
   (let ((result nil)
 	(lookup-local (lambda (local local-list)
@@ -895,7 +895,7 @@
 			     (mode:eq? (cadr l1) (cadr l2)))))
 	)
     (for-each (lambda (expr)
-		(let ((locals (-frag-expr-locals expr)))
+		(let ((locals (/frag-expr-locals expr)))
 		  (for-each (lambda (local)
 			      (let ((entry (lookup-local local result)))
 				(if (and entry
@@ -923,7 +923,7 @@
 ;
 ; The result is a vector of six elements:
 ; - sfrag usage table for each owner #(header middle trailer)
-; - statement table (vector of all statements, made with -stmt-make)
+; - statement table (vector of all statements, made with /stmt-make)
 ; - list of sequence locals used by header sfrags
 ;   - these locals are defined at the top level so that all fragments have
 ;     access to them
@@ -932,30 +932,30 @@
 ; - trailer sfrags
 ; - middle sfrags
 
-(define (-sem-find-common-frags-1 exprs owners)
+(define (/sem-find-common-frags-1 exprs owners)
   ; Sanity check.
   (if (not (elm-bound? (car owners) 'sfmt))
       (error "sformats not computed"))
 
   ; A simple procedure that calls, in order:
-  ; -frag-compute-locals!
-  ; -frag-compute-statements
-  ; -frag-pick-best
+  ; /frag-compute-locals!
+  ; /frag-compute-statements
+  ; /frag-pick-best
   ; The rest is shuffling of results.
 
   ; Internally it's easier if OWNERS is a vector.
   (let ((owners (list->vector owners))
-	(locals (-frag-compute-locals! exprs)))
+	(locals (/frag-compute-locals! exprs)))
 
     ; Collect statement usage data.
-    (let ((stmt-usage (-frag-compute-statements exprs owners)))
+    (let ((stmt-usage (/frag-compute-statements exprs owners)))
       (let ((stmt-usage-table (car stmt-usage))
 	    (stmt-table (cdr stmt-usage)))
 
 	; Compute the frags we want to create.
 	; These are in general sequences of statements.
 	(let ((desired-frags
-	       (-frag-pick-best stmt-table stmt-usage-table owners)))
+	       (/frag-pick-best stmt-table stmt-usage-table owners)))
 	  (let (
 		(expr-sfrags (vector-ref desired-frags 0))
 		(headers (vector-ref desired-frags 1))
@@ -967,11 +967,11 @@
 		    headers trailers middles))))))
 )
 
-; Cover proc of -sem-find-common-frags-1.
+; Cover proc of /sem-find-common-frags-1.
 ; See its documentation.
 
 (define (sem-find-common-frags insn-list)
-  (-sem-find-common-frags-1
+  (/sem-find-common-frags-1
    (begin
      (logit 2 "Simplifying/canonicalizing rtl ...\n")
      (map (lambda (insn)
@@ -995,7 +995,7 @@
 ; Try to use the middle fragment if present.  Otherwise,
 ; use the x-header,x-trailer virtual insns.
 
-(define (-sfrag-compute-frag-list! insn frag-usage frag-table num-headers num-trailers x-header-relnum x-trailer-relnum)
+(define (/sfrag-compute-frag-list! insn frag-usage frag-table num-headers num-trailers x-header-relnum x-trailer-relnum)
   ; `(list #f)' is so append! works.  The #f is deleted before returning.
   (let ((result (list #f))
 	(header (vector-ref frag-usage 0))
@@ -1046,7 +1046,7 @@
 ; Subroutine of sfrag-create-cse-mapping to find the fragment number of the
 ; x-header/x-trailer virtual frags.
 
-(define (-frag-lookup-virtual frag-list name)
+(define (/frag-lookup-virtual frag-list name)
   (let loop ((i 0) (frag-list frag-list))
     (if (null? frag-list)
 	(assert (not "expected virtual insn not present"))
@@ -1124,15 +1124,15 @@
 	  (let ((frag-table (list->vector (append header-list
 						  trailer-list
 						  middle-list)))
-		(x-header-relnum (-frag-lookup-virtual header-list 'x-header))
-		(x-trailer-relnum (-frag-lookup-virtual trailer-list 'x-trailer))
+		(x-header-relnum (/frag-lookup-virtual header-list 'x-header))
+		(x-trailer-relnum (/frag-lookup-virtual trailer-list 'x-trailer))
 		)
 	    ; Convert sfrag-usage-table to one that refers to the one big
 	    ; sfrag table.
 	    (logit 2 "Computing insn frag usage ...\n")
 	    (let ((insn-frags
 		   (map (lambda (insn frag-usage)
-			  (-sfrag-compute-frag-list! insn frag-usage
+			  (/sfrag-compute-frag-list! insn frag-usage
 						     frag-table
 						     num-headers num-trailers
 						     x-header-relnum
@@ -1147,57 +1147,57 @@
 
 ; Data analysis interface.
 
-(define -sim-sfrag-init? #f)
-(define (sim-sfrag-init?) -sim-sfrag-init?)
+(define /sim-sfrag-init? #f)
+(define (sim-sfrag-init?) /sim-sfrag-init?)
 
 ; Keep in globals for now, simplifies debugging.
 ; evil globals, blah blah blah.
-(define -sim-sfrag-insn-list #f)
-(define -sim-sfrag-frag-table #f)
-(define -sim-sfrag-usage-table #f)
-(define -sim-sfrag-locals-list #f)
+(define /sim-sfrag-insn-list #f)
+(define /sim-sfrag-frag-table #f)
+(define /sim-sfrag-usage-table #f)
+(define /sim-sfrag-locals-list #f)
 
 (define (sim-sfrag-insn-list)
-  (assert -sim-sfrag-init?)
-  -sim-sfrag-insn-list
+  (assert /sim-sfrag-init?)
+  /sim-sfrag-insn-list
 )
 (define (sim-sfrag-frag-table)
-  (assert -sim-sfrag-init?)
-  -sim-sfrag-frag-table
+  (assert /sim-sfrag-init?)
+  /sim-sfrag-frag-table
 )
 (define (sim-sfrag-usage-table)
-  (assert -sim-sfrag-init?)
-  -sim-sfrag-usage-table
+  (assert /sim-sfrag-init?)
+  /sim-sfrag-usage-table
 )
 (define (sim-sfrag-locals-list)
-  (assert -sim-sfrag-init?)
-  -sim-sfrag-locals-list
+  (assert /sim-sfrag-init?)
+  /sim-sfrag-locals-list
 )
 
 (define (sim-sfrag-init!)
-  (set! -sim-sfrag-init? #f)
-  (set! -sim-sfrag-insn-list #f)
-  (set! -sim-sfrag-frag-table #f)
-  (set! -sim-sfrag-usage-table #f)
-  (set! -sim-sfrag-locals-list #f)
+  (set! /sim-sfrag-init? #f)
+  (set! /sim-sfrag-insn-list #f)
+  (set! /sim-sfrag-frag-table #f)
+  (set! /sim-sfrag-usage-table #f)
+  (set! /sim-sfrag-locals-list #f)
 )
 
 (define (sim-sfrag-analyze-insns!)
-  (if (not -sim-sfrag-init?)
+  (if (not /sim-sfrag-init?)
       (begin
-	(set! -sim-sfrag-insn-list (non-multi-insns (non-alias-insns (current-insn-list))))
-	(let ((frag-data (sfrag-create-cse-mapping -sim-sfrag-insn-list)))
-	  (set! -sim-sfrag-frag-table (vector-ref frag-data 0))
-	  (set! -sim-sfrag-usage-table (vector-ref frag-data 1))
-	  (set! -sim-sfrag-locals-list (vector-ref frag-data 2)))
-	(set! -sim-sfrag-init? #t)))
+	(set! /sim-sfrag-insn-list (non-multi-insns (non-alias-insns (current-insn-list))))
+	(let ((frag-data (sfrag-create-cse-mapping /sim-sfrag-insn-list)))
+	  (set! /sim-sfrag-frag-table (vector-ref frag-data 0))
+	  (set! /sim-sfrag-usage-table (vector-ref frag-data 1))
+	  (set! /sim-sfrag-locals-list (vector-ref frag-data 2)))
+	(set! /sim-sfrag-init? #t)))
 
   *UNSPECIFIED*
 )
 
 ; Testing support.
 
-(define (-frag-small-test-data)
+(define (/frag-small-test-data)
   '(
     (a . (sequence VOID ((SI tmp)) (set DFLT tmp rm) (set DFLT rd rm)))
     (b . (sequence VOID ((SI tmp)) (set DFLT tmp rm) (set DFLT rd rm)))
@@ -1205,7 +1205,7 @@
     )
 )
 
-(define (-frag-test-data)
+(define (/frag-test-data)
   (cons
    (map (lambda (insn)
 	  (rtx-simplify-insn #f insn))
@@ -1221,7 +1221,7 @@
 (define test-middle-list #f)
 
 (define (frag-test-run)
-  (let* ((test-data (-frag-test-data))
+  (let* ((test-data (/frag-test-data))
 	 (frag-data (sem-find-common-frags (car test-data) (cdr test-data))))
     (set! test-sfrag-table (vector-ref frag-data 0))
     (set! test-stmt-table (vector-ref frag-data 1))

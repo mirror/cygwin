@@ -1,5 +1,8 @@
 2009-09-07  Doug Evans  <dje@sebabeach.org>
 
+	* cos.scm (/object-error): Convert symbols to strings before passing
+	to string-append.
+
 	* read.scm (rtl-version-equal?): New function.
 	(rtl-version-at-least?, rtl-version-older?): New functions.
 

@@ -424,11 +424,10 @@
 		 (else
 		  (estate-error
 		   estate
-		   (string-append "incompatible mode for "
-				  "(" (obj:name (cx:mode src)) " vs "
-				  (obj:name mode) ") in "
-				  "\"" (cx:c src) "\""
-				  ": ")
+		   (string-append "incompatible mode: "
+				  "(" (obj:str-name (cx:mode src)) " vs "
+				  (obj:str-name mode) ") in "
+				  "\"" (cx:c src) "\"")
 		   (obj:name mode)))))
 
 	  ; The recursive call to /rtl-c-get is in case the result of rtx-eval
@@ -455,7 +454,7 @@
 		    (estate-error
 		     estate
 		     (string-append "operand " (obj:str-name src)
-				    " referenced in incompatible mode: ")
+				    " referenced in incompatible mode")
 		     (obj:name mode))))))
 
 	  ((or (and (symbol? src) (rtx-temp-lookup (estate-env estate) src))
@@ -471,7 +470,7 @@
 		   (else (estate-error
 			  estate
 			  (string-append "sequence temp " (rtx-temp-name src)
-					 " referenced in incompatible mode: ")
+					 " referenced in incompatible mode")
 			  (obj:name mode))))))
 
 	  ((integer? src)
@@ -486,7 +485,7 @@
 	       (cx:make INT src)
 	       (cx:make mode src)))
 
-	  (else (estate-error estate "/rtl-c-get: invalid argument:" src))))
+	  (else (estate-error estate "/rtl-c-get: invalid argument" src))))
 )
 
 (define (rtl-c-get estate mode src)
@@ -515,10 +514,10 @@
 		      (rtx-eval-with-estate dest mode estate))
 		     (else
 		      (estate-error estate
-				    "rtl-c-set-quiet: invalid dest:"
+				    "rtl-c-set-quiet: invalid dest"
 				    dest)))))
     (if (not (object? xdest))
-	(estate-error estate "rtl-c-set-quiet: invalid dest:" dest))
+	(estate-error estate "rtl-c-set-quiet: invalid dest" dest))
     (let ((mode (if (mode:eq? 'DFLT mode)
 		    (rtx-obj-mode xdest)
 		    (rtx-lazy-sem-mode mode))))
@@ -542,10 +541,10 @@
 		      (rtx-eval-with-estate dest mode estate))
 		     (else
 		      (estate-error estate
-				    "rtl-c-set-trace: invalid dest:"
+				    "rtl-c-set-trace: invalid dest"
 				    dest)))))
     (if (not (object? xdest))
-	(estate-error estate "rtl-c-set-trace: invalid dest:" dest))
+	(estate-error estate "rtl-c-set-trace: invalid dest" dest))
     (let ((mode (if (mode:eq? 'DFLT mode)
 		    (rtx-obj-mode xdest)
 		    (rtx-lazy-sem-mode mode))))
@@ -1475,7 +1474,7 @@
 	 (s-c-raw-call estate 'INT "GET_ATTR"
 		       (string-upcase (gen-c-symbol attr-name))))
 	(else
-	 (estate-error estate "attr: unsupported object type:" owner)))
+	 (estate-error estate "attr: unsupported object type" owner)))
 )
 
 (define-fn const (estate options mode c)

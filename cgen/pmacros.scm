@@ -166,12 +166,19 @@
 (define (/pmacro-transformer pmac) (vector-ref pmac 5))
 (define (/pmacro-comment pmac) (vector-ref pmac 6))
 
-; Cover functions to manage an "environment" in case a need or desire for
-; another method arises.
+;; Create a new environment, prepending NAMES to PREV-ENV.
 
-(define (/pmacro-env-make prev-env names values)
-  (append! (map cons names values) prev-env)
+(define (/pmacro-env-make loc prev-env names values)
+  (if (= (length names) (length values))
+      (append! (map cons names values) prev-env)
+      (/pmacro-loc-error loc
+			 (string-append "invalid number of parameters, expected "
+					(number->string (length names)))
+			 values))
 )
+
+;; Look up NAME in ENV.
+
 (define (/pmacro-env-ref env name) (assq name env))
 
 ; Error message generator.
@@ -185,6 +192,22 @@
 	  msg
 	  ":")
 	 expr)
+)
+
+; Error message generator when we have a location.
+
+(define (/pmacro-loc-error loc errmsg expr)
+  (let* ((top-sloc (location-top loc))
+	 (intro "During pmacro expansion")
+	 (text (string-append "Error: " errmsg)))
+    (error (simple-format
+	    #f
+	    "\n~A:\n@ ~A:\n\n~A: ~A:"
+	    intro
+	    (location->string loc)
+	    (single-location->simple-string top-sloc)
+	    text)
+	   expr))
 )
 
 ; Issue an error where a number was expected.
@@ -536,7 +559,7 @@
 (define (/pmacro-build-lambda loc prev-env params expansion)
   (lambda args
     (/pmacro-expand expansion
-		    (/pmacro-env-make prev-env params args)
+		    (/pmacro-env-make loc prev-env params args)
 		    loc))
 )
 

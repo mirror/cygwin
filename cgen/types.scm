@@ -78,11 +78,6 @@
 ;
 ;(method-make! <integer> 'get-rank (lambda (self) 0))
 
-; Structures.
-; FIXME: Unfinished.
-
-(define <struct> (class-make '<struct> nil '(members) nil))
-
 ; Parse a type spec.
 ; TYPE-SPEC is: (mode [(dimensions ...)])
 ;           or: ((mode bits) [(dimensions ...)])

@@ -434,6 +434,33 @@
       ))
 )
 
+;; Subroutine of /opcode-slots to simplify it.
+;; Compute either the opcode value or mask for the bits in BITNUMS.
+;; DEFAULT is 0 when computing the opcode value, 1 for the mask value.
+;; DECODE-LEN is (length BITNUMS).
+
+(define (/get-subopcode-value value insn-len decode-len bitnums default lsb0?)
+  ;;(display (list val insn-len decode-len bl)) (newline)
+  ;; Oh My God.  This isn't tail recursive.
+  (letrec ((compute
+	    ;; BNS is the remaining elements of BITNUMS to examine.
+	    ;; THIS-BN ranges from (length bitnums), ..., 3, 2, 1.
+	    (lambda (bns this-bn)
+	      (if (null? bns)
+		  0
+		  (let ((bn (car bns)))
+		    (+ (if (or (and (>= bn insn-len) (= default 1))
+			       (and (< bn insn-len)
+				    (bit-set? value
+					      (if lsb0?
+						  bn
+						  (- insn-len bn 1)))))
+			   (integer-expt 2 (- this-bn 1))
+			   0)
+		       (compute (cdr bns) (- this-bn 1))))))))
+    (compute bitnums decode-len))
+)
+
 ; Return list of decode table entry numbers for INSN's opcode bits BITNUMS.
 ; This is the indices into the decode table that match the instruction.
 ; LSB0? is non-#f if bit number 0 is the least significant bit.
@@ -443,25 +470,11 @@
 ; part), then the result is (#b110000 #b110001 #b110010 #b110011).
 
 (define (/opcode-slots insn bitnums lsb0?)
-  (letrec ((opcode (insn-value insn))
-	   (insn-len (insn-base-mask-length insn))
-	   (decode-len (length bitnums))
-	   (compute (lambda (val insn-len decode-len bl default)
-		      ;(display (list val insn-len decode-len bl)) (newline)
-		      ; Oh My God.  This isn't tail recursive.
-		      (if (null? bl)
-			  0
-			  (+ (if (or (and (>= (car bl) insn-len) (= default 1))
-				     (and (< (car bl) insn-len)
-					  (bit-set? val
-						    (if lsb0?
-							(car bl)
-							(- insn-len (car bl) 1)))))
-				 (integer-expt 2 (- (length bl) 1))
-				 0)
-			     (compute val insn-len decode-len (cdr bl) default))))))
-    (let* ((opcode (compute (insn-value insn) insn-len decode-len bitnums 0))
-	   (opcode-mask (compute (insn-base-mask insn) insn-len decode-len bitnums 1))
+  (let ((opcode (insn-value insn))
+	(insn-len (insn-base-mask-length insn))
+	(decode-len (length bitnums)))
+    (let* ((opcode (/get-subopcode-value (insn-value insn) insn-len decode-len bitnums 0 lsb0?))
+	   (opcode-mask (/get-subopcode-value (insn-base-mask insn) insn-len decode-len bitnums 1 lsb0?))
 	   (indices (missing-bit-indices opcode-mask (- (integer-expt 2 decode-len) 1))))
       (logit 3 "insn =" (obj:name insn)
 	     " insn-value=" (number->hex (insn-value insn))
@@ -485,7 +498,8 @@
 ; Each "slot" is a list of matching instructions.
 
 (define (/fill-slot! insn-vec insn bitnums lsb0?)
-  ;(display (string-append "fill-slot!: " (obj:str-name insn) " ")) (display bitnums) (newline)
+  (logit 3 "Filling slots for " (obj:str-name insn)
+	 ", bitnums " bitnums "\n")
   (let ((slot-nums (/opcode-slots insn bitnums lsb0?)))
     ;(display (list "Filling slot(s)" slot-nums "...")) (newline)
     (for-each (lambda (slot-num)

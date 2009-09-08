@@ -1,5 +1,18 @@
 2009-09-07  Doug Evans  <dje@sebabeach.org>
 
+	* types.scm (<struct>): Delete.
+
+	* pmacros.scm (/pmacro-env-make): New argument `loc', all callers
+	updated.
+	(/pmacro-loc-error): New function.
+
+	* mach.scm (/isa-parse-decode-assist): New function.
+	(/isa-parse): Call it.
+
+	* decode.scm (/get-subopcode-value): New function.
+	(/opcode-slots): Call it.
+	(/fill-slot!): Add logging message.
+
 	* cos.scm (/object-error): Convert symbols to strings before passing
 	to string-append.
 

@@ -1133,6 +1133,20 @@
   (<= (isa-max-insn-bitsize isa) 32)
 )
 
+;; Parse an isa decode-assist spec.
+
+(define (/isa-parse-decode-assist context spec)
+  (if (not (all-true? (map non-negative-integer? spec)))
+      (parse-error context
+		   "spec must consist of non-negative-integers"
+		   spec))
+  (if (not (= (length spec) (length (nub spec identity))))
+      (parse-error context
+		   "duplicate elements"
+		   spec))
+  spec
+)
+
 ; Parse an isa condition spec.
 ; `condition' here refers to the condition performed by architectures like
 ; ARM and ARC before each insn.
@@ -1191,7 +1205,9 @@
       (parse-number (context-append context
 				    ": base-insn-bitsize")
 		    base-insn-bitsize '(8 . 128))
-      decode-assist
+      (/isa-parse-decode-assist (context-append context
+						": decode-assist")
+				decode-assist)
       liw-insns
       parallel-insns
       (/isa-parse-condition context condition)

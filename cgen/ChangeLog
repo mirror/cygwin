@@ -1,3 +1,9 @@
+2009-09-08  Doug Evans  <dje@sebabeach.org>
+
+	* rtl-c.scm (/rtl-c-get): Convert symbols to strings before passing
+	to string-append.
+	(*): Remove trailing ":" from error messages passed to estate-error.
+
 2009-09-07  Doug Evans  <dje@sebabeach.org>
 
 	* types.scm (<struct>): Delete.

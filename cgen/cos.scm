@@ -253,13 +253,14 @@
 
 ; X is any arbitrary Scheme data.
 (define (/object-error proc-name x . text)
-  (error (string-append proc-name ": " (apply string-append text)
+  (error (string-append proc-name ": "
+			(apply string-append (map ->string text))
 			(if (object? x)
 			    (string-append
-			     " (class: " (/object-class-name x)
+			     " (class: " (->string (/object-class-name x))
 			     (if (method-present? x 'get-name)
 				 (string-append ", name: "
-						(send x 'get-name))
+						(->string (send x 'get-name)))
 				 "")
 			     ")")
 			    "")

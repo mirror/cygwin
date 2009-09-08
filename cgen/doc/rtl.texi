@@ -1408,7 +1408,7 @@ Bit numbering is determined by the @code{insn-lsb0?} field of
 @code{define-arch}.
 
 If using the long form of specifying the field's position
-(@samp{word-offset} is present) then this value is the value within
+(i.e., @samp{word-offset} is specified) then this value is the value within
 the containing word.  If using the short form then this value includes
 the word offset.  See the Porting document for more info
 (@pxref{Writing define-ifield}).

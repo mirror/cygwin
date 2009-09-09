@@ -19,7 +19,8 @@
 		; The insn fields as specified in the .cpu file.
 		; Also contains values for constant fields.
 		iflds
-		(iflds-values . #f) ; Lazily computed cache
+		(/insn-value . #f) ; Lazily computed cache
+		(/insn-base-value . #f) ; Lazily computed cache
 
 		; RTL source of assertions of ifield values or #f if none.
 		; This is used, for example, by the decoder to help
@@ -861,18 +862,39 @@
 ; (i.e. the opcode field).
 ;
 ; See also (compute-insn-base-mask).
+;
+; FIXME: For non-fixed-length ISAs, using this doesn't feel right.
 
 (define (insn-value insn)
-  (if (elm-get insn 'iflds-values)
-      (elm-get insn 'iflds-values)
+  (if (elm-get insn '/insn-value)
+      (elm-get insn '/insn-value)
       (let* ((base-len (insn-base-mask-length insn))
 	     (value (apply +
 			   (map (lambda (fld) (ifld-value fld base-len (ifld-get-value fld)))
 				(find ifld-constant?
 				      (ifields-base-ifields (insn-iflds insn))))
 			   )))
-	(elm-set! insn 'iflds-values value)
+	(elm-set! insn '/insn-value value)
 	value))
+)
+
+;; Return the base value of INSN.
+
+(define (insn-base-value insn)
+  (if (elm-get insn '/insn-base-value)
+      (elm-get insn '/insn-base-value)
+      (let* ((base-len (insn-base-mask-length insn))
+	     (constant-base-iflds
+	      (find (lambda (f)
+		      (and (ifld-constant? f)
+			   (not (ifld-beyond-base? f))))
+		    (ifields-base-ifields (insn-iflds insn))))
+	     (base-value (apply +
+				(map (lambda (f)
+				       (ifld-value f base-len (ifld-get-value f)))
+				     constant-base-iflds))))
+	(elm-set! insn '/insn-base-value base-value)
+	base-value))
 )
 
 ; Insn operand utilities.

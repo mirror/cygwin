@@ -1,3 +1,13 @@
+2009-09-09  Doug Evans  <dje@sebabeach.org>
+
+	* ifield.scm (ifld-beyond-base?): Remove args base-bitsize,
+	total-bitsize.  All callers updated.
+	* insn.scm (<insn>): Rename member ifld-values to /insn-value.
+	New member /insn-base-value.
+	(insn-base-value): New function.
+	* mach.scm (/sanity-check-insns): New function.
+	(arch-analyze-insns!): Call it.
+
 2009-09-08  Doug Evans  <dje@sebabeach.org>
 
 	* iformat.scm (ifields-base-ifields): Simplify.

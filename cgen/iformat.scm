@@ -95,6 +95,9 @@
 ; instruction sets, compute the base appropriate for this set of
 ; ifields.  Check that ifields are not shared among isas with
 ; inconsistent base insn lengths.
+;
+; ??? The algorithm here is a bit odd.  [Though there is value in verifying
+; ifields are from consistent ISAs.]
 
 (define (compute-insn-base-mask-length fld-list)
   (let* ((isa-base-bitsizes

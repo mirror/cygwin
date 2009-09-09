@@ -1105,9 +1105,7 @@ Define an instruction multi-field, all arguments specified.
 
 ; Return a boolean indicating if field F extends beyond the base insn.
 
-(define (ifld-beyond-base? f base-bitsize total-bitsize)
-  ; old way
-  ;(< base-bitsize (+ (ifld-start f total-bitsize) (ifld-length f)))
+(define (ifld-beyond-base? f)
   (> (ifld-word-offset f) 0)
 )
 

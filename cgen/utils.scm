@@ -1005,6 +1005,7 @@
 
 (define (logslr val shift) (ash val (- shift)))
 (define logsll ash) ; (logsll val shift) (ash val shift))
+
 ; logand, logior, logxor defined by guile so we don't need to
 ; (define (logand a b) ...)
 ; (define (logxor a b) ...)

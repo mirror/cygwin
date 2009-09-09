@@ -1764,6 +1764,34 @@
 ;; also recorded as negative numbers, so leave enough space.
 (define MAX-VIRTUAL-INSNS 100)
 
+;; Subroutine of arch-analyze-insns! to simplify it.
+;; Sanity check the instruction set.
+
+(define (/sanity-check-insns arch)
+  (let ((insn-list (arch-insn-list arch)))
+
+    ;; Ensure instruction base values agree with their masks.
+    ;; ??? It's not clear where errors can come in.  From bad .cpu files,
+    ;; bugs, or both.  But it's better to catch such errors early.
+    (for-each (lambda (insn)
+		(let ((base-len (insn-base-mask-length insn))
+		      (base-mask (insn-base-mask insn))
+		      (base-value (insn-base-value insn)))
+		  (if (not (= (cg-logand (cg-logxor base-mask (mask base-len))
+					 base-value)
+			      0))
+		      (context-owner-error #f insn
+					   "While performing sanity checks"
+					   (string-append "Instruction has opcode bits outside of its mask.\n"
+							  "This usually means some kind of error in the instruction's ifield list.\n"
+							  "base mask: 0x" (number->hex base-mask)
+							  ", base value: 0x" (number->hex base-value))))
+		  ))
+	      (non-multi-insns (non-alias-insns insn-list)))
+
+    *UNSPECIFIED*)
+)
+
 ; Analyze the instruction set.
 ; The name is explicitly vague because it's intended that all insn analysis
 ; would be controlled here.
@@ -1826,6 +1854,11 @@
 	  (arch-set-insns-analyzed?! arch #t)
 	  (arch-set-semantics-analyzed?! arch analyze-semantics?)
 	  (arch-set-aliases-analyzed?! arch include-aliases?)
+
+	  ;; Now that the instruction formats are computed,
+	  ;; do some sanity checks.
+	  (logit 1 "Performing sanity checks ...\n")
+	  (/sanity-check-insns arch)
 
 	  (logit 1 "Done analysis.\n")
 	  ))

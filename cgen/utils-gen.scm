@@ -239,7 +239,7 @@
    " = "
    (if (adata-integral-insn? CURRENT-ARCH)
        (/gen-ifld-extract-base f total-length base-value)
-       (if (ifld-beyond-base? f base-length total-length)
+       (if (ifld-beyond-base? f)
 	   (/gen-ifld-extract-beyond f base-length total-length var-list)
 	   (/gen-ifld-extract-base f base-length base-value)))
    ";"

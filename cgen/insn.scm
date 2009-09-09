@@ -399,8 +399,9 @@
 
     (if (keep-atlist? atlist-obj #f)
 
-	(let ((ifield-assertion (if (not (null? ifield-assertion))
-				    ifield-assertion
+	(let ((ifield-assertion (if (and ifield-assertion
+					 (not (null? ifield-assertion)))
+				    (rtx-canonicalize context ifield-assertion)
 				    #f))
 	      (semantics (if (not (null? semantics))
 			     semantics

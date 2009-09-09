@@ -1,3 +1,13 @@
+2009-09-08  Doug Evans  <dje@sebabeach.org>
+
+	* iformat.scm (ifields-base-ifields): Simplify.
+	(compute-insn-length): Simplify, call ifields-base-ifields.
+	(compute-insn-base-mask): Ditto.
+	* ifield.scm (ifld-known-values): Ditto.
+	(ifld-base-ifields): Ditto.
+	* insn.scm (insn-value): Ditto.
+	* pgmr-tools.scm (pgmr-pretty-print-insn-format): Ditto.
+
 2009-09-08  DJ Delorie  <dj@redhat.com>
 
 	* cpu/mep.opc (mep_cgen_insn_supported_asm): Change the test to a

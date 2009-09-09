@@ -400,8 +400,8 @@
  <ifield> 'pretty-print
  (lambda (self)
    (string-append "(" (obj:str-name self)
-		  " " (number->string (ifld-start f))
-		  " " (number->string (ifld-length f))
+		  " " (number->string (ifld-start self))
+		  " " (number->string (ifld-length self))
 		  ")"))
 )
 

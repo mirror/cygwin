@@ -400,14 +400,14 @@
 	       (rtx-make-operand expr)
 	       (context-error context
 			      "While canonicalizing rtl"
-			      "can't canonicalize"
+			      "can't canonicalize, unknown symbol"
 			      expr))))
 	((pair? expr)
 	 expr)
 	(else
 	 (context-error context
 			"While canonicalizing rtl"
-			"can't canonicalize"
+			"can't canonicalize, syntax error"
 			expr)))
 )
 

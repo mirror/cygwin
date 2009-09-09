@@ -2637,7 +2637,9 @@ inside the loop.
 @samp{mode} must be @samp{VOID} (void mode), or it can be elided.
 
 @item (unop mode operand)
-Perform a unary arithmetic operation. @samp{unop} is one of @code{neg},
+Perform a unary arithmetic operation.
+
+@samp{unop} is one of @code{neg},
 @code{abs}, @code{inv}, @code{not}, @code{zflag}, @code{nflag}.
 @code{zflag} returns a bit indicating if @samp{operand} is
 zero. @code{nflag} returns a bit indicating if @samp{operand} is
@@ -2645,13 +2647,17 @@ negative. @code{inv} returns the bitwise complement of @samp{operand},
 whereas @code{not} returns its logical negation.
 
 @item (binop mode operand1 operand2)
-Perform a binary arithmetic operation. @samp{binop} is one of
+Perform a binary arithmetic operation.
+
+@samp{binop} is one of
 @code{add}, @code{sub}, @code{and}, @code{or}, @code{xor}, @code{mul},
 @code{div}, @code{udiv}, @code{mod}, @code{umod}.
 
 @item (binop-with-bit mode operand1 operand2 operand3)
 Same as @samp{binop}, except taking 3 operands. The third operand is
-always a single bit. @samp{binop-with-bit} is one of @code{addc},
+always a single bit.
+
+@samp{binop-with-bit} is one of @code{addc},
 @code{addc-cflag}, @code{addc-oflag}, @code{subc}, @code{subc-cflag},
 @code{subc-oflag}.
 
@@ -2668,8 +2674,10 @@ Note: The following are deprecated:
 Perform a shift operation.
 @samp{operand1} is shifted (or rotated) by the amount specified
 in @samp{operand2}.
+
 @samp{shiftop} is one of @code{sll}, @code{srl}, @code{sra},
 @code{ror}, @code{rol}.
+
 @samp{mode} must match the mode of @samp{operand1}.
 The mode of @samp{operand1} may be any integral mode.
 The mode of @samp{operand2} may be any integral mode, and need not match
@@ -2680,26 +2688,51 @@ or equal to the size of @samp{operand1}.
 If the architecture handles negative or large shift amounts,
 that needs to be handled in the surrounding RTL.
 
-@item (boolifop mode operand1 operand2)
-Perform a sequential boolean operation. @samp{operand2} is not processed
-if @samp{operand1} ``fails''. @samp{boolifop} is one of @code{andif},
-@code{orif}.
-@c Extend to handle more than two operands?
+@item (andif mode operand1 operand2)
+Evaluate @samp{operand1}.
+If it evaluates to zero the result is zero,
+and @samp{operand2} is not evaluated.
+If @samp{operand1} evaluates to non-zero, then evaluate @samp{operand2}.
+If it evaluates to non-zero the result is one,
+otherwise the result is zero.
+
+The mode of the result is @samp{BI}.
+@samp{mode} is generally elided or is @samp{BI}.
+
+@item (orif mode operand1 operand2)
+Evaluate @samp{operand1}.
+If it evaluates to non-zero the result is one,
+and @samp{operand2} is not evaluated.
+If @samp{operand1} evaluates to zero, then evaluate @samp{operand2}.
+If it evaluates to non-zero the result is one,
+otherwise the result is zero.
+
+The mode of the result is @samp{BI}.
+@samp{mode} is generally elided or is @samp{BI}.
 
 @item (convop mode operand)
-Perform a mode->mode conversion operation. @samp{convop} is one of
+Perform a mode->mode conversion operation.
+
+@samp{convop} is one of
 @code{ext}, @code{zext}, @code{trunc}, @code{float}, @code{ufloat},
 @code{fix}, @code{ufix}.
 
 @item (cmpop mode operand1 operand2)
-Perform a comparison. @samp{cmpop} is one of @code{eq}, @code{ne},
+Perform a comparison.
+
+@samp{cmpop} is one of @code{eq}, @code{ne},
 @code{lt}, @code{le}, @code{gt}, @code{ge}, @code{ltu}, @code{leu},
 @code{gtu}, @code{geu}.
 @c floating point compare-unordered?
 
+If the comparison succeeds the result is one,
+otherwise the result is zero.
+The mode of the result is @samp{BI}.
+
 @item (mathop mode operand)
-Perform a mathematical operation. @samp{mathop} is one of @code{sqrt},
-@code{cos}, @code{sin}.
+Perform a mathematical operation.
+
+@samp{mathop} is one of @code{sqrt}, @code{cos}, @code{sin}.
 
 @item (if mode condition then [else])
 Standard @code{if} statement.

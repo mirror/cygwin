@@ -796,7 +796,7 @@
 
   ; ??? Calling /parse-insn-format is a quick hack.
   ; It's an internal routine of some other file.
-  (let ((iflds (/parse-insn-format context encoding)))
+  (let ((iflds (/parse-insn-format context #f encoding)))
     (make <derived-ifield>
 	  operand-name
 	  'derived-ifield ; (string-append "<derived-ifield> for " operand-name)

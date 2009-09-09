@@ -67,11 +67,11 @@
   (number key ifields mask-length length mask eg-insn)
 )
 
-; Traverse the ifield list to collect all base (non-derived) ifields used in it.
+; Traverse the ifield list to collect all base (non-derived) ifields
+; used in it.
+
 (define (ifields-base-ifields ifld-list)
-  (collect (lambda (ifld)
-	     (ifld-base-ifields ifld))
-	   ifld-list)
+  (collect ifld-base-ifields ifld-list)
 )
 
 ; Return enum cgen_fmt_type value for FMT.
@@ -86,7 +86,7 @@
 ; All bits must be represent exactly once.
 
 (define (compute-insn-length fld-list)
-  (apply + (map ifld-length (collect ifld-base-ifields fld-list)))
+  (apply + (map ifld-length (ifields-base-ifields fld-list)))
 )
 
 ; Given FLD-LIST, compute the base length in bits.
@@ -131,9 +131,7 @@
     (apply +
 	   (map (lambda (fld) (ifld-mask fld mask-len mask-bitrange))
 		; Find the fields that have constant values.
-		(find ifld-constant? (collect ifld-base-ifields fld-list)))
-	   )
-    )
+		(find ifld-constant? (ifields-base-ifields fld-list)))))
 )
 
 ; Return the <iformat> search key for a sorted field list.

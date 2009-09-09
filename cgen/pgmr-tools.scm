@@ -110,7 +110,7 @@
 			  (map (lambda (fld)
 				 (ifld-value fld mask-length
 					     (ifld-get-value fld)))
-			       (find ifld-constant? (collect ifld-base-ifields (insn-iflds insn)))))))
+			       (find ifld-constant? (ifields-base-ifields (insn-iflds insn)))))))
 	(dump-insn-value value mask mask-length))
       ; TODO: Print value spaced according to fields.
       "\n"

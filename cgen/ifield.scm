@@ -181,7 +181,7 @@
 ; Return known value table for rtx-simplify of <ifield> list ifld-list.
 
 (define (ifld-known-values ifld-list)
-  (let ((constant-iflds (find ifld-constant? (collect ifld-base-ifields ifld-list))))
+  (let ((constant-iflds (find ifld-constant? (ifields-base-ifields ifld-list))))
     (map (lambda (f)
 	   (cons (obj:name f)
 		 (rtx-make-const 'INT (ifld-get-value f))))
@@ -1067,10 +1067,8 @@ Define an instruction multi-field, all arguments specified.
 ; Traverse the ifield to collect all base (non-derived) ifields used in it.
 
 (define (ifld-base-ifields ifld)
-  (cond ((derived-ifield? ifld) (collect (lambda (subfield) (ifld-base-ifields subfield))
-					 (derived-ifield-subfields ifld)))
-	; ((multi-ifield? ifld) (collect (lambda (subfield) (ifld-base-ifields subfield))
-	; 			       (multi-ifld-subfields ifld)))
+  (cond ((derived-ifield? ifld) (ifields-base-ifields (derived-ifield-subfields ifld)))
+	;;((multi-ifield? ifld) (ifields-base-ifields (multi-ifld-subfields ifld)))
 	(else (list ifld)))
 )
 

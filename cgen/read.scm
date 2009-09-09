@@ -275,6 +275,9 @@
 	       ; Boolean indicating if pmacro tracing is on.
 	       (cons 'trace-pmacros? #f)
 
+	       ; Issue diagnostics for instruction format issues.
+	       (cons 'verify-iformat? #f)
+
 	       ; Currently select cpu family, computed from `keep-mach'.
 	       ; Some applications don't care, and this is moderately
 	       ; expensive to compute so we use delay/force.
@@ -297,11 +300,11 @@
 
 (define-getters <reader> reader
   (keep-mach keep-isa
-   trace-commands? trace-pmacros?
+   trace-commands? trace-pmacros? verify-iformat?
    current-cpu commands location))
 (define-setters <reader> reader
   (keep-mach keep-isa
-   trace-commands? trace-pmacros?
+   trace-commands? trace-pmacros? verify-iformat?
    current-cpu commands location))
 
 (define (reader-add-command! name comment attrs arg-spec handler)
@@ -336,14 +339,11 @@
 			":")))
 )
 
-;;; Signal a parse error while reading a .cpu file.
-;;; If CONTEXT is #f, use a default context of the current reader location
-;;; and an empty prefix.
-;;; If MAYBE-HELP-TEXT is specified, elide the last trailing \n.
-;;; Multiple lines of help text need embedded newlines, and should be no longer
-;;; than 79 characters.
+;;; Subroutine of parse-error, parse-warning to simplify them.
+;;; Flag an error or a warning.
+;;; EMITTER is a function of one argument, the message to print.
 
-(define (parse-error context message expr . maybe-help-text)
+(define (/parse-diagnostic emitter context message expr maybe-help-text)
   (if (not context)
       (set! context (make <context> (current-reader-location) #f)))
 
@@ -353,7 +353,7 @@
 	 (prefix (or (context-prefix context) "Error"))
 	 (text (string-append prefix ": " message)))
 
-    (error
+    (emitter
      (simple-format
       #f
       "\n~A:\n@ ~A:\n\n~A: ~A: ~S~A"
@@ -362,9 +362,39 @@
       (single-location->simple-string top-sloc)
       text
       expr
-      (if (null? maybe-help-text)
-	  ""
-	  (string-append "\n\n" (car maybe-help-text))))))
+      (if maybe-help-text
+	  (string-append "\n\n" maybe-help-text)
+	  ""))))
+)
+
+;;; Signal a parse error while reading a .cpu file.
+;;; If CONTEXT is #f, use a default context of the current reader location
+;;; and an empty prefix.
+;;; If MAYBE-HELP-TEXT is specified, elide the last trailing \n.
+;;; Multiple lines of help text need embedded newlines, and should be no longer
+;;; than 79 characters.
+
+(define (parse-error context errmsg expr . maybe-help-text)
+  (/parse-diagnostic error
+		     context
+		     errmsg
+		     expr
+		     (if (null? maybe-help-text) "" (car maybe-help-text)))
+)
+
+;;; Signal a parse warning while reading a .cpu file.
+;;; If CONTEXT is #f, use a default context of the current reader location
+;;; and an empty prefix.
+;;; If MAYBE-HELP-TEXT is specified, elide the last trailing \n.
+;;; Multiple lines of help text need embedded newlines, and should be no longer
+;;; than 79 characters.
+
+(define (parse-warning context errmsg expr . maybe-help-text)
+  (/parse-diagnostic (lambda (text) (message "Warning: " text "\n"))
+		     context
+		     errmsg
+		     expr
+		     (if (null? maybe-help-text) #f (car maybe-help-text)))
 )
 
 ; Return the current source location.
@@ -783,6 +813,36 @@
   *UNSPECIFIED*
 )
 
+;; Diagnostic support.
+
+;;; Enable the specified diagnostics.
+;;; DIAGNOSTIC-OPTIONS is a comma-separated list of things to trace.
+;;;
+;;; Currently supported diagnostics:
+;;; iformat - issue diagnostics for iformat issues
+;;; all - turn on all diagnostics
+;;;
+;;; [If we later need to support disabling some diagnostic, one way is to
+;;; recognize an "-" in front of an option.]
+
+(define (/set-diagnostic-options! diagnostic-options)
+  (let ((all (list "iformat"))
+	(requests (string-cut diagnostic-options #\,)))
+    (if (member "all" requests)
+	(append! requests all))
+    (for-each (lambda (item)
+	      (cond ((string=? "iformat" item)
+		     (reader-set-verify-iformat?! CURRENT-READER #t))
+		    ((string=? "all" item)
+		     #t) ;; handled above
+		    (else
+		     (cgen-usage 'unknown (string-append "-w " item)
+				 common-arguments))))
+	      requests))
+
+  *UNSPECIFIED*
+)
+
 ; If #f, treat reserved fields as operands and extract them with the insn.
 ; Code can then be emitted in the extraction routines to validate them.
 ; If #t, treat reserved fields as part of the opcode.
@@ -1006,6 +1066,7 @@ Define a preprocessor-style macro.
 ; KEEP-ISA is a string of comma separated isas to keep.
 ; OPTIONS is the OPTIONS argument to -init-parse-cpu!.
 ; TRACE-OPTIONS is a random list of things to trace.
+; DIAGNOSTIC-OPTIONS is a random list of things to warn/error about.
 ; APP-INITER! is an application specific zero argument proc (thunk)
 ; to call after -init-parse-cpu!
 ; APP-FINISHER! is an application specific zero argument proc to call after
@@ -1016,11 +1077,13 @@ Define a preprocessor-style macro.
 ;
 ; This function isn't local because it's used by dev.scm.
 
-(define (cpu-load file keep-mach keep-isa options trace-options
+(define (cpu-load file keep-mach keep-isa options
+		  trace-options diagnostic-options
 		  app-initer! app-finisher! analyzer!)
   (/init-reader!)
   (/init-parse-cpu! keep-mach keep-isa options)
   (/set-trace-options! trace-options)
+  (/set-diagnostic-options! diagnostic-options)
   (app-initer!)
   (logit 1 "Loading cpu description " file " ...\n")
   (set! arch-path (dirname file))
@@ -1132,6 +1195,11 @@ Define a preprocessor-style macro.
                        "pmacros  - trace pmacro expansion"
 		       "all      - trace everything")
     ("-v" #f          "increment verbosity level")
+    ("-w" "diagnostic-options" "specify list of things to issue diagnostics about"
+                       "Options:"
+                       "iformat - verify instruction formats are valid"
+		       "all     - turn on all diagnostics")
+
     ("--version" #f   "print version info")
     )
 )
@@ -1207,6 +1275,7 @@ Define a preprocessor-style macro.
 	    (moreopts? #t)
 	    (debugging #f)    ; default is off, for speed
 	    (trace-options "")
+	    (diagnostic-options "")
 	    (cep (current-error-port))
 	    (str=? string=?)
 	    )
@@ -1257,6 +1326,9 @@ Define a preprocessor-style macro.
 		     ((str=? "-v" (car opt))
 		      (verbose-inc!)
 		      )
+		     ((str=? "-w" (car opt))
+		      (set! diagnostic-options arg)
+		      )
 		     ((str=? "--version" (car opt))
 		      (begin
 			(display "Cpu tools GENerator version ")
@@ -1297,7 +1369,8 @@ Define a preprocessor-style macro.
 	       (debug-repl nil))
 
 	   (cpu-load arch-file
-		     keep-mach keep-isa flags trace-options
+		     keep-mach keep-isa flags
+		     trace-options diagnostic-options
 		     app-init! app-finish! app-analyze!)
 
 	   ;; Start another repl loop if -d.

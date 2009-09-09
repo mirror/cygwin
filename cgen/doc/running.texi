@@ -36,6 +36,7 @@ and applications use uppercase letters for their arguments.
 * s::            -s Specify the source directory.
 * t::            -t Specify tracing of various things.
 * v::            -v Increment the verbosity level.
+* w::            -w Enable various diagnostics.
 * version::      --version Print version info.
 
 * opcodes::      Opcodes generator arguments.
@@ -292,6 +293,45 @@ make stamp-m32r CGENFLAGS="-v -b -t pmacros"
 @section Increment the verbosity level. @option{-v}
 
 Specifying multiple @code{-v} options will increase the verbosity.
+
+@node w
+@section Enable various diagnostics. @option{-w} @var{diagnostic-list}
+
+Use this to turn on warnings or errors of various things.
+The argument is a comma-separated list.
+At present the following diagnostics are supported.
+
+@itemize @bullet
+
+@item @option{iformat}
+
+Turn on verification of the instruction format.
+If an instruction's field list has missing bits or too many bits
+then a warning is issued.
+
+@emph{NOTE:} The checking is incomplete, but it does catch most
+common forms of errors.
+
+@item @option{all}
+
+Turn on diagnostics for everything.
+
+@end itemize
+
+Each application will invoke CGEN in its own way, so the details of
+enabling diagnostics may vary from application to application.
+Generally though, each application has a CGENFLAGS makefile variable
+for passing flags to CGEN.
+
+Binutils example:
+
+@smallexample
+# Turn on verification of instruction formats while generating
+# the m32r port's opcodes files in the binutils package.
+cd obj/opcodes
+rm stamp-m32r
+make stamp-m32r CGENFLAGS="-v -b -w iformat"
+@end smallexample
 
 @node version
 @section Print version info. @option{--version}

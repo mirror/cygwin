@@ -16,7 +16,8 @@
 	New arg isa, all callers updated.  Do some basic validation of the
 	ifield list if requested.
 	* mach.scm (/sanity-check-insns): Improve error message text.
-	* doc/running.text: Document -w option.
+	* doc/running.texi: Document -w option.
+	* doc/porting.texi: Document #:trace, #:diag options to cload.
 
 	* ifield.scm (/multi-ifield-parse): Initialize bitrange.
 

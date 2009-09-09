@@ -954,7 +954,9 @@ CPU description files are loaded into an interactive guile session with
 (cload #:arch "cpu-file-path"
        [#:machs "mach-list"]
        [#:isas "isa-list"]
-       [#:options "option-list"])
+       [#:options "option-list"]
+       [#:trace "trace-list"]
+       [#:diag "diagnostic-list"])
 @end example
 
 Only the @code{#:arch} argument is mandatory.
@@ -966,6 +968,13 @@ Only the @code{#:arch} argument is mandatory.
 @samp{isa-list} is a comma separated string of isas to keep.
 
 @samp{options} is a space separated string of options for the application.
+What the acceptable values are depends on the application.
+
+@samp{trace} is a comma separated string of tracing options.
+@xref{t}.
+
+@samp{diag} is a comma separated string of diagnostic options.
+@xref{w}.
 
 @node Doing an opcodes port
 @section Doing an opcodes port

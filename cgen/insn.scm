@@ -701,7 +701,7 @@
 				  ifld-list))
 		  ((> base-iflds-length base-len)
 		   (parse-warning context
-				  "too many bits specified in base insn"
+				  "too many or duplicated bits specified in base insn"
 				  ifld-list)))
 	    )
 	  ))

@@ -1,5 +1,7 @@
 2009-09-09  Doug Evans  <dje@sebabeach.org>
 
+	* rtl.texi: Add text to docs on ifield-assertions.
+
 	* insn.scm (/insn-parse): Canonicalize the ifield-assertion before
 	saving.
 

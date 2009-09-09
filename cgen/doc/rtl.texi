@@ -2109,7 +2109,26 @@ The machine encoding of the operand.
 An assertion of what values any instruction fields will or will not have
 in the containing instruction.
 
-??? A better name for this might be "constraint".
+@anchor{ifield-assertion-rtl}
+The syntax of the assertion is a restricted subset of RTL.
+It may only contain @samp{andif}, @samp{eq}, @samp{ne}, @samp{not},
+and may only use instruction fields and integers as operands.
+As a degenerate case, a single integer, is also supported.
+
+In addition, it may also use @samp{member}.
+
+Syntax: @code{(member ifield-name (value1 [value2 ...]))}
+@footnote{Like all rtx, the full syntax is
+@code{(member [(options)] [BI] ifield-name (value1 [value2 ...]))},
+but @samp{options} and @samp{mode} are not really useful here.}
+
+The result of @samp{member} is one if the value of the ifield
+is a member of the list @code{(value1 [value2 ...])}.
+Otherwise the result is zero.
+
+If the result of the assertion is non-zero, the assertion passes.
+Otherwise it fails, and the instruction is not selected for that
+particular bit pattern.
 
 @subsection getter
 
@@ -2271,6 +2290,9 @@ Format elements can be any of:
 
 This is an expression with a boolean result that is run as the final
 part of instruction decoding to verify a match.
+
+The syntax of the assertion is a restricted subset of RTL.
+@xref{ifield-assertion-rtl}.
 
 @subsection semantics
 @cindex Semantics

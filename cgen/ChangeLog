@@ -1,5 +1,8 @@
 2009-09-09  Doug Evans  <dje@sebabeach.org>
 
+	* insn.scm (/insn-parse): Canonicalize the ifield-assertion before
+	saving.
+
 	Add support for controlling warnings/errors.
 	Add tests for iformat description errors.
 	* dev.scm (cload): New option #:diag.

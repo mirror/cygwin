@@ -37,7 +37,8 @@
 	(keep-mach "all")
 	(keep-isa "all")
 	(options "")
-	(trace-options ""))
+	(trace-options "")
+	(diagnostic-options ""))
 
     ; Doesn't check if (cadr args) exists or if #:arch was specified, but
     ; this is a debugging tool!
@@ -51,48 +52,57 @@
 	      ((#:isas) (set! keep-isa (cadr args)))
 	      ((#:options) (set! options (cadr args)))
 	      ((#:trace) (set! trace-options (cadr args)))
+	      ((#:diag) (set! diagnostic-options (cadr args)))
 	      (else (error "unknown option:" (car args))))
 	    (loop (cddr args)))))
 
     (case APPLICATION
       ((UNKNOWN) (error "application not loaded"))
       ((DESC) (cpu-load cpu-file
-			keep-mach keep-isa options trace-options
+			keep-mach keep-isa options
+			trace-options diagnostic-options
 			desc-init!
 			desc-finish!
 			desc-analyze!))
       ((DOC) (cpu-load cpu-file
-			keep-mach keep-isa options trace-options
+			keep-mach keep-isa options
+			trace-options diagnostic-options
 			doc-init!
 			doc-finish!
 			doc-analyze!))
       ((OPCODES) (cpu-load cpu-file
-			   keep-mach keep-isa options trace-options
+			   keep-mach keep-isa options
+			   trace-options diagnostic-options
 			   opcodes-init!
 			   opcodes-finish!
 			   opcodes-analyze!))
       ((GAS-TEST) (cpu-load cpu-file
-			    keep-mach keep-isa options trace-options
+			    keep-mach keep-isa options
+			    trace-options diagnostic-options
 			    gas-test-init!
 			    gas-test-finish!
 			    gas-test-analyze!))
       ((SIMULATOR) (cpu-load cpu-file
-			     keep-mach keep-isa options trace-options
+			     keep-mach keep-isa options
+			     trace-options diagnostic-options
 			     sim-init!
 			     sim-finish!
 			     sim-analyze!))
       ((SID-SIMULATOR) (cpu-load cpu-file
-			     keep-mach keep-isa options trace-options
+			     keep-mach keep-isa options
+			     trace-options diagnostic-options
 			     sim-init!
 			     sim-finish!
 			     sim-analyze!))
       ((SIM-TEST) (cpu-load cpu-file
-			    keep-mach keep-isa options trace-options
+			    keep-mach keep-isa options
+			    trace-options diagnostic-options
 			    sim-test-init!
 			    sim-test-finish!
 			    sim-test-analyze!))
       ((TESTSUITE) (cpu-load cpu-file
-			     keep-mach keep-isa options trace-options
+			     keep-mach keep-isa options
+			     trace-options diagnostic-options
 			     testsuite-init!
 			     testsuite-finish!
 			     testsuite-analyze!))

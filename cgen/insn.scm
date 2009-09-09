@@ -394,7 +394,8 @@
   ;; Pick out name first to augment the error context.
   (let* ((name (parse-name context name))
 	 (context (context-append-name context name))
-	 (atlist-obj (atlist-parse context attrs "cgen_insn")))
+	 (atlist-obj (atlist-parse context attrs "cgen_insn"))
+	 (isas (bitset-attr->list (atlist-attr-value atlist-obj 'ISA #f))))
 
     (if (keep-atlist? atlist-obj #f)
 
@@ -405,6 +406,11 @@
 			     semantics
 			     #f))
 	      (format (/parse-insn-format (context-append context " format")
+					  ;; Just pick the first, the base len
+					  ;; for each should be the same.
+					  ;; If not this is caught by
+					  ;; compute-insn-base-mask-length.
+					  (current-isa-lookup (car isas))
 					  fmt))
 	      (comment (parse-comment context comment))
 	      ; If there are no semantics, mark this as an alias.
@@ -590,37 +596,10 @@
 	(parse-error context "unknown ifield" spec)))
 )
 
-; Given an insn format field from a .cpu file, replace it with a list of
-; ifield objects with the values assigned.
-;
-; An insn format field is a list of ifields that make up the instruction.
-; All bits must be specified, including reserved bits
-; [at present no checking is made of this, but the rule still holds].
-;
-; A normal entry begins with `+' and then consist of the following:
-; - operand name
-; - (ifield-name [options] value)
-; - (operand-name [options] [value])
-; - insn ifield enum
-;
-; Example: (+ OP1_ADD (f-res2 0) dr src1 (f-src2 1) (f-res1 #xea))
-;
-; where OP1_ADD is an enum, dr and src1 are operands, and f-src2 and f-res1
-; are ifield's.  The `+' allows for future extension.
-;
-; The other form of entry begins with `=' and is followed by an instruction
-; name that has the same format.  The specified instruction must already be
-; defined.  Instructions with this form typically also include an
-; `ifield-assertion' spec to keep them separate.
-;
-; An empty field list is ok.  This means it's unspecified.
-; VIRTUAL insns have this.
-;
-; This is one of the more important routines to be efficient.
-; It's called for each instruction, and is one of the more expensive routines
-; in insn parsing.
+; Subroutine of /parse-insn-format to simplify it.
+; Parse the provided iformat spec and return the list of ifields.
 
-(define (/parse-insn-format context fld-list)
+(define (/parse-insn-iformat-iflds context fld-list)
   (if (null? fld-list)
       nil ; field list unspecified
       (case (car fld-list)
@@ -654,6 +633,80 @@
 	(else
 	 (parse-error context "format must begin with `+' or `='" fld-list))
 	))
+)
+
+; Given an insn format field from a .cpu file, replace it with a list of
+; ifield objects with the values assigned.
+; If ISA is non-#f, it is an <isa> object, and we perform various checks
+; on the format (which require an isa).
+;
+; An insn format field is a list of ifields that make up the instruction.
+; All bits must be specified, including reserved bits
+; [at present no checking is made of this, but the rule still holds].
+;
+; A normal entry begins with `+' and then consist of the following:
+; - operand name
+; - (ifield-name [options] value)
+; - (operand-name [options] [value])
+; - insn ifield enum
+;
+; Example: (+ OP1_ADD (f-res2 0) dr src1 (f-src2 1) (f-res1 #xea))
+;
+; where OP1_ADD is an enum, dr and src1 are operands, and f-src2 and f-res1
+; are ifield's.  The `+' allows for future extension.
+;
+; The other form of entry begins with `=' and is followed by an instruction
+; name that has the same format.  The specified instruction must already be
+; defined.  Instructions with this form typically also include an
+; `ifield-assertion' spec to keep them separate.
+;
+; An empty field list is ok.  This means it's unspecified.
+; VIRTUAL insns have this.
+;
+; This is one of the more important routines to be efficient.
+; It's called for each instruction, and is one of the more expensive routines
+; in insn parsing.
+
+(define (/parse-insn-format context isa ifld-list)
+  (let* ((parsed-ifld-list (/parse-insn-iformat-iflds context ifld-list)))
+
+    ;; NOTE: We could sort the fields here, but it introduces differences
+    ;; in the generated opcodes files.  Later it might be a good thing to do
+    ;; but keeping the output consistent is important right now.
+    ;;   (sorted-ifld-list (sort-ifield-list parsed-ifld-list
+    ;;                                       (not (current-arch-insn-lsb0?))))
+    ;; The rest of the code assumes the list isn't sorted.
+    ;; Is there a benefit to removing this assumption?  Note that
+    ;; multi-ifields can be discontiguous, so the sorting isn't perfect.
+
+    (if (and isa
+	     (reader-verify-iformat? CURRENT-READER))
+	(let ((base-len (isa-base-insn-bitsize isa)))
+
+	  ;; Perform some error checking.
+	  ;; Look for overlapping ifields and missing bits.
+	  ;; With derived ifields this is really hard, so only do the base insn
+	  ;; for now.  Do the simple test for now, it doesn't catch everything,
+	  ;; but it should catch a lot.
+
+	  (let* ((base-iflds (find (lambda (f)
+				     (not (ifld-beyond-base? f)))
+				   (ifields-simple-ifields parsed-ifld-list)))
+		 (base-iflds-length (apply + (map ifld-length base-iflds))))
+	    ;; FIXME: We don't use parse-error here because some existing ports
+	    ;; have problems, and I don't have time to fix them right now.
+	    (cond ((< base-iflds-length base-len)
+		   (parse-warning context
+				  "insufficient number of bits specified in base insn"
+				  ifld-list))
+		  ((> base-iflds-length base-len)
+		   (parse-warning context
+				  "too many bits specified in base insn"
+				  ifld-list)))
+	    )
+	  ))
+
+    parsed-ifld-list)
 )
 
 ; Return a boolean indicating if IFLD-LIST contains anyof operands.

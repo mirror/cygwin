@@ -116,6 +116,45 @@
 
 (dnh h-pc "program counter" (PC PROFILE) (pc) () () ())
 
+; get the real index of a gpr on the circular register queue.
+
+(define-pmacro (real-gpr-index index)
+  (if WI (lt index 20)
+    ; global reg
+    index
+    ; local reg
+    (sequence WI ((WI pr))
+      (set pr (add index (reg h-gr 0)))
+      (if WI (ge pr 256)
+    (sub pr 236)
+    pr
+      )
+    )
+  )
+)
+
+; All accesses to gprs in instructions use {get|set}-{gpr|vgpr}
+; functions.  These functions handle register 0 being 0.  This cannot
+; be handled without understanding the context of the get or set since
+; regs 1-3 are 0 for vector instructions but not for scalar
+; instructions.
+;
+; general purpose registers.
+
+;(define-hardware
+;  (name h-gpr)
+;  (comment "General Purpose Registers")
+;  (type register DI (256))
+;  (indices keyword "" (gen-register-names "r" 256 0 1))
+;  (get (index)
+;    (raw-reg DI h-gpr (real-gpr-index index))
+;  )
+;  (set (index newval)
+;    (set (raw-reg DI h-gpr (real-gpr-index index)) newval)
+;  )
+;)
+
+
 (define-hardware
   (name h-gr)
   (comment "general registers")
@@ -126,6 +165,12 @@
 	     (r0 0) (r1 1) (r2 2) (r3 3) (r4 4) (r5 5) (r6 6) (r7 7)
 	     (r8 8) (r9 9) (r10 10) (r11 11) (r12 12) (r13 13) (r14 14) (r15 15)
 	     ))
+  (get (index)
+    (raw-reg WI h-gr (real-gpr-index index))
+  )
+  (set (index newval)
+    (set (raw-reg WI h-gr (real-gpr-index index)) newval)
+  )
 )
 
 (define-hardware
@@ -150,6 +195,11 @@
 
 (dsh h-df "df test" () (register DF))
 (dsh h-tf "tf test" () (register TF))
+
+(define-hardware
+  (name accum)
+  (type register (INT 64))
+)
 
 ; Operand attributes.
 

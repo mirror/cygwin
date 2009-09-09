@@ -67,13 +67,6 @@
   (number key ifields mask-length length mask eg-insn)
 )
 
-; Traverse the ifield list to collect all base (non-derived) ifields
-; used in it.
-
-(define (ifields-base-ifields ifld-list)
-  (collect ifld-base-ifields ifld-list)
-)
-
 ; Return enum cgen_fmt_type value for FMT.
 ; ??? Not currently used.
 
@@ -554,7 +547,7 @@
   ; intelligent processing of it later.
 
   (for-each (lambda (insn)
-	      (logit 3 "Scanning operands of " (obj:name insn) ": "
+	      (logit 2 "Scanning operands of " (obj:name insn) ": "
 		     (insn-syntax insn) " ...\n")
 	      (let ((sem-ops (ifmt-analyze insn compute-sformat?)))
 		(insn-set-fmt-desc! insn (car sem-ops))
@@ -598,7 +591,7 @@
 	 )
 
     (for-each (lambda (insn)
-		(logit 3 "Processing format for " (obj:name insn) ": "
+		(logit 2 "Processing format for " (obj:name insn) ": "
 		       (insn-syntax insn) " ...\n")
 
 		(let ((fmt-desc (insn-fmt-desc insn)))

@@ -1773,6 +1773,8 @@
     ;; Ensure instruction base values agree with their masks.
     ;; Errors can come from bad .cpu files, bugs, or both.
     ;; It's better to catch such errors early.
+    ;; If it is an error in the .cpu file, we don't want to crash
+    ;; on a Guile error.
 
     (for-each
 
@@ -1791,6 +1793,11 @@
 			     "This usually means some kind of error in the instruction's ifield list.\n"
 			     "base mask: 0x" (number->hex base-mask)
 			     ", base value: 0x" (number->hex base-value)
+			     "\nfield list:"
+			     (string-map (lambda (f)
+					   (string-append " "
+							  (ifld-pretty-print f)))
+					 (insn-iflds insn))
 			     )))
 
 	 ;; Insert more checks here.

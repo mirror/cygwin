@@ -933,6 +933,7 @@ Define an instruction multi-field, all arguments specified.
 	    (elm-xset! result 'mode (parse-mode-name context mode))
 	    (elm-xset! result 'encode (/ifld-parse-encode context encode))
 	    (elm-xset! result 'decode (/ifld-parse-encode context decode))
+	    (elm-xset! result 'bitrange "multi-ifields don't have bitranges") ;; FIXME
 	    (if insert
 		(elm-xset! result 'insert insert)
 		(elm-xset! result 'insert
@@ -1090,12 +1091,36 @@ Define an instruction multi-field, all arguments specified.
 		   (derived-ifield-subfields self))))
 )
 
-; Traverse the ifield to collect all base (non-derived) ifields used in it.
+; Return a list of all base (non-derived) ifields in IFLD.
+; NOTE: multi-ifields are *not* reduced to their sub-ifields.
 
 (define (ifld-base-ifields ifld)
   (cond ((derived-ifield? ifld) (ifields-base-ifields (derived-ifield-subfields ifld)))
 	;;((multi-ifield? ifld) (ifields-base-ifields (multi-ifld-subfields ifld)))
 	(else (list ifld)))
+)
+
+; Collect all base (non-derived) ifields in IFLD-LIST.
+; NOTE: multi-ifields are *not* reduced to their sub-ifields.
+
+(define (ifields-base-ifields ifld-list)
+  (collect ifld-base-ifields ifld-list)
+)
+
+; Return a list of all simple ifields in IFLD.
+; NOTE: multi-ifields *are* reduced to their sub-ifields.
+
+(define (ifld-simple-ifields ifld)
+  (cond ((derived-ifield? ifld) (ifields-simple-ifields (derived-ifield-subfields ifld)))
+	((multi-ifield? ifld) (ifields-simple-ifields (multi-ifld-subfields ifld)))
+	(else (list ifld)))
+)
+
+; Collect all simple ifields in IFLD-LIST.
+; NOTE: multi-ifields *are* reduced to their sub-ifields.
+
+(define (ifields-simple-ifields ifld-list)
+  (collect ifld-simple-ifields ifld-list)
 )
 
 ; Misc. utilities.

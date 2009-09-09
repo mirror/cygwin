@@ -15,6 +15,7 @@ procedure should be generally applicable.
 * Supported Guile versions::
 * Running configure::
 * Writing a CPU description file::
+* Interactive development::
 * Doing an opcodes port::
 * Doing a GAS port::
 * Building a GAS test suite::
@@ -118,7 +119,6 @@ descriptions of each type of entry that appears in the description file.
 * Writing define-macro-insn::        Macro instructions
 * Using define-pmacro::              Preprocessor macros
 * Splicing list arguments::          List arguments in macros
-* Interactive development::          Useful things to do in a Guile shell
 @end menu
 
 @node Conventions
@@ -860,8 +860,8 @@ concatenation}, and @xref{String concatenation}, for details.
 @node Splicing list arguments
 @subsection Splicing arguments
 
-Several cpu description elements take a list as an argument (as opposed
-to a scalar).
+Several cpu description elements take multiple arguments, as opposed
+to a single argument (even if that single argument is a list).
 When constructing a call to define-* in a pmacro, these elements must have
 their arguments spliced in to achieve the proper syntax.
 
@@ -896,18 +896,77 @@ element specified.
 @end example
 
 The @samp{.splice} is necessary because @samp{attrs}, @samp{encode},
-and @samp{decode} take a list as an argument.
+and @samp{decode} take (potentially) multiple arguments.
 
-One would then write f-op1 as:
+One would then write f-disp16 as:
 
 @example
-
-(dwf f-op1 "f-op1" () 0 16 15 4 UINT #f #f)
-
+(dwf f-disp16 "f-disp16" (PCREL-ADDR RELOC) 16 16 15 16 INT
+    ((value pc) (sra WI (sub WI value pc) (const 2)))
+    ((value pc) (add WI (sll WI value (const 2)) pc)))
 @end example
 
+It will get expanded as:
+
+@example
+(define-ifield
+  (name f-disp16)
+  (comment "f-disp16")
+  (attrs PCREL-ADDR RELOC)
+  (word-offset 16)
+  (word-length 16)
+  (start 15)
+  (length 16)
+  (mode INT)
+  (encode (value pc) (sra WI (sub WI value pc) (const 2)))
+  (decode (value pc) (add WI (sll WI value (const 2)) pc))
+)
+@end example
+
+If we didn't use @samp{.splice}, and instead just wrote:
+
+@example
+(define-pmacro (bad-dwf x-name x-comment x-attrs
+                        x-word-offset x-word-length x-start x-length
+                        x-mode x-encode x-decode)
+  "Define a field including its containing word."
+  (define-ifield
+    (name x-name)
+    (comment x-comment)
+    (attrs x-attrs)
+    (word-offset x-word-offset)
+    (word-length x-word-length)
+    (start x-start)
+    (length x-length)
+    (mode x-mode)
+    (encode x-encode)
+    (decode x-decode)
+    )
+)
+@end example
+
+Then that would expand to the following, which is incorrect:
+
+@example
+(define-ifield
+  (name f-disp16)
+  (comment "f-disp16")
+  (attrs (PCREL-ADDR RELOC))
+  (word-offset 16)
+  (word-length 16)
+  (start 15)
+  (length 16)
+  (mode INT)
+  (encode ((value pc) (sra WI (sub WI value pc) (const 2))))
+  (decode ((value pc) (add WI (sll WI value (const 2)) pc)))
+)
+@end example
+
+Note the extra level of parentheses in the @samp{attrs},
+@samp{encode}, and @samp{decode} fields.
+
 @node Interactive development
-@subsection Interactive development
+@section Interactive development
 
 The normal way@footnote{Normal for some anyway, certainly each person will have
 their own preference.} of writing a CPU description file involves starting Guile

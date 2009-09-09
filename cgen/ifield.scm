@@ -60,7 +60,7 @@
 ; {ordinal} is missing on purpose, it's handled at a higher level.
 ; {value},{follows} are missing on purpose.
 ; {value} is handled specially.
-; {follows} is rarely used
+; {follows} is rarely used.
 (method-make-make! <ifield>
 		   '(location name comment attrs mode bitrange encode decode))
 
@@ -98,12 +98,12 @@
 
 (method-make-virtual!
  <ifield> 'field-start
- (lambda (self word-len)
+ (lambda (self)
    (bitrange-start (/ifld-bitrange self)))
 )
 
-(define (ifld-start ifld word-len)
-  (send ifld 'field-start word-len)
+(define (ifld-start ifld)
+  (send ifld 'field-start)
 )
 
 (method-make-virtual!
@@ -250,7 +250,7 @@
 	  (word-offset (bitrange-word-offset bitrange))
 	  (word-length (or (and (= word-offset 0) base-len)
 			   recorded-word-length)))
-     (word-value (ifld-start self base-len)
+     (word-value (ifld-start self)
 		 (bitrange-length bitrange)
 		 word-length
 		 (bitrange-lsb0? bitrange) #f
@@ -286,7 +286,7 @@
  <ifield> 'field-extract
  (lambda (self insn value)
    (let ((base-len (insn-base-mask-length insn)))
-     (word-extract (ifld-start self base-len)
+     (word-extract (ifld-start self)
 		   (ifld-length self)
 		   base-len
 		   (ifld-lsb0? self)
@@ -392,6 +392,21 @@
 		 (< (bitrange-start br1) (bitrange-start br2)))))
 	  (else
 	   #f)))
+)
+
+;; Pretty print an ifield, typically for error messages.
+
+(method-make-virtual!
+ <ifield> 'pretty-print
+ (lambda (self)
+   (string-append "(" (obj:str-name self)
+		  " " (number->string (ifld-start f))
+		  " " (number->string (ifld-length f))
+		  ")"))
+)
+
+(define (ifld-pretty-print f)
+  (send f 'pretty-print)
 )
 
 ; Parse an ifield definition.
@@ -739,13 +754,12 @@ Define an instruction multi-field, all arguments specified.
   (find (lambda (ifld) (not (derived-ifield? ifld))) ifld-list)
 )
 
-
 ; Return the starting bit number of the first field.
 
 (method-make-virtual!
  <multi-ifield> 'field-start
- (lambda (self word-len)
-   (apply min (map (lambda (f) (ifld-start f #f)) (elm-get self 'subfields))))
+ (lambda (self)
+   (apply min (map (lambda (f) (ifld-start f)) (elm-get self 'subfields))))
 )
 
 ; Return the total length.
@@ -826,6 +840,18 @@ Define an instruction multi-field, all arguments specified.
  <multi-ifield> 'field-lsb0?
  (lambda (self)
    (ifld-lsb0? (car (elm-get self 'subfields))))
+)
+
+;; Pretty print a multi-ifield, typically for error messages.
+
+(method-make-virtual!
+ <multi-ifield> 'pretty-print
+ (lambda (self)
+   (string-append "(" (obj:str-name self)
+		  (string-map (lambda (f)
+				(string-append " " (ifld-pretty-print f)))
+			      (elm-get self 'subfields))
+		  ")"))
 )
 
 ; Multi-ifield parsing.
@@ -1089,18 +1115,18 @@ Define an instruction multi-field, all arguments specified.
 	(cgh-qsort fld-list
 		   (if up?
 		       (lambda (a b)
-			 (cgh-qsort-int-cmp (ifld-start a #f)
-					    (ifld-start b #f)))
+			 (cgh-qsort-int-cmp (ifld-start a)
+					    (ifld-start b)))
 		       (lambda (a b)
-			 (- (cgh-qsort-int-cmp (ifld-start a #f)
-					       (ifld-start b #f)))))))
+			 (- (cgh-qsort-int-cmp (ifld-start a)
+					       (ifld-start b)))))))
       (lambda (fld-list up?)
 	(sort fld-list
 	      (if up?
-		  (lambda (a b) (< (ifld-start a #f)
-				   (ifld-start b #f)))
-		  (lambda (a b) (> (ifld-start a #f)
-				   (ifld-start b #f)))))))
+		  (lambda (a b) (< (ifld-start a)
+				   (ifld-start b)))
+		  (lambda (a b) (> (ifld-start a)
+				   (ifld-start b)))))))
 )
 
 ; Return a boolean indicating if field F extends beyond the base insn.

@@ -150,7 +150,7 @@
 			  (obj-atlist self))
 		      gen-attr-mask)
       ", " (number->string (ifld-word-offset self))
-      ", " (number->string (ifld-start self #f))
+      ", " (number->string (ifld-start self))
       ", " (number->string (ifld-length self))
       ", " (number->string (ifld-word-length self))
       ", total_length"
@@ -189,7 +189,7 @@
 			  (obj-atlist self))
 		      gen-attr-mask)
       ", " (number->string (ifld-word-offset self))
-      ", " (number->string (ifld-start self #f))
+      ", " (number->string (ifld-start self))
       ", " (number->string (ifld-length self))
       ", " (number->string (ifld-word-length self))
       ", total_length"

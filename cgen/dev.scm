@@ -128,14 +128,14 @@
   (load "opc-ibld")
   (load "opc-itab")
   (load "opc-opinst")
-  (set! verbose-level 3)
+  (set! verbose-level 2)
   (set! APPLICATION 'OPCODES)
 )
 
 (define (load-gtest)
   (load-opc)
   (load "gas-test")
-  (set! verbose-level 3)
+  (set! verbose-level 2)
   (set! APPLICATION 'GAS-TEST)
 )
 
@@ -146,7 +146,7 @@
   (load "sid-cpu")
   (load "sid-model")
   (load "sid-decode")
-  (set! verbose-level 3)
+  (set! verbose-level 2)
   (set! APPLICATION 'SID-SIMULATOR)
 )
 
@@ -160,14 +160,14 @@
   (load "sim-cpu")
   (load "sim-model")
   (load "sim-decode")
-  (set! verbose-level 3)
+  (set! verbose-level 2)
   (set! APPLICATION 'SIMULATOR)
 )
 
 (define (load-stest)
   (load-opc)
   (load "sim-test")
-  (set! verbose-level 3)
+  (set! verbose-level 2)
   (set! APPLICATION 'SIM-TEST)
 )
 
@@ -176,7 +176,7 @@
   (load "desc")
   (load "desc-cpu")
   (load "testsuite.scm")
-  (set! verbose-level 3)
+  (set! verbose-level 2)
   (set! APPLICATION 'TESTSUITE)
 )
 

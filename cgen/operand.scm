@@ -397,9 +397,9 @@
 ; ??? Until other things settle.
 (method-make!
  <hw-index> 'field-start
- (lambda (self word-len)
+ (lambda (self)
    (if (eq? (hw-index:type self) 'ifield)
-       (send (hw-index:value self) 'field-start #f)
+       (send (hw-index:value self) 'field-start)
        0))
 )
 (method-make!
@@ -1478,7 +1478,7 @@
 ; Given an operand, return the starting bit number.
 ; Note that the field isn't necessarily contiguous.
 
-(define (op:start operand) (send operand 'field-start #f))
+(define (op:start operand) (send operand 'field-start))
 
 ; Given an operand, return the total length in bits.
 ; Note that the field isn't necessarily contiguous.

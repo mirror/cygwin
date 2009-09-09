@@ -155,7 +155,7 @@ const CGEN_IFLD @arch@_cgen_ifld_table[] =
                              (string-append
 		              (number->string (ifld-word-offset ifld)) ", "
 			      (number->string (ifld-word-length ifld)) ", "
-			      (number->string (ifld-start ifld #f)) ", "
+			      (number->string (ifld-start ifld)) ", "
 			      (number->string (ifld-length ifld)) ", "))
 			   (gen-obj-attr-defn 'ifld ifld all-attrs
 				      num-non-bools gen-A-attr-mask)

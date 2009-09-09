@@ -1771,25 +1771,35 @@
   (let ((insn-list (arch-insn-list arch)))
 
     ;; Ensure instruction base values agree with their masks.
-    ;; ??? It's not clear where errors can come in.  From bad .cpu files,
-    ;; bugs, or both.  But it's better to catch such errors early.
-    (for-each (lambda (insn)
-		(let ((base-len (insn-base-mask-length insn))
-		      (base-mask (insn-base-mask insn))
-		      (base-value (insn-base-value insn)))
-		  (if (not (= (cg-logand (cg-logxor base-mask (mask base-len))
-					 base-value)
-			      0))
-		      (context-owner-error #f insn
-					   "While performing sanity checks"
-					   (string-append "Instruction has opcode bits outside of its mask.\n"
-							  "This usually means some kind of error in the instruction's ifield list.\n"
-							  "base mask: 0x" (number->hex base-mask)
-							  ", base value: 0x" (number->hex base-value))))
-		  ))
-	      (non-multi-insns (non-alias-insns insn-list)))
+    ;; Errors can come from bad .cpu files, bugs, or both.
+    ;; It's better to catch such errors early.
 
-    *UNSPECIFIED*)
+    (for-each
+
+     (lambda (insn)
+
+       (let ((base-len (insn-base-mask-length insn))
+	     (base-mask (insn-base-mask insn))
+	     (base-value (insn-base-value insn)))
+	 (if (not (= (cg-logand (cg-logxor base-mask (mask base-len))
+				base-value)
+		     0))
+	     (context-owner-error
+	      #f insn
+	      "While performing sanity checks"
+	      (string-append "Instruction has opcode bits outside of its mask.\n"
+			     "This usually means some kind of error in the instruction's ifield list.\n"
+			     "base mask: 0x" (number->hex base-mask)
+			     ", base value: 0x" (number->hex base-value)
+			     )))
+
+	 ;; Insert more checks here.
+
+	 ))
+
+     (non-multi-insns (non-alias-insns insn-list))))
+
+  *UNSPECIFIED*
 )
 
 ; Analyze the instruction set.

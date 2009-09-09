@@ -94,8 +94,7 @@
 			" ("
 			base-value ", "
 			(number->string total-length) ", "
-			; ??? Is passing total-length right here?
-			(number->string (+ (ifld-start f total-length)
+			(number->string (+ (ifld-start f)
 					   (ifld-word-offset f))) ", "
 			(number->string (ifld-length f))
 			")"))
@@ -187,7 +186,7 @@
 (define (/gen-ifld-extract-beyond f base-length total-length var-list)
    ; First compute the list of variables that contains pieces of the
    ; desired value.
-   (let ((start (+ (ifld-start f total-length) (ifld-word-offset f)))
+   (let ((start (+ (ifld-start f) (ifld-word-offset f)))
 	 (length (ifld-length f))
 	 ;(word-start (ifld-word-offset f))
 	 ;(word-length (ifld-word-length f))

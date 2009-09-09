@@ -1,5 +1,17 @@
 2009-09-09  Doug Evans  <dje@sebabeach.org>
 
+	* dev.scm (*): Change default verbosity level to 2.
+
+	* ifield.scm (<ifield> pretty-print): New method.
+	(ifld-pretty-print): New function.
+	(<multi-ifield> pretty-print): New method.
+
+	* ifield.scm (<ifield> field-start): Delete word-len arg.
+	All callers updated.
+	(ifld-start): Ditto.
+	(<multi-ifield> field-start): Ditto.
+	* operand.scm (<hw-index> field-start): Ditto.
+
 	* ifield.scm (ifld-beyond-base?): Remove args base-bitsize,
 	total-bitsize.  All callers updated.
 	* insn.scm (<insn>): Rename member ifld-values to /insn-value.

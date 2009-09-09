@@ -861,7 +861,7 @@
 ; (i.e. the opcode field).
 ;
 ; See also (compute-insn-base-mask).
-;
+
 (define (insn-value insn)
   (if (elm-get insn 'iflds-values)
       (elm-get insn 'iflds-values)
@@ -869,12 +869,11 @@
 	     (value (apply +
 			   (map (lambda (fld) (ifld-value fld base-len (ifld-get-value fld)))
 				(find ifld-constant?
-				      (collect ifld-base-ifields (insn-iflds insn))))
+				      (ifields-base-ifields (insn-iflds insn))))
 			   )))
 	(elm-set! insn 'iflds-values value)
-	value)
-      )
-  )
+	value))
+)
 
 ; Insn operand utilities.
 

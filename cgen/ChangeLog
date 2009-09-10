@@ -1,6 +1,7 @@
 2009-09-10  Doug Evans  <dje@sebabeach.org>
 
 	* insn.scm (/parse-insn-format): New arg `verify?', all callers updated.
+	Improve error message for missing or too many bits.
 	(/insn-parse): Don't verify iformat for virtual insns.
 	
 	* sid-decode.scm (cgen-decode.cxx): Remove redundant call to

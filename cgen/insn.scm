@@ -686,7 +686,14 @@
 
     (if verify?
 
-	(let ((base-len (isa-base-insn-bitsize isa)))
+	(let ((base-len (isa-base-insn-bitsize isa))
+	      (pretty-print-iflds (lambda (iflds)
+				    (if (null? iflds)
+					" none provided"
+					(string-map (lambda (f)
+						      (string-append " "
+								     (ifld-pretty-print f)))
+						    iflds)))))
 
 	  ;; Perform some error checking.
 	  ;; Look for overlapping ifields and missing bits.
@@ -702,11 +709,19 @@
 	    ;; have problems, and I don't have time to fix them right now.
 	    (cond ((< base-iflds-length base-len)
 		   (parse-warning context
-				  "insufficient number of bits specified in base insn"
+				  (string-append
+				   "insufficient number of bits specified in base insn\n"
+				   "ifields:"
+				   (pretty-print-iflds parsed-ifld-list)
+				   "\nprovided spec")
 				  ifld-list))
 		  ((> base-iflds-length base-len)
 		   (parse-warning context
-				  "too many or duplicated bits specified in base insn"
+				  (string-append
+				   "too many or duplicated bits specified in base insn\n"
+				   "ifields:"
+				   (pretty-print-iflds parsed-ifld-list)
+				   "\nprovided spec")
 				  ifld-list)))
 	    )
 	  ))

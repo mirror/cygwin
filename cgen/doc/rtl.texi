@@ -2117,11 +2117,11 @@ As a degenerate case, a single integer, is also supported.
 
 In addition, it may also use @samp{member}.
 
-Syntax: @code{(member ifield-name (value1 [value2 ...]))}
+Syntax: @code{(member ifield-name (number-list value1 [value2 ...]))}
 @footnote{Like all rtx, the full syntax is
-@code{(member [(options)] [mode] ifield-name (value1 [value2 ...]))},
+@code{(member [(options)] [member-mode] ifield-name (number-list [(options)] [numlist-mode] value1 [value2 ...]))},
 but @samp{options} and @samp{mode} are not really useful here.
-@samp{mode} is @samp{BI}, since the result is a boolean value.}
+@samp{member-mode} is @samp{BI}, since the result is a boolean value.}
 
 The result of @samp{member} is one if the value of the ifield
 is a member of the list @code{(value1 [value2 ...])}.

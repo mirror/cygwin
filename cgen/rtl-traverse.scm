@@ -61,9 +61,12 @@
 ;
 ; KNOWN is an alist of known values.  This is used by rtx-simplify.
 ; Each element is (name . value) where
-; NAME is either an ifield or operand name (in the future it might be a
+; NAME is a scalar ifield name (in the future it might be an operand name or
 ; sequence local name), and
-; VALUE is either (const mode value) or (numlist mode value1 value2 ...).
+; VALUE is a const rtx, (const () mode value),
+; or a number-list rtx, (number-list () mode value1 [value2 ...]).
+; A "scalar ifield" is a simple ifield (not a multi or derived ifield),
+; or a multi-ifield consisting of only simple ifields.
 ;
 ; DEPTH is the current traversal depth.
 
@@ -130,7 +133,9 @@
     result)
 )
 
-; Lookup NAME in the known value table.  Returns the value or #f if not found.
+; Lookup NAME in the known value table.
+; Returns the value or #f if not found.
+; The value is either a const rtx or a number-list rtx.
 
 (define (tstate-known-lookup tstate name)
   (let ((known (tstate-known tstate)))

@@ -152,7 +152,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
       (string-list
        "  " (/gen-model-insn-fn-decl model insn 'before)
        "  " (/gen-model-insn-fn-decl model insn 'after)))
-    (non-multi-insns (real-insns (current-insn-list))))
+    (real-insns (current-insn-list)))
   )
 )
 
@@ -217,7 +217,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 		    (string-list
 		     (/gen-model-insn-fn model insn 'before)
 		     (/gen-model-insn-fn model insn 'after)))
-		  (non-multi-insns (real-insns (current-insn-list)))))
+		  (real-insns (current-insn-list))))
 	       (current-model-list)))
    )
 )
@@ -251,7 +251,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
    ; FIXME: revisit MAX_UNITS
   "  static const int MAX_UNITS = "
   (number->string
-   (let ((insn-list (non-multi-insns (real-insns (current-insn-list)))))
+   (let ((insn-list (real-insns (current-insn-list))))
      (if (null? insn-list)
 	 1
 	 (apply max

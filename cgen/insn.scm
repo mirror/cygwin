@@ -406,13 +406,16 @@
 	      (semantics (if (not (null? semantics))
 			     semantics
 			     #f))
-	      (format (/parse-insn-format (context-append context " format")
-					  ;; Just pick the first, the base len
-					  ;; for each should be the same.
-					  ;; If not this is caught by
-					  ;; compute-insn-base-mask-length.
-					  (current-isa-lookup (car isas))
-					  fmt))
+	      (format (/parse-insn-format
+		       (context-append context " format")
+		       (and (not (atlist-has-attr? atlist-obj 'VIRTUAL))
+			    (reader-verify-iformat? CURRENT-READER))
+		       ;; Just pick the first, the base len
+		       ;; for each should be the same.
+		       ;; If not this is caught by
+		       ;; compute-insn-base-mask-length.
+		       (current-isa-lookup (car isas))
+		       fmt))
 	      (comment (parse-comment context comment))
 	      ; If there are no semantics, mark this as an alias.
 	      ; ??? Not sure this makes sense for multi-insns.
@@ -638,8 +641,9 @@
 
 ; Given an insn format field from a .cpu file, replace it with a list of
 ; ifield objects with the values assigned.
-; If ISA is non-#f, it is an <isa> object, and we perform various checks
-; on the format (which require an isa).
+; ISA is an <isa> object or #f.
+; If VERIFY? is non-#f, perform various checks on the format
+; (ISA must be an <isa> object).
 ;
 ; An insn format field is a list of ifields that make up the instruction.
 ; All bits must be specified, including reserved bits
@@ -668,7 +672,7 @@
 ; It's called for each instruction, and is one of the more expensive routines
 ; in insn parsing.
 
-(define (/parse-insn-format context isa ifld-list)
+(define (/parse-insn-format context verify? isa ifld-list)
   (let* ((parsed-ifld-list (/parse-insn-iformat-iflds context ifld-list)))
 
     ;; NOTE: We could sort the fields here, but it introduces differences
@@ -680,8 +684,8 @@
     ;; Is there a benefit to removing this assumption?  Note that
     ;; multi-ifields can be discontiguous, so the sorting isn't perfect.
 
-    (if (and isa
-	     (reader-verify-iformat? CURRENT-READER))
+    (if verify?
+
 	(let ((base-len (isa-base-insn-bitsize isa)))
 
 	  ;; Perform some error checking.

@@ -1643,7 +1643,7 @@
 ; This is all real insns plus the `invalid' and `cond' virtual insns.
 
 (define (pbb-engine-insns)
-  (non-multi-insns (real-insns (current-insn-list)))
+  (real-insns (current-insn-list))
 )
 
 ;; Subroutine of /create-virtual-insns!.

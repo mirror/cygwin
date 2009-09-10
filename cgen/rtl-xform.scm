@@ -198,7 +198,8 @@
 		      (error "rtx-simplify: non-void-mode `if' missing `else' part" expr))))
 	     ; Can't simplify.
 	     ; We could traverse the then/else clauses here, but it's simpler
-	     ; to have our caller do it.  The cost is retraversing `test'.
+	     ; to have our caller do it (by returning #f).
+	     ; The cost is retraversing `test'.
 	     (else #f))))
 
     ((eq ne)
@@ -217,13 +218,15 @@
 	     ((#t) (rtx-true))
 	     (else
 	      ; That didn't work.  See if we have an ifield/operand with a
-	      ; known range of values.
+	      ; known range of values.  We don't need to check for a known
+	      ; single value, that is handled below.
 	      (case (rtx-name arg0)
 		((ifield)
 		 (let ((known-val (tstate-known-lookup tstate
 						       (rtx-ifield-name arg0))))
 		   (if (and known-val (rtx-kind? 'number-list known-val))
-		       (case (/rtx-const-list-equal arg1 known-val (rtx-kind? 'ne expr))
+		       (case (/rtx-const-list-equal arg1 known-val
+						    (rtx-kind? 'ne expr))
 			 ((#f) (rtx-false))
 			 ((#t) (rtx-true))
 			 (else
@@ -233,7 +236,8 @@
 		 (let ((known-val (tstate-known-lookup tstate
 						       (rtx-operand-name arg0))))
 		   (if (and known-val (rtx-kind? 'number-list known-val))
-		       (case (/rtx-const-list-equal arg1 known-val (rtx-kind? 'ne expr))
+		       (case (/rtx-const-list-equal arg1 known-val
+						    (rtx-kind? 'ne expr))
 			 ((#f) (rtx-false))
 			 ((#t) (rtx-true))
 			 (else

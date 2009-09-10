@@ -2111,11 +2111,19 @@ in the containing instruction.
 
 @anchor{ifield-assertion-rtl}
 The syntax of the assertion is a restricted subset of RTL.
-It may only contain @samp{andif}, @samp{eq}, @samp{ne}, @samp{not},
-and may only use instruction fields and integers as operands.
-As a degenerate case, a single integer, is also supported.
+It may only contain @samp{andif}, @samp{eq}, @samp{ne},
+and may only use scalar instruction fields
+@footnote{A scalar instruction field is a simple ifield
+(not a multi or derived ifield), or a multi-ifield consisting
+of only simple ifields.}
+and integers as operands.
+Furthermore, ifields must be specified in the first operand of
+@samp{eq}, @samp{ne}.
 
-In addition, it may also use @samp{member}.
+As a degenerate case, a single non-zero integer, is also supported,
+meaning the assertion passes.
+
+In addition, the assertion may also use @samp{member}.
 
 Syntax: @code{(member ifield-name (number-list value1 [value2 ...]))}
 @footnote{Like all rtx, the full syntax is

@@ -2119,8 +2119,9 @@ In addition, it may also use @samp{member}.
 
 Syntax: @code{(member ifield-name (value1 [value2 ...]))}
 @footnote{Like all rtx, the full syntax is
-@code{(member [(options)] [BI] ifield-name (value1 [value2 ...]))},
-but @samp{options} and @samp{mode} are not really useful here.}
+@code{(member [(options)] [mode] ifield-name (value1 [value2 ...]))},
+but @samp{options} and @samp{mode} are not really useful here.
+@samp{mode} is @samp{BI}, since the result is a boolean value.}
 
 The result of @samp{member} is one if the value of the ifield
 is a member of the list @code{(value1 [value2 ...])}.

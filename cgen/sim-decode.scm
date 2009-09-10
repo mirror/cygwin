@@ -586,7 +586,7 @@ const IDESC *
 
    (lambda () (/gen-decode-insn-globals (non-multi-insns (non-alias-insns (current-insn-list)))))
    /gen-idesc-init-fn
-   (lambda () (/gen-decode-fn (non-multi-insns (real-insns (current-insn-list)))
+   (lambda () (/gen-decode-fn (real-insns (current-insn-list))
 			      (state-decode-assist)
 			      (current-arch-insn-lsb0?)))
    )

@@ -1,3 +1,15 @@
+2009-09-10  Doug Evans  <dje@sebabeach.org>
+
+	* insn.scm (/parse-insn-format): New arg `verify?', all callers updated.
+	(/insn-parse): Don't verify iformat for virtual insns.
+	
+	* sid-decode.scm (cgen-decode.cxx): Remove redundant call to
+	non-multi-insns.
+	* sid-model.scm (/gen-model-insn-fn-decls): Ditto.
+	(/gen-model-insn-fns, /gen-model-class-decls): Ditto.
+	* sid.scm (pbb-engine-insns): Ditto.
+	* sim-decode.scm (cgen-decode.c): Ditto.
+
 2009-09-09  Doug Evans  <dje@sebabeach.org>
 
 	* rtl-traverse.scm: Comment tweaks.

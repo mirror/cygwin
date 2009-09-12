@@ -373,7 +373,7 @@
  (lambda (self name type mode value)
    (elm-set! self 'name name)
    (elm-set! self 'type type)
-   (elm-set! self 'mode (mode:lookup mode))
+   (elm-set! self 'mode (mode-maybe-lookup mode))
    (elm-set! self 'value value)
    self)
 )

@@ -26,6 +26,7 @@
 	      '(<source-ident>)
 	      '(
 		; The mode the raw value is to be interpreted in.
+		; This is a <mode> object.
 		mode
 
 		; A <bitrange> object.

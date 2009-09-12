@@ -11,6 +11,7 @@
 ; Subroutine of -rtx-find-op to determine if two modes are equivalent.
 ; Two modes are equivalent if they're equal, or if their sem-mode fields
 ; are equal.
+; M1 and M2 are mode names.
 
 (define (/rtx-mode-equiv? m1 m2)
   (or (eq? m1 m2)
@@ -70,6 +71,7 @@
 ; Subroutine of semantic-compile:process-expr!, to simplify it.
 ; Looks up the operand in the current set, returns it if found,
 ; otherwise adds it.
+; MODE is the mode name.
 ; REF-TYPE is one of 'use, 'set, 'set-quiet.
 ; Adds COND-CTI/UNCOND-CTI to SEM-ATTRS if the operand is a set of the pc.
 
@@ -77,7 +79,7 @@
   ;(display (list op-name mode ref-type)) (newline) (force-output)
   (let* ((mode (mode-real-name (if (eq? mode 'DFLT)
 				   (op:mode op)
-				   mode)))
+				   (mode:lookup mode))))
          ; The first #f is a placeholder for the object.
 	 (try (list '-op- #f mode op-name #f))
 	 (existing-op (/rtx-find-op try op-list)))
@@ -113,10 +115,11 @@
 	 (hw (current-hw-sem-lookup-1 hw-name)))
 
     (if hw
+
 	; If the mode is DFLT, use the object's natural mode.
 	(let* ((mode (mode-real-name (if (eq? (rtx-mode expr) 'DFLT)
-					 (obj:name (hw-mode hw))
-					 (rtx-mode expr))))
+					 (hw-mode hw)
+					 (mode:lookup (rtx-mode expr)))))
 	       (indx-sel (rtx-reg-index-sel expr))
 	       ; #f is a place-holder for the object (filled in later)
 	       (try (list 'reg #f mode hw-name indx-sel))
@@ -143,7 +146,7 @@
 ; Subroutine of semantic-compile:process-expr!, to simplify it.
 
 (define (/build-mem-operand! expr tstate op-list)
-  (let ((mode (rtx-mode expr))
+  (let ((mode (mode-real-name (mode:lookup (rtx-mode expr))))
 	(indx-sel (rtx-mem-index-sel expr)))
 
     (if (memq mode '(DFLT VOID))
@@ -334,6 +337,7 @@
        (sem-attrs (list #f))
 
        ; Called for expressions encountered in SEM-CODE.
+       ; MODE is the name of the mode.
        ; Don't waste cpu here, this is part of the slowest piece in CGEN.
        (process-expr!
 	(lambda (rtx-obj expr mode parent-expr op-pos tstate appstuff)
@@ -505,6 +509,7 @@
        (sem-attrs (list #f))
 
        ; Called for expressions encountered in SEM-CODE.
+       ; MODE is the name of the mode.
        (process-expr!
 	(lambda (rtx-obj expr mode parent-expr op-pos tstate appstuff)
 	  (case (car expr)

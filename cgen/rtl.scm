@@ -411,22 +411,24 @@
 
 ; Lookup the mode to use for semantic operations (unsigned modes aren't
 ; allowed since we don't have ANDUSI, etc.).
+; MODE is a <mode> object.
 ; ??? I have actually implemented both ways (full use of unsigned modes
 ; and mostly hidden use of unsigned modes).  Neither makes me real
 ; comfortable, though I liked bringing unsigned modes out into the open
 ; even if it doubled the number of semantic operations.
 
-(define (rtx-sem-mode m) (or (mode:sem-mode m) m))
+(define (rtx-sem-mode mode) (or (mode:sem-mode mode) mode))
 
-; MODE is a mode name or <mode> object.
+; MODE is a <mode> object.
 
-(define (rtx-lazy-sem-mode mode) (rtx-sem-mode (mode:lookup mode)))
+(define (rtx-lazy-sem-mode mode) (rtx-sem-mode mode))
 
 ; Return the mode of object OBJ.
 
 (define (rtx-obj-mode obj) (send obj 'get-mode))
 
 ; Return a boolean indicating of modes M1,M2 are compatible.
+; M1,M2 are <mode> objects.
 
 (define (rtx-mode-compatible? m1 m2)
   (let ((mode1 (rtx-lazy-sem-mode m1))
@@ -439,6 +441,7 @@
 ; Environments (sequences with local variables).
 
 ; Temporaries are created within a sequence.
+; MODE is a <mode> object.
 ; e.g. (sequence ((WI tmp)) (set tmp reg0) ...)
 ; ??? Perhaps what we want here is `let' but for now I prefer `sequence'.
 ; This isn't exactly `let' either as no initial value is specified.
@@ -455,6 +458,7 @@
 (method-make!
  <rtx-temp> 'make!
  (lambda (self name mode value)
+   (assert (mode? mode))
    (elm-set! self 'name name)
    (elm-set! self 'mode mode)
    (elm-set! self 'value (if value value (gen-temp name)))
@@ -493,14 +497,16 @@
 (define (rtx-env-empty? env) (null? env))
 
 ; Create an initial environment.
-; VAR-LIST is a list of (name <mode> value) elements.
+; VAR-LIST is a list of (name <mode>-or-mode-name value) elements.
 
 (define (rtx-env-make var-list)
   ; Convert VAR-LIST to an associative list of <rtx-temp> objects.
   (map (lambda (var-spec)
 	 (cons (car var-spec)
 	       (make <rtx-temp>
-		 (car var-spec) (cadr var-spec) (caddr var-spec))))
+		 (car var-spec)
+		 (mode-maybe-lookup (cadr var-spec))
+		 (caddr var-spec))))
        var-list)
 )
 
@@ -734,6 +740,8 @@
 (define (rtx-sequence-exprs rtx) (cddddr rtx))
 
 ; Same as rtx-sequence-locals except return in assq'able form.
+; ??? Sometimes I should it should have been (sequence ((name MODE)) ...)
+; instead of (sequence ((MODE name)) ...) from the beginning, sigh.
 
 (define (rtx-sequence-assq-locals rtx)
   (let ((locals (rtx-sequence-locals rtx)))
@@ -1014,20 +1022,20 @@
 ; ??? A register selector isn't supported yet.  It's just an idea that's
 ; been put down on paper for future reference.
 
-(define (reg estate mode hw-name . indx-sel)
-  (s-hw estate mode hw-name
+(define (reg estate mode-name hw-name . indx-sel)
+  (s-hw estate mode-name hw-name
 	(if (pair? indx-sel) (car indx-sel) 0)
 	(if (and (pair? indx-sel) (pair? (cdr indx-sel)))
 	    (cadr indx-sel)
 	    hw-selector-default))
 )
 
-; This is shorthand for (hw estate mode h-memory addr selector).
+; This is shorthand for (hw estate mode-name h-memory addr selector).
 ; ADDR must be an unevaluated RTX expression.
 ; If present (car sel) must be a number or unevaluated RTX expression.
 
-(define (mem estate mode addr . sel)
-  (s-hw estate mode 'h-memory addr
+(define (mem estate mode-name addr . sel)
+  (s-hw estate mode-name 'h-memory addr
 	(if (pair? sel) (car sel) hw-selector-default))
 )
 

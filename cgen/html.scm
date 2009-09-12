@@ -687,6 +687,7 @@ See the input .cpu file(s) for copyright information.
        (sem-attrs (list #f))
 
        ; Called for expressions encountered in SEM-CODE-LIST.
+       ; MODE is the name of the mode.
        (process-expr!
 	(lambda (rtx-obj expr mode parent-expr op-pos tstate appstuff)
 	  (case (car expr)

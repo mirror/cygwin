@@ -1,5 +1,46 @@
 2009-09-12  Doug Evans  <dje@sebabeach.org>
 
+	Clean up pass of mode handling.
+	Make use of mode name vs <mode> object more consistent and clear.
+	* hardware.scm (/keyword-read): Default mode to the mode name,
+	not the <mode> object.
+	(/hw-parse-indices): Parse mode name and pass mode object to
+	<hw-asm> constructor.
+	(/hw-parse-values): Ditto.
+	(<hw-register> parse!): Pass mode name to /hw-parse-indices
+	and /hw-parse-values.
+	(<hw-memory> parse!): Ditto.
+	(<hw-address> parse!): Ditto.
+	* mode.scm (/mode-table): New global, replaces mode-list.
+	Modes stored in hashtable instead of list.
+	(/mode-class-table): New global.
+	(mode-list-non-alias-values): Update.
+	(mode:eq?, mode-compatible?, mode:add!): Update.
+	(mode:lookup): Restrict arg to the mode's name.  All callers updated.
+	(mode-maybe-lookup): New function.
+	(mode-real-name): Restrict arg to a <mode> object.  All callers updated.
+	(mode-real-mode, mode-sem-mode, mode-bigger?): Ditto.
+	(mode-find, mode-set-word-modes!): Update
+	(mode-ensure-word-sizes-defined): Update.
+	(/sort-mode-classes!): New function.
+	(mode-builtin!): Update.  Sort mode classes here.
+	(mode-finish!): Sort mode classes here too.
+	* rtl-c.scm (/rtl-c-get): Restrict mode arg to a <mode> object.
+	All callers updated.
+	(rtl-c-set-quiet): Allow mode to be name of object.
+	(rtl-c-set-trace): Ditto.
+	* rtl-traverse.scm (rtl-eval-with-estate): Restrict mode arg to
+	<mode> object.  All callers updated.
+	* rtl.scm (rtx-sem-mode): Restrict arg to <mode> object.
+	(rtx-lazy-sem-mode): Ditto.
+	(<rtx-temp> make!): Assert mode arg is a <mode> object.
+	(rtx-env-make): Allow var-list modes to be name or object.
+	* sem-frags.scm (/frag-expr-assq-locals): New function.
+	(/frag-compute-locals!): Call it.
+	(/sfrag-create-cse-mapping): Renamed from sfrag-create-cse-mapping.
+	All callers updated.
+	* semantics.scm (/build-mem-operand!): Handle mode aliases.
+
 	* sim-test.scm (*): Symbols no longer can be passed to string-append.
 
 2009-09-10  Doug Evans  <dje@sebabeach.org>

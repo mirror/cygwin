@@ -649,7 +649,6 @@
    "      abort();\n") ; should never be called
 )
 
-
 ; Need to call op:type to resolve the hardware reference.
 ;(method-make-forward! <operand> 'type '(gen-parse gen-print))
 
@@ -679,7 +678,6 @@
 
 (method-make-forward! <operand> 'index '(gen-insert gen-extract))
 ; But: <derived-operand> has its own gen-insert / gen-extract.
-
 
 ; Return the value of PC.
 ; Used by insert/extract fields.

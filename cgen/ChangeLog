@@ -1,3 +1,7 @@
+2009-09-12  Doug Evans  <dje@sebabeach.org>
+
+	* sim-test.scm (*): Symbols no longer can be passed to string-append.
+
 2009-09-10  Doug Evans  <dje@sebabeach.org>
 
 	* insn.scm (/parse-insn-format): New arg `verify?', all callers updated.

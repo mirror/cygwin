@@ -128,7 +128,7 @@
 ; CODE is a string of C code.
 
 (define (cx:make mode code)
-  (make <c-expr> (mode:lookup mode) code nil)
+  (make <c-expr> (mode-maybe-lookup mode) code nil)
 )
 
 ; Make copy of CX in new mode MODE.
@@ -141,7 +141,7 @@
 ; Same as cx:make except with attributes.
 
 (define (cx:make-with-atlist mode code atlist)
-  (make <c-expr> (mode:lookup mode) code atlist)
+  (make <c-expr> (mode-maybe-lookup mode) code atlist)
 )
 
 ; Return a boolean indicated if X is a <c-expr> object.
@@ -270,8 +270,8 @@
 ; Build an estate for use in generating C.
 ; CONTEXT is a <context> object or #f if there is none.
 ; OWNER is the owner of the expression or #f if there is none.
-; EXTRA-VARS-ALIST is an association list of (symbol <mode> value)
-; elements to be used during value lookup.
+; EXTRA-VARS-ALIST is an association list of
+; (symbol <mode>-or-mode-name value) elements to be used during value lookup.
 ; OVERRIDES is a #:keyword/value list of parameters to apply last.
 
 (define (estate-make-for-rtl-c context owner extra-vars-alist
@@ -302,6 +302,7 @@
 
 ; Translate RTL expression EXPR to C.
 ; ESTATE is the current rtx evaluation state.
+; MODE is a <mode> object.
 
 (define (rtl-c-with-estate estate mode expr)
   (cx:c (rtl-c-get estate mode (rtx-eval-with-estate expr mode estate)))
@@ -310,8 +311,9 @@
 ; Translate parsed RTL expression X to a string of C code.
 ; X must have already been fed through rtx-parse/rtx-compile.
 ; MODE is the desired mode of the value or DFLT for "natural mode".
-; EXTRA-VARS-ALIST is an association list of extra (symbol <mode> value)
-; elements to be used during value lookup.
+; MODE is a <mode> object.
+; EXTRA-VARS-ALIST is an association list of extra
+; (symbol <mode>-or-mode-name value) elements to be used during value lookup.
 ; OVERRIDES is a #:keyword/value list of arguments to build the eval state
 ; with.
 ; ??? Maybe EXTRA-VARS-ALIST should be handled this way.
@@ -322,6 +324,7 @@
 )
 
 ; Same as rtl-c-parsed but X is unparsed.
+; MODE is a <mode> object.
 
 (define (rtl-c mode x extra-vars-alist . overrides)
   ; ??? rtx-compile could return a closure, then we wouldn't have to
@@ -331,12 +334,14 @@
 )
 
 ; Same as rtl-c-with-estate except return a <c-expr> object.
+; MODE is a <mode> object.
 
 (define (rtl-c-expr-with-estate estate mode expr)
   (rtl-c-get estate mode (rtx-eval-with-estate expr mode estate))
 )
 
 ; Same as rtl-c-parsed except return a <c-expr> object.
+; MODE is a <mode> object.
 
 (define (rtl-c-expr-parsed mode x extra-vars-alist . overrides)
   (let ((estate (estate-make-for-normal-rtl-c extra-vars-alist overrides)))
@@ -344,6 +349,7 @@
 )
 
 ; Same as rtl-c-expr-parsed but X is unparsed.
+; MODE is a <mode> object.
 
 (define (rtl-c-expr mode x extra-vars-alist . overrides)
   ; ??? rtx-compile could return a closure, then we wouldn't have to
@@ -372,6 +378,7 @@
 ; Translate parsed RTL expression X to a string of C++ code.
 ; X must have already been fed through rtx-parse/rtx-compile.
 ; MODE is the desired mode of the value or DFLT for "natural mode".
+; MODE is a <mode> object.
 ; EXTRA-VARS-ALIST is an association list of extra (symbol <mode> value)
 ; elements to be used during value lookup.
 ; OVERRIDES is a #:keyword/value list of arguments to build the eval state
@@ -384,6 +391,7 @@
 )
 
 ; Same as rtl-c-parsed but X is unparsed.
+; MODE is a <mode> object.
 
 (define (rtl-c++ mode x extra-vars-alist . overrides)
   ; ??? rtx-compile could return a closure, then we wouldn't have to
@@ -396,6 +404,7 @@
 
 ; Return a <c-expr> node to get the value of SRC in mode MODE.
 ; ESTATE is the current rtl evaluation state.
+; MODE is a <mode> object.
 ; SRC is one of:
 ; - <c-expr> node
 ; - rtl expression (e.g. '(add WI dr sr))
@@ -412,7 +421,7 @@
 ; ??? mode compatibility checks are wip
 
 (define (/rtl-c-get estate mode src)
-  (let ((mode (mode:lookup mode)))
+  (let ((mode mode)) ;;(mode:lookup mode)))
 
     (cond ((c-expr? src)
 	   (cond ((or (mode:eq? 'VOID mode)
@@ -488,18 +497,22 @@
 	  (else (estate-error estate "/rtl-c-get: invalid argument" src))))
 )
 
+;; MODE is either a <mode> object or the mode name.
+
 (define (rtl-c-get estate mode src)
-  (logit 4 (spaces (estate-depth estate))
-	 "(rtl-c-get " (mode-real-name mode) " " (rtx-strdump src) ")\n")
-  (let ((result (/rtl-c-get estate mode src)))
+  (let ((mode (mode-maybe-lookup mode)))
     (logit 4 (spaces (estate-depth estate))
-	   "(rtl-c-get " (mode-real-name mode) " " (rtx-strdump src) ") => "
-	   (cx:c result) "\n")
-    result)
+	   "(rtl-c-get " (mode-real-name mode) " " (rtx-strdump src) ")\n")
+    (let ((result (/rtl-c-get estate mode src)))
+      (logit 4 (spaces (estate-depth estate))
+	     "(rtl-c-get " (mode-real-name mode) " " (rtx-strdump src) ") => "
+	     (cx:c result) "\n")
+      result))
 )
 
 ; Return a <c-expr> object to set the value of DEST to SRC.
 ; ESTATE is the current rtl evaluation state.
+; MODE is either a <mode> object or the mode name.
 ; DEST is one of:
 ; - <c-expr> node
 ; - rtl expression (e.g. '(mem QI dr))
@@ -508,14 +521,15 @@
 
 (define (rtl-c-set-quiet estate mode dest src)
   ;(display (list 'rtl-c-set-quiet mode dest src)) (newline)
-  (let ((xdest (cond ((c-expr? dest)
-		      dest)
-		     ((rtx? dest)
-		      (rtx-eval-with-estate dest mode estate))
-		     (else
-		      (estate-error estate
-				    "rtl-c-set-quiet: invalid dest"
-				    dest)))))
+  (let* ((mode (mode-maybe-lookup mode))
+	 (xdest (cond ((c-expr? dest)
+		       dest)
+		      ((rtx? dest)
+		       (rtx-eval-with-estate dest mode estate))
+		      (else
+		       (estate-error estate
+				     "rtl-c-set-quiet: invalid dest"
+				     dest)))))
     (if (not (object? xdest))
 	(estate-error estate "rtl-c-set-quiet: invalid dest" dest))
     (let ((mode (if (mode:eq? 'DFLT mode)
@@ -528,6 +542,7 @@
 )
 
 ; Same as rtl-c-set-quiet except also print TRACE_RESULT message.
+; MODE is either a <mode> object or the mode name.
 ; ??? One possible change is to defer the (rtl-c-get src) call to dest's
 ; set handler.  Such sources would be marked accordingly and rtl-c-get
 ; would recognize them.  This would allow, for example, passing the address
@@ -535,14 +550,15 @@
 
 (define (rtl-c-set-trace estate mode dest src)
   ;(display (list 'rtl-c-set-trace mode dest src)) (newline)
-  (let ((xdest (cond ((c-expr? dest)
-		      dest)
-		     ((rtx? dest)
-		      (rtx-eval-with-estate dest mode estate))
-		     (else
-		      (estate-error estate
-				    "rtl-c-set-trace: invalid dest"
-				    dest)))))
+  (let* ((mode (mode-maybe-lookup mode))
+	 (xdest (cond ((c-expr? dest)
+		       dest)
+		      ((rtx? dest)
+		       (rtx-eval-with-estate dest mode estate))
+		      (else
+		       (estate-error estate
+				     "rtl-c-set-trace: invalid dest"
+				     dest)))))
     (if (not (object? xdest))
 	(estate-error estate "rtl-c-set-trace: invalid dest" dest))
     (let ((mode (if (mode:eq? 'DFLT mode)
@@ -567,6 +583,7 @@
 )
 
 ; Support for explicit C/C++ code.
+; MODE is the mode name.
 ; ??? Actually, "support for explicit foreign language code".
 ; s-c-call needs a better name but "unspec" seems like obfuscation.
 ; ??? Need to distinguish owner of call (cpu, ???).
@@ -603,6 +620,7 @@
 ; Same as c-call except there is no particular owner of the call.
 ; In general this means making a call to a non-member function,
 ; whereas c-call makes calls to member functions (in C++ parlance).
+; MODE is the mode name.
 
 (define (s-c-raw-call estate mode name . args)
   (cx:make mode
@@ -648,6 +666,7 @@
 )
 
 ; One operand referenced, result is in same mode.
+; MODE is the mode name.
 
 (define (s-unop estate name c-op mode src)
   (let* ((val (rtl-c-get estate mode src))
@@ -673,6 +692,7 @@
 )
 
 ; Two operands referenced in the same mode producing a result in the same mode.
+; MODE is the mode name.
 ; If MODE is DFLT, use the mode of SRC1.
 ;
 ; ??? Will eventually want to handle floating point modes specially.  Since
@@ -713,6 +733,7 @@
 )
 
 ; Same as s-binop except there's a third argument which is always one bit.
+; MODE is the mode name.
 
 (define (s-binop-with-bit estate name mode src1 src2 src3)
   (let* ((val1 (rtl-c-get estate mode src1))
@@ -732,6 +753,7 @@
 
 ; Shift operations are slightly different than binary operations:
 ; the mode of src2 is any integral mode.
+; MODE is the mode name.
 ; ??? Note that some cpus have a signed shift left that is semantically
 ; different from a logical one.  May need to create `sla' some day.  Later.
 
@@ -771,6 +793,7 @@
 
 ; Process andif, orif.
 ; SRC1 and SRC2 have any arithmetic mode.
+; MODE is the mode name.
 ; The result has mode BI.
 ; ??? May want to use INT as BI may introduce some slowness
 ; in the generated code.
@@ -795,6 +818,7 @@
 )
 
 ; Mode conversions.
+; MODE is the mode name.
 
 (define (s-convop estate name mode s1)
   ; Get S1 in its normal mode, then convert.
@@ -822,8 +846,10 @@
 				    " (" (cx:c s) ")")))))
 )
 
-; Compare SRC1 and SRC2 in mode MODE.  The result has mode BI.
+; Compare SRC1 and SRC2 in mode MODE.
 ; NAME is one of eq,ne,lt,le,gt,ge,ltu,leu,gtu,geu.
+; MODE is the mode name.
+; The result has mode BI.
 ; ??? May want a host int mode result as BI may introduce some slowness
 ; in the generated code.
 
@@ -866,6 +892,7 @@
 ; We support both: one with a result (non VOID mode), and one without (VOID mode).
 ; The non-VOID case must have an else part.
 ; MODE is the mode of the result, not the comparison.
+; MODE is the mode name.
 ; The comparison is expected to return a zero/non-zero value.
 ; ??? Perhaps this should be a syntax-expr.  Later.
 
@@ -897,6 +924,7 @@
 )
 
 ; A multiway `if'.
+; MODE is the mode name.
 ; If MODE is VOID emit a series of if/else's.
 ; If MODE is not VOID, emit a series of ?:'s.
 ; COND-CODE-LIST is a list of lists, each sublist is a list of two elements:
@@ -994,6 +1022,7 @@
 )
 
 ; Utility of s-case-non-vm to generate code to perform the test.
+; MODE is the mode name.
 
 (define (/gen-non-vm-case-test estate mode test cases)
   (assert (not (null? cases)))
@@ -1023,6 +1052,7 @@
 
 ; Utility of s-case to handle a non-void result.
 ; This is expanded as a series of ?:'s.
+; MODE is the mode name.
 
 (define (s-case-non-vm estate mode test case-list)
   (let ((if-part "(")
@@ -1067,6 +1097,7 @@
 
 ; C switch statement
 ; To follow convention, MODE is the first arg.
+; MODE is the mode name.
 ; FIXME: What to allow for case choices is wip.
 
 (define (s-case estate mode test . case-list)
@@ -1199,6 +1230,7 @@
 )
 
 ; Return a <c-expr> node for a `sequence'.
+; MODE is the mode name.
 
 (define (s-sequence estate mode env . exprs)
   (let* ((env (rtx-env-make-locals env)) ; compile env
@@ -1288,6 +1320,7 @@
 )
 
 ; The rest of this file is one big function to return the rtl->c lookup table.
+; For each of these functions, MODE is the name of the mode.
 
 (define (rtl-c-build-table)
   (let ((table (make-vector (rtx-max-num) #f)))
@@ -1411,7 +1444,7 @@
 
 ; ??? Maybe this should return an operand object.
 (define-fn index-of (estate options mode op)
-  (send (op:index (rtx-eval-with-estate op 'DFLT estate)) 'cxmake-get estate 'DFLT)
+  (send (op:index (rtx-eval-with-estate op DFLT estate)) 'cxmake-get estate 'DFLT)
 )
 
 (define-fn clobber (estate options mode object)
@@ -1444,7 +1477,8 @@
 	 ;; update cpu-global pipeline bound
 	 (cpu-set-max-delay! (current-cpu) (max (cpu-max-delay (current-cpu)) new-delay))      
 	 ;; pass along new delay to embedded rtx
-	 (rtx-eval-with-estate rtx mode (estate-with-modifiers estate `((#:delay ,new-delay)))))))
+	 (rtx-eval-with-estate rtx (mode:lookup mode)
+			       (estate-with-modifiers estate `((#:delay ,new-delay)))))))
 
     ;; not in sid-land
     (else (s-sequence (estate-with-modifiers estate '((#:delay))) VOID '() rtx)))

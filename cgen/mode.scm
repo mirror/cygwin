@@ -104,21 +104,21 @@
 
 (define cmode-elm-modes (elm-make-getter <concat-mode> 'elm-modes))
 
-; List of all modes.
+;; Table of all modes.
+(define /mode-table nil)
 
-(define mode-list nil)
-
-; Return list of mode objects.
-; Hides the fact that its stored as an alist from caller.
-
-(define (mode-list-values) (map cdr mode-list))
+;; This exists to simplify mode-find.
+(define /mode-class-table nil)
 
 ; Return list of real mode objects (no aliases).
 
 (define (mode-list-non-alias-values)
-  (map cdr
-       (find (lambda (m) (eq? (car m) (obj:name (cdr m))))
-	     mode-list))
+  (hash-fold (lambda (key value prior)
+	       (if (eq? key (obj:name value))
+		   (append value prior)
+		   prior))
+	     '()
+	     /mode-table)
 )
 
 ; Return a boolean indicating if X is a <mode> object.
@@ -134,10 +134,11 @@
 ; Return a boolean indicating if MODE1 is equal to MODE2
 ; Either may be the name of a mode or a <mode> object.
 ; Aliases are handled by refering to their real name.
+; ??? Might be useful to restrict this to <mode> objects only.
 
 (define (mode:eq? mode1 mode2)
-  (let ((mode1-name (mode-real-name mode1))
-	(mode2-name (mode-real-name mode2)))
+  (let ((mode1-name (mode-real-name (mode-maybe-lookup mode1)))
+	(mode2-name (mode-real-name (mode-maybe-lookup mode2))))
     (eq? mode1-name mode2-name))
 )
 
@@ -180,8 +181,8 @@
 ; numeric: modes must be both numeric
 
 (define (mode-compatible? how mode1 mode2)
-  (let ((m1 (mode:lookup mode1))
-	(m2 (mode:lookup mode2)))
+  (let ((m1 (mode-maybe-lookup mode1))
+	(m2 (mode-maybe-lookup mode2)))
     (case how
       ((strict)
        (eq? (obj:name m1) (obj:name m2)))
@@ -202,7 +203,7 @@
       (else (error "bad `how' arg to mode-compatible?" how))))
 )
 
-; Add MODE named NAME to the list of recognized modes.
+; Add MODE named NAME to the table of recognized modes.
 ; If NAME is already present, replace it with MODE.
 ; MODE is a mode object.
 ; NAME exists to allow aliases of modes [e.g. WI, UWI, AI, IAI].
@@ -211,11 +212,18 @@
 ; That is up to the caller.
 
 (define (mode:add! name mode)
-  (let ((entry (assq name mode-list)))
-    (if entry
-	(set-cdr! entry mode)
-	(set! mode-list (acons name mode mode-list)))
-    mode)
+  (hashq-set! /mode-table name mode)
+
+  ;; Add the mode to its mode class.
+  ;; There's no point in building this list in any particular order,
+  ;; if the user adds some they could be of any size.
+  ;; So build the list the simple way (in reverse).
+  ;; The list is sorted in mode-finish!.
+  (let ((class (mode:class mode)))
+    (hashq-set! /mode-class-table class
+		(cons mode (hashq-ref /mode-class-table class))))
+
+  *UNSPECIFIED*
 )
 
 ; Parse a mode.
@@ -258,40 +266,52 @@
 ; Return the found object or #f.
 ; If X is already a mode object, return that.
 
-(define (mode:lookup x)
-  (if (mode? x)
-      x
-      (let ((result (assq x mode-list)))
-	(if result
-	    (cdr result)
-	    #f)))
+(define (mode:lookup mode-name)
+;  (if (mode? x)
+;      x
+;      (let ((result (assq x mode-list)))
+;	(if result
+;	    (cdr result)
+;	    #f)))
+  (hashq-ref /mode-table mode-name)
+)
+
+;; Same as mode:lookup except MODE is either the mode name or a <mode> object.
+
+(define (mode-maybe-lookup mode)
+  (if (symbol? mode)
+      (hashq-ref /mode-table mode)
+      mode)
 )
 
 ; Return a boolean indicating if X is a valid mode name.
 
 (define (mode-name? x)
   (and (symbol? x)
-       ; FIXME: Time to make `mode-list' a hash table.
-       (->bool (assq x mode-list)))
+       (->bool (mode:lookup x)))
 )
 
-; Return the name of the real mode of M.
+; Return the name of the real mode of MODE, a <mode> object.
 ; This is a no-op unless M is an alias in which case we return the
 ; real mode of the alias.
 
-(define (mode-real-name m)
-  (obj:name (mode:lookup m))
+(define (mode-real-name mode)
+  (obj:name mode)
 )
 
-; Return the real mode of M.
+; Return the real mode of MODE, a <mode> object.
 ; This is a no-op unless M is an alias in which case we return the
 ; real mode of the alias.
 
-(define (mode-real-mode m)
-  (mode:lookup (mode-real-name m))
+(define (mode-real-mode mode)
+  ;; Lookups of aliases return its real mode, so this function is a no-op.
+  ;; But that's an implementation detail, so I'm not ready to delete this
+  ;; function.
+  mode
 )
 
 ; Return the version of MODE to use in semantic expressions.
+; MODE is a <mode> object.
 ; This (essentially) converts aliases to their real value and then uses
 ; mode:sem-mode.  The implementation is the opposite but the effect is the
 ; same.
@@ -299,34 +319,33 @@
 ; disallow unsigned modes from being aliased and set sem-mode for aliased
 ; modes.
 
-(define (mode-sem-mode m)
-  (let* ((m1 (mode:lookup m))
-	 (sm (mode:sem-mode m1)))
+(define (mode-sem-mode mode)
+  (let ((sm (mode:sem-mode mode)))
     (if sm
 	sm
-	(mode-real-mode m1)))
+	(mode-real-mode mode)))
 )
 
-; Return #t if mode M1-NAME is bigger than mode M2-NAME.
+; Return #t if mode M1 is bigger than mode M2.
+; Both are <mode> objects.
 
-(define (mode-bigger? m1-name m2-name)
-  (> (mode:bits (mode:lookup m1-name))
-     (mode:bits (mode:lookup m2-name)))
+(define (mode-bigger? m1 m2)
+  (> (mode:bits m1)
+     (mode:bits m2))
 )
 
 ; Return a mode in mode class CLASS wide enough to hold BITS.
 ; This ignores "host" modes (e.g. INT,UINT).
 
 (define (mode-find bits class)
-  (let ((modes (find (lambda (mode)
-		       (and (eq? (mode:class (cdr mode)) class)
-			    (not (mode:host? (cdr mode)))))
-		     mode-list)))
+  (let* ((class-modes (hashq-ref /mode-class-table class))
+	 (modes (find (lambda (mode) (not (mode:host? mode)))
+		      (or class-modes nil))))		     
     (if (null? modes)
 	(error "invalid mode class" class))
     (let loop ((modes modes))
       (cond ((null? modes) (error "no modes for bits" bits))
-	    ((<= bits (mode:bits (cdar modes))) (cdar modes))
+	    ((<= bits (mode:bits (car modes))) (car modes))
 	    (else (loop (cdr modes))))))
 )
 
@@ -421,10 +440,10 @@
 	  (set! UWI uword-mode)
 	  (set! AI uword-mode)
 	  (set! IAI uword-mode)
-	  (assq-set! mode-list 'WI word-mode)
-	  (assq-set! mode-list 'UWI uword-mode)
-	  (assq-set! mode-list 'AI uword-mode)
-	  (assq-set! mode-list 'IAI uword-mode)
+	  (hashq-set! /mode-table 'WI word-mode)
+	  (hashq-set! /mode-table 'UWI uword-mode)
+	  (hashq-set! /mode-table 'AI uword-mode)
+	  (hashq-set! /mode-table 'IAI uword-mode)
 	  ))
     )
 )
@@ -451,7 +470,7 @@
 ; and before any ifields, hardware, operand or insns have been read.
 
 (define (mode-ensure-word-sizes-defined)
-  (if (eq? (mode-real-name WI) 'VOID)
+  (if (eq? (obj:name WI) 'VOID)
       (error "word sizes must be defined"))
 )
 
@@ -468,6 +487,20 @@
 ; Variable sized portable ints.
 (define INT #f)
 (define UINT #f)
+
+;; Sort the modes for each class.
+
+(define (/sort-mode-classes!)
+  (for-each (lambda (class-name)
+	      (hashq-set! /mode-class-table class-name
+			  (sort (hashq-ref /mode-class-table class-name)
+				(lambda (a b)
+				  (< (mode:bits a)
+				     (mode:bits b))))))
+	    '(RANDOM INT UINT FLOAT))
+
+  *UNSPECIFIED*
+)
 
 (define (mode-init!)
   (set! /mode-word-sizes-kind 'IDENTICAL)
@@ -490,7 +523,13 @@ Define a mode, all arguments specified.
   ;             Elsewhere, functions are defined to perform the operation.
   (define-attr '(for mode) '(type boolean) '(name FN-SUPPORT))
 
-  (set! mode-list nil)
+  (set! /mode-class-table (make-hash-table 7))
+  (hashq-set! /mode-class-table 'RANDOM '())
+  (hashq-set! /mode-class-table 'INT '())
+  (hashq-set! /mode-class-table 'UINT '())
+  (hashq-set! /mode-class-table 'FLOAT '())
+
+  (set! /mode-table (make-hash-table 41))
 
   (let ((dfm define-full-mode))
     ; This list must be defined in order of increasing size among each type.
@@ -555,18 +594,27 @@ Define a mode, all arguments specified.
   (set! UINT (mode:lookup 'UINT))
 
   ; While setting the real values of WI/UWI/AI/IAI is defered to
-  ; mode-set-word-modes!, create entries in the list.
-  (set! WI (mode:add! 'WI (mode:lookup 'VOID)))
-  (set! UWI (mode:add! 'UWI (mode:lookup 'VOID)))
-  (set! AI (mode:add! 'AI (mode:lookup 'VOID)))
-  (set! IAI (mode:add! 'IAI (mode:lookup 'VOID)))
+  ; mode-set-word-modes!, create entries in the table.
+  (set! WI VOID)
+  (set! UWI VOID)
+  (set! AI VOID)
+  (set! IAI VOID)
+  (mode:add! 'WI VOID)
+  (mode:add! 'UWI VOID)
+  (mode:add! 'AI VOID)
+  (mode:add! 'IAI VOID)
 
-  ; Keep the fields sorted for mode-find.
-  (set! mode-list (reverse mode-list))
+  ;; Need to have usable mode classes at this point as define-cpu
+  ;; calls mode-set-word-modes!.
+  (/sort-mode-classes!)
 
   *UNSPECIFIED*
 )
 
 (define (mode-finish!)
+  ;; FIXME: mode:add! should keep the class sorted.
+  ;; It's a cleaner way to handle modes from the .cpu file.
+  (/sort-mode-classes!)
+
   *UNSPECIFIED*
 )

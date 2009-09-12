@@ -90,6 +90,8 @@
 		expr
 
 		; Local variables of the sequence `expr' is in.
+		; This is recorded in the same form as the sequence,
+		; i.e. (MODE name).
 		locals
 
 		; Ordinal of the statement.
@@ -108,7 +110,7 @@
 		; Users of this statement.
 		; Each element is (owner-number . owner-object),
 		; where owner-number is an index into the initial insn table
-		; (e.g. insn-list arg of sfrag-create-cse-mapping), and
+		; (e.g. insn-list arg of /sfrag-create-cse-mapping), and
 		; owner-object is the corresponding object.
 		users
 		)
@@ -170,6 +172,8 @@
 	(loop (cdr chars) (modulo (+ (* result 7) (car chars)) #xfffffff))))
 )
 
+;; MODE is the name of the mode.
+
 (define (/frag-hash-compute! rtx-obj expr mode parent-expr op-pos tstate appstuff)
   (let ((h 0))
     (case (rtx-name expr)
@@ -204,6 +208,8 @@
 
 (define /frag-speed-cost-tmp 0)
 (define /frag-size-cost-tmp 0)
+
+;; MODE is the name of the mode.
 
 (define (/frag-cost-compute! rtx-obj expr mode parent-expr op-pos tstate appstuff)
   ; FIXME: wip
@@ -258,6 +264,17 @@
 ; The result is in assq'able form.
 
 (define (/frag-expr-locals expr)
+  (if (rtx-kind? 'sequence expr)
+      (rtx-sequence-locals expr)
+      nil)
+)
+
+; Return the locals in EXPR in assq-able form, i.e. (name MODE).
+; If a sequence, return locals.
+; Otherwise, return nil.
+; The result is in assq'able form.
+
+(define (/frag-expr-assq-locals expr)
   (if (rtx-kind? 'sequence expr)
       (rtx-sequence-assq-locals expr)
       nil)
@@ -895,7 +912,7 @@
 			     (mode:eq? (cadr l1) (cadr l2)))))
 	)
     (for-each (lambda (expr)
-		(let ((locals (/frag-expr-locals expr)))
+		(let ((locals (/frag-expr-assq-locals expr)))
 		  (for-each (lambda (local)
 			      (let ((entry (lookup-local local result)))
 				(if (and entry
@@ -980,7 +997,7 @@
    insn-list)
 )
 
-; Subroutine of sfrag-create-cse-mapping to compute INSN's fragment list.
+; Subroutine of /sfrag-create-cse-mapping to compute INSN's fragment list.
 ; FRAG-USAGE is a vector of 3 elements: #(header middle trailer).
 ; Each element is a fragment number or #f if not present.
 ; Numbers in FRAG-USAGE are indices relative to their respective subtables
@@ -1043,7 +1060,7 @@
     (cdr result))
 )
 
-; Subroutine of sfrag-create-cse-mapping to find the fragment number of the
+; Subroutine of /sfrag-create-cse-mapping to find the fragment number of the
 ; x-header/x-trailer virtual frags.
 
 (define (/frag-lookup-virtual frag-list name)
@@ -1061,7 +1078,7 @@
 ; - table mapping used fragments for each insn (a list)
 ; - locals list
 
-(define (sfrag-create-cse-mapping insn-list)
+(define (/sfrag-create-cse-mapping insn-list)
   (logit 1 "Creating semantic fragments for pbb engine ...\n")
 
   (let ((cse-data (sem-find-common-frags insn-list)))
@@ -1186,7 +1203,7 @@
   (if (not /sim-sfrag-init?)
       (begin
 	(set! /sim-sfrag-insn-list (non-multi-insns (non-alias-insns (current-insn-list))))
-	(let ((frag-data (sfrag-create-cse-mapping /sim-sfrag-insn-list)))
+	(let ((frag-data (/sfrag-create-cse-mapping /sim-sfrag-insn-list)))
 	  (set! /sim-sfrag-frag-table (vector-ref frag-data 0))
 	  (set! /sim-sfrag-usage-table (vector-ref frag-data 1))
 	  (set! /sim-sfrag-locals-list (vector-ref frag-data 2)))

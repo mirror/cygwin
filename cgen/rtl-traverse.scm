@@ -31,6 +31,7 @@
 ; It is applied recursively to the expression and each sub-expression.
 ; It must be defined as
 ; (lambda (rtx-obj expr mode parent-expr op-pos tstate appstuff) ...).
+; MODE is the name of the mode.
 ; If the result of EXPR-FN is a lambda, it is applied to
 ; (cons TSTATE (cdr EXPR)).  TSTATE is prepended to the arguments.
 ; For syntax expressions if the result of EXPR-FN is #f, the operands are
@@ -1023,7 +1024,7 @@
 ; RTX expression evaluator.
 ;
 ; EXPR is the expression to be eval'd.  It must be in compiled form.
-; MODE is the mode of EXPR, a <mode> object or its name.
+; MODE is the mode of EXPR, a <mode> object.
 ; ESTATE is the current evaluation state.
 
 (define (rtx-eval-with-estate expr mode estate)
@@ -1066,5 +1067,5 @@
 ; FIXME: context?
 
 (define (rtx-value expr owner)
-  (rtx-eval-with-estate expr 'DFLT (estate-make-for-eval #f owner))
+  (rtx-eval-with-estate expr DFLT (estate-make-for-eval #f owner))
 )

@@ -208,7 +208,7 @@
 (define <hw-asm>
   (class-make '<hw-asm> '(<ident>)
 	      '(
-		; The mode to use.
+		; The <mode> object of the mode to use.
 		; A copy of the object's mode if we're in the "values"
 		; member.  If we're in the "indices" member this is typically
 		; UINT.
@@ -255,7 +255,7 @@
 ; The syntax of VALUES is: (prefix ((name1 [value1 [(attr-list1)]]) ...))
 ; NAME-PREFIX is a prefix added to each value's name in the generated
 ; lookup table.
-; Each value is a number of mode MODE.
+; Each value is a number of mode MODE, the name of the mode.
 ; ??? We have no problem handling any kind of number, we're Scheme.
 ; However, it's not clear yet how applications will want to handle it, but
 ; that is left to the application.  Still, it might be preferable to impose
@@ -300,7 +300,7 @@
 	(name #f)
 	(comment "")
 	(attrs nil)
-	(mode INT)
+	(mode 'INT)
 	(enum-prefix #f) ;; #f indicates "not set"
 	(name-prefix "")
 	(values nil)
@@ -390,6 +390,7 @@
 ; Parse an inline keyword spec.
 ; These are keywords defined inside something else.
 ; CONTAINER is the <ident> object of the container.
+; MODE is the name of the mode.
 
 (define (/hw-parse-keyword context args container mode)
   (if (!= (length args) 2)
@@ -413,14 +414,14 @@
 ; Parse an indices spec.
 ; CONTAINER is the <ident> object of the container.
 ; Currently there is only special support for keywords.
-; Otherwise MODE is used.
+; Otherwise MODE is used.  MODE is the name, not a <mode> object.
 ; The syntax is: (keyword keyword-spec) - see <keyword> for details.
 
 (define (/hw-parse-indices context indices container mode)
   (if (null? indices)
       (make <hw-asm>
 	(obj:name container) (obj:comment container) (obj-atlist container)
-	mode)
+	(parse-mode-name (context-append context ": mode") mode))
       (begin
 	(if (not (list? indices))
 	    (parse-error context "invalid indices spec" indices))
@@ -441,14 +442,14 @@
 ; Parse a values spec.
 ; CONTAINER is the <ident> object of the container.
 ; Currently there is only special support for keywords.
-; Otherwise MODE is used.
+; Otherwise MODE is used.  MODE is the name, not a <mode> object.
 ; The syntax is: (keyword keyword-spec) - see <keyword> for details.
 
 (define (/hw-parse-values context values container mode)
   (if (null? values)
       (make <hw-asm>
 	(obj:name container) (obj:comment container) (obj-atlist container)
-	mode)
+	(parse-mode-name (context-append context ": mode") mode))
       (begin
 	(if (not (list? values))
 	    (parse-error context "invalid values spec" values))
@@ -887,10 +888,10 @@
 		   (/hw-create-setter-from-layout context layout width)))
 	 ))
 
-   (elm-set! self 'indices (/hw-parse-indices context indices self UINT))
+   (elm-set! self 'indices (/hw-parse-indices context indices self 'UINT))
    (elm-set! self 'values (/hw-parse-values context values self
-					    (send (elm-get self 'type)
-						  'get-mode)))
+					    (obj:name (send (elm-get self 'type)
+							    'get-mode))))
    (elm-set! self 'handlers (/hw-parse-handlers context handlers))
    (elm-set! self 'get (/hw-parse-getter context getter (hw-scalar? self)))
    (elm-set! self 'set (/hw-parse-setter context setter (hw-scalar? self)))
@@ -1003,10 +1004,10 @@
        (parse-error context "layout specified for memory" values))
    (elm-set! self 'type (parse-type context type))
    ; Setting INDICES,VALUES here is mostly for experimentation at present.
-   (elm-set! self 'indices (/hw-parse-indices context indices self AI))
+   (elm-set! self 'indices (/hw-parse-indices context indices self 'AI))
    (elm-set! self 'values (/hw-parse-values context values self
-					    (send (elm-get self 'type)
-						  'get-mode)))
+					    (obj:name (send (elm-get self 'type)
+							    'get-mode))))
    (elm-set! self 'handlers (/hw-parse-handlers context handlers))
    (elm-set! self 'get (/hw-parse-getter context getter (hw-scalar? self)))
    (elm-set! self 'set (/hw-parse-setter context setter (hw-scalar? self)))
@@ -1055,8 +1056,8 @@
    (if (not (null? layout))
        (parse-error context "layout specified for immediate" values))
    (elm-set! self 'values (/hw-parse-values context values self
-					    (send (elm-get self 'type)
-						  'get-mode)))
+					    (obj:name (send (elm-get self 'type)
+							    'get-mode))))
    (elm-set! self 'handlers (/hw-parse-handlers context handlers))
    (if (not (null? getter))
        (parse-error context "getter specified for immediate" getter))
@@ -1113,8 +1114,8 @@
    (if (not (null? layout))
        (parse-error context "layout specified for address" values))
    (elm-set! self 'values (/hw-parse-values context values self
-					    (send (elm-get self 'type)
-						  'get-mode)))
+					    (obj:name (send (elm-get self 'type)
+							    'get-mode))))
    (elm-set! self 'handlers (/hw-parse-handlers context handlers))
    (if (not (null? getter))
        (parse-error context "getter specified for address" getter))

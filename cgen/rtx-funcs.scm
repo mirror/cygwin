@@ -126,7 +126,7 @@
 ;(dron (opspec: &options &mode op-name op-num hw-ref attrs)
 ;      (OPTIONS ANYMODE SYMBOL NUMBER RTX ATTRS) (NA NA NA NA ANY NA)
 ;      ARG
-;      (let ((opval (rtx-eval-with-estate hw-ref mode *estate*)))
+;      (let ((opval (rtx-eval-with-estate hw-ref (mode:lookup &mode) *estate*)))
 ;	(assert (operand? opval))
 ;	; Set the specified mode, ensuring it's ok.
 ;	; This also makes a copy as we don't want to modify predefined
@@ -186,7 +186,7 @@
 (dron (index-of &options &mode op-rtx)
       (OPTIONS DFLTMODE RTX) (NA NA ANY)
       ARG
-      (let* ((operand (rtx-eval-with-estate op-rtx 'DFLT *estate*))
+      (let* ((operand (rtx-eval-with-estate op-rtx DFLT *estate*))
 	     (f (hw-index:value (op:index operand)))
 	     (f-name (obj:name f)))
 	(make <operand> (if (source-ident? f) (obj-location f) #f)

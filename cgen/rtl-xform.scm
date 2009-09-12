@@ -116,6 +116,7 @@
 
 ; Subroutine of rtx-simplify.
 ; This is the EXPR-FN argument to rtx-traverse.
+; MODE is the name of the mode.
 
 (define (/rtx-simplify-expr-fn rtx-obj expr mode parent-expr op-pos
 			       tstate appstuff)
@@ -324,6 +325,7 @@
 
 ; Subroutine of rtx-solve.
 ; This is the EXPR-FN argument to rtx-traverse.
+; MODE is the name of the mode.
 
 (define (/solve-expr-fn rtx-obj expr mode parent-expr op-pos tstate appstuff)
   #f ; wip
@@ -417,6 +419,21 @@
 
 ;; rtx-compile (and supporting cast)
 
+;; Subroutine of rtx-compile.
+;; This is the tstate-expr-fn.
+;; MODE is the name of the mode.
+
+(define (/compile-expr-fn rtx-obj expr mode parent-expr op-pos tstate appstuff)
+; (cond 
+; The intent of this is to handle sequences/closures, but is it needed?
+;  ((rtx-style-syntax? rtx-obj)
+;   ((rtx-evaluator rtx-obj) rtx-obj expr mode
+;			     parent-expr op-pos tstate))
+;  (else
+  (cons (car expr) ; rtx-obj
+	(/rtx-traverse-operands rtx-obj expr tstate appstuff))
+)
+
 ; Convert rtl expression EXPR from source form to compiled form.
 ; The expression is validated and rtx macros are expanded as well.
 ; CONTEXT is a <context> object or #f if there is none.
@@ -429,17 +446,6 @@
 ;
 ; ??? In the future the compiled form may be the same as the source form
 ; except that all elements would be converted to their respective objects.
-
-(define (/compile-expr-fn rtx-obj expr mode parent-expr op-pos tstate appstuff)
-; (cond 
-; The intent of this is to handle sequences/closures, but is it needed?
-;  ((rtx-style-syntax? rtx-obj)
-;   ((rtx-evaluator rtx-obj) rtx-obj expr mode
-;			     parent-expr op-pos tstate))
-;  (else
-  (cons (car expr) ; rtx-obj
-	(/rtx-traverse-operands rtx-obj expr tstate appstuff))
-)
 
 (define (rtx-compile context expr extra-vars-alist)
   (/rtx-traverse expr #f 'DFLT #f 0

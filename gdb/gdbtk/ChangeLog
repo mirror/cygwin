@@ -1,3 +1,8 @@
+2009-09-16  Pierre Muller  <muller@ics.u-strasbg.fr>
+
+	* generic/gdbtk-varobj.c (variable_children): Adapt to
+	varobj_list_children function change.
+	
 2009-07-07  Pierre Muller  <muller@ics.u-strasbg.fr>
 
 	* generic/gdbtk-bp.c: Include "arch-utils.h".

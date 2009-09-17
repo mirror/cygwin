@@ -420,6 +420,9 @@ variable_children (Tcl_Interp *interp, struct varobj *var)
 
   list = Tcl_NewListObj (0, NULL);
 
+  from = -1;
+  to = -1;
+
   children = varobj_list_children (var, &from, &to);
 
   for (ix = from; ix < to && VEC_iterate (varobj_p, children, ix, child); ++ix)

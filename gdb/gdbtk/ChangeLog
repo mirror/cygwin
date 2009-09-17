@@ -1,3 +1,8 @@
+2009-09-17  Pierre Muller  <muller@ics.u-strasbg.fr>
+
+	* generic/gdbtk-varobj.c (variable_children): Initialize new locals
+	used in varobj_list_children function call.
+	
 2009-09-16  Pierre Muller  <muller@ics.u-strasbg.fr>
 
 	* generic/gdbtk-varobj.c (variable_children): Adapt to

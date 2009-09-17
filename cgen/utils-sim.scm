@@ -231,10 +231,10 @@
 	)
     (logit 4 
 	   "/sfmt-contents sfmt=" (obj:name sfmt) 
-	   " needed-iflds=" (string-map obj:str-name needed-iflds)
-	   " extracted-ops=" (string-map obj:str-name extracted-ops)
-	   " in-ops=" (string-map obj:str-name in-ops)
-	   " out-ops=" (string-map obj:str-name out-ops)
+	   " needed-iflds=" (obj-csv-names needed-iflds)
+	   " extracted-ops=" (obj-csv-names extracted-ops)
+	   " in-ops=" (obj-csv-names in-ops)
+	   " out-ops=" (obj-csv-names out-ops)
 	   "\n")
     (cons sfmt
 	  (sort

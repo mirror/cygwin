@@ -1,3 +1,8 @@
+2009-09-17  Doug Evans  <dje@sebabeach.org>
+
+	* utils-cgen.scm (obj-csv-names): New function.
+	* utils-sim.scm (/sfmt-contents): Use it in logging message.
+
 2009-09-12  Doug Evans  <dje@sebabeach.org>
 
 	Clean up pass of mode handling.

@@ -236,6 +236,16 @@
 
 (define (obj:str-name obj) (symbol->string (obj:name obj)))
 
+;; Given a list of named objects, return a string of comma-separated names.
+
+(define (obj-csv-names obj-list)
+  (string-drop1
+   (string-map (lambda (o)
+		 (string-append ","
+				(obj:str-name o)))
+	       obj-list))
+)
+
 ; Subclass of <ident> for use by description file objects.
 ;
 ; Records the source location of the object.

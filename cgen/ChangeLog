@@ -1,3 +1,7 @@
+2009-09-20  Doug Evans  <dje@sebabeach.org>
+
+	* rtl.scm (rtx-strdump): Use write instead of display.
+
 2009-09-17  Doug Evans  <dje@sebabeach.org>
 
 	* utils-cgen.scm (obj-csv-names): New function.

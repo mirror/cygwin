@@ -790,7 +790,8 @@
 (define (rtx-strdump rtx)
   (with-output-to-string
     (lambda ()
-      (display (rtx-dump rtx))))
+      ;; Use write instead of display, we want strings displayed with quotes.
+      (write (rtx-dump rtx))))
 )
 
 ; Return a boolean indicating if EXPR is known to be a compile-time constant.

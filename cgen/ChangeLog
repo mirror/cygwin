@@ -1,5 +1,7 @@
 2009-09-21  Doug Evans  <dje@sebabeach.org>
 
+	* openrisc.cpu (or32 isa): Fix setup-semantics.
+
 	* rtl.scm (rtx-class-*?): Delete, unused.
 	(rtx-style-function?, rtx-style-operand?, rtx-style-macro?): Ditto.
 

@@ -93,7 +93,7 @@
   (base-insn-bitsize 32)
 
   ; Address of insn in delay slot
-  (setup-semantics (set-quiet (reg h-delay-insn) (add pc (attr (current-insn) 4))))
+  (setup-semantics (set-quiet (reg h-delay-insn) (add pc 4)))
 )
 
 

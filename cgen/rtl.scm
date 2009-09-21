@@ -121,21 +121,7 @@
   (name args arg-types arg-modes class style evaluator num)
 )
 
-(define (rtx-class-arg? rtx) (eq? (rtx-class rtx) 'ARG))
-(define (rtx-class-set? rtx) (eq? (rtx-class rtx) 'SET)) 
-(define (rtx-class-unary? rtx) (eq? (rtx-class rtx) 'UNARY))
-(define (rtx-class-binary? rtx) (eq? (rtx-class rtx) 'BINARY))
-(define (rtx-class-trinary? rtx) (eq? (rtx-class rtx) 'TRINARY))
-(define (rtx-class-if? rtx) (eq? (rtx-class rtx) 'IF))
-(define (rtx-class-cond? rtx) (eq? (rtx-class rtx) 'COND))
-(define (rtx-class-sequence? rtx) (eq? (rtx-class rtx) 'SEQUENCE))
-(define (rtx-class-unspec? rtx) (eq? (rtx-class rtx) 'UNSPEC))
-(define (rtx-class-misc? rtx) (eq? (rtx-class rtx) 'MISC))
-
-(define (rtx-style-function? rtx) (eq? (rtx-style rtx) 'function))
 (define (rtx-style-syntax? rtx) (eq? (rtx-style rtx) 'syntax))
-(define (rtx-style-operand? rtx) (eq? (rtx-style rtx) 'operand))
-(define (rtx-style-macro? rtx) (eq? (rtx-style rtx) 'macro))
 
 ; Add standard `get-name' method since this isn't a subclass of <ident>.
 

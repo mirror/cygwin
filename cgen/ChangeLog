@@ -1,5 +1,8 @@
 2009-09-21  Doug Evans  <dje@sebabeach.org>
 
+	* rtl.scm (rtx-class-*?): Delete, unused.
+	(rtx-style-function?, rtx-style-operand?, rtx-style-macro?): Ditto.
+
 	* read.scm (/CGEN-RTL-VERSION): Initialize to #f.
 	(init-reader!): Set /CGEN-RTL-VERSION to default.
 

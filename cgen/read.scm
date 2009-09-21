@@ -72,7 +72,8 @@
 ; A list of two numbers designating the description language version.
 ; Note that this is different from /CGEN-VERSION.
 ; See section "RTL Versions" of the docs.
-(define /CGEN-RTL-VERSION '(0 7))
+(define /CGEN-RTL-VERSION #f)
+(define /default-rtl-version '(0 7))
 (define (cgen-rtl-version) /CGEN-RTL-VERSION)
 (define (cgen-rtl-major) (car /CGEN-RTL-VERSION))
 (define (cgen-rtl-minor) (cadr /CGEN-RTL-VERSION))
@@ -906,6 +907,8 @@
 (define (/init-reader!)
   (set! CURRENT-READER (new <reader>))
 
+  (set! /CGEN-RTL-VERSION /default-rtl-version)
+
   (reader-add-command! 'define-rtl-version
 		       "Specify the RTL version being used.\n"
 		       nil '(major minor) /cmd-define-rtl-version)
@@ -1086,6 +1089,11 @@ Define a preprocessor-style macro.
   (/set-diagnostic-options! diagnostic-options)
   (app-initer!)
   (logit 1 "Loading cpu description " file " ...\n")
+  (logit 1 "machs:   " keep-mach "\n")
+  (logit 1 "isas:    " keep-isa "\n")
+  (logit 1 "options: " options "\n")
+  (logit 1 "trace:   " trace-options "\n")
+  (logit 1 "diags:   " diagnostic-options "\n")
   (set! arch-path (dirname file))
   (reader-read-file! file)
   (logit 2 "Processing cpu description " file " ...\n")

@@ -126,6 +126,7 @@
   ; bash$ guile -l dev.scm
   ; guile> (load-doc)
   ; guile> (cload #:arch "./cpu/m32r.cpu")
+  (set! verbose-level 2)
   (set! APPLICATION 'DOC)
 )
 

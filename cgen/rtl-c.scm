@@ -1327,8 +1327,8 @@
 
 ; Error generation
 
-(define-fn error (estate options mode message)
-  (let ((c-call (s-c-call estate mode "cgen_rtx_error"
+(define-fn error (*estate* options mode message)
+  (let ((c-call (s-c-call *estate* mode "cgen_rtx_error"
 			  (string-append "\""
 					 (backslash "\"" message)
 					 "\""))))
@@ -1339,7 +1339,7 @@
 
 ; Enum support
 
-(define-fn enum (estate options mode name)
+(define-fn enum (*estate* options mode name)
   (cx:make mode (string-upcase (gen-c-symbol name)))
 )
 
@@ -1348,8 +1348,8 @@
 ; in semantics.scm.
 ; ??? Mode support is wip.
 
-(define-fn ifield (estate options mode ifld-name)
-  (if (estate-ifield-var? estate)
+(define-fn ifield (*estate* options mode ifld-name)
+  (if (estate-ifield-var? *estate*)
       (cx:make 'UINT (gen-c-symbol ifld-name))
       (cx:make 'UINT (string-append "FLD (" (gen-c-symbol ifld-name) ")")))
 ;  (let ((f (current-ifld-lookup ifld-name)))
@@ -1365,20 +1365,20 @@
 
 ; Operand support
 
-(define-fn operand (estate options mode object-or-name)
+(define-fn operand (*estate* options mode object-or-name)
   (cond ((operand? object-or-name)
 	 object-or-name)
 	((symbol? object-or-name)
 	 (let ((object (current-op-lookup object-or-name)))
 	   (if (not object)
-	       (estate-error estate "undefined operand" object-or-name))
+	       (estate-error *estate* "undefined operand" object-or-name))
 	   object))
 	(else
-	 (estate-error estate "bad arg to `operand'" object-or-name)))
+	 (estate-error *estate* "bad arg to `operand'" object-or-name)))
 )
 
-(define-fn xop (estate options mode object) 
-  (let ((delayed (assoc '#:delay (estate-modifiers estate))))
+(define-fn xop (*estate* options mode object) 
+  (let ((delayed (assoc '#:delay (estate-modifiers *estate*))))
     (if (and delayed
 	     (equal? APPLICATION 'SID-SIMULATOR)
 	     (operand? object))
@@ -1395,68 +1395,68 @@
 	;; else return the normal object
 	object)))
 
-(define-fn local (estate options mode object-or-name)
+(define-fn local (*estate* options mode object-or-name)
   (cond ((rtx-temp? object-or-name)
 	 object-or-name)
 	((symbol? object-or-name)
-	 (let ((object (rtx-temp-lookup (estate-env estate) object-or-name)))
+	 (let ((object (rtx-temp-lookup (estate-env *estate*) object-or-name)))
 	   (if (not object)
-	       (estate-error estate "undefined local" object-or-name))
+	       (estate-error *estate* "undefined local" object-or-name))
 	   object))
 	(else
-	 (estate-error estate "bad arg to `local'" object-or-name)))
+	 (estate-error *estate* "bad arg to `local'" object-or-name)))
 )
 
-(define-fn reg (estate options mode hw-elm . indx-sel)
+(define-fn reg (*estate* options mode hw-elm . indx-sel)
   (let ((indx (or (list-maybe-ref indx-sel 0) 0))
 	(sel (or (list-maybe-ref indx-sel 1) hw-selector-default)))
-    (s-hw estate mode hw-elm indx sel))
+    (s-hw *estate* mode hw-elm indx sel))
 )
 
-(define-fn raw-reg (estate options mode hw-elm . indx-sel)
+(define-fn raw-reg (*estate* options mode hw-elm . indx-sel)
   (let ((indx (or (list-maybe-ref indx-sel 0) 0))
 	(sel (or (list-maybe-ref indx-sel 1) hw-selector-default)))
-    (let ((result (s-hw estate mode hw-elm indx sel)))
+    (let ((result (s-hw *estate* mode hw-elm indx sel)))
       (obj-cons-attr! result (bool-attr-make 'RAW #t))
       result))
 )
 
-(define-fn mem (estate options mode addr . sel)
-  (s-hw estate mode 'h-memory addr
+(define-fn mem (*estate* options mode addr . sel)
+  (s-hw *estate* mode 'h-memory addr
 	(if (pair? sel) (car sel) hw-selector-default))
 )
 
-(define-fn pc (estate options mode)
+(define-fn pc (*estate* options mode)
   s-pc
 )
 
-(define-fn ref (estate options mode name)
-  (if (not (insn? (estate-owner estate)))
-      (estate-error estate "ref: not processing an insn"
-		    (obj:name (estate-owner estate))))
+(define-fn ref (*estate* options mode name)
+  (if (not (insn? (estate-owner *estate*)))
+      (estate-error *estate* "ref: not processing an insn"
+		    (obj:name (estate-owner *estate*))))
   (cx:make 'UINT
 	   (string-append
 	    "(referenced & (1 << "
 	    (number->string
-	     (op:num (insn-lookup-op (estate-owner estate) name)))
+	     (op:num (insn-lookup-op (estate-owner *estate*) name)))
 	    "))"))
 )
 
 ; ??? Maybe this should return an operand object.
-(define-fn index-of (estate options mode op)
-  (send (op:index (rtx-eval-with-estate op DFLT estate)) 'cxmake-get estate 'DFLT)
+(define-fn index-of (*estate* options mode op)
+  (send (op:index (rtx-eval-with-estate op DFLT *estate*)) 'cxmake-get *estate* 'DFLT)
 )
 
-(define-fn clobber (estate options mode object)
+(define-fn clobber (*estate* options mode object)
   (cx:make VOID "; /*clobber*/\n")
 )
 
-(define-fn delay (estate options mode num-node rtx)
+(define-fn delay (*estate* options mode num-node rtx)
   ;; FIXME: Try to move SID stuff into sid-foo.scm.
   (case APPLICATION
     ((SID-SIMULATOR)
      (let* ((n (cadddr num-node))
-	    (old-delay (let ((old (assoc '#:delay (estate-modifiers estate))))
+	    (old-delay (let ((old (assoc '#:delay (estate-modifiers *estate*))))
 			 (if old (cadr old) 0)))
 	    (new-delay (+ n old-delay)))    
        (begin
@@ -1467,34 +1467,34 @@
 			  (else #f))))		    	       
 	       (not (and hw (or (pc? hw) (memory? hw) (register? hw)))))
 	     (estate-error 
-	      estate
+	      *estate*
 	      "(delay ...) rtx applied to wrong type of operand, should be pc, register or memory"
 	       (car rtx)))
 	 ;; signal an error if we're delayed and not in a "parallel-insns" CPU
 	 (if (not (with-parallel?)) 
-	     (estate-error estate "delayed operand in a non-parallel cpu"
+	     (estate-error *estate* "delayed operand in a non-parallel cpu"
 			   (car rtx)))
 	 ;; update cpu-global pipeline bound
 	 (cpu-set-max-delay! (current-cpu) (max (cpu-max-delay (current-cpu)) new-delay))      
 	 ;; pass along new delay to embedded rtx
 	 (rtx-eval-with-estate rtx (mode:lookup mode)
-			       (estate-with-modifiers estate `((#:delay ,new-delay)))))))
+			       (estate-with-modifiers *estate* `((#:delay ,new-delay)))))))
 
     ;; not in sid-land
-    (else (s-sequence (estate-with-modifiers estate '((#:delay))) VOID '() rtx)))
+    (else (s-sequence (estate-with-modifiers *estate* '((#:delay))) VOID '() rtx)))
 )
 
 ; Gets expanded as a macro.
-;(define-fn annul (estate yes?)
-;  (s-c-call estate 'VOID "SEM_ANNUL_INSN" "pc" yes?)
+;(define-fn annul (*estate* yes?)
+;  (s-c-call *estate* 'VOID "SEM_ANNUL_INSN" "pc" yes?)
 ;)
 
-(define-fn skip (estate options mode yes?)
-  (send pc 'cxmake-skip estate yes?)
-  ;(s-c-call estate 'VOID "SEM_SKIP_INSN" "pc" yes?)
+(define-fn skip (*estate* options mode yes?)
+  (send pc 'cxmake-skip *estate* yes?)
+  ;(s-c-call *estate* 'VOID "SEM_SKIP_INSN" "pc" yes?)
 )
 
-(define-fn eq-attr (estate options mode obj attr-name value)
+(define-fn eq-attr (*estate* options mode obj attr-name value)
   (cx:make 'INT
 	   (string-append "(GET_ATTR ("
 			  (gen-c-symbol attr-name)
@@ -1503,15 +1503,15 @@
 			  ")"))
 )
 
-(define-fn attr (estate options mode owner attr-name)
+(define-fn attr (*estate* options mode owner attr-name)
   (cond ((equal? owner '(current-insn () DFLT))
-	 (s-c-raw-call estate 'INT "GET_ATTR"
+	 (s-c-raw-call *estate* 'INT "GET_ATTR"
 		       (string-upcase (gen-c-symbol attr-name))))
 	(else
-	 (estate-error estate "attr: unsupported object type" owner)))
+	 (estate-error *estate* "attr: unsupported object type" owner)))
 )
 
-(define-fn const (estate options mode c)
+(define-fn const (*estate* options mode c)
   (assert (not (mode:eq? 'VOID mode)))
   (if (mode:eq? 'DFLT mode)
       (set! mode 'INT))
@@ -1535,11 +1535,11 @@
 		   (else (number->string c)))))
 )
 
-(define-fn join (estate options out-mode in-mode arg1 . arg-rest)
+(define-fn join (*estate* options out-mode in-mode arg1 . arg-rest)
   ; FIXME: Endianness issues undecided.
   ; FIXME: Ensure correct number of args for in/out modes.
   ; Ensure compatible modes.
-  (apply s-c-raw-call (cons estate
+  (apply s-c-raw-call (cons *estate*
 			    (cons out-mode
 				  (cons (stringsym-append "JOIN"
 							  in-mode
@@ -1547,9 +1547,9 @@
 					(cons arg1 arg-rest)))))
 )
 
-(define-fn subword (estate options mode value word-num)
+(define-fn subword (*estate* options mode value word-num)
   (let* ((mode (mode:lookup mode))
-	 (val (rtl-c-get estate DFLT value))
+	 (val (rtl-c-get *estate* DFLT value))
 	 ; Refetch mode in case it was DFLT.
 	 (val-mode (cx:mode val)))
     (cx:make mode
@@ -1561,240 +1561,240 @@
 				 ", "
 				 (if (number? word-num)
 				     (number->string word-num)
-				     (cx:c (rtl-c-get estate DFLT word-num))))
+				     (cx:c (rtl-c-get *estate* DFLT word-num))))
 				"")
 			    ")")))
 )
 
-(define-fn c-code (estate options mode text)
+(define-fn c-code (*estate* options mode text)
   (cx:make mode text)
 )
 
-(define-fn c-call (estate options mode name . args)
-  (apply s-c-call (cons estate (cons mode (cons name args))))
+(define-fn c-call (*estate* options mode name . args)
+  (apply s-c-call (cons *estate* (cons mode (cons name args))))
 )
 
-(define-fn c-raw-call (estate options mode name . args)
-  (apply s-c-raw-call (cons estate (cons mode (cons name args))))
+(define-fn c-raw-call (*estate* options mode name . args)
+  (apply s-c-raw-call (cons *estate* (cons mode (cons name args))))
 )
 
-(define-fn nop (estate options mode)
+(define-fn nop (*estate* options mode)
   (cx:make VOID "((void) 0); /*nop*/\n")
 )
 
-(define-fn set (estate options mode dst src)
-  (if (insn? (estate-owner estate))
-      (rtl-c-set-trace estate mode dst (rtl-c-get estate mode src))
-      (rtl-c-set-quiet estate mode dst (rtl-c-get estate mode src)))
+(define-fn set (*estate* options mode dst src)
+  (if (insn? (estate-owner *estate*))
+      (rtl-c-set-trace *estate* mode dst (rtl-c-get *estate* mode src))
+      (rtl-c-set-quiet *estate* mode dst (rtl-c-get *estate* mode src)))
 )
 
-(define-fn set-quiet (estate options mode dst src)
-  (rtl-c-set-quiet estate mode dst (rtl-c-get estate mode src))
+(define-fn set-quiet (*estate* options mode dst src)
+  (rtl-c-set-quiet *estate* mode dst (rtl-c-get *estate* mode src))
 )
 
-(define-fn neg (estate options mode s1)
-  (s-unop estate "NEG" "-" mode s1)
+(define-fn neg (*estate* options mode s1)
+  (s-unop *estate* "NEG" "-" mode s1)
 )
 
-(define-fn abs (estate options mode s1)
-  (s-unop estate "ABS" #f mode s1)
+(define-fn abs (*estate* options mode s1)
+  (s-unop *estate* "ABS" #f mode s1)
 )
 
-(define-fn inv (estate options mode s1)
-  (s-unop estate "INV" "~" mode s1)
+(define-fn inv (*estate* options mode s1)
+  (s-unop *estate* "INV" "~" mode s1)
 )
 
-(define-fn not (estate options mode s1)
-  (s-unop estate "NOT" "!" mode s1)
+(define-fn not (*estate* options mode s1)
+  (s-unop *estate* "NOT" "!" mode s1)
 )
 
-(define-fn add (estate options mode s1 s2)
-  (s-binop estate "ADD" "+" mode s1 s2)
+(define-fn add (*estate* options mode s1 s2)
+  (s-binop *estate* "ADD" "+" mode s1 s2)
 )
-(define-fn sub (estate options mode s1 s2)
-  (s-binop estate "SUB" "-" mode s1 s2)
+(define-fn sub (*estate* options mode s1 s2)
+  (s-binop *estate* "SUB" "-" mode s1 s2)
 )
 
-(define-fn addc (estate options mode s1 s2 s3)
-  (s-binop-with-bit estate "ADDC" mode s1 s2 s3)
+(define-fn addc (*estate* options mode s1 s2 s3)
+  (s-binop-with-bit *estate* "ADDC" mode s1 s2 s3)
 )
 ;; ??? Whether to rename ADDCF/ADDOF -> ADDCCF/ADDCOF is debatable.
-(define-fn addc-cflag (estate options mode s1 s2 s3)
-  (s-binop-with-bit estate "ADDCF" mode s1 s2 s3)
+(define-fn addc-cflag (*estate* options mode s1 s2 s3)
+  (s-binop-with-bit *estate* "ADDCF" mode s1 s2 s3)
 )
-(define-fn addc-oflag (estate options mode s1 s2 s3)
-  (s-binop-with-bit estate "ADDOF" mode s1 s2 s3)
+(define-fn addc-oflag (*estate* options mode s1 s2 s3)
+  (s-binop-with-bit *estate* "ADDOF" mode s1 s2 s3)
 )
 
-(define-fn subc (estate options mode s1 s2 s3)
-  (s-binop-with-bit estate "SUBC" mode s1 s2 s3)
+(define-fn subc (*estate* options mode s1 s2 s3)
+  (s-binop-with-bit *estate* "SUBC" mode s1 s2 s3)
 )
 ;; ??? Whether to rename SUBCF/SUBOF -> SUBCCF/SUBCOF is debatable.
-(define-fn subc-cflag (estate options mode s1 s2 s3)
-  (s-binop-with-bit estate "SUBCF" mode s1 s2 s3)
+(define-fn subc-cflag (*estate* options mode s1 s2 s3)
+  (s-binop-with-bit *estate* "SUBCF" mode s1 s2 s3)
 )
-(define-fn subc-oflag (estate options mode s1 s2 s3)
-  (s-binop-with-bit estate "SUBOF" mode s1 s2 s3)
+(define-fn subc-oflag (*estate* options mode s1 s2 s3)
+  (s-binop-with-bit *estate* "SUBOF" mode s1 s2 s3)
 )
 
 ;; ??? These are deprecated.  Delete in time.
-(define-fn add-cflag (estate options mode s1 s2 s3)
-  (s-binop-with-bit estate "ADDCF" mode s1 s2 s3)
+(define-fn add-cflag (*estate* options mode s1 s2 s3)
+  (s-binop-with-bit *estate* "ADDCF" mode s1 s2 s3)
 )
-(define-fn add-oflag (estate options mode s1 s2 s3)
-  (s-binop-with-bit estate "ADDOF" mode s1 s2 s3)
+(define-fn add-oflag (*estate* options mode s1 s2 s3)
+  (s-binop-with-bit *estate* "ADDOF" mode s1 s2 s3)
 )
-(define-fn sub-cflag (estate options mode s1 s2 s3)
-  (s-binop-with-bit estate "SUBCF" mode s1 s2 s3)
+(define-fn sub-cflag (*estate* options mode s1 s2 s3)
+  (s-binop-with-bit *estate* "SUBCF" mode s1 s2 s3)
 )
-(define-fn sub-oflag (estate options mode s1 s2 s3)
-  (s-binop-with-bit estate "SUBOF" mode s1 s2 s3)
+(define-fn sub-oflag (*estate* options mode s1 s2 s3)
+  (s-binop-with-bit *estate* "SUBOF" mode s1 s2 s3)
 )
 
-;(define-fn zflag (estate options mode value)
+;(define-fn zflag (*estate* options mode value)
 ;  (list 'eq mode value (list 'const mode 0))
 ;)
 
-;(define-fn nflag (estate options mode value)
+;(define-fn nflag (*estate* options mode value)
 ;  (list 'lt mode value (list 'const mode 0))
 ;)
 
-(define-fn mul (estate options mode s1 s2)
-  (s-binop estate "MUL" "*" mode s1 s2)
+(define-fn mul (*estate* options mode s1 s2)
+  (s-binop *estate* "MUL" "*" mode s1 s2)
 )
-(define-fn div (estate options mode s1 s2)
-  (s-binop estate "DIV" "/" mode s1 s2)
+(define-fn div (*estate* options mode s1 s2)
+  (s-binop *estate* "DIV" "/" mode s1 s2)
 )
-(define-fn udiv (estate options mode s1 s2)
-  (s-binop estate "UDIV" "/" mode s1 s2)
+(define-fn udiv (*estate* options mode s1 s2)
+  (s-binop *estate* "UDIV" "/" mode s1 s2)
 )
-(define-fn mod (estate options mode s1 s2)
-  (s-binop estate "MOD" "%" mode s1 s2)
+(define-fn mod (*estate* options mode s1 s2)
+  (s-binop *estate* "MOD" "%" mode s1 s2)
 )
-(define-fn umod (estate options mode s1 s2)
-  (s-binop estate "UMOD" "%" mode s1 s2)
-)
-
-(define-fn sqrt (estate options mode s1)
-  (s-unop estate "SQRT" #f mode s1)
-)
-(define-fn cos (estate options mode s1)
-  (s-unop estate "COS" #f mode s1)
-)
-(define-fn sin (estate options mode s1)
-  (s-unop estate "SIN" #f mode s1)
+(define-fn umod (*estate* options mode s1 s2)
+  (s-binop *estate* "UMOD" "%" mode s1 s2)
 )
 
-(define-fn min (estate options mode s1 s2)
-  (s-binop estate "MIN" #f mode s1 s2)
+(define-fn sqrt (*estate* options mode s1)
+  (s-unop *estate* "SQRT" #f mode s1)
 )
-(define-fn max (estate options mode s1 s2)
-  (s-binop estate "MAX" #f mode s1 s2)
+(define-fn cos (*estate* options mode s1)
+  (s-unop *estate* "COS" #f mode s1)
 )
-(define-fn umin (estate options mode s1 s2)
-  (s-binop estate "UMIN" #f mode s1 s2)
-)
-(define-fn umax (estate options mode s1 s2)
-  (s-binop estate "UMAX" #f mode s1 s2)
+(define-fn sin (*estate* options mode s1)
+  (s-unop *estate* "SIN" #f mode s1)
 )
 
-(define-fn and (estate options mode s1 s2)
-  (s-binop estate "AND" "&" mode s1 s2)
+(define-fn min (*estate* options mode s1 s2)
+  (s-binop *estate* "MIN" #f mode s1 s2)
 )
-(define-fn or (estate options mode s1 s2)
-  (s-binop estate "OR" "|" mode s1 s2)
+(define-fn max (*estate* options mode s1 s2)
+  (s-binop *estate* "MAX" #f mode s1 s2)
 )
-(define-fn xor (estate options mode s1 s2)
-  (s-binop estate "XOR" "^" mode s1 s2)
+(define-fn umin (*estate* options mode s1 s2)
+  (s-binop *estate* "UMIN" #f mode s1 s2)
 )
-
-(define-fn sll (estate options mode s1 s2)
-  (s-shop estate "SLL" "<<" mode s1 s2)
-)
-(define-fn srl (estate options mode s1 s2)
-  (s-shop estate "SRL" ">>" mode s1 s2)
-)
-(define-fn sra (estate options mode s1 s2)
-  (s-shop estate "SRA" ">>" mode s1 s2)
-)
-(define-fn ror (estate options mode s1 s2)
-  (s-shop estate "ROR" #f mode s1 s2)
-)
-(define-fn rol (estate options mode s1 s2)
-  (s-shop estate "ROL" #f mode s1 s2)
+(define-fn umax (*estate* options mode s1 s2)
+  (s-binop *estate* "UMAX" #f mode s1 s2)
 )
 
-(define-fn andif (estate options mode s1 s2)
-  (s-boolifop estate "ANDIF" "&&" s1 s2)
+(define-fn and (*estate* options mode s1 s2)
+  (s-binop *estate* "AND" "&" mode s1 s2)
 )
-(define-fn orif (estate options mode s1 s2)
-  (s-boolifop estate "ORIF" "||" s1 s2)
+(define-fn or (*estate* options mode s1 s2)
+  (s-binop *estate* "OR" "|" mode s1 s2)
 )
-
-(define-fn ext (estate options mode s1)
-  (s-convop estate "EXT" mode s1)
-)
-(define-fn zext (estate options mode s1)
-  (s-convop estate "ZEXT" mode s1)
-)
-(define-fn trunc (estate options mode s1)
-  (s-convop estate "TRUNC" mode s1)
-)
-(define-fn fext (estate options mode s1)
-  (s-convop estate "FEXT" mode s1)
-)
-(define-fn ftrunc (estate options mode s1)
-  (s-convop estate "FTRUNC" mode s1)
-)
-(define-fn float (estate options mode s1)
-  (s-convop estate "FLOAT" mode s1)
-)
-(define-fn ufloat (estate options mode s1)
-  (s-convop estate "UFLOAT" mode s1)
-)
-(define-fn fix (estate options mode s1)
-  (s-convop estate "FIX" mode s1)
-)
-(define-fn ufix (estate options mode s1)
-  (s-convop estate "UFIX" mode s1)
+(define-fn xor (*estate* options mode s1 s2)
+  (s-binop *estate* "XOR" "^" mode s1 s2)
 )
 
-(define-fn eq (estate options mode s1 s2)
-  (s-cmpop estate 'eq "==" mode s1 s2)
+(define-fn sll (*estate* options mode s1 s2)
+  (s-shop *estate* "SLL" "<<" mode s1 s2)
 )
-(define-fn ne (estate options mode s1 s2)
-  (s-cmpop estate 'ne "!=" mode s1 s2)
+(define-fn srl (*estate* options mode s1 s2)
+  (s-shop *estate* "SRL" ">>" mode s1 s2)
 )
-
-(define-fn lt (estate options mode s1 s2)
-  (s-cmpop estate 'lt "<" mode s1 s2)
+(define-fn sra (*estate* options mode s1 s2)
+  (s-shop *estate* "SRA" ">>" mode s1 s2)
 )
-(define-fn le (estate options mode s1 s2)
-  (s-cmpop estate 'le "<=" mode s1 s2)
+(define-fn ror (*estate* options mode s1 s2)
+  (s-shop *estate* "ROR" #f mode s1 s2)
 )
-(define-fn gt (estate options mode s1 s2)
-  (s-cmpop estate 'gt ">" mode s1 s2)
-)
-(define-fn ge (estate options mode s1 s2)
-  (s-cmpop estate 'ge ">=" mode s1 s2)
+(define-fn rol (*estate* options mode s1 s2)
+  (s-shop *estate* "ROL" #f mode s1 s2)
 )
 
-(define-fn ltu (estate options mode s1 s2)
-  (s-cmpop estate 'ltu "<" mode s1 s2)
+(define-fn andif (*estate* options mode s1 s2)
+  (s-boolifop *estate* "ANDIF" "&&" s1 s2)
 )
-(define-fn leu (estate options mode s1 s2)
-  (s-cmpop estate 'leu "<=" mode s1 s2)
-)
-(define-fn gtu (estate options mode s1 s2)
-  (s-cmpop estate 'gtu ">" mode s1 s2)
-)
-(define-fn geu (estate options mode s1 s2)
-  (s-cmpop estate 'geu ">=" mode s1 s2)
+(define-fn orif (*estate* options mode s1 s2)
+  (s-boolifop *estate* "ORIF" "||" s1 s2)
 )
 
-(define-fn member (estate options mode value set)
+(define-fn ext (*estate* options mode s1)
+  (s-convop *estate* "EXT" mode s1)
+)
+(define-fn zext (*estate* options mode s1)
+  (s-convop *estate* "ZEXT" mode s1)
+)
+(define-fn trunc (*estate* options mode s1)
+  (s-convop *estate* "TRUNC" mode s1)
+)
+(define-fn fext (*estate* options mode s1)
+  (s-convop *estate* "FEXT" mode s1)
+)
+(define-fn ftrunc (*estate* options mode s1)
+  (s-convop *estate* "FTRUNC" mode s1)
+)
+(define-fn float (*estate* options mode s1)
+  (s-convop *estate* "FLOAT" mode s1)
+)
+(define-fn ufloat (*estate* options mode s1)
+  (s-convop *estate* "UFLOAT" mode s1)
+)
+(define-fn fix (*estate* options mode s1)
+  (s-convop *estate* "FIX" mode s1)
+)
+(define-fn ufix (*estate* options mode s1)
+  (s-convop *estate* "UFIX" mode s1)
+)
+
+(define-fn eq (*estate* options mode s1 s2)
+  (s-cmpop *estate* 'eq "==" mode s1 s2)
+)
+(define-fn ne (*estate* options mode s1 s2)
+  (s-cmpop *estate* 'ne "!=" mode s1 s2)
+)
+
+(define-fn lt (*estate* options mode s1 s2)
+  (s-cmpop *estate* 'lt "<" mode s1 s2)
+)
+(define-fn le (*estate* options mode s1 s2)
+  (s-cmpop *estate* 'le "<=" mode s1 s2)
+)
+(define-fn gt (*estate* options mode s1 s2)
+  (s-cmpop *estate* 'gt ">" mode s1 s2)
+)
+(define-fn ge (*estate* options mode s1 s2)
+  (s-cmpop *estate* 'ge ">=" mode s1 s2)
+)
+
+(define-fn ltu (*estate* options mode s1 s2)
+  (s-cmpop *estate* 'ltu "<" mode s1 s2)
+)
+(define-fn leu (*estate* options mode s1 s2)
+  (s-cmpop *estate* 'leu "<=" mode s1 s2)
+)
+(define-fn gtu (*estate* options mode s1 s2)
+  (s-cmpop *estate* 'gtu ">" mode s1 s2)
+)
+(define-fn geu (*estate* options mode s1 s2)
+  (s-cmpop *estate* 'geu ">=" mode s1 s2)
+)
+
+(define-fn member (*estate* options mode value set)
   ; FIXME: Multiple evalutions of VALUE.
-  (let ((c-value (rtl-c-get estate 'DFLT value))
+  (let ((c-value (rtl-c-get *estate* 'DFLT value))
 	(set (rtx-number-list-values set)))
     (let loop ((set (cdr set))
 	       (code (string-append "(" (cx:c c-value)
@@ -1812,35 +1812,35 @@
 			       ")")))))
 )
 
-(define-fn if (estate options mode cond then . else)
-  (apply s-if (append! (list estate mode cond then) else))
+(define-fn if (*estate* options mode cond then . else)
+  (apply s-if (append! (list *estate* mode cond then) else))
 )
 
-(define-fn cond (estate options mode . cond-code-list)
-  (apply s-cond (cons estate (cons mode cond-code-list)))
+(define-fn cond (*estate* options mode . cond-code-list)
+  (apply s-cond (cons *estate* (cons mode cond-code-list)))
 )
 
-(define-fn case (estate options mode test . case-list)
-  (apply s-case (cons estate (cons mode (cons test case-list))))
+(define-fn case (*estate* options mode test . case-list)
+  (apply s-case (cons *estate* (cons mode (cons test case-list))))
 )
 
-(define-fn parallel (estate options mode ignore expr . exprs)
-  (apply s-parallel (cons estate (cons expr exprs)))
+(define-fn parallel (*estate* options mode ignore expr . exprs)
+  (apply s-parallel (cons *estate* (cons expr exprs)))
 )
 
-(define-fn sequence (estate options mode locals expr . exprs)
+(define-fn sequence (*estate* options mode locals expr . exprs)
   (apply s-sequence
-	 (cons estate (cons mode (cons locals (cons expr exprs)))))
+	 (cons *estate* (cons mode (cons locals (cons expr exprs)))))
 )
 
-(define-fn do-count (estate options mode iter-var nr-times expr . exprs)
+(define-fn do-count (*estate* options mode iter-var nr-times expr . exprs)
   (apply s-do-count
-	 (cons estate (cons iter-var (cons nr-times (cons expr exprs)))))
+	 (cons *estate* (cons iter-var (cons nr-times (cons expr exprs)))))
 )
 
-(define-fn closure (estate options mode expr env)
+(define-fn closure (*estate* options mode expr env)
   ; ??? estate-push-env?
-  (rtl-c-with-estate (estate-new-env estate env) DFLT expr)
+  (rtl-c-with-estate (estate-new-env *estate* env) DFLT expr)
 )
 
 ;; The result is the rtl->c generator table.

@@ -1,5 +1,8 @@
 2009-09-21  Doug Evans  <dje@sebabeach.org>
 
+	* rtl-c.scm (/rtl-c-build-table): Renamed from rtl-c-build-table.
+	All callers updated.  Add FIXME.
+
 	* openrisc.cpu (or32 isa): Fix setup-semantics.
 
 	* rtl.scm (rtx-class-*?): Delete, unused.

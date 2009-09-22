@@ -1315,14 +1315,14 @@
 )
 
 (define (rtl-c-init!)
-  (set! /rtl-c-gen-table (rtl-c-build-table))
+  (set! /rtl-c-gen-table (/rtl-c-build-table))
   *UNSPECIFIED*
 )
 
 ; The rest of this file is one big function to return the rtl->c lookup table.
 ; For each of these functions, MODE is the name of the mode.
 
-(define (rtl-c-build-table)
+(define (/rtl-c-build-table)
   (let ((table (make-vector (rtx-max-num) #f)))
 
 ; Error generation
@@ -1843,8 +1843,9 @@
   (rtl-c-with-estate (estate-new-env estate env) DFLT expr)
 )
 
-; The result is the rtl->c generator table.
+;; The result is the rtl->c generator table.
+;; FIXME: verify all elements are filled
 
 table
 
-)) ; End of rtl-c-build-table
+)) ;; End of /rtl-c-build-table

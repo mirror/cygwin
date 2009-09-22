@@ -1168,7 +1168,7 @@
 ; Builtins, attributes, init/fini support.
 
 (define h-memory #f)
-(define h-sint #f)
+(define h-sint #f) ;; FIXME: convention says this should be named h-int
 (define h-uint #f)
 (define h-addr #f)
 (define h-iaddr #f)

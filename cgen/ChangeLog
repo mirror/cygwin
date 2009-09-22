@@ -2,6 +2,8 @@
 
 	* rtl-c.scm (/rtl-c-build-table): Renamed from rtl-c-build-table.
 	All callers updated.  Add FIXME.
+	(all rtx functions): Rename local estate to *estate*.  It's an
+	artificial argument added to the rtx, so make it stand out.
 
 	* openrisc.cpu (or32 isa): Fix setup-semantics.
 

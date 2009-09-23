@@ -78,6 +78,19 @@
 ; ptr-to is currently private so there is no accessor.
 (define mode:host? (elm-make-getter <mode> 'host?))
 
+;; Utility to set the parameters of WI/UWI/AI/IAI modes.
+
+(define (/mode-set-word-params! dst src)
+  (assert (mode? dst))
+  (assert (mode? src))
+  (elm-xset! dst 'bits (elm-xget src 'bits))
+  (elm-xset! dst 'bytes (elm-xget src 'bytes))
+  (elm-xset! dst 'non-mode-c-type (elm-xget src 'non-mode-c-type))
+  (elm-xset! dst 'printf-type (elm-xget src 'printf-type))
+  (elm-xset! dst 'sem-mode (elm-xget src 'sem-mode))
+  *UNSPECIFIED*
+)
+
 ; Return string C type to use for values of mode M.
 
 (define (mode:c-type m)
@@ -156,28 +169,35 @@
 
 (define (mode-class-numeric? class) (memq class '(INT UINT FLOAT)))
 
-; Return a boolean indicating if MODE has an integral mode class.
+; Return a boolean indicating if <mode> MODE has an integral mode class.
 ; Similarily for signed/unsigned.
 
 (define (mode-integral? mode) (mode-class-integral? (mode:class mode)))
 (define (mode-signed? mode) (mode-class-signed? (mode:class mode)))
 (define (mode-unsigned? mode) (mode-class-unsigned? (mode:class mode)))
 
-; Return a boolean indicating if MODE has a floating point mode class.
+; Return a boolean indicating if <mode> MODE has a floating point mode class.
 
 (define (mode-float? mode) (mode-class-float? (mode:class mode)))
 
-; Return a boolean indicating if MODE has a numeric mode class.
+; Return a boolean indicating if <mode> MODE has a numeric mode class.
 
 (define (mode-numeric? mode) (mode-class-numeric? (mode:class mode))) 
+
+;; Return a boolean indicating if <mode> MODE is VOID.
+
+(define (mode-void? mode)
+  (eq? mode VOID)
+)
 
 ; Return a boolean indicating if MODE1 is compatible with MODE2.
 ; MODE[12] are either names or <mode> objects.
 ; HOW is a symbol indicating how the test is performed:
 ; strict: modes must have same name
-; samesize: modes must be both float or both integer (int or uint) and have
-;           same size
-; sameclass: modes must be both float or both integer (int or uint)
+; samesize: modes must be both float, or both integer (int or uint),
+;           or both VOID and have same size
+; sameclass: modes must be both float, or both integer (int or uint),
+;            or both VOID
 ; numeric: modes must be both numeric
 
 (define (mode-compatible? how mode1 mode2)
@@ -193,10 +213,13 @@
 	     ((mode-float? m1)
 	      (and (mode-float? m2)
 		   (= (mode:bits m1) (mode:bits m2))))
+	     ((mode-void? m1)
+	      (mode-void? m2))
 	     (else #f)))
       ((sameclass)
        (cond ((mode-integral? m1) (mode-integral? m2))
 	     ((mode-float? m1) (mode-float? m2))
+	     ((mode-void? m1) (mode-void? m2))
 	     (else #f)))
       ((numeric)
        (and (mode-numeric? m1) (mode-numeric? m2)))
@@ -409,6 +432,9 @@
 ; IDENTICAL: all word sizes must be identical
 (define /mode-word-sizes-kind #f)
 
+;; Set to true if mode-set-word-modes! has been called.
+(define /mode-word-sizes-defined? #f)
+
 ; Called when a cpu-family is read in to set the word sizes.
 
 (define (mode-set-word-modes! bitsize)
@@ -422,8 +448,7 @@
 	(error "unable to find precise mode to match cpu word-bitsize" bitsize))
 
     ; Enforce word size kind.
-    (if (!= current-word-bitsize 0)
-	; word size already set
+    (if /mode-word-sizes-defined?
 	(case /mode-word-sizes-kind
 	  ((IDENTICAL)
 	   (if (!= current-word-bitsize (mode:bits word-mode))
@@ -436,16 +461,14 @@
 
     (if (not ignore?)
 	(begin
-	  (set! WI word-mode)
-	  (set! UWI uword-mode)
-	  (set! AI uword-mode)
-	  (set! IAI uword-mode)
-	  (hashq-set! /mode-table 'WI word-mode)
-	  (hashq-set! /mode-table 'UWI uword-mode)
-	  (hashq-set! /mode-table 'AI uword-mode)
-	  (hashq-set! /mode-table 'IAI uword-mode)
+	  (/mode-set-word-params! WI word-mode)
+	  (/mode-set-word-params! UWI uword-mode)
+	  (/mode-set-word-params! AI uword-mode)
+	  (/mode-set-word-params! IAI uword-mode)
 	  ))
     )
+
+  (set! /mode-word-sizes-defined? #t)
 )
 
 ; Called by apps to indicate cpu:word-bitsize always has one value.
@@ -468,9 +491,10 @@
 ; Ensure word sizes have been defined.
 ; This must be called after all cpu families have been defined
 ; and before any ifields, hardware, operand or insns have been read.
+; FIXME: sparc.cpu breaks this
 
 (define (mode-ensure-word-sizes-defined)
-  (if (eq? (obj:name WI) 'VOID)
+  (if (not /mode-word-sizes-defined?)
       (error "word sizes must be defined"))
 )
 
@@ -504,6 +528,7 @@
 
 (define (mode-init!)
   (set! /mode-word-sizes-kind 'IDENTICAL)
+  (set! /mode-word-sizes-defined? #f)
 
   (reader-add-command! 'define-full-mode
 		       "\
@@ -533,12 +558,21 @@ Define a mode, all arguments specified.
 
   (let ((dfm define-full-mode))
     ; This list must be defined in order of increasing size among each type.
+    ; FIXME: still true?
 
     (dfm 'VOID "void" '() 'RANDOM 0 0 "void" "" #f #f #f) ; VOIDmode
 
     ; Special marker to indicate "use the default mode".
-    ; ??? Not yet used everywhere it should be.
     (dfm 'DFLT "default mode" '() 'RANDOM 0 0 "" "" #f #f #f)
+
+    ; Mode used in `symbol' rtxs.
+    (dfm 'SYM "symbol" '() 'RANDOM 0 0 "" "" #f #f #f)
+
+    ; Mode used in `current-insn' rtxs.
+    (dfm 'INSN "insn" '() 'RANDOM 0 0 "" "" #f #f #f)
+
+    ; Mode used in `current-mach' rtxs.
+    (dfm 'MACH "mach" '() 'RANDOM 0 0 "" "" #f #f #f)
 
     ; Not UINT on purpose.
     (dfm 'BI "one bit (0,1 not 0,-1)" '() 'INT 1 1 "int" "'x'" #f #f #f)
@@ -593,16 +627,17 @@ Define a mode, all arguments specified.
   (set! INT (mode:lookup 'INT))
   (set! UINT (mode:lookup 'UINT))
 
-  ; While setting the real values of WI/UWI/AI/IAI is defered to
-  ; mode-set-word-modes!, create entries in the table.
-  (set! WI VOID)
-  (set! UWI VOID)
-  (set! AI VOID)
-  (set! IAI VOID)
-  (mode:add! 'WI VOID)
-  (mode:add! 'UWI VOID)
-  (mode:add! 'AI VOID)
-  (mode:add! 'IAI VOID)
+  ;; While setting the real values of WI/UWI/AI/IAI is defered to
+  ;; mode-set-word-modes!, create usable entries in the table.
+  ;; The entries must be usable as h/w elements may be defined that use them.
+  (set! WI (object-copy-top (mode:lookup 'SI)))
+  (set! UWI (object-copy-top (mode:lookup 'USI)))
+  (set! AI (object-copy-top (mode:lookup 'USI)))
+  (set! IAI (object-copy-top (mode:lookup 'USI)))
+  (mode:add! 'WI WI)
+  (mode:add! 'UWI UWI)
+  (mode:add! 'AI AI)
+  (mode:add! 'IAI IAI)
 
   ;; Need to have usable mode classes at this point as define-cpu
   ;; calls mode-set-word-modes!.

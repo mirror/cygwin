@@ -1151,7 +1151,7 @@
 )
 
 ; Return list of index numbers of elements in list L that satisfy PRED.
-; I is usually 0.
+; I is added to each index, it's usually 0.
 
 (define (find-index i pred l)
   (define (find1 i pred l result)
@@ -1159,6 +1159,16 @@
 	  ((pred (car l)) (find1 (+ 1 i) pred (cdr l) (cons i result)))
 	  (else (find1 (+ 1 i) pred (cdr l) result))))
   (reverse! (find1 i pred l nil))
+)
+
+; Return index number of first element in list L that satisfy PRED.
+; Returns #f if not present.
+; I is added to the result, it's usually 0.
+
+(define (find-first-index i pred l)
+  (cond ((null? l) #f)
+	((pred (car l)) i)
+	(else (find-first-index (+ 1 i) pred (cdr l))))
 )
 
 ; Return list of elements of L that satisfy PRED.

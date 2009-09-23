@@ -384,17 +384,18 @@
 
 ; Compute an iformat descriptor used to build an <iformat> object for INSN.
 ;
-; If COMPUTE-SFORMAT? is #t compile the semantics and compute the semantic
-; format (same as instruction format except that operands are used to
+; If COMPUTE-SFORMAT? is #t compute the semantic format
+; (same as instruction format except that operands are used to
 ; distinguish insns).
 ; Attributes derivable from the semantics are also computed.
 ; This is all done at the same time to minimize the number of times the
 ; semantic code is traversed.
+; The semantics of INSN must already be compiled and stored in
+; compiled-semantics.
 ;
-; The result is (descriptor compiled-semantics attrs).
+; The result is (descriptor attrs).
 ; `descriptor' is #f for insns with an empty field list
 ; (this happens for virtual insns).
-; `compiled-semantics' is #f if COMPUTE-SFORMAT? is #f.
 ; `attrs' is an <attr-list> object of attributes derived from the semantics.
 ;
 ; ??? We never traverse the semantics of virtual insns.
@@ -415,8 +416,7 @@
 	; Field list is unspecified.
 	(list #f #f atlist-empty)
 
-	; FIXME: error checking (e.g. missing or overlapping bits)
-	(let* ((sem (insn-semantics insn))
+	(let* ((sem (insn-canonical-semantics insn))
 	       ; Compute list of input and output operands if asked for.
 	       (sem-ops (if compute-sformat?
 			    (semantic-compile #f ; FIXME: context
@@ -425,14 +425,15 @@
 				       (if sem
 					   (semantic-attrs #f ; FIXME: context
 							   insn sem)
-					   atlist-empty))))
-	       )
+					   atlist-empty)))))
+
 	  (let ((compiled-sem (csem-code sem-ops))
 		(in-ops (csem-inputs sem-ops))
 		(out-ops (csem-outputs sem-ops))
 		(attrs (csem-attrs sem-ops))
 		(cti? (or (atlist-cti? (csem-attrs sem-ops))
 			  (insn-cti? insn))))
+
 	    (list (make <fmt-desc>
 		    cti? sorted-ifields in-ops out-ops
 		    (if (and in-ops out-ops)

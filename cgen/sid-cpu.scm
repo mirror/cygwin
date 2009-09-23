@@ -705,18 +705,25 @@ using namespace cgen;
 
 (define (gen-semantic-code insn)
   ; Indicate generating code for INSN.
-  ; Use the compiled form if available.
-  ; The case when they're not available is for virtual insns.
-  (let ((sem-c-code
-	 (if (insn-compiled-semantics insn)
-	     (rtl-c++-parsed VOID (insn-compiled-semantics insn) nil
-			     #:rtl-cover-fns? #t
-			     #:owner insn)
-	     (rtl-c++ VOID (insn-semantics insn) nil
-		      #:rtl-cover-fns? #t
-		      #:owner insn)))
-	)
-    sem-c-code)
+  ; Use the canonical form if available.
+  ; The case when they're not available is for virtual insns. (??? Still true?)
+  (cond ((insn-compiled-semantics insn)
+	 => (lambda (sem)
+	      (rtl-c++-parsed VOID sem nil
+			      #:for-insn? #t
+			      #:rtl-cover-fns? #t
+			      #:owner insn)))
+	((insn-canonical-semantics insn)
+	 => (lambda (sem)
+	      (rtl-c++-parsed VOID sem nil
+			      #:for-insn? #t
+			      #:rtl-cover-fns? #t
+			      #:owner insn)))
+	(else
+	 (rtl-c++ VOID (insn-semantics insn) nil
+		  #:for-insn? #t
+		  #:rtl-cover-fns? #t
+		  #:owner insn)))
 )
 
 ; Return definition of C function to perform INSN.
@@ -887,6 +894,7 @@ using namespace @prefix@; // FIXME: namespace organization still wip\n"))
 	 (string-append
 	  "      "
 	  (rtl-c++ VOID (isa-setup-semantics (current-isa)) nil
+		   #:for-insn? #t
 		   #:rtl-cover-fns? #t
 		   #:owner insn))
 	 "")
@@ -1112,16 +1120,19 @@ struct @prefix@_pbb_label {
   (let ((sem (sfrag-compiled-semantics frag))
 	; If the frag has one owner, use it.  Otherwise indicate the owner is
 	; unknown.  In cases where the owner is needed by the semantics, the
-	; frag should have only one owner.
+	; frag should have only one owner.  In practice this means that frags
+	; with the ref,current-insn rtx cannot be used by multiple insns.
 	(owner (if (= (length (sfrag-users frag)) 1)
 		   (car (sfrag-users frag))
 		   #f))
 	)
     (if sem
 	(rtl-c++-parsed VOID sem locals
+			#:for-insn? #t
 			#:rtl-cover-fns? #t
 			#:owner owner)
 	(rtl-c++ VOID (sfrag-semantics frag) locals
+		 #:for-insn? #t
 		 #:rtl-cover-fns? #t
 		 #:owner owner)))
 )

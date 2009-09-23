@@ -40,6 +40,8 @@
 		; that require a unique hardware element to be refered to are
 		; required to ensure duplicates are discarded (usually done
 		; by keeping the appropriate machs).
+		; All h/w elements with the same semantic name are required
+		; to be the same kind (register, immediate, etc.).
 		; FIXME: Rename to hw.
 		(type . #f)
 
@@ -276,6 +278,7 @@
 ; NOTE: Even if the mode isn't changing this creates a copy.
 ; If OP has been subclassed the result must contain the complete class
 ; (e.g. the behaviour of `object-copy-top').
+; NEW-MODE-NAME must be a valid numeric mode.
 
 (define (op:new-mode op new-mode-name)
   (let ((result (object-copy-top op)))
@@ -284,11 +287,12 @@
     ;   " hw-name=" (op:hw-name op)
     ;   " mode=" (op:mode op)
     ;   " newmode=" new-mode-name)
-    (if (or (eq? new-mode-name 'DFLT)
-	    (eq? new-mode-name 'VOID) ; temporary: for upward compatibility
-	    (mode:eq? new-mode-name (op:mode op)))
-	; Mode isn't changing.
-	result
+;    (if (or (eq? new-mode-name 'DFLT)
+;	    (eq? new-mode-name 'VOID) ; temporary: for upward compatibility
+;	    (mode:eq? new-mode-name (op:mode op)))
+;	; Mode isn't changing.
+;	result
+    (if #t ;; FIXME
 	; See if new mode is supported by the hardware.
 	(if (hw-mode-ok? (op:type op) new-mode-name (op:index op))
 	    (let ((new-mode (mode:lookup new-mode-name)))
@@ -733,10 +737,31 @@
 	      '())
 )
 
-(method-make-make! <derived-operand>
-		   '(name comment attrs mode
-			  args syntax base-ifield encoding ifield-assertion
-			  getter setter)
+;; <derived-operand> constructor.
+;; MODE is a <mode> object.
+
+(method-make!
+ <derived-operand> 'make!
+ (lambda (self name comment attrs mode
+	       args syntax base-ifield encoding ifield-assertion
+	       getter setter)
+   (elm-set! self 'name name)
+   (elm-set! self 'comment comment)
+   (elm-set! self 'attrs attrs)
+   (elm-set! self 'sem-name name)
+   (elm-set! self 'pretty-sem-name #f) ;; FIXME
+   (elm-set! self 'hw-name #f) ;; FIXME
+   (elm-set! self 'mode mode)
+   (elm-set! self 'mode-name (obj:name mode))
+   (elm-set! self 'getter getter)
+   (elm-set! self 'setter setter)
+   ;; These are the additional fields in <derived-operand>.
+   (elm-set! self 'args args)
+   (elm-set! self 'syntax syntax)
+   (elm-set! self 'base-ifield base-ifield)
+   (elm-set! self 'encoding encoding)
+   (elm-set! self 'ifield-assertion ifield-assertion)
+   self)
 )
 
 (define (derived-operand? x) (class-instance? <derived-operand> x))
@@ -767,11 +792,14 @@
 
 (method-make!
  <anyof-operand> 'make!
- (lambda (self name comment attrs mode base-ifield choices)
+ (lambda (self name comment attrs mode-name base-ifield choices)
    (elm-set! self 'name name)
    (elm-set! self 'comment comment)
    (elm-set! self 'attrs attrs)
-   (elm-set! self 'mode-name mode)
+   (elm-set! self 'sem-name name)
+   (elm-set! self 'pretty-sem-name #f) ;; FIXME
+   (elm-set! self 'hw-name #f) ;; FIXME
+   (elm-set! self 'mode-name mode-name)
    (elm-set! self 'base-ifield base-ifield)
    (elm-set! self 'choices choices)
    ; Set index to a special marker value.
@@ -806,17 +834,15 @@
 	  ))
 )
 
-; Subroutine of /derived-operand-parse to parse the ifield assertion.
-; The ifield assertion is either () or an RTL expression asserting something
-; about the ifield values of the containing insn.
-; Operands are specified by name, but what is used is their indices (there's
-; an implicit `index-of' going on).
+;; Subroutine of /derived-operand-parse to parse the ifield assertion.
+;; The ifield assertion is either () or a (restricted) RTL expression
+;; asserting something about the ifield values of the containing insn.
+;; The result is #f if the assertion is (), or the canonical rtl.
 
-(define (/derived-parse-ifield-assertion context args ifield-assertion)
-  ; FIXME: for now
+(define (/derived-parse-ifield-assertion context ifield-assertion)
   (if (null? ifield-assertion)
       #f
-      ifield-assertion)
+      (rtx-canonicalize context 'INT ifield-assertion nil))
 )
 
 ; Parse a derived operand definition.
@@ -864,18 +890,19 @@
 		       syntax
 		       base-ifield ; FIXME: validate
 		       parsed-encoding
-		       (/derived-parse-ifield-assertion context args ifield-assertion)
+		       (/derived-parse-ifield-assertion context ifield-assertion)
 		       (if (null? getter)
 			   #f
 			   (/operand-parse-getter context
 						  (list args
-							(rtx-canonicalize context getter))
+							(rtx-canonicalize context mode getter nil))
 						  (length args)))
 		       (if (null? setter)
 			   #f
 			   (/operand-parse-setter context
 						  (list (append args '(newval))
-							(rtx-canonicalize context setter))
+							(rtx-canonicalize context 'VOID setter
+									  (list (list 'newval mode #f))))
 						  (length args)))
 		       )))
 	    (elm-set! result 'hw-name (obj:name (hardware-for-mode mode-obj)))

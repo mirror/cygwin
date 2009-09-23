@@ -679,6 +679,8 @@ See the input .cpu file(s) for copyright information.
 ; The possibilities are: MEM, FPU.
 
 (define (get-insn-properties insn)
+  (logit 2 "Collecting properties of insn " (obj:name insn) " ...\n")
+
   (let*
       ((context #f) ; ??? do we need a better context?
 
@@ -687,15 +689,14 @@ See the input .cpu file(s) for copyright information.
        (sem-attrs (list #f))
 
        ; Called for expressions encountered in SEM-CODE-LIST.
-       ; MODE is the name of the mode.
        (process-expr!
-	(lambda (rtx-obj expr mode parent-expr op-pos tstate appstuff)
+	(lambda (rtx-obj expr parent-expr op-pos tstate appstuff)
 	  (case (car expr)
 
-	    ((operand) (if (memory? (op:type (rtx-operand-obj expr)))
+	    ((operand) (if (memory? (op:type (current-op-lookup (rtx-arg1 expr))))
 			   ; Don't change to '(MEM), since we use append!.
 			   (append! sem-attrs (list 'MEM)))
-		       (if (mode-float? (op:mode (rtx-operand-obj expr)))
+		       (if (mode-float? (mode:lookup (rtx-mode expr)))
 			   ; Don't change to '(FPU), since we use append!.
 			   (append! sem-attrs (list 'FPU)))
 		       )

@@ -7,9 +7,27 @@
 ;; In particular:
 ;; rtx-simplify
 ;; rtx-solve
-;; rtx-canonicalize
-;; rtx-compile
 ;; rtx-trim-for-doc
+
+;; Utility to verify there are no DFLT modes present in EXPR
+
+;; Subroutine of rtx-verify-no-dflt-modes to simplify it.
+;; This is the EXPR-FN argument to rtl-traverse.
+
+(define (/rtx-verify-no-dflt-modes-expr-fn rtx-obj expr parent-expr op-pos
+					   tstate appstuff)
+  (if (eq? (rtx-mode expr) 'DFLT)
+      (tstate-error tstate "DFLT mode present" expr))
+
+  ;; Leave EXPR unchanged and continue.
+  #f
+)
+
+;; Entry point.  Verify there are no DFLT modes in EXPR.
+
+(define (rtx-verify-no-dflt-modes context expr)
+  (rtx-traverse context #f expr /rtx-verify-no-dflt-modes-expr-fn #f)
+)
 
 ;; rtx-simplify (and supporting cast)
 
@@ -116,9 +134,8 @@
 
 ; Subroutine of rtx-simplify.
 ; This is the EXPR-FN argument to rtx-traverse.
-; MODE is the name of the mode.
 
-(define (/rtx-simplify-expr-fn rtx-obj expr mode parent-expr op-pos
+(define (/rtx-simplify-expr-fn rtx-obj expr parent-expr op-pos
 			       tstate appstuff)
 
   ;(display "Processing ") (display (rtx-dump expr)) (newline)
@@ -127,9 +144,7 @@
 
     ((not)
      (let* ((arg (/rtx-traverse (rtx-alu-op-arg expr 0)
-				'RTX
-				(rtx-alu-op-mode expr)
-				expr 1 tstate appstuff))
+				'RTX expr 1 tstate appstuff))
 	    (no-side-effects? (not (rtx-side-effects? arg))))
        (cond ((and no-side-effects? (rtx-false? arg))
 	      (rtx-true))
@@ -139,9 +154,9 @@
 
     ((orif)
      (let ((arg0 (/rtx-traverse (rtx-boolif-op-arg expr 0)
-				'RTX 'DFLT expr 0 tstate appstuff))
+				'RTX expr 0 tstate appstuff))
 	   (arg1 (/rtx-traverse (rtx-boolif-op-arg expr 1)
-				'RTX 'DFLT expr 1 tstate appstuff)))
+				'RTX expr 1 tstate appstuff)))
        (let ((no-side-effects-0? (not (rtx-side-effects? arg0)))
 	     (no-side-effects-1? (not (rtx-side-effects? arg1))))
 	 (cond ((and no-side-effects-0? (rtx-true? arg0))
@@ -160,9 +175,9 @@
 
     ((andif)
      (let ((arg0 (/rtx-traverse (rtx-boolif-op-arg expr 0)
-				'RTX 'DFLT expr 0 tstate appstuff))
+				'RTX expr 0 tstate appstuff))
 	   (arg1 (/rtx-traverse (rtx-boolif-op-arg expr 1)
-				'RTX 'DFLT expr 1 tstate appstuff)))
+				'RTX expr 1 tstate appstuff)))
        (let ((no-side-effects-0? (not (rtx-side-effects? arg0)))
 	     (no-side-effects-1? (not (rtx-side-effects? arg1))))
 	 (cond ((and no-side-effects-0? (rtx-false? arg0))
@@ -186,16 +201,17 @@
 	    ; ??? Was this but that calls rtx-traverse again which
 	    ; resets the temp stack!
 	    ; (rtx-simplify context (caddr expr))))
-	    (/rtx-traverse (rtx-if-test expr) 'RTX 'DFLT expr 1 tstate appstuff)))
+	    (/rtx-traverse (rtx-if-test expr) 'RTX expr 1 tstate appstuff)))
        (cond ((rtx-true? test)
-	      (/rtx-traverse (rtx-if-then expr) 'RTX mode expr 2 tstate appstuff))
+	      (/rtx-traverse (rtx-if-then expr) 'RTX expr 2 tstate appstuff))
 	     ((rtx-false? test)
 	      (if (rtx-if-else expr)
-		  (/rtx-traverse (rtx-if-else expr) 'RTX mode expr 3 tstate appstuff)
+		  (/rtx-traverse (rtx-if-else expr) 'RTX expr 3 tstate appstuff)
 		  ; Sanity check, mode must be VOID.
+		  ; FIXME: DFLT can no longer appear
 		  (if (or (mode:eq? 'DFLT (rtx-mode expr))
 			  (mode:eq? 'VOID (rtx-mode expr)))
-		      (rtx-make 'nop)
+		      (rtx-make 'nop 'VOID)
 		      (error "rtx-simplify: non-void-mode `if' missing `else' part" expr))))
 	     ; Can't simplify.
 	     ; We could traverse the then/else clauses here, but it's simpler
@@ -207,10 +223,8 @@
      (let ((name (rtx-name expr))
 	   (cmp-mode (rtx-cmp-op-mode expr))
 	   (arg0 (/rtx-traverse (rtx-cmp-op-arg expr 0) 'RTX
-				(rtx-cmp-op-mode expr)
 				expr 1 tstate appstuff))
 	   (arg1 (/rtx-traverse (rtx-cmp-op-arg expr 1) 'RTX
-				(rtx-cmp-op-mode expr)
 				expr 2 tstate appstuff)))
        (if (or (rtx-side-effects? arg0) (rtx-side-effects? arg1))
 	   (rtx-make name cmp-mode arg0 arg1)
@@ -277,7 +291,7 @@
 
 ; Simplify an rtl expression.
 ;
-; EXPR must be in source form.
+; EXPR must be in canonical source form.
 ; The result is a possibly simplified EXPR, still in source form.
 ;
 ; CONTEXT is a <context> object or #f, used for error messages.
@@ -298,11 +312,11 @@
 ; ??? Will become more intelligent as needed.
 
 (define (rtx-simplify context owner expr known)
-  (/rtx-traverse expr #f 'DFLT #f 0
+  (/rtx-traverse expr #f #f 0
 		 (tstate-make context owner
-			      (/fastcall-make /rtx-simplify-expr-fn)
+			      /rtx-simplify-expr-fn
 			      (rtx-env-empty-stack)
-			      #f #f known 0)
+			      #f known 0)
 		 #f)
 )
 
@@ -310,7 +324,7 @@
 ;; CONTEXT is a <context> object or #f, used for error messages.
 
 (define (rtx-simplify-insn context insn)
-  (rtx-simplify context insn (insn-semantics insn)
+  (rtx-simplify context insn (insn-canonical-semantics insn)
 		(insn-build-known-values insn))
 )
 
@@ -325,9 +339,8 @@
 
 ; Subroutine of rtx-solve.
 ; This is the EXPR-FN argument to rtx-traverse.
-; MODE is the name of the mode.
 
-(define (/solve-expr-fn rtx-obj expr mode parent-expr op-pos tstate appstuff)
+(define (/solve-expr-fn rtx-obj expr parent-expr op-pos tstate appstuff)
   #f ; wip
 )
 
@@ -352,11 +365,11 @@
   (let* ((simplified-expr (rtx-simplify context owner expr known))
 	 (maybe-solved-expr
 	  simplified-expr) ; FIXME: for now
-;	  (/rtx-traverse simplified-expr #f 'DFLT #f 0
+;	  (/rtx-traverse simplified-expr #f #f 0
 ;			 (tstate-make context owner
-;				      (/fastcall-make /solve-expr-fn)
+;				      /solve-expr-fn
 ;				      (rtx-env-empty-stack)
-;				      #f #f known 0)
+;				      #f known 0)
 ;			 #f))
 	 )
     (cond ((rtx-true? maybe-solved-expr) #t)
@@ -364,101 +377,15 @@
 	  (else '?)))
 )
 
-;; rtx-canonicalize (and supporting cast)
-
-; RTX canonicalization.
-; ??? wip
-
-; Subroutine of rtx-canonicalize.
-; Return canonical form of rtx expression EXPR.
-; CONTEXT is a <context> object or #f if there is none.
-; It is used for error message.
-; RTX-OBJ is the <rtx-func> object of (car expr).
-
-(define (/rtx-canonicalize-expr context rtx-obj expr)
-  #f
-)
-
-; Return canonical form of EXPR.
-; CONTEXT is a <context> object or #f if there is none.
-; It is used for error message.
-;
-; Does:
-; - operand shortcuts expanded
-;   - numbers -> (const number)
-;   - operand-name -> (operand operand-name)
-;   - ifield-name -> (ifield ifield-name)
-; - no options -> null option list
-; - absent result mode of those that require a mode -> DFLT
-; - rtx macros are expanded
-;
-; EXPR is returned in source form.  We could speed up future processing by
-; transforming it into a more compiled form, but that makes debugging more
-; difficult, so for now we don't.
-
-(define (rtx-canonicalize context expr)
-  ; FIXME: wip
-  (cond ((integer? expr)
-	 (rtx-make-const 'INT expr))
-	((symbol? expr)
-	 (let ((op (current-op-lookup expr)))
-	   (if op
-	       (rtx-make-operand expr)
-	       (context-error context
-			      "While canonicalizing rtl"
-			      "can't canonicalize, unknown symbol"
-			      expr))))
-	((pair? expr)
-	 expr)
-	(else
-	 (context-error context
-			"While canonicalizing rtl"
-			"can't canonicalize, syntax error"
-			expr)))
-)
-
-;; rtx-compile (and supporting cast)
-
-;; Subroutine of rtx-compile.
-;; This is the tstate-expr-fn.
-;; MODE is the name of the mode.
-
-(define (/compile-expr-fn rtx-obj expr mode parent-expr op-pos tstate appstuff)
-; (cond 
-; The intent of this is to handle sequences/closures, but is it needed?
-;  ((rtx-style-syntax? rtx-obj)
-;   ((rtx-evaluator rtx-obj) rtx-obj expr mode
-;			     parent-expr op-pos tstate))
-;  (else
-  (cons (car expr) ; rtx-obj
-	(/rtx-traverse-operands rtx-obj expr tstate appstuff))
-)
-
-; Convert rtl expression EXPR from source form to compiled form.
-; The expression is validated and rtx macros are expanded as well.
-; CONTEXT is a <context> object or #f if there is none.
-; It is used in error messages.
-; EXTRA-VARS-ALIST is an association list of extra (symbol <mode> value)
-; elements to be used during value lookup.
-;
-; This does the same operation that rtx-traverse does, except that it provides
-; a standard value for EXPR-FN.
-;
-; ??? In the future the compiled form may be the same as the source form
-; except that all elements would be converted to their respective objects.
-
-(define (rtx-compile context expr extra-vars-alist)
-  (/rtx-traverse expr #f 'DFLT #f 0
-		 (tstate-make context #f
-			      (/fastcall-make /compile-expr-fn)
-			      (rtx-env-init-stack1 extra-vars-alist)
-			      #f #f nil 0)
-		 #f)
-)
-
 ;; rtx-trim-for-doc (and supporting cast)
+;; RTX trimming (removing fluff not normally needed for the human viewer).
 
-; RTX trimming (removing fluff not normally needed for the human viewer).
+;; Subroutine of /rtx-trim-args to simplify it.
+;; Trim a list of rtxes.
+
+(define (/rtx-trim-rtx-list rtx-list)
+  (map /rtx-rtim-for-doc rtx-list)
+)
 
 ; Subroutine of /rtx-trim-for-doc to simplify it.
 ; Trim all the arguments of rtx NAME.
@@ -487,7 +414,9 @@
 	      ((OPTIONS)
 	       (assert #f)) ; shouldn't get here
 
-	      ((ANYMODE INTMODE FLOATMODE NUMMODE EXPLNUMMODE NONVOIDMODE VOIDMODE DFLTMODE)
+	      ((ANYINTMODE ANYFLOATMODE ANYNUMMODE ANYEXPRMODE EXPLNUMMODE
+		VOIDORNUMMODE VOIDMODE BIMODE INTMODE
+		SYMMODE INSNMODE MACHMODE)
 	       #f) ; leave arg untouched
 
 	      ((RTX SETRTX TESTRTX)
@@ -529,11 +458,12 @@
 		  (cons new-arg result))))))
 )
 
-; Given a fully specified rtx expression, usually the result of rtx-simplify,
+; Given a canonical rtl expression, usually the result of rtx-simplify,
 ; remove bits unnecessary for documentation purposes.
-; rtx-simplify adds a lot of verbosity because in the process of
-; simplifying the rtl it produces fully-specified rtl.
-; Examples of things to remove: empty options list, DFLT mode.
+; Canonical rtl too verbose for docs.
+; Examples of things to remove:
+; - empty options list
+; - ifield/operand/local/const wrappers
 ;
 ; NOTE: While having to trim the result of rtx-simplify may seem ironical,
 ; it isn't.  You need to keep separate the notions of simplifying "1+1" to "2"
@@ -548,14 +478,24 @@
 
 	(case name
 
-	  ((const) (car rest))
-
-	  ((ifield operand local)
+	  ((const ifield operand local)
 	   (if (null? options)
-	       (if (eq? mode 'DFLT)
-		   (car rest)
-		   (cons name (cons mode rest)))
+	       (car rest)
 	       rtx))
+
+	  ((set)
+	   (let ((trimmed-args (/rtx-trim-args name rest)))
+	     (if (null? options)
+		 (cons name trimmed-args)
+		 (cons name (cons options (cons mode trimmed-args))))))
+
+	  ((if)
+	   (let ((trimmed-args (/rtx-trim-args name rest)))
+	     (if (null? options)
+		 (if (eq? mode 'VOID)
+		     (cons name trimmed-args)
+		     (cons name (cons mode trimmed-args)))
+		 (cons name (cons options (cons mode trimmed-args))))))
 
 	  ((sequence parallel)
 	   ; No special support is needed, except it's nice to remove nop
@@ -568,7 +508,7 @@
 			     (set! result (cons rtx result))))
 		       trimmed-args)
 	     (if (null? options)
-		 (if (eq? mode 'DFLT)
+		 (if (eq? mode 'VOID)
 		     (cons name (reverse result))
 		     (cons name (cons mode (reverse result))))
 		 (cons name (cons options (cons mode (reverse result)))))))
@@ -576,7 +516,7 @@
 	  (else
 	   (let ((trimmed-args (/rtx-trim-args name rest)))
 	     (if (null? options)
-		 (if (eq? mode 'DFLT)
+		 (if (eq? mode 'DFLT) ;; FIXME: DFLT can no longer appear
 		     (cons name trimmed-args)
 		     (cons name (cons mode trimmed-args)))
 		 (cons name (cons options (cons mode trimmed-args))))))))

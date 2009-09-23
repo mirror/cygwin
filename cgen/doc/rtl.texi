@@ -2853,20 +2853,25 @@ an experiment and will probably change.
 Skip the next instruction if @samp{yes?} is non-zero. This rtx is
 an experiment and will probably change.
 
-@item (attr mode kind attr-name)
-Return the value of attribute @samp{attr-name} in mode
-@samp{mode}. @samp{kind} must currently be @samp{insn}: the current
-instruction.
-
 @item (symbol name)
 Return a symbol with value @samp{name}, for use in attribute
 processing. This is equivalent to @samp{quote} in Scheme but
 @samp{quote} sounds too jargonish.
 
-@item (eq-attr mode attr-name value)
-Return non-zero if the value of attribute @samp{attr-name} is
-@samp{value}. If @samp{value} is a list return ``true'' if
-@samp{attr-name} is any of the listed values.
+@item (int-attr mode object attr-name)
+Return the value of attribute @samp{attr-name} in mode @samp{mode}.
+@samp{object} must currently be @samp{(current-insn)}, the current instruction,
+or @samp{(current-mach)}, the current machine.
+The attribute's value must be representable as an integer.
+
+@item (eq-attr mode object attr-name value)
+Return non-zero if the value of attribute @samp{attr-name} of
+object @samp{object} is @samp{value}.
+
+@emph{NOTE:} List values of @samp{value} may be changed to allow use the
+@samp{number-list} rtx function.
+If @samp{value} is a list return ``true'' if the attribute is any of
+the listed values.  But this is not implemented yet.
 
 @item (index-of operand)
 Return the index of @samp{operand}. For registers this is the register number.

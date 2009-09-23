@@ -71,18 +71,17 @@
 ; Subroutine of semantic-compile:process-expr!, to simplify it.
 ; Looks up the operand in the current set, returns it if found,
 ; otherwise adds it.
-; MODE is the mode name.
 ; REF-TYPE is one of 'use, 'set, 'set-quiet.
 ; Adds COND-CTI/UNCOND-CTI to SEM-ATTRS if the operand is a set of the pc.
 
-(define (/build-operand! op-name op mode tstate ref-type op-list sem-attrs)
-  ;(display (list op-name mode ref-type)) (newline) (force-output)
-  (let* ((mode (mode-real-name (if (eq? mode 'DFLT)
-				   (op:mode op)
-				   (mode:lookup mode))))
-         ; The first #f is a placeholder for the object.
-	 (try (list '-op- #f mode op-name #f))
+(define (/build-operand! op-expr tstate ref-type op-list sem-attrs)
+  (let* ((op (rtx-operand-obj op-expr))
+	 (mode (rtx-mode op-expr))
+	 ;; The first #f is a placeholder for the object.
+	 (try (list '-op- #f mode (rtx-arg1 op-expr) #f))
 	 (existing-op (/rtx-find-op try op-list)))
+
+    (assert (not (eq? (op:mode-name op) 'DFLT)))
 
     (if (and (pc? op)
 	     (memq ref-type '(set set-quiet)))
@@ -99,10 +98,10 @@
 	; operands.  This is done by creating shared rtx (a la gcc) - the
 	; operand number then need only be updated in one place.
 
-	(let ((xop (op:new-mode op mode)))
-	  (op:set-cond?! xop (tstate-cond? tstate))
+	(begin
+	  (op:set-cond?! op (tstate-cond? tstate))
 	  ; Set the object rtx in `try', now that we have it.
-	  (set-car! (cdr try) (rtx-make 'xop xop))
+	  (set-car! (cdr try) (rtx-make-xop op))
 	  ; Add the operand to in/out-ops.
 	  (append! op-list (list try))
 	  (cadr try))))
@@ -116,10 +115,7 @@
 
     (if hw
 
-	; If the mode is DFLT, use the object's natural mode.
-	(let* ((mode (mode-real-name (if (eq? (rtx-mode expr) 'DFLT)
-					 (hw-mode hw)
-					 (mode:lookup (rtx-mode expr)))))
+	(let* ((mode (rtx-mode expr))
 	       (indx-sel (rtx-reg-index-sel expr))
 	       ; #f is a place-holder for the object (filled in later)
 	       (try (list 'reg #f mode hw-name indx-sel))
@@ -135,7 +131,7 @@
 						(cons hw-name indx-sel))))))
 		(op:set-cond?! xop (tstate-cond? tstate))
 		; Set the object rtx in `try', now that we have it.
-		(set-car! (cdr try) (rtx-make 'xop xop))
+		(set-car! (cdr try) (rtx-make-xop xop))
 		; Add the operand to in/out-ops.
 		(append! op-list (list try))
 		(cadr try))))
@@ -146,12 +142,8 @@
 ; Subroutine of semantic-compile:process-expr!, to simplify it.
 
 (define (/build-mem-operand! expr tstate op-list)
-  (let ((mode (mode-real-name (mode:lookup (rtx-mode expr))))
+  (let ((mode (rtx-mode expr))
 	(indx-sel (rtx-mem-index-sel expr)))
-
-    (if (memq mode '(DFLT VOID))
-	(parse-error (tstate-context tstate)
-		     "memory must have explicit mode" expr))
 
     (let* ((try (list 'mem #f mode 'h-memory indx-sel))
 	   (existing-op (/rtx-find-op try op-list)))
@@ -165,7 +157,7 @@
 				      (cons mode indx-sel)))))
 	    (op:set-cond?! xop (tstate-cond? tstate))
 	    ; Set the object in `try', now that we have it.
-	    (set-car! (cdr try) (rtx-make 'xop xop))
+	    (set-car! (cdr try) (rtx-make-xop xop))
 	    ; Add the operand to in/out-ops.
 	    (append! op-list (list try))
 	    (cadr try)))))
@@ -198,7 +190,7 @@
 			   (make <hw-index> 'anonymous
 				 'ifield (ifld-mode f) f)
 			   nil #f #f)))
-	    (set-car! (cdr try) (rtx-make 'xop xop))
+	    (set-car! (cdr try) (rtx-make-xop xop))
 	    (append! op-list (list try))
 	    (cadr try)))))
 )
@@ -246,7 +238,7 @@
 				     ; (send (op:type op) 'get-index-mode)
 				     f)
 			       nil #f #f)))
-		(set-car! (cdr try) (rtx-make 'xop xop))
+		(set-car! (cdr try) (rtx-make-xop xop))
 		(append! op-list (list try))
 		(cadr try)))))))
 )
@@ -337,11 +329,13 @@
        (sem-attrs (list #f))
 
        ; Called for expressions encountered in SEM-CODE.
-       ; MODE is the name of the mode.
        ; Don't waste cpu here, this is part of the slowest piece in CGEN.
        (process-expr!
-	(lambda (rtx-obj expr mode parent-expr op-pos tstate appstuff)
+	(lambda (rtx-obj expr parent-expr op-pos tstate appstuff)
 	  (case (car expr)
+
+	    ;; NOTE: Despite the ! in, e.g., /build-reg-operand!,
+	    ;; it does return a result.
 
 	    ; Registers.
 	    ((reg) (let ((ref-type (/rtx-ref-type parent-expr op-pos))
@@ -373,16 +367,15 @@
 					      out-ops))))
 
 	    ; Operands.
-	    ((operand) (let ((op (rtx-operand-obj expr))
-			     (ref-type (/rtx-ref-type parent-expr op-pos)))
-			 (/build-operand! (obj:name op) op mode tstate ref-type
+	    ((operand) (let ((ref-type (/rtx-ref-type parent-expr op-pos)))
+			 (/build-operand! expr tstate ref-type
 					  (if (eq? ref-type 'use)
 					      in-ops
 					      out-ops)
 					  sem-attrs)))
 
 	    ; Give operand new name.
-	    ((name) (let ((result (/rtx-traverse (caddr expr) 'RTX mode
+	    ((name) (let ((result (/rtx-traverse (caddr expr) 'RTX
 						 parent-expr op-pos tstate appstuff)))
 		      (if (not (operand? result))
 			  (error "name: invalid argument:" expr result))
@@ -509,12 +502,12 @@
        (sem-attrs (list #f))
 
        ; Called for expressions encountered in SEM-CODE.
-       ; MODE is the name of the mode.
        (process-expr!
-	(lambda (rtx-obj expr mode parent-expr op-pos tstate appstuff)
+	(lambda (rtx-obj expr parent-expr op-pos tstate appstuff)
 	  (case (car expr)
 
-	    ((operand) (if (and (eq? 'pc (obj:name (rtx-operand-obj expr)))
+	    ;; FIXME: What's the result for the operand case?
+	    ((operand) (if (and (eq? 'pc (rtx-operand-name expr))
 				(memq (/rtx-ref-type parent-expr op-pos)
 				      '(set set-quiet)))
 			   (append! sem-attrs

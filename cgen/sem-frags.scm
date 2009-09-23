@@ -174,7 +174,7 @@
 
 ;; MODE is the name of the mode.
 
-(define (/frag-hash-compute! rtx-obj expr mode parent-expr op-pos tstate appstuff)
+(define (/frag-hash-compute! rtx-obj expr parent-expr op-pos tstate appstuff)
   (let ((h 0))
     (case (rtx-name expr)
       ((operand)
@@ -211,7 +211,7 @@
 
 ;; MODE is the name of the mode.
 
-(define (/frag-cost-compute! rtx-obj expr mode parent-expr op-pos tstate appstuff)
+(define (/frag-cost-compute! rtx-obj expr parent-expr op-pos tstate appstuff)
   ; FIXME: wip
   (let ((speed 0)
 	(size 0))
@@ -990,7 +990,7 @@
 (define (sem-find-common-frags insn-list)
   (/sem-find-common-frags-1
    (begin
-     (logit 2 "Simplifying/canonicalizing rtl ...\n")
+     (logit 2 "Simplifying rtl ...\n")
      (map (lambda (insn)
 	    (rtx-simplify-insn #f insn))
 	  insn-list))

@@ -44,7 +44,8 @@
 		tmp
 
 		; Instruction semantics.
-		; This is the rtl in source form or #f if there is none.
+		; This is the rtl in source form, as provided in the
+		; description file, or #f if there is none.
 		;
 		; There are a few issues (ick, I hate that word) to consider
 		; here:
@@ -62,9 +63,13 @@
 		; separate class.
 		; ??? Contents of trap expressions is wip.  It will probably
 		; be a sequence with an #:errchk modifier or some such.
-		(semantics . #f)
+		semantics
 
-		; The processed form of the above.
+		; The processed form of the semantics.
+		; This remains #f for virtual insns (FIXME: keep?).
+		(canonical-semantics . #f)
+
+		; The processed form of the semantics.
 		; This remains #f for virtual insns (FIXME: keep?).
 		(compiled-semantics . #f)
 
@@ -73,7 +78,7 @@
 		; Another thing that will be needed is [in some cases] a more
 		; simplified version of the RTL for use by apps like compilers.
 		; Perhaps that's what this will become.
-		host-semantics
+		;host-semantics
 
 		; The function unit usage of the instruction.
 		timing
@@ -90,11 +95,12 @@
 
 (define-getters <insn> insn
   (syntax iflds ifield-assertion fmt-desc ifmt sfmt tmp
-	  semantics compiled-semantics host-semantics timing)
+	  semantics canonical-semantics compiled-semantics timing)
 )
 
 (define-setters <insn> insn
-  (fmt-desc ifmt sfmt tmp ifield-assertion compiled-semantics)
+  (fmt-desc ifmt sfmt tmp ifield-assertion
+   canonical-semantics compiled-semantics)
 )
 
 ; Return a boolean indicating if X is an <insn>.
@@ -401,7 +407,8 @@
 
 	(let ((ifield-assertion (if (and ifield-assertion
 					 (not (null? ifield-assertion)))
-				    (rtx-canonicalize context ifield-assertion)
+				    (rtx-canonicalize context 'DFLT ;; BI?
+						      ifield-assertion nil)
 				    #f))
 	      (semantics (if (not (null? semantics))
 			     semantics
@@ -700,6 +707,7 @@
 	  ;; With derived ifields this is really hard, so only do the base insn
 	  ;; for now.  Do the simple test for now, it doesn't catch everything,
 	  ;; but it should catch a lot.
+	  ;; ??? One thing we don't catch yet is overlapping bits.
 
 	  (let* ((base-iflds (find (lambda (f)
 				     (not (ifld-beyond-base? f)))

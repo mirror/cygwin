@@ -1,5 +1,131 @@
 2009-09-23  Doug Evans  <dje@sebabeach.org>
 
+	* xc16x.cpu (h-cr): New hardware.
+	(muls): Comment out parts that won't compile, add fixme.
+	(mulu, divl, divlu, jmpabs, jmpa-, jmprel, jbc, jnbs, callr): Ditto.
+	(scxti, scxtmg, scxtm, bclear, bclr18, bset19, bitset, bmov): Ditto.
+	(bmovn, band, bor, bxor, bcmp, bfldl, bfldh): Ditto.
+
+	Rewrite rtl processing to require it to be "canonicalized" first,
+	and write a full canonicalizer / expression checker.
+	Remove all appearances of DFLT in canonical rtl.
+	* attr.scm (/attr-eval atval owner): Call rtx-canonicalize,
+	then rtx-simplify.
+	* iformat.scm (ifmt-analyze) Use canonical semantics.
+	* insn (<insn>): New member canonical-semantics.
+	* mach.scm (<arch>): New member multi-insns-instantiated?.
+	(/instantiate-multi-insns!): New function.
+	(/canonicalize-insns!): New function.
+	(arch-analyze-insns!): Canonicalize insn semantics before processing
+	them.
+	* mode.scm (/mode-set-word-params!): New function.
+	(mode-void?): New function.
+	(mode-compatible?): VOID is compatible with VOID.
+	(/mode-word-sizes-defined?): New global.
+	(mode-set-word-modes!): Use/set it.
+	(mode-ensure-word-sizes-defined): Update.
+	(mode-builtin!): New builtin "modes" SYM, INSN, MACH.
+	Redo WI/UWI/AI/IAI handling.
+	(op:new-mode): No longer accept DFLT.
+	(<derived-operand> constructor): Ensure all fields are initialized.
+	(<anyof-operand> constructor): Ditto.
+	(/derived-parse-ifield-assertion): Delete arg `args'.
+	All callers updated.
+	* rtl-c.scm (<rtl-c-eval-state>): New member `for-insn?'.
+	(rtl-c): Call rtx-canonicalize instead of rtx-compile.
+	(rtl-c-expr, rtl-c++): Ditto.
+	(/rtl-c-get): Use mode of operand, not containing expression.
+	(rtl-c-set-quiet, rtl-c-set-trace): Remove DFLT support.
+	(/rtx-use-sem-fn?): Don't check for (insn? owner), check
+	estate-for-insn? instead.
+	(s-unop): Use mode of expression, not first operand.
+	(s-binop, s-binop-with-bit, s-shop, s-cmpop): Ditto.
+	(s-sequence): Remove DFLT support.
+	(ifield): Use mode of expression, not UINT.
+	(pc): Comment out, unused.
+	(int-attr): New rtx kind.
+	(attr): Deprecate.
+	(set, set-quiet): Pass src to rtl-c-set-{trace,quiet} for expansion.
+	* rtl-traverse.scm (/rtx-canon-debug?): New global.
+	(/make-cstate): New function.
+	(/cstate-context, /cstate-outer-expr): New functions.
+	(/rtx-canon-error): New function.
+	(/rtx-lookup-hw, /rtx-pick-mode, /rtx-pick-mode3, /rtx-pick-op-mode,
+	/rtx-get-last-cond-case-rtx): New functions.
+	(/rtx-canon-*): New functions.
+	(/rtx-canner-table, /rtx-operand-canoners): New globals.
+	(/rtx-make-canon-table, /rtx-special-expr-canoners): New functions.
+	(/rtx-option, /rtx-option-list?): Rewrite.
+	(rtx-munge-mode&options): Replaces /rtx-munge-mode&options.
+	Rewritten, all callers updated.
+	(/rtx-canon-expr, /rtx-canon): New functions.
+	(rtx-canonicalize): Move here from rtl-xform.scm and rewrite.
+	(rtx-canonicalize-stmt): New function.
+	(tstate-make): Remove arg `set?'.  All callers updated.
+	(tstate-new-set?): Delete.
+	(/rtx-traverse-options, /rtx-traverse-*mode): Delete,
+	moved to /rtx-canon-*.
+	(/rtx-traverse-normal-operand): New function.
+	(/rtx-traverse-rtx-list): Delete arg `mode', all callers updated.
+	(/rtx-traverse-rtx, /rtx-traverse-setrtx,, /rtx-traverse-testrtx,
+	/rtx-traverse-condrtx, /rtx-traverse-casertx, /rtx-traverse-locals,
+	/rtx-traverse-iteration, /rtx-traverse-env, /rtx-traverse-attrs):
+	Ditto.
+	(/rtx-traverse-symbol, /rtx-traverse-string, /rtx-traverse-number,
+	/rtx-traverse-symornum, /rtx-traverse-object): Delete.
+	(/rtx-make-traverser-table): Update.
+	(/rtx-traverse-operands): Remove mode processing, now done during
+	canonicalization.
+	(/rtx-traverse-expr): Delete arg `mode', all callers updated.
+	(/rtx-traverse): Ditto.
+	(rtx-init-traverser-tables!): New function.
+	* rtl-xform (/rtx-verify-no-dflt-modes-expr-fn): New function.
+	(rtx-verify-no-dflt-modes): New function.
+	(/rtx-simplify-expr-fn): Update, `arg' mode deleted.
+	(rtx-simplify-insn): Use insn-canonical-semantics.
+	(rtx-canonicalize): Moved to rtl-traverse.scm.
+	(/compile-expr-fn, rtx-compile): Delete.
+	(/rtx-trim-rtx-list): New function.
+	(/rtx-trim-for-doc): Handle set, if.
+	* rtl.scm (<rtx-func>): New members result-mode, matchexpr-index.
+	(/rtx-valid-mode-types): Update.
+	(/rtx-valid-matches): Update.
+	(/rtx-find-matchexpr-index): New function.
+	(rtx-lookup): Require rtx-kind to be the rtx name.
+	(def-rtx-node): New arg result-mode, all callers updated.
+	(def-rtx-syntax-node, def-rtx-operand-node): Ditto.
+	(rtx-lazy-sem-mode): Delete.
+	(/rtx-closure-make): New arg `mode', all callers updated.
+	(rtx-make-ifield, rtx-make-operand, rtx-make-local): Ditto.
+	(rtx-operand-obj): Rewrite.
+	(rtx-make-xop): New functions.
+	(/hw): Renamed from `hw', all callers updated.
+	Use the correct mode instead of DFLT for the index.
+	(rtl-builtin!): Call rtx-init-traversal-tables!.
+	(rtl-finish!): Update.
+	* rtx-funcs.scm (all rtx functions): New parameter: result-mode.
+	Update mode arg-type.
+	(pc): Comment out.
+	(int-attr): New rtx kind.
+	(attr): Deprecate.
+	* sem-frags.scm (/frag-hash-compute!): Update, mode arg deleted.
+	(/frag-cost-compute!): Ditto.
+	* semantics.scm (/build-operand!): Delete args op-name, op.
+	New arg op-expr.  All callers updated.
+	(/build-mem-operand!): Remove DFLT support.
+	(semantic-compile): Update process-expr!, mode arg deleted.
+	* sid-cpu.scm (gen-semantic-code): Specify #:for-insn? in
+	rtl-c++ calls.
+	(/gen-sem-case, /gen-sfrag-code): Ditto.
+	* sid.scm (/op-gen-set-trace1): Renamed from /op-gen-set-trace.
+	(/op-gen-set-trace): New function.  If not doing profiling,
+	call /op-gen-set-quiet.
+	* sim-cpu.scm (gen-semantic-code): Specify #:for-insn? in rtl-c calls.
+	* utils-gen.scm (/gen-ifld-extract-base): Update call to rtl-c.
+	(/gen-ifld-extract-beyond, gen-multi-ifld-extract): Ditto.
+	* utils.scm (find-first-index): New function.
+	* doc/rtl.texi: Delete docs for `attr'.  Add `int-attr'.
+
 	* rtx-funcs.scm (eq,ne,lt,gt,le,ge,ltu,leu,gtu,geu): Change class
 	to COMPARE.
 	* sem-frags.scm (/frag-cost-compute!): Add COMPARE.

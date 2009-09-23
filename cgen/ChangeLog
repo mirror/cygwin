@@ -1,3 +1,9 @@
+2009-09-23  Doug Evans  <dje@sebabeach.org>
+
+	* rtx-funcs.scm (eq,ne,lt,gt,le,ge,ltu,leu,gtu,geu): Change class
+	to COMPARE.
+	* sem-frags.scm (/frag-cost-compute!): Add COMPARE.
+
 2009-09-21  Doug Evans  <dje@sebabeach.org>
 
 	* rtl-c.scm (/rtl-c-build-table): Renamed from rtl-c-build-table.

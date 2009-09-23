@@ -222,7 +222,7 @@
        ; FIXME: speed/size = 0?
        (set! speed 1)
        (set! size 1))
-      ((UNARY BINARY TRINARY)
+      ((UNARY BINARY TRINARY COMPARE)
        (set! speed 1)
        (set! size 1))
       ((IF)

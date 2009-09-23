@@ -893,54 +893,54 @@
 
 (drn (eq &options &mode s1 s2)
      (OPTIONS ANYMODE RTX RTX) (NA NA OP0 MATCH1)
-     BINARY
+     COMPARE
      #f
 )
 (drn (ne &options &mode s1 s2)
      (OPTIONS ANYMODE RTX RTX) (NA NA OP0 MATCH1)
-     BINARY
+     COMPARE
      #f
 )
 ; ??? In non-sim case, ensure s1,s2 is in right C type for right result.
 (drn (lt &options &mode s1 s2)
      (OPTIONS ANYMODE RTX RTX) (NA NA OP0 MATCH1)
-     BINARY
+     COMPARE
      #f
 )
 (drn (le &options &mode s1 s2)
      (OPTIONS ANYMODE RTX RTX) (NA NA OP0 MATCH1)
-     BINARY
+     COMPARE
      #f
 )
 (drn (gt &options &mode s1 s2)
      (OPTIONS ANYMODE RTX RTX) (NA NA OP0 MATCH1)
-     BINARY
+     COMPARE
      #f
 )
 (drn (ge &options &mode s1 s2)
      (OPTIONS ANYMODE RTX RTX) (NA NA OP0 MATCH1)
-     BINARY
+     COMPARE
      #f
 )
 ; ??? In non-sim case, ensure s1,s2 is in right C type for right result.
 (drn (ltu &options &mode s1 s2)
      (OPTIONS ANYMODE RTX RTX) (NA NA OP0 MATCH1)
-     BINARY
+     COMPARE
      #f
 )
 (drn (leu &options &mode s1 s2)
      (OPTIONS ANYMODE RTX RTX) (NA NA OP0 MATCH1)
-     BINARY
+     COMPARE
      #f
 )
 (drn (gtu &options &mode s1 s2)
      (OPTIONS ANYMODE RTX RTX) (NA NA OP0 MATCH1)
-     BINARY
+     COMPARE
      #f
 )
 (drn (geu &options &mode s1 s2)
      (OPTIONS ANYMODE RTX RTX) (NA NA OP0 MATCH1)
-     BINARY
+     COMPARE
      #f
 )
 

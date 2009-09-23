@@ -86,6 +86,7 @@
 		; UNARY - not, inv, etc.
 		; BINARY - add, sub, etc.
 		; TRINARY - addc, subc, etc.
+		; COMPARE - eq, ne, etc.
 		; IF - if
 		; COND - cond, case
 		; SEQUENCE - sequence, parallel

@@ -32,23 +32,33 @@
   (class-make '<rtx-func> nil
 	      '(
 		; name as it appears in RTL
+		; must be accessed via obj:name
 		name
 
 		; argument list
+		; ??? Not used I think, but keep.
 		args
+
+		; result mode, or #f if from arg 2
+		; (or the containing expression when canonicalizing)
+		result-mode
 
 		; types of each argument, as symbols
 		; This is #f for macros.
 		; Possible values:
-		; OPTIONS - optional list of :-prefixed options.
-		; ANYMODE - any mode
-		; INTMODE - any integer mode
-		; FLOATMODE - any floating point mode
-		; NUMMODE - any numeric mode
+		; OPTIONS - optional list of keyword-prefixed options
+		; ANYINTMODE - any integer mode
+		; ANYFLOATMODE - any floating point mode
+		; ANYNUMMODE - any numeric mode
+		; ANYEXPRMODE - VOID, PTR, or any numeric mode
 		; EXPLNUMMODE - explicit numeric mode, can't be DFLT or VOID
-		; NONVOIDMODE - can't be `VOID'
+		; VOIDORNUMMODE - VOID or any numeric mode
 		; VOIDMODE - must be `VOID'
-		; DFLTMODE - must be `DFLT', used when any mode is inappropriate
+		; BIMODE - BI (boolean or bit int)
+		; INTMODE - must be `INT'
+		; SYMMODE - must be SYM
+		; INSNMODE - must be INSN
+		; MACHMODE - must be MACH
 		; RTX - any rtx
 		; SETRTX - any rtx allowed to be `set'
 		; TESTRTX - the test of an `if'
@@ -57,32 +67,42 @@
 		; LOCALS - the locals list of a sequence
 		; ENV - environment stack
 		; ATTRS - attribute list
-		; SYMBOL - operand must be a symbol
-		; STRING - operand must be a string
-		; NUMBER - operand must be a number
-		; SYMORNUM - operand must be a symbol or number
-		; OBJECT - operand is an object
+		; SYMBOL - arg must be a symbol
+		; STRING - arg must be a string
+		; NUMBER - arg must be a number
+		; SYMORNUM - arg must be a symbol or number
+		; OBJECT - arg is an object (FIXME: restrict to <operand>?)
 		arg-types
 
 		; required mode of each argument
 		; This is #f for macros.
 		; Possible values include any mode name and:
 		; ANY - any mode
+		; ANYINT - any integer mode
 		; NA - not applicable
-		; OP0 - mode is specified in operand 0
-		;       unless it is DFLT in which case use the default mode
-		;       of the operand
-		; MATCH1 - must match mode of operand 1
-		;          which will have OP0 for its mode spec
-		; MATCH2 - must match mode of operand 2
-		;          which will have OP0 for its mode spec
+		; MATCHEXPR - mode has to match the mode specified in the
+		;             containing expression
+		;             NOTE: This isn't necessarily the mode of the
+		;             result of the expression.  E.g. in `set', the
+		;             result always has mode VOID, but the mode
+		;             specified in the expression is the mode of the
+		;             set destination.
+		; MATCHSEQ - for sequences
+		;            last expression has to match mode of sequence,
+		;            preceding expressions must be VOID
+		; MATCH2 - must match mode of arg 2
+		; MATCH3 - must match mode of arg 3
 		; <MODE-NAME> - must match specified mode
 		arg-modes
+
+		; arg number of the MATCHEXPR arg,
+		; or #f if there is none
+		matchexpr-index
 
 		; The class of rtx.
 		; This is #f for macros.
 		; ARG - operand, local, const
-		; SET - set
+		; SET - set, set-quiet
 		; UNARY - not, inv, etc.
 		; BINARY - add, sub, etc.
 		; TRINARY - addc, subc, etc.
@@ -95,10 +115,10 @@
 		class
 
 		; A symbol indicating the flavour of rtx node this is.
-		; function - normal function
-		; syntax - don't pre-eval arguments
-		; operand - result is an operand
-		; macro - converts one rtx expression to another
+		; FUNCTION - normal function
+		; SYNTAX - don't pre-eval arguments
+		; OPERAND - result is an operand
+		; MACRO - converts one rtx expression to another
 		; The word "style" was chosen to be sufficiently different
 		; from "type", "kind", and "class".
 		style
@@ -119,7 +139,7 @@
 ; Accessor fns
 
 (define-getters <rtx-func> rtx
-  (name args arg-types arg-modes class style evaluator num)
+  (result-mode arg-types arg-modes matchexpr-index class style evaluator num)
 )
 
 (define (rtx-style-syntax? rtx) (eq? (rtx-style rtx) 'syntax))
@@ -132,7 +152,8 @@
 
 (define /rtx-valid-mode-types
   '(
-    ANYMODE INTMODE FLOATMODE NUMMODE EXPLNUMMODE NONVOIDMODE VOIDMODE DFLTMODE
+    ANYINTMODE ANYFLOATMODE ANYNUMMODE ANYEXPRMODE EXPLNUMMODE VOIDORNUMMODE
+    VOIDMODE BIMODE INTMODE SYMMODE INSNMODE MACHMODE
    )
 )
 
@@ -150,7 +171,23 @@
 ; List of valid mode matchers, excluding mode names.
 
 (define /rtx-valid-matches
-  '(ANY NA OP0 MATCH1 MATCH2)
+  '(ANY ANYINT NA MATCHEXPR MATCHSEQ MATCH2 MATCH3)
+)
+
+;; Return arg number of MATCHEXPR in ARG-MODES or #f if not present.
+
+(define (/rtx-find-matchexpr-index arg-modes)
+  ;; We can't use find-first-index here because arg-modes can be an
+  ;; improper list (a b c . d).
+  ;;(find-first-index 0 (lambda (t) (eq? t 'MATCHEXPR)) arg-modes)
+  (define (improper-find-first-index i pred l)
+    (cond ((null? l) #f)
+	  ((pair? l)
+	   (cond ((pred (car l)) i)
+		 (else (improper-find-first-index (+ 1 i) pred (cdr l)))))
+	  ((pred l) i)
+	  (else #f)))
+  (improper-find-first-index 0 (lambda (t) (eq? t 'MATCHEXPR)) arg-modes)
 )
 
 ; List of all defined rtx names.  This can be map'd over without having
@@ -166,14 +203,11 @@
 
 ; Look up the <rtx-func> object for RTX-KIND.
 ; Returns the object or #f if not found.
-; RTX-KIND may already be an <rtx-func> object.  FIXME: delete?
+; RTX-KIND is the name of the rtx function.
 
 (define (rtx-lookup rtx-kind)
-  (cond ((symbol? rtx-kind)
-	 (hashq-ref /rtx-func-table rtx-kind))
-	((rtx-func? rtx-kind)
-	 rtx-kind)
-	(else #f))
+  (assert (symbol? rtx-kind))
+  (hashq-ref /rtx-func-table rtx-kind)
 )
 
 ; Table of rtx macro objects.
@@ -209,15 +243,33 @@
 ;
 ; ??? Note that we can support variables.  Not sure it should be done.
 
-(define (def-rtx-node name-args arg-types arg-modes class action)
-  (let ((name (car name-args))
-	(args (cdr name-args)))
+(define (def-rtx-node name-args result-mode arg-types arg-modes class action)
+  (let* ((name (car name-args))
+	 (args (cdr name-args))
+	 (context (make-prefix-context (string-append "defining rtx "
+						      (symbol->string name))))
+	 (matchexpr-index (/rtx-find-matchexpr-index arg-modes)))
+
+;    (map1-improper (lambda (arg-type)
+;		     (if (not (memq arg-type /rtx-valid-types))
+;			 (context-error context "While defining rtx functions"
+;					"invalid arg type" arg-type)))
+;		   arg-types)
+;    (map1-improper (lambda (arg-mode)
+;		     (if (and (not (memq arg-mode /rtx-valid-matches))
+;			      (not (symbol? arg-mode))) ;; FIXME: mode-name?
+;			 (context-error context "While defining rtx functions"
+;					"invalid arg mode match" arg-mode)))
+;		   arg-modes)
+
     (let ((rtx (make <rtx-func> name args
-		     arg-types arg-modes
+		     result-mode arg-types arg-modes matchexpr-index
 		     class
 		     'function
 		     (if action
-			 (eval1 (list 'lambda (cons '*estate* args) action))
+			 (eval1 (list 'lambda
+				      (cons '*estate* args)
+				      action))
 			 #f)
 		     /rtx-num-next)))
       ; Add it to the table of rtx handlers.
@@ -237,15 +289,18 @@
 ; Same as define-rtx-node but don't pre-evaluate the arguments.
 ; Remember that `mode' must be the first argument.
 
-(define (def-rtx-syntax-node name-args arg-types arg-modes class action)
+(define (def-rtx-syntax-node name-args result-mode arg-types arg-modes class action)
   (let ((name (car name-args))
-	(args (cdr name-args)))
+	(args (cdr name-args))
+	(matchexpr-index (/rtx-find-matchexpr-index arg-modes)))
     (let ((rtx (make <rtx-func> name args
-		     arg-types arg-modes
+		     result-mode arg-types arg-modes matchexpr-index
 		     class
 		     'syntax
 		     (if action
-			 (eval1 (list 'lambda (cons '*estate* args) action))
+			 (eval1 (list 'lambda
+				      (cons '*estate* args)
+				      action))
 			 #f)
 		     /rtx-num-next)))
       ; Add it to the table of rtx handlers.
@@ -265,16 +320,19 @@
 ; Same as define-rtx-node but return an operand (usually an <operand> object).
 ; ??? `mode' must be the first argument?
 
-(define (def-rtx-operand-node name-args arg-types arg-modes class action)
+(define (def-rtx-operand-node name-args result-mode arg-types arg-modes class action)
   ; Operand nodes must specify an action.
   (assert action)
   (let ((name (car name-args))
-	(args (cdr name-args)))
+	(args (cdr name-args))
+	(matchexpr-index (/rtx-find-matchexpr-index arg-modes)))
     (let ((rtx (make <rtx-func> name args
-		     arg-types arg-modes
+		     result-mode arg-types arg-modes matchexpr-index
 		     class
 		     'operand
-		     (eval1 (list 'lambda (cons '*estate* args) action))
+		     (eval1 (list 'lambda
+				  (cons '*estate* args)
+				  action))
 		     /rtx-num-next)))
       ; Add it to the table of rtx handlers.
       (hashq-set! /rtx-func-table name rtx)
@@ -300,7 +358,7 @@
   (assert action)
   (let ((name (car name-args))
 	(args (cdr name-args)))
-    (let ((rtx (make <rtx-func> name args #f #f
+    (let ((rtx (make <rtx-func> name args #f #f #f #f
 		     #f ; class
 		     'macro
 		     (eval1 (list 'lambda args action))
@@ -406,10 +464,6 @@
 
 (define (rtx-sem-mode mode) (or (mode:sem-mode mode) mode))
 
-; MODE is a <mode> object.
-
-(define (rtx-lazy-sem-mode mode) (rtx-sem-mode mode))
-
 ; Return the mode of object OBJ.
 
 (define (rtx-obj-mode obj) (send obj 'get-mode))
@@ -418,10 +472,10 @@
 ; M1,M2 are <mode> objects.
 
 (define (rtx-mode-compatible? m1 m2)
-  (let ((mode1 (rtx-lazy-sem-mode m1))
-	(mode2 (rtx-lazy-sem-mode m2)))
-    ;(eq? (obj:name mode1) (obj:name mode2)))
-    ; ??? This is more permissive than is perhaps proper.
+  ;; ??? This is more permissive than is perhaps proper.
+  (let ((mode1 (rtx-sem-mode m1))
+	(mode2 (rtx-sem-mode m2)))
+    ;;(eq? (obj:name mode1) (obj:name mode2)))
     (mode-compatible? 'sameclass mode1 mode2))
 )
 
@@ -429,6 +483,7 @@
 
 ; Temporaries are created within a sequence.
 ; MODE is a <mode> object.
+; VALUE is #f if not set yet.
 ; e.g. (sequence ((WI tmp)) (set tmp reg0) ...)
 ; ??? Perhaps what we want here is `let' but for now I prefer `sequence'.
 ; This isn't exactly `let' either as no initial value is specified.
@@ -537,7 +592,6 @@
 ; ??? Should environments only have rtx-temps?
 
 (define (rtx-temp-lookup env name)
-  ;(display "looking up:") (display name) (newline)
   (let loop ((stack (rtx-env-var-list env)))
     (if (null? stack)
 	#f
@@ -549,8 +603,8 @@
 
 ; Create a "closure" of EXPR using the current temp stack.
 
-(define (/rtx-closure-make estate expr)
-  (rtx-make 'closure expr (estate-env estate))
+(define (/rtx-closure-make estate mode expr)
+  (rtx-make 'closure mode expr (estate-env estate))
 )
 
 (define (rtx-env-dump env)
@@ -579,7 +633,7 @@
 ; that much.
 
 (define (rtx-make kind . args)
-  (cons kind (/rtx-munge-mode&options args))
+  (cons kind (rtx-munge-mode&options (rtx-lookup kind) 'DFLT kind args))
 )
 
 (define rtx-name car)
@@ -641,7 +695,9 @@
 ; Return argument to `symbol' rtx.
 (define rtx-symbol-name rtx-arg1)
 
-(define (rtx-make-ifield ifield-name) (rtx-make 'ifield ifield-name))
+(define (rtx-make-ifield mode-name ifield-name)
+  (rtx-make 'ifield mode-name ifield-name)
+)
 (define (rtx-ifield? rtx) (eq? 'ifield (rtx-name rtx)))
 (define (rtx-ifield-name rtx)
   (let ((ifield (rtx-arg1 rtx)))
@@ -656,22 +712,37 @@
 	ifield))
 )
 
-(define (rtx-make-operand op-name) (rtx-make 'operand op-name))
+(define (rtx-make-operand mode-name op-name)
+  (rtx-make 'operand mode-name op-name)
+)
 (define (rtx-operand? rtx) (eq? 'operand (rtx-name rtx)))
+;; FIXME: This should just fetch rtx-arg1,
+;; operand rtxes shouldn't have objects, that's what xop is for.
 (define (rtx-operand-name rtx)
   (let ((operand (rtx-arg1 rtx)))
     (if (symbol? operand)
 	operand
 	(obj:name operand)))
 )
+
+;; Given an operand rtx, construct the <operand> object.
+;; RTX must be canonical rtl.
+
 (define (rtx-operand-obj rtx)
-  (let ((operand (rtx-arg1 rtx)))
-    (if (symbol? operand)
-	(current-op-lookup operand)
-	operand))
+  (let ((op (current-op-lookup (rtx-arg1 rtx)))
+	(mode (rtx-mode rtx)))
+    (assert op)
+    (assert (not (eq? mode 'DFLT)))
+    ;; NOTE: op:mode-name can be DFLT, which means use the mode of the type.
+    ;; But we can't propagate DFLT here, in canonical rtl DFLT is not allowed.
+    (if (mode:eq? (op:mode-name op) mode)
+	op
+	(op:new-mode op mode)))
 )
 
-(define (rtx-make-local local-name) (rtx-make 'local local-name))
+(define (rtx-make-local mode-name local-name)
+  (rtx-make 'local mode-name local-name)
+)
 (define (rtx-local? rtx) (eq? 'local (rtx-name rtx)))
 (define (rtx-local-name rtx)
   (let ((local (rtx-arg1 rtx)))
@@ -684,6 +755,10 @@
     (if (symbol? local)
 	(error "can't use rtx-local-obj on local name")
 	local))
+)
+
+(define (rtx-make-xop op)
+  (rtx-make 'xop (op:mode-name op) op)
 )
 
 (define rtx-xop-obj rtx-arg1)
@@ -744,7 +819,7 @@
   (if (pair? rtx)
       (case (car rtx)
 	((const) (number->string (rtx-const-value rtx)))
-	((operand) (symbol->string (obj:name (rtx-operand-obj rtx))))
+	((operand) (symbol->string (rtx-operand-name rtx)))
 	((local) (symbol->string (rtx-local-name rtx)))
 	((xop) (symbol->string (obj:name (rtx-xop-obj rtx))))
 	(else
@@ -927,7 +1002,7 @@
 ; Maybe in the future allow arrays although there's significant utility in
 ; allowing only at most a scalar index.
 
-(define (hw estate mode-name hw-name index-arg selector)
+(define (/hw estate mode-name hw-name index-arg selector)
   ; Enforce some rules to keep things in line with the current design.
   (if (not (symbol? mode-name))
       (parse-error (estate-context estate) "invalid mode name" mode-name))
@@ -946,6 +1021,7 @@
 
     (let* ((mode (if (eq? mode-name 'DFLT) (hw-mode hw) (mode:lookup mode-name)))
 	   (hw-name-with-mode (symbol-append hw-name '- (obj:name mode)))
+	   (index-mode (if (eq? hw-name 'h-memory) 'AI 'INT))
 	   (result (new <operand>))) ; ??? lookup-for-new?
 
       (if (not mode)
@@ -970,8 +1046,8 @@
 			(if (rtx-constant? index-arg)
 			    (make <hw-index> 'anonymous 'constant UINT
 				  (rtx-constant-value index-arg))
-			    (make <hw-index> 'anonymous 'rtx DFLT
-				  (/rtx-closure-make estate index-arg))))
+			    (make <hw-index> 'anonymous 'rtx (mode:lookup index-mode)
+				  (/rtx-closure-make estate index-mode index-arg))))
 		       (else (parse-error (estate-context estate)
 					  "invalid index" index-arg))))
 
@@ -1004,9 +1080,9 @@
 ; ESTATE is the current rtx evaluation state.
 ; INDX-SEL is an optional register number and possible selector.
 ; The register number, if present, is (car indx-sel) and must be a number or
-; unevaluated RTX expression.
+; unevaluated canonical RTX expression.
 ; The selector, if present, is (cadr indx-sel) and must be a number or
-; unevaluated RTX expression.
+; unevaluated canonical RTX expression.
 ; ??? A register selector isn't supported yet.  It's just an idea that's
 ; been put down on paper for future reference.
 
@@ -1019,8 +1095,9 @@
 )
 
 ; This is shorthand for (hw estate mode-name h-memory addr selector).
-; ADDR must be an unevaluated RTX expression.
-; If present (car sel) must be a number or unevaluated RTX expression.
+; ADDR must be an unevaluated canonical RTX expression.
+; If present (car sel) must be a number or unevaluated canonical
+; RTX expression.
 
 (define (mem estate mode-name addr . sel)
   (s-hw estate mode-name 'h-memory addr
@@ -1029,7 +1106,7 @@
 
 ; For the rtx nodes to use.
 
-(define s-hw hw)
+(define s-hw /hw)
 
 ; The program counter.
 ; When this code is loaded, global `pc' is nil, it hasn't been set to the
@@ -1076,6 +1153,7 @@
 ; The argument to drn,drmn,drsn must be Scheme code (or a fixed subset
 ; thereof).  .str/.sym are used in pmacros so it makes sense to include them
 ; in the subset.
+; FIXME: Huh?
 (define .str string-append)
 (define .sym symbol-append)
 
@@ -1123,12 +1201,15 @@
 Define an rtx subroutine, name/value pair list version.
 "
 		       nil 'arg-list define-subr)
+
   *UNSPECIFIED*
 )
 
-; Install builtins
+;; Install builtins
 
 (define (rtl-builtin!)
+  (rtx-init-traversal-tables!)
+
   *UNSPECIFIED*
 )
 
@@ -1142,20 +1223,6 @@ Define an rtx subroutine, name/value pair list version.
 
   ; Update s-pc, must be called after operand-init!.
   (set! s-pc pc)
-
-  ; Table of traversers for the various rtx elements.
-  (let ((hash-table (/rtx-make-traverser-table)))
-    (set! /rtx-traverser-table (make-vector (rtx-max-num) #f))
-    (for-each (lambda (rtx-name)
-		(let ((rtx (rtx-lookup rtx-name)))
-		  (if rtx
-		      (vector-set! /rtx-traverser-table (rtx-num rtx)
-				   (map1-improper
-				    (lambda (arg-type)
-				      (cons arg-type
-					    (hashq-ref hash-table arg-type)))
-				    (rtx-arg-types rtx))))))
-	      (rtx-name-list)))
 
   ; Initialize the operand hash table.
   (set! /rtx-operand-table (make-hash-table 127))

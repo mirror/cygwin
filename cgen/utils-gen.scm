@@ -107,7 +107,7 @@
 	; cadr: fetches expression to be evaluated
 	; caar: fetches symbol in arglist
 	; cadar: fetches `pc' symbol in arglist
-	(rtl-c VOID (cadr decode)
+	(rtl-c DFLT (cadr decode)
 	       (list (list (caar decode) 'UINT extraction)
 		     (list (cadar decode) 'IAI "pc"))
 	       #:rtl-cover-fns? #f #:ifield-var? #t)))
@@ -223,7 +223,7 @@
 	 ; cadr: fetches expression to be evaluated
 	 ; caar: fetches symbol in arglist
 	 ; cadar: fetches `pc' symbol in arglist
-	 (rtl-c VOID (cadr decode)
+	 (rtl-c DFLT (cadr decode)
 		(list (list (caar decode) 'UINT extraction)
 		      (list (cadar decode) 'IAI "pc"))
 		#:rtl-cover-fns? #f #:ifield-var? #t)))
@@ -255,14 +255,14 @@
   (let* ((decode-proc (ifld-decode f))
 	 (varname (gen-sym f))
 	 (decode (string-list
-		  ;; First, the block that extract the multi-ifield into the ifld variable
+		  ;; First, the block that extract the multi-ifield into the ifld variable.
 		  (rtl-c VOID (multi-ifld-extract f) nil
 			 #:rtl-cover-fns? #f #:ifield-var? #t)
-		  ;; Next, the decode routine that modifies it
+		  ;; Next, the decode routine that modifies it.
 		  (if decode-proc
 		      (string-append
 		       "  " varname " = "
-		       (rtl-c VOID (cadr decode-proc)
+		       (rtl-c DFLT (cadr decode-proc)
 			      (list (list (caar decode-proc) 'UINT varname)
 				    (list (cadar decode-proc) 'IAI "pc"))
 			      #:rtl-cover-fns? #f #:ifield-var? #t)

@@ -495,7 +495,7 @@
 
 (define (/attr-eval atval owner)
   (let* ((estate (estate-make-for-eval #f owner))
-	 (expr (rtx-compile #f (rtx-simplify #f owner atval nil) nil))
+	 (expr (rtx-simplify #f owner (rtx-canonicalize #f 'DFLT atval nil) nil))
 	 (value (rtx-eval-with-estate expr DFLT estate)))
     (cond ((symbol? value) value)
 	  ((number? value) value)

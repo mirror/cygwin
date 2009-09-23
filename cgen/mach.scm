@@ -37,6 +37,8 @@
 		; standard values derived from the input data
 		derived
 
+		; #t if multi-insns have been instantiated
+		(multi-insns-instantiated? . #f)
 		; #t if instructions have been analyzed
 		(insns-analyzed? . #f)
 		; #t if semantics were included in the analysis
@@ -61,6 +63,7 @@
    ifld-table hw-list op-table ifmt-list sfmt-list
    insn-table minsn-table subr-list
    derived
+   multi-insns-instantiated?
    insns-analyzed? semantics-analyzed? aliases-analyzed?
    next-ordinal
    )
@@ -73,6 +76,7 @@
    ifld-table hw-list op-table ifmt-list sfmt-list
    insn-table minsn-table subr-list
    derived
+   multi-insns-instantiated?
    insns-analyzed? semantics-analyzed? aliases-analyzed?
    next-ordinal
    )
@@ -1809,6 +1813,67 @@
   *UNSPECIFIED*
 )
 
+;; Instantiate the multi-insns of ARCH (if there are any).
+
+(define (/instantiate-multi-insns! arch)
+  ;; Skip if already done, we don't want to create duplicates.
+
+  (if (not (arch-multi-insns-instantiated? arch))
+      (begin
+
+	(if (any-true? (map multi-insn? (arch-insn-list arch)))
+
+	    (begin
+	      ; Instantiate sub-insns of all multi-insns.
+	      (logit 1 "Instantiating multi-insns ...\n")
+
+	      ;; FIXME: Hack to remove differences in generated code when we
+	      ;; switched to recording insns in hash tables.
+	      ;; Multi-insn got instantiated after the list of insns had been
+	      ;; reversed and they got added to the front of the list, in
+	      ;; reverse order.  Blech!
+	      ;; Eventually remove this, have a flag day, and check in the
+	      ;; updated files.
+	      ;; NOTE: This causes major diffs to opcodes/m32c-*.[ch].
+	      (let ((orig-ord (arch-next-ordinal arch)))
+		(arch-set-next-ordinal! arch (- MAX-VIRTUAL-INSNS))
+		(for-each (lambda (insn)
+			    (multi-insn-instantiate! insn))
+			  (multi-insns (arch-insn-list arch)))
+		(arch-set-next-ordinal! arch orig-ord))
+
+	      (logit 1 "Done instantiating multi-insns.\n")
+	      ))
+
+	(arch-set-multi-insns-instantiated?! arch #t)
+	))
+)
+
+;; Subroutine of arch-analyze-insns! to simplify it.
+;; Canonicalize INSNS of ARCH.
+
+(define (/canonicalize-insns! arch insn-list)
+  (logit 1 "Canonicalizing instruction semantics ...\n")
+
+  (for-each (lambda (insn)
+	      (cond ((insn-canonical-semantics insn)
+		     #t) ;; already done
+		    ((insn-semantics insn)
+		     (logit 2 "Canonicalizing semantics for " (obj:name insn) " ...\n")
+		     (let ((canon-sem
+			    (rtx-canonicalize
+			     (make-obj-context insn
+					       (string-append "canonicalizing semantics of "
+							      (obj:str-name insn)))
+			     'VOID (insn-semantics insn) nil)))
+		       (insn-set-canonical-semantics! insn canon-sem)))
+		    (else
+		     (logit 2 "Skipping instruction " (obj:name insn) ", no semantics ...\n"))))
+	    insn-list)
+
+  (logit 1 "Done canonicalization.\n")
+)
+
 ; Analyze the instruction set.
 ; The name is explicitly vague because it's intended that all insn analysis
 ; would be controlled here.
@@ -1831,55 +1896,37 @@
 
       (begin
 
-	;; FIXME: This shouldn't be calling current-insn-list,
-	;; it should use (arch-insn-list arch).
-	;; Then again various subroutines assume arch == CURRENT-ARCH.
-	;; Still, something needs to be cleaned up.
-	(if (any-true? (map multi-insn? (current-insn-list)))
-	    (begin
-	      ; Instantiate sub-insns of all multi-insns.
-	      (logit 1 "Instantiating multi-insns ...\n")
+	(/instantiate-multi-insns! arch)
 
-	      ;; FIXME: Hack to remove differences in generated code when we
-	      ;; switched to recording insns in hash tables.
-	      ;; Multi-insn got instantiated after the list of insns had been
-	      ;; reversed and they got added to the front of the list, in
-	      ;; reverse order.  Blech!
-	      ;; Eventually remove this, have a flag day, and check in the
-	      ;; updated files.
-	      ;; NOTE: This causes major diffs to opcodes/m32c-*.[ch].
-	      (let ((orig-ord (arch-next-ordinal arch)))
-		(arch-set-next-ordinal! arch (- MAX-VIRTUAL-INSNS))
-		(for-each (lambda (insn)
-			    (multi-insn-instantiate! insn))
-			  (multi-insns (current-insn-list)))
-		(arch-set-next-ordinal! arch orig-ord))
-	      ))
+	(let ((insn-list (non-multi-insns
+			  (if include-aliases?
+			      (arch-insn-list arch)
+			      (non-alias-insns (arch-insn-list arch))))))
 
-	; This is expensive so indicate start/finish.
-	(logit 1 "Analyzing instruction set ...\n")
+	  ;; Compile each insns semantics, traversers/evaluators require it.
+	  (/canonicalize-insns! arch insn-list)
 
-	(let ((fmt-lists
-	       (ifmt-compute! (non-multi-insns 
-			       (if include-aliases?
-				   (arch-insn-list arch)
-				   (non-alias-insns (arch-insn-list arch))))
-			      analyze-semantics?)))
+	  ;; This is expensive so indicate start/finish.
+	  (logit 1 "Analyzing instruction set ...\n")
 
-	  (arch-set-ifmt-list! arch (car fmt-lists))
-	  (arch-set-sfmt-list! arch (cadr fmt-lists))
-	  (arch-set-insns-analyzed?! arch #t)
-	  (arch-set-semantics-analyzed?! arch analyze-semantics?)
-	  (arch-set-aliases-analyzed?! arch include-aliases?)
+	  (let ((fmt-lists
+		 (ifmt-compute! insn-list
+				analyze-semantics?)))
 
-	  ;; Now that the instruction formats are computed,
-	  ;; do some sanity checks.
-	  (logit 1 "Performing sanity checks ...\n")
-	  (/sanity-check-insns arch)
+	    (arch-set-ifmt-list! arch (car fmt-lists))
+	    (arch-set-sfmt-list! arch (cadr fmt-lists))
+	    (arch-set-insns-analyzed?! arch #t)
+	    (arch-set-semantics-analyzed?! arch analyze-semantics?)
+	    (arch-set-aliases-analyzed?! arch include-aliases?)
 
-	  (logit 1 "Done analysis.\n")
-	  ))
-      )
+	    ;; Now that the instruction formats are computed,
+	    ;; do some sanity checks.
+	    (logit 1 "Performing sanity checks ...\n")
+	    (/sanity-check-insns arch)
+
+	    (logit 1 "Done analysis.\n")
+	    ))
+	))
 
   *UNSPECIFIED*
 )

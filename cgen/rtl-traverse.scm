@@ -1,14 +1,1295 @@
-; RTL traversing support.
-; Copyright (C) 2000, 2001, 2009 Red Hat, Inc.
-; This file is part of CGEN.
-; See file COPYING.CGEN for details.
+;; RTL traversing support.
+;; Copyright (C) 2000, 2001, 2009 Red Hat, Inc.
+;; This file is part of CGEN.
+;; See file COPYING.CGEN for details.
 
-; RTL expression traversal support.
-; Traversal (and compilation) involves validating the source form and
-; converting it to internal form.
-; ??? At present the internal form is also the source form (easier debugging).
+;; Canonicalization support.
+;; Canonicalizing an rtl expression involves adding possibly missing options
+;; and mode, and converting occurrences of DFLT into usable modes.
+;; Various error checks are done as well.
+;; This is done differently than traversal support because it has a more
+;; specific purpose, it doesn't need to support arbitrary "expr-fns".
+;; ??? At present the internal form is also the source form (easier debugging).
 
-; Set to #t to debug rtx traversal.
+(define /rtx-canon-debug? #f)
+
+;; Canonicalization state.
+;; This carries the immutable elements only!
+;; OUTER-EXPR is the EXPR argument to rtx-canonicalize.
+
+(define (/make-cstate context outer-expr)
+  (vector context outer-expr)
+)
+
+(define (/cstate-context cstate) (vector-ref cstate 0))
+(define (/cstate-outer-expr cstate) (vector-ref cstate 1))
+
+;; Flag an error while canonicalizing rtl.
+
+(define (/rtx-canon-error cstate errmsg expr parent-expr op-num)
+  (let* ((pretty-parent-expr
+	  (with-output-to-string
+	    (lambda ()
+	      (pretty-print (rtx-dump (/cstate-outer-expr cstate))))))
+	 (intro (if parent-expr
+		    (string-append "While canonicalizing "
+				   (rtx-strdump parent-expr)
+				   (if op-num
+				       (string-append ", operand #"
+						      (number->string op-num))
+				       "")
+				   " of:\n"
+				   pretty-parent-expr)
+		    (string-append "While canonicalizing:\n" pretty-parent-expr))))
+    (context-error (/cstate-context cstate) intro errmsg (rtx-dump expr)))
+)
+
+;; Lookup h/w object HW-NAME and return it (as a <hardware-base> object).
+;; If multiple h/w objects with the same name are defined, require
+;; all to have the same mode.
+;; CHECK-KIND is a function of one argument to verify the h/w objects
+;; are valid and if not flag an error.
+
+(define (/rtx-lookup-hw cstate hw-name parent-expr check-kind)
+  (let ((hw-objs (current-hw-sem-lookup hw-name)))
+
+    (if (null? hw-objs)
+	(/rtx-canon-error cstate "unknown h/w object"
+			  hw-name parent-expr #f))
+
+    ;; Just check the first one with CHECK-KIND.
+    (check-kind (car hw-objs))
+
+    (let* ((hw1 (car hw-objs))
+	   (hw1-mode (hw-mode hw1))
+	   (hw1-mode-name (obj:name hw1-mode)))
+
+      ;; Allow multiple h/w objects with the same name
+      ;; as long has they have the same mode.
+      (if (> (length hw-objs) 1)
+	  (let ((other-hw-mode-names (map (lambda (hw)
+					    (obj:name (hw-mode hw)))
+					  (cdr hw-objs))))
+	    (if (not (all-true? (map (lambda (mode-name)
+				       (eq? mode-name hw1-mode-name))
+				     other-hw-mode-names)))
+		(/rtx-canon-error cstate "multiple h/w objects with different modes selected"
+				  hw-name parent-expr #f))))
+
+      hw1))
+)
+
+;; Return the mode name to use in an expression given the requested mode
+;; and the mode used in the expression.
+;; If both are DFLT, leave it alone and hope the expression provides
+;; enough info to pick a usable mode.
+;; If both are provided, prefer the mode used in the expression.
+;; If the modes are incompatible, return #f.
+
+(define (/rtx-pick-mode cstate requested-mode-name expr-mode-name)
+  (cond ((eq? requested-mode-name 'DFLT)
+	 expr-mode-name)
+	((eq? expr-mode-name 'DFLT)
+	 requested-mode-name)
+	(else
+	 (let ((requested-mode (mode:lookup requested-mode-name))
+	       (expr-mode (mode:lookup expr-mode-name)))
+	   (if (not requested-mode)
+	       (/rtx-canon-error cstate "invalid mode" requested-mode-name #f #f))
+	   (if (not expr-mode)
+	       (/rtx-canon-error cstate "invalid mode" expr-mode-name #f #f))
+	   ;; FIXME: 'would prefer samesize or "no precision lost", sigh
+	   (if (mode-compatible? 'sameclass requested-mode expr-mode)
+	       expr-mode-name
+	       expr-mode-name)))) ;; FIXME: should be #f, disabled pending completion of rtl mode handling rewrite
+)
+
+;; Return the mode name (as a symbol) to use in an object's rtl given
+;; the requested mode, the mode used in the expression, and the object's
+;; real mode.
+;; If both requested mode and expr mode are DFLT, use the real mode.
+;; If requested mode is DFLT, prefer expr mode.
+;; If expr mode is DFLT, prefer the real mode.
+;; If both requested mode and expr mode are specified, prefer expr-mode.
+;; If there's an error the result is the error message (as a string).
+;;
+;; E.g. in (set SI dest (ifield DFLT f-r1)), the mode of the ifield's
+;; expression is DFLT, the requested mode is SI, and the real mode of f-r1
+;; may be INT.
+;;
+;; REAL-MODE is a <mode> object.
+
+(define (/rtx-pick-mode3 requested-mode-name expr-mode-name real-mode)
+  ;; Leave checking for (symbol? requested-mode-name) to caller (or higher).
+  (let ((expr-mode (mode:lookup expr-mode-name)))
+    (cond ((not expr-mode)
+	   "unknown mode")
+	  ((eq? requested-mode-name 'DFLT)
+	   (if (eq? expr-mode-name 'DFLT)
+	       (obj:name real-mode)
+	       (if (rtx-mode-compatible? expr-mode real-mode)
+		   expr-mode-name
+		   (string-append "expression mode "
+				  (symbol->string expr-mode-name)
+				  " is incompatible with real mode "
+				  (obj:str-name real-mode)))))
+	  ((eq? expr-mode-name 'DFLT)
+	   (if (rtx-mode-compatible? (mode:lookup requested-mode-name)
+				     real-mode)
+	       (obj:name real-mode)
+	       (string-append "mode of containing expression "
+			      (symbol->string requested-mode-name)
+			      " is incompatible with real mode "
+			      (obj:str-name real-mode))))
+	  (else
+	   (let ((requested-mode (mode:lookup requested-mode-name)))
+	     (cond ((not (rtx-mode-compatible? requested-mode expr-mode))
+		    (string-append "mode of containing expression "
+				   (symbol->string requested-mode-name)
+				   " is incompatible with expression mode "
+				   (symbol->string expr-mode-name)))
+		   ((not (rtx-mode-compatible? expr-mode real-mode))
+		    (string-append "expression mode "
+				   (symbol->string expr-mode-name)
+				   " is incompatible with real mode "
+				   (obj:str-name real-mode)))
+		   (else
+		    expr-mode-name))))))
+)
+
+;; Return the mode name (as a symbol) to use in an operand's rtl given
+;; the requested mode, the mode used in the expression, and the operand's
+;; real mode.
+;; If both requested mode and expr mode are DFLT, use the real mode.
+;; If requested mode is DFLT, prefer expr mode.
+;; If expr mode is DFLT, prefer the real mode.
+;; If both requested mode and expr mode are specified, prefer expr-mode.
+;; If the modes are incompatible an error is signalled.
+;;
+;; E.g. in (set QI (mem QI src2) src1), the mode to set is QI, but if src1
+;; is a 32-bit (SI) register we want QI.
+;; OTOH, in (set QI (mem QI src2) uimm8), the mode to set is QI, but we want
+;; the real mode of uimm8.
+;;
+;; ??? This is different from /rtx-pick-mode3 for compatibility with
+;; pre-full-canonicalization versions.
+;  It's currently a toss-up on whether it improves things.
+;;
+;; OP is an <operand> object.
+;;
+;; Things are complicated because multiple versions of a h/w object can be
+;; defined, and the operand refers to the h/w by name.
+;; op:type, which op:mode calls, will flag an error if multiple versions of
+;; a h/w object are defined - only one should have been kept during .cpu
+;; file loading.  This is for semantic code generation, but for generating
+;; files covering the entire architecture we need to keep all the versions.
+;; Things are ok, as far as canonicalization is concerned, if all h/w versions
+;; have the same mode (which could be WI for 32/64 arches).
+
+(define (/rtx-pick-op-mode cstate requested-mode-name expr-mode-name op
+			   parent-expr)
+  ;; Leave checking for (symbol? requested-mode-name) to caller (or higher).
+  (let* ((op-mode-name (op:mode-name op))
+	 (hw (/rtx-lookup-hw cstate (op:hw-name op) parent-expr
+			     (lambda (hw) *UNSPECIFIED*)))
+	 (op-mode (if (eq? op-mode-name 'DFLT)
+		      (hw-mode hw)
+		      (mode:lookup op-mode-name)))
+	 (expr-mode (mode:lookup expr-mode-name)))
+    (cond ((not expr-mode)
+	   (/rtx-canon-error cstate "unknown mode" expr-mode-name
+			     parent-expr #f))
+	  ((eq? requested-mode-name 'DFLT)
+	   (if (eq? expr-mode-name 'DFLT)
+	       (obj:name op-mode)
+	       (if (rtx-mode-compatible? expr-mode op-mode)
+		   expr-mode-name
+		   (/rtx-canon-error cstate
+				     (string-append
+				      "expression mode "
+				      (symbol->string expr-mode-name)
+				      " is incompatible with operand mode "
+				      (obj:str-name op-mode))
+				     expr-mode-name parent-expr #f))))
+	  ((eq? expr-mode-name 'DFLT)
+	   (if (rtx-mode-compatible? (mode:lookup requested-mode-name)
+				     op-mode)
+; FIXME: Experiment.  It's currently a toss-up on whether it improves things.
+;	       (cond ((pc? op)
+;		      (obj:name op-mode))
+;		     ((register? hw)
+;		      requested-mode-name)
+;		     (else
+;		      (obj:name op-mode)))
+	       (obj:name op-mode)
+	       (/rtx-canon-error cstate
+				 (string-append
+				  "mode of containing expression "
+				  (symbol->string requested-mode-name)
+				  " is incompatible with operand mode "
+				  (obj:str-name op-mode))
+				 requested-mode-name parent-expr #f)))
+	  (else
+	   (let ((requested-mode (mode:lookup requested-mode-name)))
+	     (cond ((not (rtx-mode-compatible? requested-mode expr-mode))
+		    (/rtx-canon-error cstate
+				      (string-append
+				       "mode of containing expression "
+				       (symbol->string requested-mode-name)
+				       " is incompatible with expression mode "
+				       (symbol->string expr-mode-name))
+				      requested-mode-name parent-expr #f))
+		   ((not (rtx-mode-compatible? expr-mode op-mode))
+		    (/rtx-canon-error cstate
+				      (string-append
+				       "expression mode "
+				       (symbol->string expr-mode-name)
+				       " is incompatible with operand mode "
+				       (obj:str-name op-mode))
+				      expr-mode-name parent-expr #f))
+		   (else
+		    expr-mode-name))))))
+)
+
+;; Return the last rtx in cond or case expression EXPR.
+
+(define (/rtx-get-last-cond-case-rtx expr)
+  (let ((len (length expr)))
+    (list-ref expr (- len 1)))
+)
+
+;; Canonicalize a list of rtx's.
+;; The mode of rtxes prior to the last one must be VOID.
+
+(define (/rtx-canon-rtx-list rtx-list mode parent-expr op-num cstate env depth)
+  (let* ((nr-rtxes (length rtx-list))
+	 (last-op-num (- nr-rtxes 1)))
+    (map (lambda (rtx op-num)
+	   (/rtx-canon rtx 'RTX
+		       (if (= op-num last-op-num) mode 'VOID)
+		       parent-expr op-num cstate env depth))
+	 rtx-list (iota nr-rtxes)))
+)
+
+;; Rtx canonicalizers.
+;; These are defined as individual functions that are then built into a table
+;; mostly for simplicity.
+;
+;; The result is either a pair of the parsed VAL and new environment,
+;; or #f meaning there is no change (saves lots of unnecessarying cons'ing).
+
+(define (/rtx-canon-options val mode parent-expr op-num cstate env depth)
+  #f
+)
+
+(define (/rtx-canon-anyintmode val mode parent-expr op-num cstate env depth)
+  (let ((val-obj (mode:lookup val)))
+    (if (and val-obj
+	     (or (memq (mode:class val-obj) '(INT UINT))
+		 (eq? val 'DFLT)))
+	#f
+	(/rtx-canon-error cstate "expecting an integer mode"
+			  val parent-expr op-num)))
+)
+
+(define (/rtx-canon-anyfloatmode val mode parent-expr op-num cstate env depth)
+  (let ((val-obj (mode:lookup val)))
+    (if (and val-obj
+	     (or (memq (mode:class val-obj) '(FLOAT))
+		 (eq? val 'DFLT)))
+	#f
+	(/rtx-canon-error cstate "expecting a float mode"
+			  val parent-expr op-num)))
+)
+
+(define (/rtx-canon-anynummode val mode parent-expr op-num cstate env depth)
+  (let ((val-obj (mode:lookup val)))
+    (if (and val-obj
+	     (or (memq (mode:class val-obj) '(INT UINT FLOAT))
+		 (eq? val 'DFLT)))
+	#f
+	(/rtx-canon-error cstate "expecting a numeric mode"
+			  val parent-expr op-num)))
+)
+
+(define (/rtx-canon-anyexprmode val mode parent-expr op-num cstate env depth)
+  (let ((val-obj (mode:lookup val)))
+    (if (and val-obj
+	     (or (memq (mode:class val-obj) '(INT UINT FLOAT))
+		 (memq val '(DFLT PTR VOID))))
+	#f
+	(/rtx-canon-error cstate "expecting a numeric mode, PTR, or VOID"
+			  val parent-expr op-num)))
+)
+
+(define (/rtx-canon-explnummode val mode parent-expr op-num cstate env depth)
+  (let ((val-obj (mode:lookup val)))
+    (if (and val-obj
+	     (memq (mode:class val-obj) '(INT UINT FLOAT)))
+	#f
+	(/rtx-canon-error cstate "expecting an explicit numeric mode"
+			  val parent-expr op-num)))
+)
+
+(define (/rtx-canon-voidornummode val mode parent-expr op-num cstate env depth)
+  (let ((val-obj (mode:lookup val)))
+    (if (and val-obj
+	     (or (memq (mode:class val-obj) '(INT UINT FLOAT))
+		 (memq val '(DFLT VOID))))
+	#f
+	(/rtx-canon-error cstate "expecting void or a numeric mode"
+			  val parent-expr op-num)))
+)
+
+(define (/rtx-canon-voidmode val mode parent-expr op-num cstate env depth)
+  (if (memq val '(DFLT VOID))
+      (cons 'VOID env)
+      (/rtx-canon-error cstate "expecting VOID mode"
+			val parent-expr op-num))
+)
+
+(define (/rtx-canon-bimode val mode parent-expr op-num cstate env depth)
+  (if (memq val '(DFLT BI))
+      (cons 'BI env)
+      (/rtx-canon-error cstate "expecting BI mode"
+			val parent-expr op-num))
+)
+
+(define (/rtx-canon-intmode val mode parent-expr op-num cstate env depth)
+  (if (memq val '(DFLT INT))
+      (cons 'INT env)
+      (/rtx-canon-error cstate "expecting INT mode"
+			val parent-expr op-num))
+)
+
+(define (/rtx-canon-symmode val mode parent-expr op-num cstate env depth)
+  (if (memq val '(DFLT SYM))
+      (cons 'SYM env)
+      (/rtx-canon-error cstate "expecting SYM mode"
+			val parent-expr op-num))
+)
+
+(define (/rtx-canon-insnmode val mode parent-expr op-num cstate env depth)
+  (if (memq val '(DFLT INSN))
+      (cons 'INSN env)
+      (/rtx-canon-error cstate "expecting INSN mode"
+			val parent-expr op-num))
+)
+
+(define (/rtx-canon-machmode val mode parent-expr op-num cstate env depth)
+  (if (memq val '(DFLT MACH))
+      (cons 'MACH env)
+      (/rtx-canon-error cstate "expecting MACH mode"
+			val parent-expr op-num))
+)
+
+(define (/rtx-canon-rtx val mode parent-expr op-num cstate env depth)
+; Commented out 'cus it doesn't quite work yet.
+; (if (not (rtx? val))
+;     (/rtx-canon-error cstate "expecting an rtx" val parent-expr op-num))
+  (cons (/rtx-canon val 'RTX mode parent-expr op-num cstate env depth)
+	env)
+)
+
+(define (/rtx-canon-setrtx val mode parent-expr op-num cstate env depth)
+; Commented out 'cus it doesn't quite work yet.
+; (if (not (rtx? val))
+;     (/rtx-canon-error cstate "expecting an rtx" val parent-expr op-num))
+  (let ((dest (/rtx-canon val 'SETRTX mode parent-expr op-num cstate env depth)))
+    (cons dest env))
+)
+
+;; This is the test of an `if'.
+
+(define (/rtx-canon-testrtx val mode parent-expr op-num cstate env depth)
+; Commented out 'cus it doesn't quite work yet.
+; (if (not (rtx? val))
+;     (/rtx-canon-error cstate "expecting an rtx"
+;			  val parent-expr op-num))
+  (cons (/rtx-canon val 'RTX mode parent-expr op-num cstate env depth)
+	env)
+)
+
+(define (/rtx-canon-condrtx val mode parent-expr op-num cstate env depth)
+  (if (not (pair? val))
+      (/rtx-canon-error cstate "expecting an expression"
+			  val parent-expr op-num))
+  (if (eq? (car val) 'else)
+      (begin
+	(if (!= (+ op-num 2) (length parent-expr))
+	    (/rtx-canon-error cstate "`else' clause not last"
+			      val parent-expr op-num))
+	(cons (cons 'else
+		    (/rtx-canon-rtx-list
+		     (cdr val) mode parent-expr op-num cstate env depth))
+	      env))
+      (cons (cons
+	     ;; ??? Entries after the first are conditional.
+	     (/rtx-canon (car val) 'RTX 'INT parent-expr op-num cstate env depth)
+	     (/rtx-canon-rtx-list
+	      (cdr val) mode parent-expr op-num cstate env depth))
+	    env))
+)
+
+(define (/rtx-canon-casertx val mode parent-expr op-num cstate env depth)
+  (if (or (not (list? val))
+	  (< (length val) 2))
+      (/rtx-canon-error cstate "invalid `case' expression"
+			val parent-expr op-num))
+  ;; car is either 'else or list of symbols/numbers
+  (if (not (or (eq? (car val) 'else)
+	       (and (list? (car val))
+		    (not (null? (car val)))
+		    (all-true? (map /rtx-symornum?
+				    (car val))))))
+      (/rtx-canon-error cstate "invalid `case' choice"
+			val parent-expr op-num))
+  (if (and (eq? (car val) 'else)
+	   (!= (+ op-num 2) (length parent-expr)))
+      (/rtx-canon-error cstate "`else' clause not last"
+			val parent-expr op-num))
+  (cons (cons (car val)
+	      (/rtx-canon-rtx-list
+	       (cdr val) mode parent-expr op-num cstate env depth))
+	env)
+)
+
+(define (/rtx-canon-locals val mode parent-expr op-num cstate env depth)
+  (if (not (list? val))
+      (/rtx-canon-error cstate "bad locals list"
+			val parent-expr op-num))
+  (for-each (lambda (var)
+	      (if (or (not (list? var))
+		      (!= (length var) 2)
+		      (not (/rtx-any-mode? (car var)))
+		      (not (symbol? (cadr var))))
+		  (/rtx-canon-error cstate "bad locals list"
+				    val parent-expr op-num)))
+	    val)
+  (let ((new-env (rtx-env-make-locals val)))
+    (cons val (cons new-env env)))
+)
+
+(define (/rtx-canon-iteration val mode parent-expr op-num cstate env depth)
+  (if (not (symbol? val))
+      (/rtx-canon-error cstate "bad iteration variable name"
+			val parent-expr op-num))
+  (let ((new-env (rtx-env-make-iteration-locals val)))
+    (cons val (cons new-env env)))
+)
+
+(define (/rtx-canon-env val mode parent-expr op-num cstate env depth)
+  ;; VAL is an environment stack.
+  (if (not (list? val))
+      (/rtx-canon-error cstate "environment not a list"
+			val parent-expr op-num))
+  ;; FIXME: Shouldn't this push VAL onto ENV?
+  (cons val env)
+)
+
+(define (/rtx-canon-attrs val mode parent-expr op-num cstate env depth)
+;  (cons val ; (atlist-source-form (atlist-parse (make-prefix-cstate "with-attr") val ""))
+;	env)
+  #f
+)
+
+(define (/rtx-canon-symbol val mode parent-expr op-num cstate env depth)
+  (if (not (symbol? val))
+      (/rtx-canon-error cstate "expecting a symbol"
+			val parent-expr op-num))
+  #f
+)
+
+(define (/rtx-canon-string val mode parent-expr op-num cstate env depth)
+  (if (not (string? val))
+      (/rtx-canon-error cstate "expecting a string"
+			val parent-expr op-num))
+  #f
+)
+
+(define (/rtx-canon-number val mode parent-expr op-num cstate env depth)
+  (if (not (number? val))
+      (/rtx-canon-error cstate "expecting a number"
+			val parent-expr op-num))
+  #f
+)
+
+(define (/rtx-canon-symornum val mode parent-expr op-num cstate env depth)
+  (if (not (or (symbol? val) (number? val)))
+      (/rtx-canon-error cstate "expecting a symbol or number"
+			val parent-expr op-num))
+  #f
+)
+
+(define (/rtx-canon-object val mode parent-expr op-num cstate env depth)
+  #f
+)
+
+;; Table of rtx canonicalizers.
+;; This is a vector of size rtx-max-num.
+;; Each entry is a list of (arg-type-name . canonicalizer) elements
+;; for rtx-arg-types.
+;; FIXME: Initialized in rtl.scm (i.e. outside this file).
+
+(define /rtx-canoner-table #f)
+
+;; Return a hash table of standard operand canonicalizers.
+;; The result of each canonicalizer is a pair of the canonical form
+;; of `val' and a possibly new environment or #f if there is no change.
+
+(define (/rtx-make-canon-table)
+  (let ((hash-tab (make-hash-table 31))
+	(canoners
+	 (list
+	  (cons 'OPTIONS /rtx-canon-options)
+	  (cons 'ANYINTMODE /rtx-canon-anyintmode)
+	  (cons 'ANYFLOATMODE /rtx-canon-anyfloatmode)
+	  (cons 'ANYNUMMODE /rtx-canon-anynummode)
+	  (cons 'ANYEXPRMODE /rtx-canon-anyexprmode)
+	  (cons 'EXPLNUMMODE /rtx-canon-explnummode)
+	  (cons 'VOIDORNUMMODE /rtx-canon-voidornummode)
+	  (cons 'VOIDMODE /rtx-canon-voidmode)
+	  (cons 'BIMODE /rtx-canon-bimode)
+	  (cons 'INTMODE /rtx-canon-intmode)
+	  (cons 'SYMMODE /rtx-canon-symmode)
+	  (cons 'INSNMODE /rtx-canon-insnmode)
+	  (cons 'MACHMODE /rtx-canon-machmode)
+	  (cons 'RTX /rtx-canon-rtx)
+	  (cons 'SETRTX /rtx-canon-setrtx)
+	  (cons 'TESTRTX /rtx-canon-testrtx)
+	  (cons 'CONDRTX /rtx-canon-condrtx)
+	  (cons 'CASERTX /rtx-canon-casertx)
+	  (cons 'LOCALS /rtx-canon-locals)
+	  (cons 'ITERATION /rtx-canon-iteration)
+	  (cons 'ENV /rtx-canon-env)
+	  (cons 'ATTRS /rtx-canon-attrs)
+	  (cons 'SYMBOL /rtx-canon-symbol)
+	  (cons 'STRING /rtx-canon-string)
+	  (cons 'NUMBER /rtx-canon-number)
+	  (cons 'SYMORNUM /rtx-canon-symornum)
+	  (cons 'OBJECT /rtx-canon-object)
+	  )))
+
+    (for-each (lambda (canoner)
+		(hashq-set! hash-tab (car canoner) (cdr canoner)))
+	      canoners)
+
+    hash-tab)
+)
+
+;; Standard expression operand canonicalizer.
+;; Loop over the operands, verifying them according to the argument type
+;; and mode matcher, and replace DFLT with a usable mode.
+
+(define (/rtx-canon-operands rtx-obj requested-mode-name
+			     func args parent-expr parent-op-num
+			     cstate env depth)
+  ;; ??? Might want to just leave operands as a list.
+  (let* ((operands (list->vector args))
+	 (nr-operands (vector-length operands))
+	 (this-expr (cons func args)) ;; For error messages.
+	 (expr-mode 
+	  ;; For sets, the requested mode is DFLT or VOID (the mode of the
+	  ;; result), but the mode we want is the mode of the set destination.
+	  (if (rtx-result-mode rtx-obj)
+	      (cadr args) ;; mode of arg2 doesn't come from containing expr
+	      (/rtx-pick-mode cstate requested-mode-name (cadr args))))
+	 (all-arg-types (vector-ref /rtx-canoner-table (rtx-num rtx-obj))))
+
+    (if (not expr-mode)
+	(/rtx-canon-error cstate
+			  (string-append "requested mode "
+					 (symbol->string requested-mode-name)
+					 " is incompatible with expression mode "
+					 (symbol->string (cadr args)))
+			  this-expr parent-expr #f))
+
+    (let loop ((env env)
+	       (op-num 0)
+	       (arg-types all-arg-types)
+	       (arg-modes (rtx-arg-modes rtx-obj)))
+
+      (let ((varargs? (and (pair? arg-types) (symbol? (car arg-types)))))
+
+	(if /rtx-canon-debug?
+	    (begin
+	      (display (spaces (* 4 depth)))
+	      (if (= op-num nr-operands)
+		  (display "end of operands")
+		  (begin
+		    (display "op-num ") (display op-num) (display ": ")
+		    (display (rtx-dump (vector-ref operands op-num)))
+		    (display ", ")
+		    (display (if varargs? (car arg-types) (caar arg-types)))
+		    (display ", ")
+		    (display (if varargs? arg-modes (car arg-modes)))
+		    ))
+	      (newline)
+	      (force-output)))
+
+	(cond ((= op-num nr-operands)
+
+	       ;; Out of operands, check if we have the expected number.
+	       (if (or (null? arg-types)
+		       varargs?)
+
+		   ;; We're theoretically done.
+		   (let ((set-mode-from-arg!
+			  (lambda (arg-num)
+			    (if /rtx-canon-debug?
+				(begin
+				  (display (spaces (* 4 depth)))
+				  (display "Computing expr mode from arguments.")
+				  (newline)))
+			    (let* ((expr-to-match 
+				    (case func
+				      ((cond case)
+				       (/rtx-get-last-cond-case-rtx (vector-ref operands arg-num)))
+				      (else
+				       (vector-ref operands arg-num))))
+				   (expr-to-match-obj (rtx-lookup (rtx-name expr-to-match)))
+				   (result-mode (or (rtx-result-mode expr-to-match-obj)
+						    (let ((expr-mode (rtx-mode expr-to-match)))
+						      (if (eq? expr-mode 'DFLT)
+							  (if (eq? requested-mode-name 'DFLT)
+							      (/rtx-canon-error cstate
+										"unable to determine mode of expression from arguments, please specify a mode"
+										this-expr parent-expr #f)
+							      requested-mode-name)
+							  expr-mode)))))
+			      (vector-set! operands 1 result-mode)))))
+		     ;; The expression's mode might still be DFLT.
+		     ;; If it is, fetch the mode of the MATCHEXPR operand,
+		     ;; or MATCHSEQ operand, or containing expression.
+		     ;; If it's still DFLT, flag an error.
+		     (if (eq? (vector-ref operands 1) 'DFLT)
+			 (cond ((rtx-matchexpr-index rtx-obj)
+				=> (lambda (matchexpr-index)
+				     (set-mode-from-arg! matchexpr-index)))
+			       ((eq? func 'sequence)
+				(set-mode-from-arg! (- nr-operands 1)))
+			       (else
+				(if /rtx-canon-debug?
+				    (begin
+				      (display (spaces (* 4 depth)))
+				      (display "Computing expr mode from containing expression.")
+				      (newline)))
+				(if (or (eq? requested-mode-name 'DFLT)
+					(rtx-result-mode rtx-obj))
+				    (/rtx-canon-error cstate
+						      "unable to determine mode of expression, please specify a mode"
+						      this-expr parent-expr #f)
+				    (vector-set! operands 1 requested-mode-name)))))
+		     (vector->list operands))
+
+		   (/rtx-canon-error cstate "missing operands"
+				     this-expr parent-expr #f)))
+
+	      ((null? arg-types)
+	       (/rtx-canon-error cstate "too many operands"
+				 this-expr parent-expr #f))
+
+	      (else
+	       (let ((type (if varargs? arg-types (car arg-types)))
+		     (mode (let ((mode-spec (if varargs?
+						arg-modes
+						(car arg-modes))))
+			     ;; We don't necessarily have enough information
+			     ;; at this point.  Just propagate what we do know,
+			     ;; and leave it for final processing to fix up what
+			     ;; we missed.
+			     ;; This is small enough that case is fast enough,
+			     ;; and the number of entries should be stable.
+			     (case mode-spec
+			       ((ANY) 'DFLT)
+			       ((ANYINT) 'DFLT) ;; FIXME
+			       ((NA) #f)
+			       ((MATCHEXPR) expr-mode)
+			       ((MATCHSEQ)
+				(if (= (+ op-num 1) nr-operands) ;; last one?
+				    expr-mode
+				    'VOID))
+			       ((MATCH2)
+				;; This is complicated by the fact that some
+				;; rtx have a different result mode than what
+				;; is specified in the rtl (e.g. set, eq).
+				;; ??? Make these rtx specify both modes?
+				(let* ((op2 (vector-ref operands 2))
+				       (op2-obj (rtx-lookup (rtx-name op2))))
+				  (or (rtx-result-mode op2-obj)
+				      (rtx-mode op2))))
+			       ((MATCH3)
+				;; This is complicated by the fact that some
+				;; rtx have a different result mode than what
+				;; is specified in the rtl (e.g. set, eq).
+				;; ??? Make these rtx specify both modes?
+				(let* ((op2 (vector-ref operands 3))
+				       (op2-obj (rtx-lookup (rtx-name op2))))
+				  (or (rtx-result-mode op2-obj)
+				      (rtx-mode op2))))
+			       ;; Otherwise mode-spec is the mode to use.
+			       (else mode-spec))))
+		     (val (vector-ref operands op-num))
+		     )
+
+		 ;; Look up the canoner for this operand and perform it.
+		 ;; FIXME: This would benefit from returning multiple values.
+		 (let ((canoner (cdr type)))
+		   (let ((canon-val (canoner val mode this-expr op-num
+					     cstate env depth)))
+		     (if canon-val
+			 (begin
+			   (set! val (car canon-val))
+			   (set! env (cdr canon-val))))))
+
+		 (vector-set! operands op-num val)
+
+		 ;; Done with this operand, proceed to the next.
+		 (loop env
+		       (+ op-num 1)
+		       (if varargs? arg-types (cdr arg-types))
+		       (if varargs? arg-modes (cdr arg-modes)))))))))
+)
+
+(define (/rtx-canon-rtx-enum rtx-obj requested-mode-name
+			     func args parent-expr parent-op-num
+			     cstate env depth)
+  (if (!= (length args) 3)
+      (/rtx-canon-error cstate "wrong number of operands to enum, expecting 3"
+			(cons func args) parent-expr #f))
+
+  (let ((mode-name (cadr args))
+	(enum-name (caddr args)))
+    (let ((mode-obj (mode:lookup mode-name))
+	  (enum-obj (enum-lookup-val enum-name)))
+
+      (if (not enum-obj)
+	  (/rtx-canon-error cstate "unknown enum value"
+			    enum-name parent-expr #f))
+
+      (let ((expr-mode-or-errmsg (/rtx-pick-mode3 requested-mode-name mode-name INT)))
+	(if (symbol? expr-mode-or-errmsg)
+	    (list (car args) expr-mode-or-errmsg enum-name)
+	    (/rtx-canon-error cstate expr-mode-or-errmsg
+			      enum-name parent-expr #f)))))
+)
+
+(define (/rtx-canon-rtx-ifield rtx-obj requested-mode-name
+			       func args parent-expr parent-op-num
+			       cstate env depth)
+  (if (!= (length args) 3)
+      (/rtx-canon-error cstate "wrong number of operands to ifield, expecting 3"
+			(cons func args) parent-expr #f))
+
+  (let ((expr-mode-name (cadr args))
+	(ifld-name (caddr args)))
+    (let ((ifld-obj (current-ifld-lookup ifld-name)))
+
+      (if ifld-obj
+
+	  (let ((mode-or-errmsg (/rtx-pick-mode3 requested-mode-name
+						 expr-mode-name
+						 (ifld-mode ifld-obj))))
+	    (if (symbol? mode-or-errmsg)
+		(list (car args) mode-or-errmsg ifld-name)
+		(/rtx-canon-error cstate mode-or-errmsg expr-mode-name
+				  parent-expr parent-op-num)))
+
+	  (/rtx-canon-error cstate "unknown ifield"
+			    ifld-name parent-expr #f))))
+)
+
+(define (/rtx-canon-rtx-operand rtx-obj requested-mode-name
+				func args parent-expr parent-op-num
+				cstate env depth)
+  (if (!= (length args) 3)
+      (/rtx-canon-error cstate "wrong number of operands to operand, expecting 3"
+			(cons func args) parent-expr #f))
+
+  (let ((expr-mode-name (cadr args))
+	(op-name (caddr args)))
+    (let ((op-obj (current-op-lookup op-name)))
+
+      (if op-obj
+
+	  (let ((mode (/rtx-pick-op-mode cstate requested-mode-name
+					 expr-mode-name op-obj parent-expr)))
+	    (list (car args) mode op-name))
+
+	  (/rtx-canon-error cstate "unknown operand"
+			    op-name parent-expr #f))))
+)
+
+(define (/rtx-canon-rtx-xop rtx-obj requested-mode-name
+			    func args parent-expr parent-op-num
+			    cstate env depth)
+  (if (!= (length args) 3)
+      (/rtx-canon-error cstate "wrong number of operands to xop, expecting 3"
+			(cons func args) parent-expr #f))
+
+  (let ((expr-mode-name (cadr args))
+	(xop-obj (caddr args)))
+
+    (if (operand? xop-obj)
+
+	(let ((mode-or-errmsg (/rtx-pick-mode3 requested-mode-name
+					       expr-mode-name
+					       (op:mode xop-obj))))
+	  (if (symbol? mode-or-errmsg)
+	      (list (car args) mode-or-errmsg xop-obj)
+	      (/rtx-canon-error cstate mode-or-errmsg expr-mode-name
+				parent-expr parent-op-num)))
+
+	(/rtx-canon-error cstate "xop operand #2 not an operand"
+			  (obj:name xop-obj) parent-expr #f)))
+)
+
+(define (/rtx-canon-rtx-local rtx-obj requested-mode-name
+			      func args parent-expr parent-op-num
+			      cstate env depth)
+  (if (!= (length args) 3)
+      (/rtx-canon-error cstate "wrong number of operands to local, expecting 3"
+			(cons func args) parent-expr #f))
+
+  (let ((expr-mode-name (cadr args))
+	(local-name (caddr args)))
+    (let ((local-obj (rtx-temp-lookup env local-name)))
+
+      (if local-obj
+
+	  (let ((mode-or-errmsg (/rtx-pick-mode3 requested-mode-name
+						 expr-mode-name
+						 (rtx-temp-mode local-obj))))
+	    (if (symbol? mode-or-errmsg)
+		(list (car args) mode-or-errmsg local-name)
+		(/rtx-canon-error cstate mode-or-errmsg expr-mode-name
+				  parent-expr parent-op-num)))
+
+	  (/rtx-canon-error cstate "unknown local"
+			    local-name parent-expr #f))))
+)
+
+(define (/rtx-canon-rtx-ref rtx-obj requested-mode-name
+			    func args parent-expr parent-op-num
+			    cstate env depth)
+  (if (!= (length args) 3)
+      (/rtx-canon-error cstate "wrong number of operands to ref, expecting 3"
+			(cons func args) parent-expr #f))
+
+  (let ((expr-mode-name (cadr args))
+	(ref-name (caddr args)))
+    ;; FIXME: Will current-op-lookup find named operands?
+    (let ((op-obj (current-op-lookup env ref-name)))
+
+      (if op-obj
+
+	  ;; The result of "ref" is canonically an INT.
+	  (let ((mode-or-errmsg (/rtx-pick-mode3 requested-mode-name
+						 expr-mode-name
+						 INT)))
+	    (if (symbol? mode-or-errmsg)
+		(list (car args) mode-or-errmsg ref-name)
+		(/rtx-canon-error cstate mode-or-errmsg expr-mode-name
+				  parent-expr parent-op-num)))
+
+	  (/rtx-canon-error cstate "unknown operand"
+			    ref-name parent-expr #f))))
+)
+
+(define (/rtx-canon-rtx-reg rtx-obj requested-mode-name
+			    func args parent-expr parent-op-num
+			    cstate env depth)
+  (let ((len (length args)))
+    (if (or (< len 3) (> len 5))
+	(/rtx-canon-error cstate
+			  ;; TODO: be more firm on expected number of args
+			  (string-append
+			   "wrong number of operands to "
+			   (symbol->string func)
+			   ", expecting 3 (or possibly 4,5)")
+			  (cons func args) parent-expr #f))
+
+    (let ((expr-mode-name (cadr args))
+	  (hw-name (caddr args))
+	  (this-expr (cons func args)))
+      (let* ((hw (/rtx-lookup-hw cstate hw-name parent-expr
+				 (lambda (hw)
+				   (if (not (register? hw))
+				       (/rtx-canon-error cstate "not a register" hw-name
+							 parent-expr parent-op-num))
+				   *UNSPECIFIED*)))
+	     (hw-mode-obj (hw-mode hw)))
+
+	(let ((mode-or-errmsg (/rtx-pick-mode3 requested-mode-name
+					       expr-mode-name
+					       hw-mode-obj)))
+
+	  (if (symbol? mode-or-errmsg)
+
+	      ;; Canonicalizing optional index/selector.
+	      (let ((index (if (>= len 4)
+			       (let ((canon (/rtx-canon-rtx
+					     (list-ref args 3) 'INT
+					     this-expr 3 cstate env depth)))
+				 (car canon)) ;; discard env
+			       #f))
+		    (sel (if (= len 5)
+			     (let ((canon (/rtx-canon-rtx
+					   (list-ref args 4) 'INT
+					   this-expr 4 cstate env depth)))
+			       (car canon)) ;; discard env
+			     #f)))
+		(if sel
+		    (begin
+		      (assert index)
+		      (list (car args) mode-or-errmsg hw-name index sel))
+		    (if index
+			(list (car args) mode-or-errmsg hw-name index)
+			(list (car args) mode-or-errmsg hw-name))))
+
+	      (/rtx-canon-error cstate mode-or-errmsg expr-mode-name
+				parent-expr parent-op-num))))))
+)
+
+(define (/rtx-canon-rtx-mem rtx-obj requested-mode-name
+			    func args parent-expr parent-op-num
+			    cstate env depth)
+  (let ((len (length args)))
+    (if (or (< len 3) (> len 4))
+	(/rtx-canon-error cstate
+			  "wrong number of operands to mem, expecting 3 (or possibly 4)"
+			  (cons func args) parent-expr #f))
+
+    (let ((expr-mode-name (cadr args))
+	  (addr-expr (caddr args))
+	  (this-expr (cons func args)))
+
+      ;; Call /rtx-canon-explnummode just for the error checking.
+      (/rtx-canon-explnummode expr-mode-name #f this-expr 1 cstate env depth)
+
+      (if (and (not (eq? requested-mode-name 'DFLT))
+	       ;; FIXME: 'would prefer samesize or "no precision lost", sigh
+	       (not (mode-compatible? 'sameclass
+				      requested-mode-name expr-mode-name)))
+	  (/rtx-canon-error cstate
+			    (string-append "requested mode "
+					   (symbol->string requested-mode-name)
+					   " is incompatible with expression mode "
+					   (symbol->string expr-mode-name))
+			    this-expr parent-expr #f))
+
+      (let ((addr (car ;; discard env
+		   (/rtx-canon-rtx (list-ref args 2) 'AI
+				   this-expr 2 cstate env depth)))
+	    (sel (if (= len 4)
+		     (let ((canon (/rtx-canon-rtx (list-ref args 3) 'INT
+						  this-expr 3 cstate env depth)))
+		       (car canon)) ;; discard env
+		     #f)))
+	(if sel
+	    (list (car args) expr-mode-name addr sel)
+	    (list (car args) expr-mode-name addr)))))
+)
+
+(define (/rtx-canon-rtx-const rtx-obj requested-mode-name
+			      func args parent-expr parent-op-num
+			      cstate env depth)
+  (if (!= (length args) 3)
+      (/rtx-canon-error cstate "wrong number of operands to const, expecting 3"
+			(cons func args) parent-expr #f))
+
+  ;; ??? floating point support is wip
+  ;; NOTE: (integer? 1.0) == #t, but (inexact? 1.0) ==> #t too.
+
+  (let ((expr-mode-name1 (if (and (eq? requested-mode-name 'DFLT)
+				  (eq? (cadr args) 'DFLT))
+			     'INT
+			     (cadr args)))
+	(value (caddr args))
+	(this-expr (cons func args)))
+
+    (let ((expr-mode-name (/rtx-pick-mode cstate requested-mode-name
+					  expr-mode-name1)))
+
+      (if (not expr-mode-name)
+	  (/rtx-canon-error cstate
+			    (string-append "requested mode "
+					   (symbol->string requested-mode-name)
+					   " is incompatible with expression mode "
+					   (symbol->string expr-mode-name1))
+			    this-expr parent-expr #f))
+
+      (let ((expr-mode (mode:lookup expr-mode-name)))
+
+	(cond ((integer? value)
+	       (if (not (memq (mode:class expr-mode) '(INT UINT FLOAT)))
+		   (/rtx-canon-error cstate "integer value incompatible with mode"
+				     value this-expr 2)))
+	      ((inexact? value)
+	       (if (not (memq (mode:class expr-mode) '(FLOAT)))
+		   (/rtx-canon-error cstate "floating point value incompatible with mode"
+				     value this-expr 2)))
+	      (else
+	       (/rtx-canon-error cstate
+				 (string-append "expecting a"
+						(if (eq? (mode:class expr-mode) 'FLOAT)
+						    " floating point"
+						    "n integer")
+						" constant")
+				 value this-expr 2)))
+
+	(list (car args) expr-mode-name value))))
+)
+
+;; Table of operand canonicalizers.
+;; The main one is /rtx-traverse-operands, but a few rtx functions are simple
+;; and special-purpose enough that it's simpler to have specific traversers.
+
+(define /rtx-operand-canoners #f)
+
+;; Return list of rtx functions that have special purpose canoners.
+
+(define (/rtx-special-expr-canoners)
+  (list
+   (cons 'enum /rtx-canon-rtx-enum)
+   (cons 'ifield /rtx-canon-rtx-ifield)
+   (cons 'operand /rtx-canon-rtx-operand)
+   ;;(cons 'name /rtx-canon-rtx-name) ;; ??? needed?
+   (cons 'xop /rtx-canon-rtx-xop) ;; yes, it can appear
+   (cons 'local /rtx-canon-rtx-local)
+   (cons 'ref /rtx-canon-rtx-ref)
+   ;;(cons 'index-of /rtx-canon-rtx-index-of) ;; ??? needed?
+   (cons 'reg /rtx-canon-rtx-reg)
+   (cons 'raw-reg /rtx-canon-rtx-reg)
+   (cons 'mem /rtx-canon-rtx-mem)
+   (cons 'const /rtx-canon-rtx-const)
+   )
+)
+
+;; Subroutine of rtx-munge-mode&options.
+;; Return boolean indicating if X is an rtx option.
+
+(define (/rtx-option? x)
+  (keyword? x)
+)
+
+;; Subroutine of rtx-munge-mode&options.
+;; Return boolean indicating if X is an rtx option list.
+
+(define (/rtx-option-list? x)
+  (or (null? x)
+      (and (pair? x)
+	   (/rtx-option? (car x))))
+)
+
+;; Subroutine of /rtx-canon-expr to fill in the options and mode if absent.
+;; The result is the canonical form of ARGS.
+;;
+;; "munge" is an awkward name to use here, but I like it for now because
+;; it's easy to grep for.
+;; An empty option list requires a mode to be present so that the empty
+;; list in `(sequence () foo bar)' is unambiguously recognized as the locals
+;; list.  Icky, sure, but less icky than the alternatives thus far.
+
+(define (rtx-munge-mode&options rtx-obj requested-mode-name func args)
+  (let ((orig-args args)
+	(options #f)
+	(mode-name #f)
+	;; The mode in a `set' is the mode of the destination,
+	;; whereas the mode of the result is VOID.
+	;; The mode in a compare (e.g. `eq') is the mode of the operands,
+	;; but the mode of the result is BI.
+	(requested-mode-name (if (rtx-result-mode rtx-obj)
+				 'DFLT ;; mode of args doesn't come from containing expr
+				 'DFLT))) ;; FIXME: requested-mode-name)))
+
+    ;; Pick off the option list if present.
+    (if (and (pair? args)
+	     (/rtx-option-list? (car args))
+	     ;; Handle `(sequence () foo bar)'.  If empty list isn't followed
+	     ;; by a mode, it is not an option list.
+	     (or (not (null? (car args)))
+		 (and (pair? (cdr args))
+		      (mode-name? (cadr args)))))
+	(begin
+	  (set! options (car args))
+	  (set! args (cdr args))))
+
+    ;; Pick off the mode if present.
+    (if (and (pair? args)
+	     (mode-name? (car args)))
+	(begin
+	  (set! mode-name (car args))
+	  (set! args (cdr args))))
+
+    ;; Now put option list and mode back.
+    ;; But don't do unnecessary consing.
+    (if options
+	(if (and mode-name (not (eq? mode-name 'DFLT)))
+	    orig-args ;; can return ARGS unchanged
+	    (cons options (cons requested-mode-name args)))
+	(if (and mode-name (not (eq? mode-name 'DFLT)))
+	    (cons nil orig-args) ;; just need to insert options
+	    (cons nil (cons requested-mode-name args)))))
+)
+
+;; Subroutine of /rtx-canon to simplify it.
+
+(define (/rtx-canon-expr rtx-obj requested-mode-name
+			 func args parent-expr op-num cstate env depth)
+  (let ((args2 (rtx-munge-mode&options rtx-obj requested-mode-name func args)))
+
+    (if /rtx-canon-debug?
+	(begin
+	  (display (spaces (* 4 depth)))
+	  (display "Traversing operands of: ")
+	  (display (rtx-dump (cons func args)))
+	  (newline)
+	  (display (spaces (* 4 depth)))
+	  (display "Requested mode: ")
+	  (display requested-mode-name)
+	  (newline)
+	  (display (spaces (* 4 depth)))
+	  (rtx-env-dump env)
+	  (force-output)))
+
+    (let* ((canoner (vector-ref /rtx-operand-canoners (rtx-num rtx-obj)))
+	   (operands (canoner rtx-obj requested-mode-name
+			      func args2 parent-expr op-num
+			      cstate env (+ depth 1))))
+      (cons func operands)))
+)
+
+;; Convert rtl expression EXPR from source form to canonical form.
+;; The expression is validated and rtx macros are expanded as well.
+;; Plus DFLT mode is converted to a useful mode.
+;; The result is EXPR in canonical form.
+;;
+;; CSTATE is a <cstate> object or #f if there is none.
+;; It is used in error messages.
+
+(define (/rtx-canon expr expected mode parent-expr op-num cstate env depth)
+  (if /rtx-canon-debug?
+      (begin
+	(display (spaces (* 4 depth)))
+	(display "Canonicalizing (")
+	(display mode)
+	(display "): ")
+	(display (rtx-dump expr))
+	(newline)
+	(display (spaces (* 4 depth)))
+	(rtx-env-dump env)
+	(force-output)
+	))
+
+  (let ((result
+	 (if (pair? expr) ;; pair? -> cheap non-null-list?
+
+	     (let ((rtx-obj (rtx-lookup (car expr))))
+	       (if rtx-obj
+		   (/rtx-canon-expr rtx-obj mode (car expr) (cdr expr)
+				    parent-expr op-num cstate env depth)
+		   (let ((rtx-obj (/rtx-macro-lookup (car expr))))
+		     (if rtx-obj
+			 (/rtx-canon (/rtx-macro-expand expr rtx-evaluator)
+				     expected mode parent-expr op-num cstate env (+ depth 1))
+			 (/rtx-canon-error cstate "unknown rtx function"
+					   expr parent-expr op-num)))))
+
+	     ;; EXPR is not a list.
+	     ;; See if it's an operand shortcut.
+	     (if (memq expected '(RTX SETRTX))
+
+		 (cond ((symbol? expr)
+			(cond ((current-op-lookup expr)
+			       => (lambda (op)
+				    ;; NOTE: We can't simply call
+				    ;; op:mode-name here, we need the real
+				    ;; mode, not (potentially) DFLT.
+				    ;; See /rtx-pick-op-mode.
+				    (rtx-make-operand (/rtx-pick-op-mode cstate mode 'DFLT op parent-expr)
+						      expr)))
+			      ((rtx-temp-lookup env expr)
+			       => (lambda (tmp)
+				    (rtx-make-local (obj:name (rtx-temp-mode tmp)) expr)))
+			      ((current-ifld-lookup expr)
+			       => (lambda (f)
+				    (rtx-make-ifield (obj:name (ifld-mode f)) expr)))
+			      ((enum-lookup-val expr)
+			       ;; ??? If enums could have modes other than INT,
+			       ;; we'd want to propagate that mode here.
+			       (rtx-make-enum 'INT expr))
+			      (else
+			       (/rtx-canon-error cstate "unknown operand"
+						 expr parent-expr op-num))))
+		       ((integer? expr)
+			(rtx-make-const 'INT expr))
+		       (else
+			(/rtx-canon-error cstate "unexpected operand"
+					  expr parent-expr op-num)))
+
+		 ;; Not expecting RTX or SETRTX.
+		 (/rtx-canon-error cstate "unexpected operand"
+				   expr parent-expr op-num)))))
+
+    (if /rtx-canon-debug?
+	(begin
+	  (display (spaces (* 4 depth)))
+	  (display "Result: ")
+	  (display (rtx-dump result))
+	  (newline)
+	  (force-output)
+	  ))
+
+    result)
+)
+
+;; Public entry point.
+;; Convert rtl expression EXPR from source form to canonical form.
+;; The expression is validated and rtx macros are expanded as well.
+;; Plus operand shortcuts are expanded:
+;;   - numbers -> (const number)
+;;   - operand-name -> (operand operand-name)
+;;   - ifield-name -> (ifield ifield-name)
+;; Plus an absent option list is replaced with ().
+;; Plus DFLT mode is converted to a useful mode.
+;;
+;; The result is EXPR in canonical form.
+;;
+;; CONTEXT is a <context> object or #f if there is none.
+;; It is used in error messages.
+;;
+;; MODE-NAME is the requested mode of the result, or DFLT.
+;;
+;; EXTRA-VARS-ALIST is an association list of extra (symbol <mode> value)
+;; elements to be used during value lookup.
+;; VALUE can be #f which means "unknown".
+;;
+;; ??? If EXTRA-VARS-ALIST is non-null, it might be nice to return a closure.
+;; It might simplify subsequent uses of the canonicalized code.
+
+(define (rtx-canonicalize context mode-name expr extra-vars-alist)
+  (let ((result
+	 (/rtx-canon expr 'RTX mode-name #f 0
+		     (/make-cstate context expr)
+		     (rtx-env-init-stack1 extra-vars-alist) 0)))
+    (rtx-verify-no-dflt-modes context result)
+    result)
+)
+
+;; Utility for a common case.
+;; Canonicalize rtl expression STMT which has a VOID result,
+;; and no external environment.
+
+(define (rtx-canonicalize-stmt context stmt)
+  (rtx-canonicalize context 'VOID stmt nil)
+)
+
+;; RTL expression traversal support.
+;; This is for analyzing the semantics in some way.
+;; The rtl must already be in canonical form.
+
+;; Set to #t to debug rtx traversal.
 
 (define /rtx-traverse-debug? #f)
 
@@ -30,16 +1311,15 @@
 ; lookup the function which will then process the expression.
 ; It is applied recursively to the expression and each sub-expression.
 ; It must be defined as
-; (lambda (rtx-obj expr mode parent-expr op-pos tstate appstuff) ...).
-; MODE is the name of the mode.
+; (lambda (rtx-obj expr parent-expr op-pos tstate appstuff) ...).
 ; If the result of EXPR-FN is a lambda, it is applied to
-; (cons TSTATE (cdr EXPR)).  TSTATE is prepended to the arguments.
+; (cons TSTATE EXPR), TSTATE is prepended to the arguments.
 ; For syntax expressions if the result of EXPR-FN is #f, the operands are
 ; processed using the builtin traverser.
 ; So to repeat: EXPR-FN can process the expression, and if its result is a
 ; lambda then it also processes the expression.  The arguments to EXPR-FN
-; are (rtx-obj expr mode parent-expr op-pos tstate appstuff).  The format
-; of the result of EXPR-FN are (cons TSTATE (cdr EXPR)).
+; are (rtx-obj expr parent-expr op-pos tstate appstuff).  The format
+; of the result of EXPR-FN are (cons TSTATE EXPR).
 ; The reason for the duality is that when trying to understand EXPR (e.g. when
 ; computing the insn format) EXPR-FN processes the expression itself, and
 ; when evaluating EXPR it's the result of EXPR-FN that computes the value.
@@ -53,9 +1333,6 @@
 ; It is used, for example, to speed up the simulator: there's no need to keep
 ; track of whether an operand has been assigned to (or potentially read from)
 ; if it's known it's always assigned to.
-;
-; SET? is a boolean indicating if the current expression is an operand being
-; set.
 ;
 ; OWNER is the owner of the expression or #f if there is none.
 ; Typically it is an <insn> object.
@@ -71,8 +1348,8 @@
 ;
 ; DEPTH is the current traversal depth.
 
-(define (tstate-make context owner expr-fn env cond? set? known depth)
-  (vector context owner expr-fn env cond? set? known depth)
+(define (tstate-make context owner expr-fn env cond? known depth)
+  (vector context owner expr-fn env cond? known depth)
 )
 
 (define (tstate-context state)             (vector-ref state 0))
@@ -85,12 +1362,10 @@
 (define (tstate-set-env! state newval)     (vector-set! state 3 newval))
 (define (tstate-cond? state)               (vector-ref state 4))
 (define (tstate-set-cond?! state newval)   (vector-set! state 4 newval))
-(define (tstate-set? state)                (vector-ref state 5))
-(define (tstate-set-set?! state newval)    (vector-set! state 5 newval))
-(define (tstate-known state)               (vector-ref state 6))
-(define (tstate-set-known! state newval)   (vector-set! state 6 newval))
-(define (tstate-depth state)               (vector-ref state 7))
-(define (tstate-set-depth! state newval)   (vector-set! state 7 newval))
+(define (tstate-known state)               (vector-ref state 5))
+(define (tstate-set-known! state newval)   (vector-set! state 5 newval))
+(define (tstate-depth state)               (vector-ref state 6))
+(define (tstate-set-depth! state newval)   (vector-set! state 6 newval))
 
 ; Create a copy of STATE.
 
@@ -126,14 +1401,6 @@
     result)
 )
 
-; Create a copy of STATE with a new SET? value.
-
-(define (tstate-new-set? state set?)
-  (let ((result (tstate-copy state)))
-    (tstate-set-set?! result set?)
-    result)
-)
-
 ; Lookup NAME in the known value table.
 ; Returns the value or #f if not found.
 ; The value is either a const rtx or a number-list rtx.
@@ -165,7 +1432,7 @@
 			   (cons errmsg expr)))))
 )
 
-; Traversal/compilation support.
+; Traversal support.
 
 ; Return a boolean indicating if X is a mode.
 
@@ -181,10 +1448,10 @@
 
 ; Traverse a list of rtx's.
 
-(define (/rtx-traverse-rtx-list rtx-list mode expr op-num tstate appstuff)
+(define (/rtx-traverse-rtx-list rtx-list expr op-num tstate appstuff)
   (map (lambda (rtx)
 	 ; ??? Shouldn't OP-NUM change for each element?
-	 (/rtx-traverse rtx 'RTX mode expr op-num tstate appstuff))
+	 (/rtx-traverse rtx 'RTX expr op-num tstate appstuff))
        rtx-list)
 )
 
@@ -195,247 +1462,82 @@
 (define (/rtx-traverse-error tstate errmsg rtl-expr op-num)
   (tstate-error tstate
 		(string-append errmsg ", operand #" (number->string op-num))
-		(rtx-strdump rtl-expr))
+		(rtx-dump rtl-expr))
 )
 
 ; Rtx traversers.
-; These are defined as individual functions that are then built into a table
-; so that we can use Hobbit's "fastcall" support.
 ;
 ; The result is either a pair of the parsed VAL and new TSTATE,
 ; or #f meaning there is no change (saves lots of unnecessarying cons'ing).
 
-(define (/rtx-traverse-options val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-normal-operand val expr op-num tstate appstuff)
   #f
 )
 
-(define (/rtx-traverse-anymode val mode expr op-num tstate appstuff)
-  (let ((val-obj (mode:lookup val)))
-    (if (not val-obj)
-	(/rtx-traverse-error tstate "expecting a mode"
-			     expr op-num))
-    #f)
-)
-
-(define (/rtx-traverse-intmode val mode expr op-num tstate appstuff)
-  (let ((val-obj (mode:lookup val)))
-    (if (and val-obj
-	     (or (memq (mode:class val-obj) '(INT UINT))
-		 (eq? val 'DFLT)))
-	#f
-	(/rtx-traverse-error tstate "expecting an integer mode"
-			     expr op-num)))
-)
-
-(define (/rtx-traverse-floatmode val mode expr op-num tstate appstuff)
-  (let ((val-obj (mode:lookup val)))
-    (if (and val-obj
-	     (or (memq (mode:class val-obj) '(FLOAT))
-		 (eq? val 'DFLT)))
-	#f
-	(/rtx-traverse-error tstate "expecting a float mode"
-			     expr op-num)))
-)
-
-(define (/rtx-traverse-nummode val mode expr op-num tstate appstuff)
-  (let ((val-obj (mode:lookup val)))
-    (if (and val-obj
-	     (or (memq (mode:class val-obj) '(INT UINT FLOAT))
-		 (eq? val 'DFLT)))
-	#f
-	(/rtx-traverse-error tstate "expecting a numeric mode"
-			     expr op-num)))
-)
-
-(define (/rtx-traverse-explnummode val mode expr op-num tstate appstuff)
-  (let ((val-obj (mode:lookup val)))
-    (if (not val-obj)
-	(/rtx-traverse-error tstate "expecting a mode"
-			     expr op-num))
-    (if (memq val '(DFLT VOID))
-	(/rtx-traverse-error tstate "DFLT and VOID not allowed here"
-			     expr op-num))
-    #f)
-)
-
-(define (/rtx-traverse-nonvoidmode val mode expr op-num tstate appstuff)
-  (if (eq? val 'VOID)
-      (/rtx-traverse-error tstate "mode can't be VOID"
-			   expr op-num))
-  #f
-)
-
-(define (/rtx-traverse-voidmode val mode expr op-num tstate appstuff)
-  (if (memq val '(DFLT VOID))
-      #f
-      (/rtx-traverse-error tstate "expecting mode VOID"
-			   expr op-num))
-)
-
-(define (/rtx-traverse-dfltmode val mode expr op-num tstate appstuff)
-  (if (eq? val 'DFLT)
-      #f
-      (/rtx-traverse-error tstate "expecting mode DFLT"
-			   expr op-num))
-)
-
-(define (/rtx-traverse-rtx val mode expr op-num tstate appstuff)
-; Commented out 'cus it doesn't quite work yet.
-; (if (not (rtx? val))
-;     (/rtx-traverse-error tstate "expecting an rtx"
-;			   expr op-num))
-  (cons (/rtx-traverse val 'RTX mode expr op-num tstate appstuff)
+(define (/rtx-traverse-rtx val expr op-num tstate appstuff)
+  (cons (/rtx-traverse val 'RTX expr op-num tstate appstuff)
 	tstate)
 )
 
-(define (/rtx-traverse-setrtx val mode expr op-num tstate appstuff)
-  ; FIXME: Still need to turn it off for sub-exprs.
-  ; e.g. (mem (reg ...))
-; Commented out 'cus it doesn't quite work yet.
-; (if (not (rtx? val))
-;     (/rtx-traverse-error tstate "expecting an rtx"
-;				  expr op-num))
-  (cons (/rtx-traverse val 'SETRTX mode expr op-num
-		       (tstate-new-set? tstate #t)
-		       appstuff)
+(define (/rtx-traverse-setrtx val expr op-num tstate appstuff)
+  (cons (/rtx-traverse val 'SETRTX expr op-num tstate appstuff)
 	tstate)
 )
 
 ; This is the test of an `if'.
 
-(define (/rtx-traverse-testrtx val mode expr op-num tstate appstuff)
-; Commented out 'cus it doesn't quite work yet.
-; (if (not (rtx? val))
-;     (/rtx-traverse-error tstate "expecting an rtx"
-;				  expr op-num))
-  (cons (/rtx-traverse val 'RTX mode expr op-num tstate appstuff)
+(define (/rtx-traverse-testrtx val expr op-num tstate appstuff)
+  (cons (/rtx-traverse val 'RTX expr op-num tstate appstuff)
 	(tstate-new-cond?
 	 tstate
 	 (not (rtx-compile-time-constant? val))))
 )
 
-(define (/rtx-traverse-condrtx val mode expr op-num tstate appstuff)
-  (if (not (pair? val))
-      (/rtx-traverse-error tstate "expecting an expression"
-			   expr op-num))
+(define (/rtx-traverse-condrtx val expr op-num tstate appstuff)
   (if (eq? (car val) 'else)
-      (begin
-	(if (!= (+ op-num 2) (length expr))
-	    (/rtx-traverse-error tstate
-				 "`else' clause not last"
-				 expr op-num))
-	(cons (cons 'else
-		    (/rtx-traverse-rtx-list
-		     (cdr val) mode expr op-num
-		     (tstate-new-cond? tstate #t)
-		     appstuff))
-	      (tstate-new-cond? tstate #t)))
+      (cons (cons 'else
+		  (/rtx-traverse-rtx-list
+		   (cdr val) expr op-num
+		   (tstate-new-cond? tstate #t)
+		   appstuff))
+	    (tstate-new-cond? tstate #t))
       (cons (cons
 	     ; ??? Entries after the first are conditional.
-	     (/rtx-traverse (car val) 'RTX 'ANY expr op-num tstate appstuff)
+	     (/rtx-traverse (car val) 'RTX expr op-num tstate appstuff)
 	     (/rtx-traverse-rtx-list
-	      (cdr val) mode expr op-num
+	      (cdr val) expr op-num
 	      (tstate-new-cond? tstate #t)
 	      appstuff))
 	    (tstate-new-cond? tstate #t)))
 )
 
-(define (/rtx-traverse-casertx val mode expr op-num tstate appstuff)
-  (if (or (not (list? val))
-	  (< (length val) 2))
-      (/rtx-traverse-error tstate
-			   "invalid `case' expression"
-			   expr op-num))
-  ; car is either 'else or list of symbols/numbers
-  (if (not (or (eq? (car val) 'else)
-	       (and (list? (car val))
-		    (not (null? (car val)))
-		    (all-true? (map /rtx-symornum?
-				    (car val))))))
-      (/rtx-traverse-error tstate
-			   "invalid `case' choice"
-			   expr op-num))
-  (if (and (eq? (car val) 'else)
-	   (!= (+ op-num 2) (length expr)))
-      (/rtx-traverse-error tstate "`else' clause not last"
-			   expr op-num))
+(define (/rtx-traverse-casertx val expr op-num tstate appstuff)
   (cons (cons (car val)
 	      (/rtx-traverse-rtx-list
-	       (cdr val) mode expr op-num
+	       (cdr val) expr op-num
 	       (tstate-new-cond? tstate #t)
 	       appstuff))
 	(tstate-new-cond? tstate #t))
 )
 
-(define (/rtx-traverse-locals val mode expr op-num tstate appstuff)
-  (if (not (list? val))
-      (/rtx-traverse-error tstate "bad locals list"
-			   expr op-num))
-  (for-each (lambda (var)
-	      (if (or (not (list? var))
-		      (!= (length var) 2)
-		      (not (/rtx-any-mode? (car var)))
-		      (not (symbol? (cadr var))))
-		  (/rtx-traverse-error tstate
-				       "bad locals list"
-				       expr op-num)))
-	    val)
+(define (/rtx-traverse-locals val expr op-num tstate appstuff)
   (let ((env (rtx-env-make-locals val)))
     (cons val (tstate-push-env tstate env)))
 )
 
-(define (/rtx-traverse-iteration val mode expr op-num tstate appstuff)
-  (if (not (symbol? val))
-      (/rtx-traverse-error tstate "bad iteration variable name"
-			   expr op-num))
+(define (/rtx-traverse-iteration val expr op-num tstate appstuff)
   (let ((env (rtx-env-make-iteration-locals val)))
     (cons val (tstate-push-env tstate env)))
 )
 
-(define (/rtx-traverse-env val mode expr op-num tstate appstuff)
-  ; VAL is an environment stack.
-  (if (not (list? val))
-      (/rtx-traverse-error tstate "environment not a list"
-			   expr op-num))
+(define (/rtx-traverse-env val expr op-num tstate appstuff)
+  ;; VAL is an environment stack.
   (cons val (tstate-new-env tstate val))
 )
 
-(define (/rtx-traverse-attrs val mode expr op-num tstate appstuff)
+(define (/rtx-traverse-attrs val expr op-num tstate appstuff)
 ;  (cons val ; (atlist-source-form (atlist-parse (make-prefix-context "with-attr") val ""))
 ;	tstate)
-  #f
-)
-
-(define (/rtx-traverse-symbol val mode expr op-num tstate appstuff)
-  (if (not (symbol? val))
-      (/rtx-traverse-error tstate "expecting a symbol"
-			   expr op-num))
-  #f
-)
-
-(define (/rtx-traverse-string val mode expr op-num tstate appstuff)
-  (if (not (string? val))
-      (/rtx-traverse-error tstate "expecting a string"
-			   expr op-num))
-  #f
-)
-
-(define (/rtx-traverse-number val mode expr op-num tstate appstuff)
-  (if (not (number? val))
-      (/rtx-traverse-error tstate "expecting a number"
-			   expr op-num))
-  #f
-)
-
-(define (/rtx-traverse-symornum val mode expr op-num tstate appstuff)
-  (if (not (or (symbol? val) (number? val)))
-      (/rtx-traverse-error tstate
-			   "expecting a symbol or number"
-			   expr op-num))
-  #f
-)
-
-(define (/rtx-traverse-object val mode expr op-num tstate appstuff)
   #f
 )
 
@@ -455,31 +1557,33 @@
   (let ((hash-tab (make-hash-table 31))
 	(traversers
 	 (list
-	  ; /fastcall-make is recognized by Hobbit and handled specially.
-	  ; When not using Hobbit it is a macro that returns its argument.
-	  (cons 'OPTIONS (/fastcall-make /rtx-traverse-options))
-	  (cons 'ANYMODE (/fastcall-make /rtx-traverse-anymode))
-	  (cons 'INTMODE (/fastcall-make /rtx-traverse-intmode))
-	  (cons 'FLOATMODE (/fastcall-make /rtx-traverse-floatmode))
-	  (cons 'NUMMODE (/fastcall-make /rtx-traverse-nummode))
-	  (cons 'EXPLNUMMODE (/fastcall-make /rtx-traverse-explnummode))
-	  (cons 'NONVOIDMODE (/fastcall-make /rtx-traverse-nonvoidmode))
-	  (cons 'VOIDMODE (/fastcall-make /rtx-traverse-voidmode))
-	  (cons 'DFLTMODE (/fastcall-make /rtx-traverse-dfltmode))
-	  (cons 'RTX (/fastcall-make /rtx-traverse-rtx))
-	  (cons 'SETRTX (/fastcall-make /rtx-traverse-setrtx))
-	  (cons 'TESTRTX (/fastcall-make /rtx-traverse-testrtx))
-	  (cons 'CONDRTX (/fastcall-make /rtx-traverse-condrtx))
-	  (cons 'CASERTX (/fastcall-make /rtx-traverse-casertx))
-	  (cons 'LOCALS (/fastcall-make /rtx-traverse-locals))
-	  (cons 'ITERATION (/fastcall-make /rtx-traverse-iteration))
-	  (cons 'ENV (/fastcall-make /rtx-traverse-env))
-	  (cons 'ATTRS (/fastcall-make /rtx-traverse-attrs))
-	  (cons 'SYMBOL (/fastcall-make /rtx-traverse-symbol))
-	  (cons 'STRING (/fastcall-make /rtx-traverse-string))
-	  (cons 'NUMBER (/fastcall-make /rtx-traverse-number))
-	  (cons 'SYMORNUM (/fastcall-make /rtx-traverse-symornum))
-	  (cons 'OBJECT (/fastcall-make /rtx-traverse-object))
+	  (cons 'OPTIONS /rtx-traverse-normal-operand)
+	  (cons 'ANYINTMODE /rtx-traverse-normal-operand)
+	  (cons 'ANYFLOATMODE /rtx-traverse-normal-operand)
+	  (cons 'ANYNUMMODE /rtx-traverse-normal-operand)
+	  (cons 'ANYEXPRMODE /rtx-traverse-normal-operand)
+	  (cons 'EXPLNUMMODE /rtx-traverse-normal-operand)
+	  (cons 'VOIDORNUMMODE /rtx-traverse-normal-operand)
+	  (cons 'VOIDMODE /rtx-traverse-normal-operand)
+	  (cons 'BIMODE /rtx-traverse-normal-operand)
+	  (cons 'INTMODE /rtx-traverse-normal-operand)
+	  (cons 'SYMMODE /rtx-traverse-normal-operand)
+	  (cons 'INSNMODE /rtx-traverse-normal-operand)
+	  (cons 'MACHMODE /rtx-traverse-normal-operand)
+	  (cons 'RTX /rtx-traverse-rtx)
+	  (cons 'SETRTX /rtx-traverse-setrtx)
+	  (cons 'TESTRTX /rtx-traverse-testrtx)
+	  (cons 'CONDRTX /rtx-traverse-condrtx)
+	  (cons 'CASERTX /rtx-traverse-casertx)
+	  (cons 'LOCALS /rtx-traverse-locals)
+	  (cons 'ITERATION /rtx-traverse-iteration)
+	  (cons 'ENV /rtx-traverse-env)
+	  (cons 'ATTRS /rtx-traverse-attrs)
+	  (cons 'SYMBOL /rtx-traverse-normal-operand)
+	  (cons 'STRING /rtx-traverse-normal-operand)
+	  (cons 'NUMBER /rtx-traverse-normal-operand)
+	  (cons 'SYMORNUM /rtx-traverse-normal-operand)
+	  (cons 'OBJECT /rtx-traverse-normal-operand)
 	  )))
 
     (for-each (lambda (traverser)
@@ -490,9 +1594,7 @@
 )
 
 ; Traverse the operands of EXPR, a canonicalized RTL expression.
-; Here "canonicalized" means that /rtx-munge-mode&options has been called to
-; insert an option list and mode if they were absent in the original
-; expression.
+; Here "canonicalized" means that EXPR has been run through rtx-canonicalize.
 ; Note that this means that, yes, the options and mode are "traversed" too.
 
 (define (/rtx-traverse-operands rtx-obj expr tstate appstuff)
@@ -503,15 +1605,13 @@
 	(display (rtx-dump expr))
 	(newline)
 	(rtx-env-dump (tstate-env tstate))
-	(force-output)
-	))
+	(force-output)))
 
   (let loop ((operands (cdr expr))
 	     (op-num 0)
 	     (arg-types (vector-ref /rtx-traverser-table (rtx-num rtx-obj)))
 	     (arg-modes (rtx-arg-modes rtx-obj))
-	     (result nil)
-	     )
+	     (result nil))
 
     (let ((varargs? (and (pair? arg-types) (symbol? (car arg-types)))))
 
@@ -529,56 +1629,32 @@
 		  (display (if varargs? arg-modes (car arg-modes)))
 		  ))
 	    (newline)
-	    (force-output)
-	    ))
+	    (force-output)))
 
       (cond ((null? operands)
-	     ; Out of operands, check if we have the expected number.
+	     ;; Out of operands, check if we have the expected number.
 	     (if (or (null? arg-types)
 		     varargs?)
 		 (reverse! result)
-		 (tstate-error tstate "missing operands" (rtx-strdump expr))))
+		 (tstate-error tstate "missing operands" (rtx-dump expr))))
 
 	    ((null? arg-types)
-	     (tstate-error tstate "too many operands" (rtx-strdump expr)))
+	     (tstate-error tstate "too many operands" (rtx-dump expr)))
 
 	    (else
-	     (let ((type (if varargs? arg-types (car arg-types)))
-		   (mode (let ((mode-spec (if varargs?
-					      arg-modes
-					      (car arg-modes))))
-			   ; This is small enough that this is fast enough,
-			   ; and the number of entries should be stable.
-			   ; FIXME: for now
-			   (case mode-spec
-			     ((ANY) 'DFLT)
-			     ((NA) #f)
-			     ((OP0) (rtx-mode expr))
-			     ((MATCH1)
-			      ; If there is an explicit mode, use it.
-			      ; Otherwise we have to look at operand 1.
-			      (if (eq? (rtx-mode expr) 'DFLT)
-				  'DFLT
-				  (rtx-mode expr)))
-			     ((MATCH2)
-			      ; If there is an explicit mode, use it.
-			      ; Otherwise we have to look at operand 2.
-			      (if (eq? (rtx-mode expr) 'DFLT)
-				  'DFLT
-				  (rtx-mode expr)))
-			     (else mode-spec))))
-		   (val (car operands))
-		   )
+	     (let* ((val (car operands))
+		    (type (if varargs? arg-types (car arg-types))))
 
-	       ; Look up the traverser for this kind of operand and perform it.
+	       ;; Look up the traverser for this kind of operand and perform it.
+	       ;; FIXME: This would benefit from returning multiple values.
 	       (let ((traverser (cdr type)))
-		 (let ((traversed-val (fastcall6 traverser val mode expr op-num tstate appstuff)))
+		 (let ((traversed-val (traverser val expr op-num tstate appstuff)))
 		   (if traversed-val
 		       (begin
 			 (set! val (car traversed-val))
 			 (set! tstate (cdr traversed-val))))))
 
-	       ; Done with this operand, proceed to the next.
+	       ;; Done with this operand, proceed to the next.
 	       (loop (cdr operands)
 		     (+ op-num 1)
 		     (if varargs? arg-types (cdr arg-types))
@@ -591,65 +1667,12 @@
 
 (define rtx-traverse-operands /rtx-traverse-operands)
 
-; Subroutine of /rtx-munge-mode&options.
-; Return boolean indicating if X is an rtx option.
-
-(define (/rtx-option? x)
-  (and (symbol? x)
-       (char=? (string-ref (symbol->string x) 0) #\:))
-)
-
-; Subroutine of /rtx-munge-mode&options.
-; Return boolean indicating if X is an rtx option list.
-
-(define (/rtx-option-list? x)
-  (or (null? x)
-      (and (pair? x)
-	   (/rtx-option? (car x))))
-)
-
-; Subroutine of /rtx-traverse-expr to fill in the mode if absent and to
-; collect the options into one list.
-;
-; ARGS is the list of arguments to the rtx function
-; (e.g. (1 2) in (add 1 2)).
-; ??? "munge" is an awkward name to use here, but I like it for now because
-; it's easy to grep for.
-; ??? An empty option list requires a mode to be present so that the empty
-; list in `(sequence () foo bar)' is unambiguously recognized as the locals
-; list.  Icky, sure, but less icky than the alternatives thus far.
-
-(define (/rtx-munge-mode&options args)
-  (let ((options nil)
-	(mode-name 'DFLT))
-    ; Pick off the option list if present.
-    (if (and (pair? args)
-	     (/rtx-option-list? (car args))
-	     ; Handle `(sequence () foo bar)'.  If empty list isn't followed
-	     ; by a mode, it is not an option list.
-	     (or (not (null? (car args)))
-		 (and (pair? (cdr args))
-		      (mode-name? (cadr args)))))
-	(begin
-	  (set! options (car args))
-	  (set! args (cdr args))))
-    ; Pick off the mode if present.
-    (if (and (pair? args)
-	     (mode-name? (car args)))
-	(begin
-	  (set! mode-name (car args))
-	  (set! args (cdr args))))
-    ; Now put option list and mode back.
-    (cons options (cons mode-name args)))
-)
-
 ; Subroutine of /rtx-traverse to traverse an expression.
 ;
 ; RTX-OBJ is the <rtx-func> object of the (outer) expression being traversed.
 ;
 ; EXPR is the expression to be traversed.
-;
-; MODE is the name of the mode of EXPR.
+; It must be fully canonical.
 ;
 ; PARENT-EXPR is the expression EXPR is contained in.  The top-level
 ; caller must pass #f for it.
@@ -672,21 +1695,19 @@
 ; This is for semantic-compile's sake and all traversal handlers are
 ; required to do this if the expr-fn returns #f.
 
-(define (/rtx-traverse-expr rtx-obj expr mode parent-expr op-pos tstate appstuff)
-  (let* ((expr2 (cons (car expr)
-		      (/rtx-munge-mode&options (cdr expr))))
-	 (fn (fastcall7 (tstate-expr-fn tstate)
-			rtx-obj expr2 mode parent-expr op-pos tstate appstuff)))
+(define (/rtx-traverse-expr rtx-obj expr parent-expr op-pos tstate appstuff)
+  (let ((fn ((tstate-expr-fn tstate)
+	     rtx-obj expr parent-expr op-pos tstate appstuff)))
     (if fn
 	(if (procedure? fn)
 	    ; Don't traverse operands for syntax expressions.
-	    (if (rtx-style-syntax? rtx-obj)
-		(apply fn (cons tstate (cdr expr2)))
-		(let ((operands (/rtx-traverse-operands rtx-obj expr2 tstate appstuff)))
+	    (if (eq? (rtx-style rtx-obj) 'SYNTAX)
+		(apply fn (cons tstate cdr expr))
+		(let ((operands (/rtx-traverse-operands rtx-obj expr tstate appstuff)))
 		  (apply fn (cons tstate operands))))
 	    fn)
-	(let ((operands (/rtx-traverse-operands rtx-obj expr2 tstate appstuff)))
-	  (cons (car expr2) operands))))
+	(let ((operands (/rtx-traverse-operands rtx-obj expr tstate appstuff)))
+	  (cons (car expr) operands))))
 )
 
 ; Main entry point for expression traversal.
@@ -697,11 +1718,10 @@
 ; in the case of operands.
 ;
 ; EXPR is the expression to be traversed.
+; It must be fully canonical.
 ;
 ; EXPECTED is one of `-rtx-valid-types' and indicates the expected rtx type
 ; or #f if it doesn't matter.
-;
-; MODE is the name of the mode of EXPR.
 ;
 ; PARENT-EXPR is the expression EXPR is contained in.  The top-level
 ; caller must pass #f for it.
@@ -719,7 +1739,7 @@
 ; - operands, ifields, and numbers appearing where an rtx is expected are
 ;   converted to use `operand', `ifield', or `const'.
 
-(define (/rtx-traverse expr expected mode parent-expr op-pos tstate appstuff)
+(define (/rtx-traverse expr expected parent-expr op-pos tstate appstuff)
   (if /rtx-traverse-debug?
       (begin
 	(display (spaces (* 4 (tstate-depth tstate))))
@@ -730,12 +1750,10 @@
 	(display "-expected:       ")
 	(display expected)
 	(newline)
-	(display (spaces (* 4 (tstate-depth tstate))))
-	(display "-mode:           ")
-	(display mode)
-	(newline)
 	(force-output)
 	))
+
+  ;; FIXME: error checking here should be deleteable.
 
   (if (pair? expr) ; pair? -> cheap non-null-list?
 
@@ -743,11 +1761,11 @@
 	(tstate-incr-depth! tstate)
 	(let ((result
 	       (if rtx-obj
-		   (/rtx-traverse-expr rtx-obj expr mode parent-expr op-pos tstate appstuff)
+		   (/rtx-traverse-expr rtx-obj expr parent-expr op-pos tstate appstuff)
 		   (let ((rtx-obj (/rtx-macro-lookup (car expr))))
 		     (if rtx-obj
 			 (/rtx-traverse (/rtx-macro-expand expr rtx-evaluator)
-					expected mode parent-expr op-pos tstate appstuff)
+					expected parent-expr op-pos tstate appstuff)
 			 (tstate-error tstate "unknown rtx function" expr))))))
 	  (tstate-decr-depth! tstate)
 	  result))
@@ -758,28 +1776,33 @@
 
 	  (cond ((symbol? expr)
 		 (cond ((current-op-lookup expr)
-			(/rtx-traverse
-			 (rtx-make-operand expr) ; (current-op-lookup expr))
-			 expected mode parent-expr op-pos tstate appstuff))
+			=> (lambda (op)
+			     (/rtx-traverse
+			      ;; NOTE: Can't call op:mode-name here, we need
+			      ;; the real mode, not (potentially) DFLT.
+			      (rtx-make-operand (obj:name (op:mode op)) expr)
+			      expected parent-expr op-pos tstate appstuff)))
 		       ((rtx-temp-lookup (tstate-env tstate) expr)
-			(/rtx-traverse
-			 (rtx-make-local expr) ; (rtx-temp-lookup (tstate-env tstate) expr))
-			 expected mode parent-expr op-pos tstate appstuff))
+			=> (lambda (tmp)
+			     (/rtx-traverse
+			      (rtx-make-local (rtx-temp-mode tmp) expr)
+			      expected parent-expr op-pos tstate appstuff)))
 		       ((current-ifld-lookup expr)
-			(/rtx-traverse
-			 (rtx-make-ifield expr)
-			 expected mode parent-expr op-pos tstate appstuff))
+			=> (lambda (f)
+			     (/rtx-traverse
+			      (rtx-make-ifield (obj:name (ifld-mode f)) expr)
+			      expected parent-expr op-pos tstate appstuff)))
 		       ((enum-lookup-val expr)
 			;; ??? If enums could have modes other than INT,
 			;; we'd want to propagate that mode here.
 			(/rtx-traverse
 			 (rtx-make-enum 'INT expr)
-			 expected mode parent-expr op-pos tstate appstuff))
+			 expected parent-expr op-pos tstate appstuff))
 		       (else
 			(tstate-error tstate "unknown operand" expr))))
 		((integer? expr)
 		 (/rtx-traverse (rtx-make-const 'INT expr)
-				expected mode parent-expr op-pos tstate appstuff))
+				expected parent-expr op-pos tstate appstuff))
 		(else
 		 (tstate-error tstate "unexpected operand" expr)))
 
@@ -788,6 +1811,7 @@
 )
 
 ; User visible procedures to traverse an rtl expression.
+; EXPR must be fully canonical (i.e. compiled).
 ; These calls /rtx-traverse to do most of the work.
 ; See tstate-make for explanations of OWNER, EXPR-FN.
 ; CONTEXT is a <context> object or #f if there is none.
@@ -795,33 +1819,32 @@
 ; APPSTUFF is for application specific use.
 
 (define (rtx-traverse context owner expr expr-fn appstuff)
-  (/rtx-traverse expr #f 'DFLT #f 0
+  (/rtx-traverse expr #f #f 0
 		 (tstate-make context owner expr-fn (rtx-env-empty-stack)
-			      #f #f nil 0)
+			      #f nil 0)
 		 appstuff)
 )
 
 (define (rtx-traverse-with-locals context owner expr expr-fn locals appstuff)
-  (/rtx-traverse expr #f 'DFLT #f 0
+  (/rtx-traverse expr #f #f 0
 		 (tstate-make context owner expr-fn
 			      (rtx-env-push (rtx-env-empty-stack)
 					    (rtx-env-make-locals locals))
-			      #f #f nil 0)
+			      #f nil 0)
 		 appstuff)
 )
 
 ; Traverser debugger.
+; This just traverses EXPR printing everything it sees.
 
 (define (rtx-traverse-debug expr)
   (rtx-traverse
    #f #f expr
-   (lambda (rtx-obj expr mode parent-expr op-pos tstate appstuff)
+   (lambda (rtx-obj expr parent-expr op-pos tstate appstuff)
      (display "-expr:    ")
      (display (string-append "rtx=" (obj:str-name rtx-obj)))
      (display " expr=")
      (display expr)
-     (display " mode=")
-     (display mode)
      (display " parent=")
      (display parent-expr)
      (display " op-pos=")
@@ -1023,15 +2046,17 @@
 
 ; RTX expression evaluator.
 ;
-; EXPR is the expression to be eval'd.  It must be in compiled form.
-; MODE is the mode of EXPR, a <mode> object.
+; EXPR is the expression to be eval'd.  It must be in compiled(canonical) form.
+; MODE is the desired mode of EXPR, a <mode> object.
 ; ESTATE is the current evaluation state.
 
 (define (rtx-eval-with-estate expr mode estate)
   (if /rtx-eval-debug?
       (begin
-	(display "Traversing ")
-	(display expr)
+	(display "Evaluating expr with mode ")
+	(display (if (symbol? mode) mode (obj:name mode)))
+	(newline)
+	(display (rtx-dump expr))
 	(newline)
 	(rtx-env-dump (estate-env estate))
 	))
@@ -1044,7 +2069,7 @@
 	    (if (procedure? fn)
 		(apply fn (cons estate (cdr expr)))
 ;		; Don't eval operands for syntax expressions.
-;		(if (rtx-style-syntax? rtx-obj)
+;		(if (eq? (rtx-style rtx-obj) 'SYNTAX)
 ;		    (apply fn (cons estate (cdr expr)))
 ;		    (let ((operands
 ;			   (/rtx-eval-operands rtx-obj expr estate)))
@@ -1061,11 +2086,46 @@
 )
 
 ; Evaluate rtx expression EXPR and return the computed value.
-; EXPR must already be in compiled form (the result of rtx-compile).
+; EXPR must already be in canonical form (the result of rtx-canonicalize).
 ; OWNER is the owner of the value, used for attribute computation,
 ; or #f if there isn't one.
 ; FIXME: context?
 
 (define (rtx-value expr owner)
   (rtx-eval-with-estate expr DFLT (estate-make-for-eval #f owner))
+)
+
+;; Initialize the tables.
+
+(define (rtx-init-traversal-tables!)
+  (let ((compiler-hash-table (/rtx-make-canon-table))
+	(traverser-hash-table (/rtx-make-traverser-table)))
+
+    (set! /rtx-canoner-table (make-vector (rtx-max-num) #f))
+    (set! /rtx-traverser-table (make-vector (rtx-max-num) #f))
+
+    (for-each (lambda (rtx-name)
+		(let ((rtx (rtx-lookup rtx-name)))
+		  (if rtx
+		      (let ((num (rtx-num rtx))
+			    (arg-types (rtx-arg-types rtx)))
+			(vector-set! /rtx-canoner-table num
+				     (map1-improper
+				      (lambda (arg-type)
+					(cons arg-type
+					      (hashq-ref compiler-hash-table arg-type)))
+				      arg-types))
+			(vector-set! /rtx-traverser-table num
+				     (map1-improper
+				      (lambda (arg-type)
+					(cons arg-type
+					      (hashq-ref traverser-hash-table arg-type)))
+				      arg-types))))))
+	      (rtx-name-list)))
+
+  (set! /rtx-operand-canoners (make-vector (rtx-max-num) /rtx-canon-operands))
+  (for-each (lambda (rtx-canoner)
+	      (let ((rtx-obj (rtx-lookup (car rtx-canoner))))
+		(vector-set! /rtx-operand-canoners (rtx-num rtx-obj) (cdr rtx-canoner))))
+	    (/rtx-special-expr-canoners))
 )

@@ -640,7 +640,7 @@
 (method-make!
  <hw-memory> 'cxmake-get
  (lambda (self estate mode index selector)
-   (let ((mode (if (mode:eq? 'DFLT mode)
+   (let ((mode (if (mode:eq? 'DFLT mode) ;; FIXME: delete, DFLT
 		   (hw-mode self)
 		   mode))
 	 (default-selector? (hw-selector-default? selector)))
@@ -1021,7 +1021,7 @@
   (/op-gen-delayed-set-maybe-trace op estate mode index selector newval #f))
 
 
-(define (/op-gen-set-trace op estate mode index selector newval)
+(define (/op-gen-set-trace1 op estate mode index selector newval)
   (string-append
    "  {\n"
    "    " (mode:c-type mode) " opval = " (cx:c newval) ";\n"
@@ -1081,6 +1081,18 @@
        (send (op:type op) 'gen-set-quiet estate mode index selector
 		(cx:make-with-atlist mode "opval" (cx:atlist newval))))
    "  }\n")
+)
+
+(define (/op-gen-set-trace op estate mode index selector newval)
+  ;; If tracing hasn't been enabled, use gen-set-quiet, mostly to reduce
+  ;; diffs in the generated source from pre-full-canonicalization cgen.
+   (if (or (and (with-profile?)
+		(op:cond? op))
+	   (not (current-pbb-engine?))
+	   ;; FIXME: Why doesn't gen-set-quiet check op:setter?
+	   (op:setter op))
+       (/op-gen-set-trace1 op estate mode index selector newval)
+       (/op-gen-set-quiet op estate mode index selector newval))
 )
 
 (define (/op-gen-delayed-set-trace op estate mode index selector newval)

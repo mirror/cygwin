@@ -118,8 +118,8 @@
 	rtl-c++ calls.
 	(/gen-sem-case, /gen-sfrag-code): Ditto.
 	* sid.scm (/op-gen-set-trace1): Renamed from /op-gen-set-trace.
-	(/op-gen-set-trace): New function.  If not doing profiling,
-	call /op-gen-set-quiet.
+	(/op-gen-set-trace): New function.  If not doing profiling, or using
+	the pbb engine, call /op-gen-set-quiet.
 	* sim-cpu.scm (gen-semantic-code): Specify #:for-insn? in rtl-c calls.
 	* utils-gen.scm (/gen-ifld-extract-base): Update call to rtl-c.
 	(/gen-ifld-extract-beyond, gen-multi-ifld-extract): Ditto.

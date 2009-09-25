@@ -1,6 +1,7 @@
 2009-09-25  Doug Evans  <dje@sebabeach.org>
 
 	* operand.scm (/anyof-merge-setter): Handle set-quiet.
+	* rtl.scm (rtx-single-set?): Handle set-quiet.
 
 	* rtl-c.scm (estate-make-for-rtl-c): Delete args context, owner,
 	rtl-cover-fns?, macro?.  All callers updated.
@@ -19,8 +20,6 @@
 	* rtl-traverse.scm (/rtx-canon-error): Use it.
 	(<eval-state>): New member outer-expr.
 	(estate-error): Include outer expression in error message if present.
-
-	* rtl.scm (rtx-single-set?): Handle set-quiet.
 
 2009-09-23  Doug Evans  <dje@sebabeach.org>
 

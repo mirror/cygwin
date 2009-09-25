@@ -1018,7 +1018,7 @@
 ; For operands, the word `read' is only used in this context.
 
 (define (op:read op sfmt)
-  (let ((estate (estate-make-for-normal-rtl-c nil nil)))
+  (let ((estate (estate-make-for-rtl-c nil nil)))
     (send op 'gen-read estate sfmt /par-operand-macro))
 )
 
@@ -1029,7 +1029,7 @@
 ; For operands, the word `write' is only used in this context.
 
 (define (op:write op sfmt)
-  (let ((estate (estate-make-for-normal-rtl-c nil nil)))
+  (let ((estate (estate-make-for-rtl-c nil nil)))
     (send op 'gen-write estate sfmt /par-operand-macro))
 )
 
@@ -1328,7 +1328,7 @@
 ; smart enough to know there is no need.
 
 (define (op:record-profile op sfmt out?)
-  (let ((estate (estate-make-for-normal-rtl-c nil nil)))
+  (let ((estate (estate-make-for-rtl-c nil nil)))
     (send op 'gen-record-profile sfmt out? estate))
 )
 

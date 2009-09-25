@@ -760,7 +760,6 @@
 (define (rtx-make-xop op)
   (rtx-make 'xop (op:mode-name op) op)
 )
-
 (define rtx-xop-obj rtx-arg1)
 
 ;(define (rtx-opspec? rtx) (eq? 'opspec (rtx-name rtx)))
@@ -773,7 +772,7 @@
 (define (rtx-make-set dest src) (rtx-make 'set dest src))
 (define rtx-set-dest rtx-arg1)
 (define rtx-set-src rtx-arg2)
-(define (rtx-single-set? rtx) (eq? (car rtx) 'set))
+(define (rtx-single-set? rtx) (memq (car rtx) '(set set-quiet)))
 
 (define rtx-alu-op-mode rtx-mode)
 (define (rtx-alu-op-arg rtx n) (list-ref rtx (+ n 3)))
@@ -854,6 +853,14 @@
     (lambda ()
       ;; Use write instead of display, we want strings displayed with quotes.
       (write (rtx-dump rtx))))
+)
+
+;; Return the pretty-printed from of RTX.
+
+(define (rtx-pretty-strdump rtx)
+  (with-output-to-string
+    (lambda ()
+      (pretty-print (rtx-dump rtx))))
 )
 
 ; Return a boolean indicating if EXPR is known to be a compile-time constant.

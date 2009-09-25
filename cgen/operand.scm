@@ -1239,7 +1239,8 @@
 	 (let ((src (rtx-set-src setter))
 	       (dest (rtx-set-dest setter))
 	       (mode (rtx-mode setter))
-	       (options (rtx-options setter)))
+	       (options (rtx-options setter))
+	       (name (rtx-name setter)))
 	   (if (rtx-kind 'mem dest)
 	       (set! dest
 		     (rtx-change-address dest
@@ -1247,7 +1248,7 @@
 					  (rtx-mem-addr dest)
 					  value-names values))))
 	   (set! src (/anyof-merge-getter src value-names values))
-	   (rtx-make 'set options mode dest src)))
+	   (rtx-make name options mode dest src)))
 	(else
 	 (error "/anyof-merge-setter: unsupported form" (car setter))))
 )

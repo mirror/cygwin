@@ -27,10 +27,7 @@
 ;; Flag an error while canonicalizing rtl.
 
 (define (/rtx-canon-error cstate errmsg expr parent-expr op-num)
-  (let* ((pretty-parent-expr
-	  (with-output-to-string
-	    (lambda ()
-	      (pretty-print (rtx-dump (/cstate-outer-expr cstate))))))
+  (let* ((pretty-parent-expr (rtx-pretty-strdump (/cstate-outer-expr cstate)))
 	 (intro (if parent-expr
 		    (string-append "While canonicalizing "
 				   (rtx-strdump parent-expr)
@@ -1881,6 +1878,10 @@
 		; want it to).  So we record the value here.
 		(owner . #f)
 
+		;; The outer expr being evaluated, for error messages.
+		;; #f if there is none.
+		(outer-expr . #f)
+
 		; EXPR-FN is a dual-purpose beast.  The first purpose is to
 		; just process the current expression and return the result.
 		; The second purpose is to lookup the function which will then
@@ -1937,6 +1938,8 @@
 	      (elm-set! self 'context (cadr args)))
 	     ((#:owner)
 	      (elm-set! self 'owner (cadr args)))
+	     ((#:outer-expr)
+	      (elm-set! self 'outer-expr (cadr args)))
 	     ((#:expr-fn)
 	      (elm-set! self 'expr-fn (cadr args)))
 	     ((#:env)
@@ -1955,10 +1958,10 @@
 ; Accessors.
 
 (define-getters <eval-state> estate
-  (context owner expr-fn env depth modifiers)
+  (context owner outer-expr expr-fn env depth modifiers)
 )
 (define-setters <eval-state> estate
-  (context owner expr-fn env depth modifiers)
+  (env depth modifiers)
 )
 
 ; Build an estate for use in producing a value from rtl.
@@ -2028,7 +2031,12 @@
   (apply context-owner-error
 	 (cons (estate-context estate)
 	       (cons (estate-owner estate)
-		     (cons "During rtx evalution"
+		     (cons (string-append "During rtx evalution"
+					  (if (estate-outer-expr estate)
+					      (string-append " of\n"
+							     (rtx-pretty-strdump (estate-outer-expr estate))
+							     "\n")
+					      ""))
 			   (cons errmsg expr)))))
 )
 

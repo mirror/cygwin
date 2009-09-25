@@ -1,3 +1,27 @@
+2009-09-25  Doug Evans  <dje@sebabeach.org>
+
+	* operand.scm (/anyof-merge-setter): Handle set-quiet.
+
+	* rtl-c.scm (estate-make-for-rtl-c): Delete args context, owner,
+	rtl-cover-fns?, macro?.  All callers updated.
+	(estate-make-for-normal-rtl-c): Delete, have all callers call
+	estate-make-for-rtl-c directly.
+	(rtl-c-parsed): Pass #:outer-expr to estate-make-for-rtl-c.
+	(rtl-c, rtl-c-expr-parsed, rtl-c-expr, rtl-c++-parsed, rtl-c++): Ditto.
+
+	* rtl-c.scm (/par-replace-set-dest-expr-fn): New function,
+	replaces /par-replace-set-dests.
+	(/par-replace-set-src-expr-fn): New function, replaces
+	/par-replace-set-srcs.
+	(s-parallel): Rewrite.
+
+	* rtl.scm (rtx-pretty-strdump): New function.
+	* rtl-traverse.scm (/rtx-canon-error): Use it.
+	(<eval-state>): New member outer-expr.
+	(estate-error): Include outer expression in error message if present.
+
+	* rtl.scm (rtx-single-set?): Handle set-quiet.
+
 2009-09-23  Doug Evans  <dje@sebabeach.org>
 
 	* xc16x.cpu (h-cr): New hardware.

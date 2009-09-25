@@ -272,37 +272,24 @@
 	   (loop (cddr args) unrecognized)))))
 )
 
-; Build an estate for use in generating C.
-; CONTEXT is a <context> object or #f if there is none.
-; OWNER is the owner of the expression or #f if there is none.
-; EXTRA-VARS-ALIST is an association list of
-; (symbol <mode>-or-mode-name value) elements to be used during value lookup.
-; OVERRIDES is a #:keyword/value list of parameters to apply last.
+;; Build an estate for use in generating C.
+;; EXTRA-VARS-ALIST is an association list of
+;; (symbol <mode>-or-mode-name value) elements to be used during value lookup.
+;; OVERRIDES is a #:keyword/value list of parameters to apply last.
+;;
+;; ??? Move EXTRA-VARS-ALIST into OVERRIDES (caller would have to call
+;; rtx-env-init-stack1)?
 
-(define (estate-make-for-rtl-c context owner extra-vars-alist
-			       rtl-cover-fns? macro? overrides)
+(define (estate-make-for-rtl-c extra-vars-alist overrides)
   (apply vmake
 	 (append!
 	  (list
 	   <rtl-c-eval-state>
-	   #:context context
-	   #:owner owner
 	   #:expr-fn (lambda (rtx-obj expr mode estate)
 		       (rtl-c-generator rtx-obj))
 	   #:env (rtx-env-init-stack1 extra-vars-alist)
-	   #:rtl-cover-fns? rtl-cover-fns?
-	   #:macro? macro?)
-	   overrides))
-)
-
-(define (estate-make-for-normal-rtl-c extra-vars-alist overrides)
-  (estate-make-for-rtl-c
-   #f ; FIXME: context
-   #f ; FIXME: owner
-   extra-vars-alist
-   /rtl-c-rtl-cover-fns?
-   #f ; macro?
-   overrides)
+	   #:rtl-cover-fns? /rtl-c-rtl-cover-fns?)
+	  overrides))
 )
 
 ; Translate RTL expression EXPR to C.
@@ -323,7 +310,12 @@
 ; with.
 
 (define (rtl-c-parsed mode x extra-vars-alist . overrides)
-  (let ((estate (estate-make-for-normal-rtl-c extra-vars-alist overrides)))
+  ;; ??? If we're passed insn-compiled-semantics the output of xops is
+  ;; confusing.  Fix by subclassing <operand> -> <xoperand>, and
+  ;; have <xoperand> provide original source expr.
+  (let ((estate (estate-make-for-rtl-c extra-vars-alist
+				       (cons #:outer-expr
+					     (cons x overrides)))))
     (rtl-c-with-estate estate mode x))
 )
 
@@ -331,7 +323,11 @@
 ; MODE is a <mode> object.
 
 (define (rtl-c mode x extra-vars-alist . overrides)
-  (let ((estate (estate-make-for-normal-rtl-c extra-vars-alist overrides)))
+  ;; This doesn't pass the canonicalized expr for #outer-expr on purpose,
+  ;; to keep it closer to what the user wrote.
+  (let ((estate (estate-make-for-rtl-c extra-vars-alist
+				       (cons #:outer-expr
+					     (cons x overrides)))))
     (rtl-c-with-estate estate mode (rtx-canonicalize #f (obj:name mode) x
 						     extra-vars-alist)))
 )
@@ -347,7 +343,12 @@
 ; MODE is a <mode> object.
 
 (define (rtl-c-expr-parsed mode x extra-vars-alist . overrides)
-  (let ((estate (estate-make-for-normal-rtl-c extra-vars-alist overrides)))
+  ;; ??? If we're passed insn-compiled-semantics the output of xops is
+  ;; confusing.  Fix by subclassing <operand> -> <xoperand>, and
+  ;; have <xoperand> provide original source expr.
+  (let ((estate (estate-make-for-rtl-c extra-vars-alist
+				       (cons #:outer-expr
+					     (cons x overrides)))))
     (rtl-c-expr-with-estate estate mode x))
 )
 
@@ -355,7 +356,11 @@
 ; MODE is a <mode> object.
 
 (define (rtl-c-expr mode x extra-vars-alist . overrides)
-  (let ((estate (estate-make-for-normal-rtl-c extra-vars-alist overrides)))
+  ;; This doesn't pass the canonicalized expr for #outer-expr on purpose,
+  ;; to keep it closer to what the user wrote.
+  (let ((estate (estate-make-for-rtl-c extra-vars-alist
+				       (cons #:outer-expr
+					     (cons x overrides)))))
     (rtl-c-expr-with-estate estate mode (rtx-canonicalize #f (obj:name mode) x
 							  extra-vars-alist)))
 )
@@ -367,14 +372,9 @@
 ; elements to be used during value lookup.
 ; OVERRIDES is a #:keyword/value list of parameters to apply last.
 
-(define (estate-make-for-normal-rtl-c++ extra-vars-alist overrides)
-  (estate-make-for-rtl-c
-   #f ; FIXME: context
-   #f ; FIXME: owner
-   extra-vars-alist
-   /rtl-c-rtl-cover-fns?
-   #f ; macro?
-   (cons #:output-language (cons "c++" overrides)))
+(define (estate-make-for-rtl-c++ extra-vars-alist overrides)
+  (estate-make-for-rtl-c extra-vars-alist
+			 (cons #:output-language (cons "c++" overrides)))
 )
 
 ; Translate parsed RTL expression X to a string of C++ code.
@@ -387,7 +387,12 @@
 ; with.
 
 (define (rtl-c++-parsed mode x extra-vars-alist . overrides)
-  (let ((estate (estate-make-for-normal-rtl-c++ extra-vars-alist overrides)))
+  ;; ??? If we're passed insn-compiled-semantics the output of xops is
+  ;; confusing.  Fix by subclassing <operand> -> <xoperand>, and
+  ;; have <xoperand> provide original source expr.
+  (let ((estate (estate-make-for-rtl-c++ extra-vars-alist
+					 (cons #:outer-expr
+					       (cons x overrides)))))
     (rtl-c-with-estate estate mode x))
 )
 
@@ -395,7 +400,11 @@
 ; MODE is a <mode> object.
 
 (define (rtl-c++ mode x extra-vars-alist . overrides)
-  (let ((estate (estate-make-for-normal-rtl-c++ extra-vars-alist overrides)))
+  ;; This doesn't pass the canonicalized expr for #outer-expr on purpose,
+  ;; to keep it closer to what the user wrote.
+  (let ((estate (estate-make-for-rtl-c++ extra-vars-alist
+					 (cons #:outer-expr
+					       (cons x overrides)))))
     (rtl-c-with-estate estate mode (rtx-canonicalize #f (obj:name mode) x
 						     extra-vars-alist)))
 )
@@ -1162,89 +1171,90 @@
    "\n")
 )
 
-; Parallels are handled by converting them into two sequences.  The first has
-; all set destinations replaced with temps, and the second has all set sources
-; replaced with those temps.
-; ??? Revisit later to see if (if ...) and (set pc ...) is ok.
-; How about disallowing if's and jump's inside parallels?
-; One can still put a parallel inside an `if' however.
+;; Parallels are handled by converting them into two sequences.  The first has
+;; all set destinations replaced with temps, and the second has all set sources
+;; replaced with those temps.
 
-(define (/par-replace-set-dests estate exprs)
-  ;(display exprs) (newline)
-  (let ((sets (list 'set 'set-quiet
-		    (rtx-lookup 'set) (rtx-lookup 'set-quiet))))
-    (letrec ((replace
-	      (lambda (expr)
-		;(display expr) (newline)
-		(let ((name (car expr))
-		      (options (rtx-options expr))
-		      (mode (rtx-mode expr)))
-		  (if (memq name sets)
-		      (list name
-			    options
-			    mode
-			    (/par-new-temp! ; replace dest with temp
-			     (if (mode:eq? 'DFLT mode) ;; FIXME: can't get DFLT anymore
-				 (rtx-lvalue-mode-name estate (rtx-set-dest expr))
-				 mode))
-			    (rtx-set-src expr))
-		      (cons name
-			    (cons options
-				  (cons mode (replace (rtx-args expr)))))))))
-	     )
-      (map replace exprs)))
+;; rtl-traverse expr-fn to replace the dest of sets with the parallel temp.
+
+(define (/par-replace-set-dest-expr-fn rtx-obj expr parent-expr op-pos
+				       tstate appstuff)
+  (case (car expr)
+    ((set set-quiet)
+     (let ((name (rtx-name expr))
+	   (options (rtx-options expr))
+	   (mode (rtx-mode expr))
+	   (dest (rtx-set-dest expr))
+	   (src (rtx-set-src expr)))
+       (list name options mode (/par-new-temp! mode) src)))
+    (else #f))
 )
 
-; This must process expressions in the same order as /par-replace-set-dests!
+;; rtl-traverse expr-fn to replace the src of sets with the parallel temp.
+;; This must process expressions in the same order as /par-replace-set-dests.
 
-(define (/par-replace-set-srcs estate exprs)
-  (let ((sets (list 'set 'set-quiet
-		    (rtx-lookup 'set) (rtx-lookup 'set-quiet))))
-    (letrec ((replace
-	      (lambda (expr)
-		(let ((name (car expr))
-		      (options (rtx-options expr))
-		      (mode (rtx-mode expr)))
-		  (if (memq name sets)
-		      (list name
-			    options
-			    mode
-			    (rtx-set-dest expr)
-			    (/par-next-temp!)) ; the source's temp
-		      (cons name
-			    (cons options
-				  (cons mode (replace (cddr expr)))))))))
-	     )
-      (map replace exprs)))
+(define (/par-replace-set-src-expr-fn rtx-obj expr parent-expr op-pos
+				      tstate appstuff)
+  (case (car expr)
+    ((set set-quiet)
+     (let ((name (rtx-name expr))
+	   (options (rtx-options expr))
+	   (mode (rtx-mode expr))
+	   (dest (rtx-set-dest expr))
+	   (src (rtx-set-src expr)))
+       (list name options mode dest (/par-next-temp!))))
+    (else #f))
 )
 
-; Return a <c-expr> node for a `parallel'.
+;; Return a <c-expr> node for a `parallel'.
 
 (define (s-parallel estate . exprs)
   (begin
-    ; Initialize /par-temp-list for /par-replace-set-dests.
+
+    ;; Initialize /par-temp-list for /par-replace-set-dests.
     (set! /par-temp-list nil)
-    (let* ((set-dests (string-map (lambda (e)
-				    (rtl-c-with-estate estate VOID e))
-				  (/par-replace-set-dests estate exprs)))
+
+    (let* ((set-dest-exprs
+	    (map (lambda (expr)
+		   (rtx-traverse (estate-context estate)
+				 (estate-owner estate)
+				 expr
+				 /par-replace-set-dest-expr-fn
+				 #f))
+		 exprs))
+	   (set-dests (string-map (lambda (expr)
+				    (rtl-c-with-estate estate VOID expr))
+				  set-dest-exprs))
 	   (temps (reverse! /par-temp-list)))
-      ; Initialize /par-temp-list for /par-replace-set-srcs.
+
+      ;; Initialize /par-temp-list for /par-replace-set-srcs.
       (set! /par-temp-list temps)
-      (cx:make VOID
-	       (string-append
-		; FIXME: do {} while (0); doesn't get "optimized out"
-		; internally by gcc, meaning two labels and a loop are
-		; created for it to have to process.  We can generate pretty
-		; big files and can cause gcc to require *lots* of memory.
-		; So let's try just {} ...
-		"{\n"
-		(/gen-par-temp-defns temps)
-		set-dests
-		(string-map (lambda (e)
-			      (rtl-c-with-estate estate VOID e))
-			    (/par-replace-set-srcs estate exprs))
-		"}\n")
-	       )))
+
+      (let* ((set-src-exprs
+	      (map (lambda (expr)
+		     (rtx-traverse (estate-context estate)
+				   (estate-owner estate)
+				   expr
+				   /par-replace-set-src-expr-fn
+				   #f))
+		   exprs))
+	     (set-srcs (string-map (lambda (expr)
+				     (rtl-c-with-estate estate VOID expr))
+				    set-src-exprs)))
+
+	(cx:make VOID
+		 (string-append
+		  ;; ??? do {} while (0); doesn't get "optimized out"
+		  ;; internally by gcc, meaning two labels and a loop are
+		  ;; created for it to have to process.  We can generate pretty
+		  ;; big files and can cause gcc to require *lots* of memory.
+		  ;; So let's try just {} ...
+		  "{\n"
+		  (/gen-par-temp-defns temps)
+		  set-dests
+		  set-srcs
+		  "}\n")
+		 ))))
 )
 
 ; Return a <c-expr> node for a `sequence'.
@@ -1257,7 +1267,7 @@
 	    (mode:eq? 'VOID mode))
 	(cx:make VOID
 		 (string-append 
-		  ; FIXME: do {} while (0); doesn't get "optimized out"
+		  ; ??? do {} while (0); doesn't get "optimized out"
 		  ; internally by gcc, meaning two labels and a loop are
 		  ; created for it to have to process.  We can generate pretty
 		  ; big files and can cause gcc to require *lots* of memory.
@@ -1380,10 +1390,11 @@
 ;	  nil #f #f))
 )
 
-; Operand support
+;; Operand support.
 
 (define-fn operand (*estate* options mode object-or-name)
   (cond ((operand? object-or-name)
+	 ;; FIXME: <operand> objects is what xop is for
 	 ;; mode checking to be done during canonicalization
 	 object-or-name)
 	((symbol? object-or-name)
@@ -1396,7 +1407,7 @@
 	 (estate-error *estate* "bad arg to `operand'" object-or-name)))
 )
 
-(define-fn xop (*estate* options mode object) 
+(define-fn xop (*estate* options mode object)
   (let ((delayed (assoc '#:delay (estate-modifiers *estate*))))
     (if (and delayed
 	     (equal? APPLICATION 'SID-SIMULATOR)

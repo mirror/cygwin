@@ -197,18 +197,6 @@
 (define /object-unspecified #:unspecified)
 (define /object-unbound #:unbound)
 
-; Associative list of classes to be traced.
-
-(define /object-debug-classes #f)
-
-; Associative list of elements to be traced.
-
-(define /object-debug-elements #f)
-
-; Associative list of messages to be traced.
-
-(define /object-debug-methods #f)
-
 ; True if error messages are verbose and debugging messages are printed.
 
 (define /object-verbose? #f)

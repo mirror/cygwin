@@ -1,5 +1,8 @@
 2009-09-27  Doug Evans  <dje@sebabeach.org>
 
+	* cos.scm (/object-debug-classes): Delete.
+	(/object-debug-elements, /object-debug-methods): Delete.
+
 	* cos.scm (/method-lookup): Delete arg virtual?, all callers updated.
 	(method-proc): Delete.
 	(method-make-virtual!, method-make-virtual-forward!): Delete.

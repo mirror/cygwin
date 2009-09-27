@@ -35,7 +35,7 @@
 ; confuse that with intentions at directions.  Given that something better
 ; will eventually happen, being deliberately different is useful.
 ;
-; METHOD-ALIST is an alist of (symbol . (virtual? . procedure)) for this
+; METHOD-ALIST is an alist of (symbol . procedure) for this
 ; class only.
 ;
 ; FULL-ELM-INITIAL-LIST is the elements of the flattened inheritance tree.
@@ -155,19 +155,10 @@
 ;
 ; Add method NAME to CLASS.
 ;
-; (method-make-virtual! class name lambda) -> unspecified
-;
-; Add virtual method NAME to CLASS.
-;
 ; (method-make-forward! class elm-name methods) -> unspecified
 ;
 ; Add METHODS to CLASS that pass the "message" onto the object in element
 ; ELM-NAME.
-;
-; (method-make-virtual-forward! class elm-name methods) -> unspecified
-;
-; Add virtual METHODS to CLASS that pass the "message" onto the object in
-; element ELM-NAME.
 ;
 ; (elm-get object elm-name) -> value of element ELM-NAME in OBJ
 ;
@@ -936,14 +927,12 @@
 
 ; Lookup the next method in a class.
 ; This means begin the search in the parents.
-; ??? What should this do for virtual methods.  At present we treat them as
-; non-virtual.
 
 (define (/method-lookup-next class-desc method-name)
   (let loop ((parents (/class-desc-parents class-desc)))
     (if (null? parents)
 	#f
-	(let ((meth (/method-lookup (car parents) method-name #f)))
+	(let ((meth (/method-lookup (car parents) method-name)))
 	  (if meth
 	      meth
 	      (loop (cdr parents))))))
@@ -951,14 +940,11 @@
 
 ; Lookup a method in a class.
 ; The result is (class-desc . method).  If the method is found in a parent
-; class, the associated parent class descriptor is returned.  If the method is
-; a virtual method, the appropriate subclass's class descriptor is returned.
-; VIRTUAL? is #t if virtual methods are to be treated as such.
-; Otherwise they're treated as normal methods.
+; class, the associated parent class descriptor is returned.
 ;
 ; FIXME: We don't yet implement the method cache.
 
-(define (/method-lookup class-desc method-name virtual?)
+(define (/method-lookup class-desc method-name)
   (if /object-verbose?
       (display (string-append "Looking up method " method-name " in "
 			      (/class-name (/class-desc-class class-desc)) ".\n")
@@ -966,30 +952,8 @@
 
   (let ((meth (assq method-name (/class-methods (/class-desc-class class-desc)))))
     (if meth
-	(if (and virtual? (cadr meth)) ; virtual?
-	    ; Traverse back up the inheritance chain looking for overriding
-	    ; methods.  The closest one to the top is the one to use.
-	    (let loop ((child (/class-desc-child class-desc))
-		       (goal-class-desc class-desc)
-		       (goal-meth meth))
-	      (if child
-		  (begin
-		    (if /object-verbose?
-			(display (string-append "Looking up virtual method "
-						method-name " in "
-						(/class-name (/class-desc-class child))
-						".\n")
-				 (current-error-port)))
-		    (let ((meth (assq method-name (/class-methods (/class-desc-class child)))))
-		      (if meth
-			  ; Method found, update goal object and method.
-			  (loop (/class-desc-child child) child meth)
-			  ; Method not found at this level.
-			  (loop (/class-desc-child child) goal-class-desc goal-meth))))
-		  ; Went all the way up to the top.
-		  (cons goal-class-desc (cddr goal-meth))))
-	    ; Non-virtual, done.
-	    (cons class-desc (cddr meth)))
+	;; Found.
+	(cons class-desc (cdr meth))
 	; Method not found, search parents.
 	(/method-lookup-next class-desc method-name)))
 )
@@ -998,18 +962,7 @@
 
 (define (method-present? obj name)
   (/object-check obj "method-present?")
-  (->bool (/method-lookup (/object-class-desc obj) name #f))
-)
-
-; Return method NAME of CLASS or #f if not present.
-; ??? Assumes CLASS has been initialized.
-
-(define (method-proc class name)
-  (/class-check class "method-proc")
-  (let ((meth (/method-lookup (/class-class-desc class) name #t)))
-    (if meth
-	(cdr meth)
-	#f))
+  (->bool (/method-lookup (/object-class-desc obj) name))
 )
 
 ; Add a method to a class.
@@ -1019,21 +972,7 @@
   (/class-check class "method-make!")
   (if (not (procedure? method))
       (/object-error "method-make!" method "method must be a procedure"))
-  (/class-set-methods! class (acons method-name
-				    (cons #f method)
-				    (/class-methods class)))
-  /object-unspecified
-)
-
-; Add a virtual method to a class.
-; FIXME: ensure method-name is a symbol
-
-(define (method-make-virtual! class method-name method)
-  (/class-check class "method-make-virtual!")
-  (if (not (procedure? method))
-      (/object-error "method-make-virtual!" method "method must be a procedure"))
-  (/class-set-methods! class (acons method-name
-				    (cons #t method)
+  (/class-set-methods! class (acons method-name method
 				    (/class-methods class)))
   /object-unspecified
 )
@@ -1047,23 +986,6 @@
 (define (method-make-forward! class elm-name methods)
   (for-each (lambda (method-name)
 	      (method-make!
-	       class method-name
-	       (eval1 `(lambda args
-			 (apply send
-				(cons (elm-get (car args)
-					       (quote ,elm-name))
-				      (cons (quote ,method-name)
-					    (cdr args))))))))
-	    methods)
-  /object-unspecified
-)
-
-; Same as method-make-forward! but creates virtual methods.
-; FIXME: ensure elm-name is a symbol
-
-(define (method-make-virtual-forward! class elm-name methods)
-  (for-each (lambda (method-name)
-	      (method-make-virtual!
 	       class method-name
 	       (eval1 `(lambda args
 			 (apply send
@@ -1103,7 +1025,7 @@
   (if /object-verbose? (/object-method-notify obj method-name ""))
 
   (let ((class-desc.meth (/method-lookup (/object-class-desc obj)
-					 method-name #t)))
+					 method-name)))
     (if class-desc.meth
 	(apply (cdr class-desc.meth)
 	       (cons (/object-specialize obj (car class-desc.meth))
@@ -1322,16 +1244,3 @@
     (define /object-vector-copy vector-copy)
     (define (/object-vector-copy v) (list->vector (vector->list v)))
 )
-
-; Profiling support
-
-(if (and #f (defined? 'proc-profile))
-    (begin
-      (proc-profile elm-get)
-      (proc-profile elm-xset!)
-      (proc-profile elm-present?)
-      (proc-profile /method-lookup)
-      (proc-profile send)
-      (proc-profile new)
-      (proc-profile make)
-      ))

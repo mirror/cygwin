@@ -49,7 +49,7 @@
       ""
       (string-list-map (lambda (hw)
 			 (string-list
-			  (gen-decl hw)
+			  (gen-defn hw)
 			  (gen-obj-sanitize hw
 					    (string-list
 					     (send hw 'gen-get-macro)

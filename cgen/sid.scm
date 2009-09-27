@@ -241,7 +241,7 @@
 
 ; Methods:
 ; gen-type - return C code representing the type
-; gen-sym-decl - generate decl using the provided symbol
+; gen-sym-defn - generate definition using the provided symbol
 ; gen-sym-get-macro - generate GET macro for accessing CPU elements
 ; gen-sym-set-macro - generate SET macro for accessing CPU elements
 
@@ -253,7 +253,7 @@
 )
 
 (method-make!
- <scalar> 'gen-sym-decl
+ <scalar> 'gen-sym-defn
  (lambda (self sym comment)
    (string-append
     "  /* " comment " */\n"
@@ -271,7 +271,7 @@
 )
 
 (method-make!
- <array> 'gen-sym-decl
+ <array> 'gen-sym-defn
  (lambda (self sym comment)
    (string-append
     "  /* " comment " */\n"
@@ -310,7 +310,7 @@
 ;   )
 ;)
 ;
-;(method-make! <integer> 'gen-sym-decl (lambda (self sym comment) ""))
+;(method-make! <integer> 'gen-sym-defn (lambda (self sym comment) ""))
 ;(method-make! <integer> 'gen-sym-get-macro (lambda (self sym comment) ""))
 ;(method-make! <integer> 'gen-sym-set-macro (lambda (self sym comment) ""))
 
@@ -320,35 +320,38 @@
 ; things the simulator will want to do with it.
 ;
 ; Methods:
-; gen-decl
+; gen-type      - C type to use to record value.
+;                 ??? Delete and just use get-mode?
+; gen-defn      - generate a definition of the h/w element
 ; gen-write     - Same as gen-read except done on output operands
 ; cxmake-get    - Return a <c-expr> object to fetch the value.
 ; gen-set-quiet - Set the value.
 ;                 ??? Could just call this gen-set as there is no gen-set-trace
 ;                 but for consistency with the messages passed to operands
 ;                 we use this same.
-; gen-type      - C type to use to record value.
-;                 ??? Delete and just use get-mode?
 ; save-index?   - return #t if an index needs to be saved for parallel
 ;                 execution post-write processing
 ; gen-profile-decl
 ; gen-record-profile
 ; get-mode
 ; gen-profile-locals
-; gen-sym-decl  - Return a C declaration using the provided symbol.
 ; gen-sym-get-macro - Generate default GET access macro.
 ; gen-sym-set-macro - Generate default SET access macro.
 ; gen-ref       - Return a C reference to the object.
 
-; Generate CPU state struct entries.
+; gen-type handler, must be overridden
 
 (method-make!
- <hardware-base> 'gen-decl
- (lambda (self)
-   (send self 'gen-sym-decl (obj:name self) (obj:comment self)))
+ <hardware-base> 'gen-type
+ (lambda (self) (error "gen-type not overridden:" self))
 )
 
-(method-make-virtual! <hardware-base> 'gen-sym-decl (lambda (self sym comment) ""))
+; Generate CPU state struct entries, must be overridden.
+
+(method-make!
+ <hardware-base> 'gen-defn
+ (lambda (self) (error "gen-defn not overridden:" self))
+)
 
 ; Return a C reference to a hardware object.
 
@@ -360,13 +363,6 @@
  <hardware-base> 'gen-write
  (lambda (self estate index mode sfmt op access-macro)
    (error "gen-write method not overridden:" self))
-)
-
-; gen-type handler, must be overridden
-
-(method-make-virtual!
- <hardware-base> 'gen-type
- (lambda (self) (error "gen-type not overridden:" self))
 )
 
 (method-make! <hardware-base> 'gen-profile-decl (lambda (self) ""))
@@ -459,8 +455,14 @@
 
 ; Registers.
 
-; Forward these methods onto TYPE.
-(method-make-virtual-forward! <hw-register> 'type '(gen-type gen-sym-decl))
+(method-make-forward! <hw-register> 'type '(gen-type))
+
+(method-make!
+ <hw-register> 'gen-defn
+ (lambda (self)
+   (send (elm-get self 'type) 'gen-sym-defn (obj:name self) (obj:comment self)))
+)
+
 (method-make-forward! <hw-register> 'type '(gen-ref
 					    gen-sym-get-macro
 					    gen-sym-set-macro))
@@ -676,8 +678,8 @@
 		    ", " (cx:c newval) ");\n")))
 )
 
-(method-make-virtual-forward! <hw-memory> 'type '(gen-type))
-(method-make-virtual! <hw-memory> 'gen-sym-decl (lambda (self sym comment) ""))
+(method-make-forward! <hw-memory> 'type '(gen-type))
+(method-make! <hw-memory> 'gen-defn (lambda (self) ""))
 (method-make! <hw-memory> 'gen-sym-get-macro (lambda (self sym comment) ""))
 (method-make! <hw-memory> 'gen-sym-set-macro (lambda (self sym comment) ""))
 
@@ -706,8 +708,14 @@
 
 ; Immediates, addresses.
 
-; Forward these methods onto TYPE.
-(method-make-virtual-forward! <hw-immediate> 'type '(gen-type gen-sym-decl))
+(method-make-forward! <hw-immediate> 'type '(gen-type))
+
+(method-make!
+ <hw-immediate> 'gen-defn
+ (lambda (self)
+   (send (elm-get self 'type) 'gen-sym-defn (obj:name self) (obj:comment self)))
+)
+
 (method-make-forward! <hw-immediate> 'type '(gen-sym-get-macro
 					     gen-sym-set-macro))
 
@@ -717,9 +725,9 @@
    (error "gen-write of <hw-immediate> shouldn't happen"))
 )
 
-; FIXME.
-(method-make-virtual! <hw-address> 'gen-type (lambda (self) "ADDR"))
-(method-make-virtual! <hw-address> 'gen-sym-decl (lambda (self sym comment) ""))
+;; FIXME
+(method-make! <hw-address> 'gen-type (lambda (self) "ADDR"))
+(method-make! <hw-address> 'gen-defn (lambda (self) ""))
 (method-make! <hw-address> 'gen-sym-get-macro (lambda (self sym comment) ""))
 (method-make! <hw-address> 'gen-sym-set-macro (lambda (self sym comment) ""))
 
@@ -745,8 +753,8 @@
    (error "gen-write of <hw-address> shouldn't happen"))
 )
 
-; FIXME: revisit.
-(method-make-virtual! <hw-iaddress> 'gen-type (lambda (self) "IADDR"))
+;; FIXME: consistency says there should be gen-defn, gen-sym-[gs]et-macro
+(method-make! <hw-iaddress> 'gen-type (lambda (self) "IADDR"))
 
 ; Return a <c-expr> object of the value of SELF.
 ; ESTATE is the current rtl evaluator state.

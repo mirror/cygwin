@@ -97,7 +97,7 @@
 
 ; Return start of ifield.
 
-(method-make-virtual!
+(method-make!
  <ifield> 'field-start
  (lambda (self)
    (bitrange-start (/ifld-bitrange self)))
@@ -107,7 +107,7 @@
   (send ifld 'field-start)
 )
 
-(method-make-virtual!
+(method-make!
  <ifield> 'field-length
  (lambda (self)
    (bitrange-length (elm-get self 'bitrange)))
@@ -397,7 +397,7 @@
 
 ;; Pretty print an ifield, typically for error messages.
 
-(method-make-virtual!
+(method-make!
  <ifield> 'pretty-print
  (lambda (self)
    (string-append "(" (obj:str-name self)
@@ -757,7 +757,7 @@ Define an instruction multi-field, all arguments specified.
 
 ; Return the starting bit number of the first field.
 
-(method-make-virtual!
+(method-make!
  <multi-ifield> 'field-start
  (lambda (self)
    (apply min (map (lambda (f) (ifld-start f)) (elm-get self 'subfields))))
@@ -765,7 +765,7 @@ Define an instruction multi-field, all arguments specified.
 
 ; Return the total length.
 
-(method-make-virtual!
+(method-make!
  <multi-ifield> 'field-length
  (lambda (self)
    (apply + (map ifld-length (elm-get self 'subfields))))
@@ -845,7 +845,7 @@ Define an instruction multi-field, all arguments specified.
 
 ;; Pretty print a multi-ifield, typically for error messages.
 
-(method-make-virtual!
+(method-make!
  <multi-ifield> 'pretty-print
  (lambda (self)
    (string-append "(" (obj:str-name self)

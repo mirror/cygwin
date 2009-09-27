@@ -1,3 +1,32 @@
+2009-09-27  Doug Evans  <dje@sebabeach.org>
+
+	* cos.scm (/method-lookup): Delete arg virtual?, all callers updated.
+	(method-proc): Delete.
+	(method-make-virtual!, method-make-virtual-forward!): Delete.
+	* ifield.scm (<ifield> field-start): Update.
+	(<ifield> field-length, pretty-print): Update.
+	(<multi-ifield> field-length, field-start, pretty-print): Update.
+	* sid-cpu.scm (/gen-hardware-struct): Use gen-defn instead of gen-decl.
+	* sid.scm (<scalar> gen-sym-defn): Renamed from gen-sym-decl.
+	(<array> gen-sym-defn): Ditto.
+	(<hardware-base> gen-defn): Renamed from gen-defn.
+	(<hw-register> gen-type): Update.
+	(<hw-register> gen-defn): Renamed from gen-sym-decl, rewrite.
+	(<hw-memory>, <hw-address>, <hw-iaddress> gen-type): Update.
+	(<hw-memory>, <hw-address> gen-defn): Renamed from gen-sym-decl.
+	(<hw-immediate> gen-type): Update.
+	(<hw-immediate> gen-defn): Renamed from gen-sym-decl, rewrite.
+	* sim-cpu.scm (/gen-hardware-struct): Use gen-defn instead of gen-decl.
+	* sim.scm (<scalar> gen-sym-defn): Renamed from gen-sym-decl.
+	(<array> gen-sym-defn): Ditto.
+	(<hardware-base> gen-defn): Renamed from gen-defn.
+	(<hw-register> gen-type): Update.
+	(<hw-register> gen-defn): Renamed from gen-sym-decl, rewrite.
+	(<hw-memory>, <hw-address>, <hw-iaddress> gen-type): Update.
+	(<hw-memory>, <hw-address> gen-defn): Renamed from gen-sym-decl.
+	(<hw-immediate> gen-type): Update.
+	(<hw-immediate> gen-defn): Renamed from gen-sym-decl, rewrite.
+
 2009-09-25  Doug Evans  <dje@sebabeach.org>
 
 	* operand.scm (/anyof-merge-setter): Handle set-quiet.

@@ -187,7 +187,7 @@ namespace @arch@ {
 	   (string-append "  // Hardware elements for " prefix ".\n")
 	   "  // Hardware elements.\n")
        "  struct {\n"
-       (string-list-map gen-decl hw-list)
+       (string-list-map gen-defn hw-list)
        "  } "
        (if prefix
 	   (string-append prefix "_")

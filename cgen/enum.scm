@@ -347,7 +347,7 @@
 (method-make!
  <insn-enum> 'make!
  (lambda (self name comment attrs prefix fld vals)
-   (send (object-parent self <enum>) 'make! name comment attrs prefix vals)
+   (send-next self '<insn-enum> 'make! name comment attrs prefix vals)
    (elm-set! self 'fld fld)
    self
    )

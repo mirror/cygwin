@@ -253,7 +253,8 @@
 (method-make!
  <pc> 'make!
  (lambda (self)
-   (send-next self 'make! (builtin-location) 'pc "program counter"
+   (send-next self '<pc> 'make!
+	      (builtin-location) 'pc "program counter"
 	      (atlist-parse (make-prefix-context "make! of pc")
 			    '(SEM-ONLY) "cgen_operand")
 	      'h-pc

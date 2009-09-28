@@ -250,7 +250,8 @@
  <rtl-c-eval-state> 'vmake!
  (lambda (self args)
    ; Initialize parent class first.
-   (let loop ((args (send-next self 'vmake! args)) (unrecognized nil))
+   (let loop ((args (send-next self '<rtl-c-eval-state> 'vmake! args))
+	      (unrecognized nil))
      (if (null? args)
 	 (reverse! unrecognized) ; ??? Could invoke method to initialize here.
 	 (begin

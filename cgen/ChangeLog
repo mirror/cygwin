@@ -1,5 +1,39 @@
 2009-09-27  Doug Evans  <dje@sebabeach.org>
 
+	* cos.scm (/class-table): New global.
+	(/class-uid, /class-set-uid!): New functions.
+	(/class-parent-name): Renamed from /class-parents.
+	(/class-make!): Change parents arg to parent-name, all callers updated.
+	Assign uid to class.
+	(/class-lookup-uid): New function.
+	(/class-parent-classes): Rewrite.
+	(/class-mi?): Delete.
+	(/class-desc-mi?, /class-desc-offset-case, /class-desc-offset-case):
+	Delete.
+	(/class-desc-offset, /class-desc-child, /class-desc-parents): Update.
+	(/class-compute-class-desc, class-desc-dump): Update.
+	(/object-make!): Update.
+	(/object-make-with-values!): Delete arg class-desc, all callers
+	updated.
+	(/object-copy): Delete arg top?, all callers updated.
+	(/object-specialize): Delete.
+	(/object-elements, /object-top-class): Delete.
+	(/object-class-name, /object-class-desc): Update.
+	(/object-class-uid): New function.
+	(/object-elm-get, /object-elm-set!, object?, /class-check-init!,
+	class-make, /class-subclass? /class-lookup-element,
+	Update.
+	(/elm-delta, elm-list): Delete.
+	(/elm-make-method-getter, elm-get, elm-xget): Update.
+	(/elm-make-method-setter, elm-set!, elm-xset!): Update.
+	(elm-make-getter, elm-make-setter): Update.
+	(/method-lookup-next): Update.
+	(send): Don't specialize class passed to method.
+	(send-next): New arg class-name, all callers updated.
+	(/class-parent, /class-parent-via-path, object-parent): Delete.
+	(class-cons-parent!, class-append-parent!): Delete.
+	(object-reset!): Init /class-table.
+
 	* cos.scm (/object-debug-classes): Delete.
 	(/object-debug-elements, /object-debug-methods): Delete.
 

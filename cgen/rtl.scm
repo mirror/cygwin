@@ -65,6 +65,7 @@
 		; CONDRTX - a cond expression ((test) rtx ... rtx)
 		; CASERTX - a case expression ((symbol .. symbol) rtx ... rtx)
 		; LOCALS - the locals list of a sequence
+		; ITERATION - the iteration 
 		; ENV - environment stack
 		; ATTRS - attribute list
 		; SYMBOL - arg must be a symbol

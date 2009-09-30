@@ -9,6 +9,21 @@
 Simulator support comes in the form of machine generated the decoder/executer
 as well as the structure that records CPU state information (i.e., registers).
 
+There are currently two simulators that use CGEN:
+
+@menu
+* GDB Simulator::
+* SID Simulator::
+@end menu
+
+@node GDB Simulator
+@section GDB Simulator
+
+Several simulators in the GDB tree use CGEN.
+These simulators use a combination of the CGEN-generated files,
+common files in the sim/common directory of GDB releases,
+and custom target-specific code.
+
 There are 3 architecture-wide generated files:
 
 @table @file
@@ -40,6 +55,30 @@ Code to perform each instruction.
 Same as @file{semantics.c} but as one giant @code{switch} statement.
 @end table
 
+Either or both of @file{semantics.c} and @file{sem-switch.c} may
+be provided, it's up to the port to choose.
+@file{semantics.c} is either to work with, one function per instruction,
+but @file{sem-switch.c} uses a ``computed goto'' switch and is thus
+provides faster simulation.
+
+@emph{NOTE:} The actual file names are up to the port.
+The names of the files listed here are the convention.
+One reason to use different names is if the port is simulating
+different architecture variants and generates different files
+for each variant.
+
 A ``CPU family'' is an artificial creation to sort architecture variants
 along whatever lines seem useful.  Additional hand-written files must be
 provided.  @xref{Porting}, for details.
+
+@node SID Simulator
+@section SID Simulator
+
+The SID simulator has its home page here:
+http://sourceware.org/sid/.
+Please refer to it for documentation on SID.
+
+The CGEN-based simulators in SID live in directory
+sid/component/cgen-cpu of the SID source tree.
+
+CGEN provides the instruction decoder and semantic routines.

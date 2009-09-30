@@ -1217,40 +1217,45 @@ At this point further additions/modifications are usually done by hand.
 @node Doing a simulator port
 @section Doing a simulator port
 
+@emph{NOTE:} This section applies to GDB simulators, not SID simulators
+(@pxref{SID Simulator}).
+
 The same basic procedure for opcodes porting applies here.
 
-@enumerate
-@item Run @code{guile}.
-@item @code{(load "dev.scm")}
-@item @code{(load-sim)}
-@item Edit your @file{cpu/$arch.cpu} file.
-@c We use $arch instead of <arch> here because texi2html doesn't
-@c properly escape <> instead double-quotes (with or without @code).
-@item @code{(cload #:arch "cpu/$arch.cpu")}
-@item Run each of:
-        @itemize @bullet
-	@item @code{(cgen-arch.h)}
-	@item @code{(cgen-arch.c)}
-	@item @code{(cgen-cpuall.h)}
-        @end itemize
-@item Repeat steps 4,5,6 until the output looks reasonable.
-@item Edit your @file{cpu/<arch>.cpu} file.
-@c We use $arch instead of <arch> here because texi2html doesn't
-@c properly escape <> instead double-quotes (with or without @code).
-@item @code{(cload #:arch "cpu/$arch.cpu" #:machs "mach1[,mach2[,...]]")}
-@item Run each of:
-        @itemize @bullet
-	@item @code{(cgen-cpu.h)}
-	@item @code{(cgen-cpu.c)}
-	@item @code{(cgen-decode.h)}
-	@item @code{(cgen-decode.c)}
-	@item @code{(cgen-semantics.c)}
-	@item @code{(cgen-sem-switch.c)} -- only if using a switch()
-                version of semantics.
-	@item @code{(cgen-model.c)}
-        @end itemize
-@item Repeat steps 8, 9 and 10 until the output looks reasonable.
-@end enumerate
+Simulator ports consist of four pieces:
+
+@itemize @bullet
+
+@item configury
+
+You'll have to write @file{Makefile.in} and @file{configure.ac}.
+It's easiest to simply take an existing one as boilerplate and hack it.
+
+@item things common to all simulators
+
+Directory @file{sim/common} in the simulator tree consists of various
+things the simulators use.  You probably won't have to hack on these
+files, but you might if your target has needs something new.
+
+@item main loop
+
+CGEN simulators generate source code for their main loop from a
+shell script, named by convention @file{mloop.in}.
+It's easiest to take an existing one as boilerplate and hack it.
+
+@item generated files
+
+The CGEN generated files.
+
+@end itemize
+
+@menu
+* Simulator files::                   Notes on the various files
+* Interactive simulator development:: Testing the generated files
+@end menu
+
+@node Simulator files
+@subsection Simulator files
 
 The following additional files are also needed. These live in the
 @file{sim/<arch>} directory. Administrivia files like
@@ -1378,6 +1383,44 @@ timing for each function unit.
 The M32R port has two other handwritten files: @file{devices.c} and
 @file{traps.c}.  How you wish to organize this is up to you.
 @end itemize
+
+@node Interactive simulator development
+@subsection Interactive simulator development
+
+When ready to generate the simulator files,
+
+@enumerate
+@item Run @code{guile}.
+@item @code{(load "dev.scm")}
+@item @code{(load-sim)}
+@item Edit your @file{cpu/$arch.cpu} file.
+@c We use $arch instead of <arch> here because texi2html doesn't
+@c properly escape <> instead double-quotes (with or without @code).
+@item @code{(cload #:arch "cpu/$arch.cpu")}
+@item Run each of:
+        @itemize @bullet
+	@item @code{(cgen-arch.h)}
+	@item @code{(cgen-arch.c)}
+	@item @code{(cgen-cpuall.h)}
+        @end itemize
+@item Repeat steps 4,5,6 until the output looks reasonable.
+@item Edit your @file{cpu/<arch>.cpu} file.
+@c We use $arch instead of <arch> here because texi2html doesn't
+@c properly escape <> instead double-quotes (with or without @code).
+@item @code{(cload #:arch "cpu/$arch.cpu" #:machs "mach1[,mach2[,...]]")}
+@item Run each of:
+        @itemize @bullet
+	@item @code{(cgen-cpu.h)}
+	@item @code{(cgen-cpu.c)}
+	@item @code{(cgen-decode.h)}
+	@item @code{(cgen-decode.c)}
+	@item @code{(cgen-semantics.c)}
+	@item @code{(cgen-sem-switch.c)} -- only if using a switch()
+                version of semantics.
+	@item @code{(cgen-model.c)}
+        @end itemize
+@item Repeat steps 8, 9 and 10 until the output looks reasonable.
+@end enumerate
 
 @node Building a simulator test suite
 @section Building a simulator test suite

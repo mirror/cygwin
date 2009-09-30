@@ -1,3 +1,9 @@
+2009-09-30  Doug Evans  <dje@sebabeach.org>
+
+	* doc/intro.texi: Mention SID.
+	* doc/sim.texi: Ditto.
+	* doc/porting.text (Doing a simulator port): Add some text.
+
 2009-09-27  Doug Evans  <dje@sebabeach.org>
 
 	* cos.scm (/class-table): New global.

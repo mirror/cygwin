@@ -449,8 +449,6 @@
 
 ; Combine smaller modes into a larger one.
 ; Arguments are specified most significant to least significant.
-; ??? May also want an endian dependent argument order.  That can be
-; implemented on top of or beside this.
 ; ??? Not all of the combinations are supported in the simulator.
 ; They'll get added as necessary.
 (drn (join &options &out-mode in-mode arg1 . arg-rest)
@@ -464,11 +462,12 @@
 
 ; GCC's subreg.
 ; Called subword 'cus it's not exactly subreg.
-; Word numbering is from most significant (word 0) to least (word N-1).
-; ??? May also want an endian dependent word ordering.  That can be
-; implemented on top of or beside this.
+; Word numbering is word-order dependent.
+; Word number 0 is the most significant word if big-endian-words.
+; Word number 0 is the least significant word if little-endian-words.
 ; ??? GCC plans to switch to SUBREG_BYTE.  Keep an eye out for the switch
 ; (which is extensive so probably won't happen anytime soon).
+; MODE is the mode of the result, not operand0.
 ;
 ; The mode spec of operand0 use to be MATCHEXPR, but subword is not a normal rtx.
 ; The mode of operand0 is not necessarily the same as the mode of the result,
@@ -515,7 +514,7 @@
 ;           (c-call mode name arg1 arg2 ...)
 ; which is converted into a C function call:
 ;           name (current_cpu, arg1, arg2, ...)
-; Mode is the mode of the result.
+; MODE is the mode of the result.
 ; If it is VOID this call is a statement and ';' is appended.
 ; Otherwise it is part of an expression.
 

@@ -2627,8 +2627,6 @@ Concatenate @samp{arg1[,arg2[,...]]} to create a value of mode @samp{out-mode}.
 @samp{arg1} becomes the most significant part of the result.
 Each argument is interpreted in mode @samp{in-mode}.
 @samp{in-mode} must evenly divide @samp{out-mode}.
-@c ??? Endianness issues have yet to be decided.
-@c Blech.  Time to decide them.
 
 @item (sequence mode ((mode1 local1) ...) expr1 ...)
 Execute @samp{expr1}, @samp{expr2}, etc. sequentially.

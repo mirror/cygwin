@@ -607,6 +607,10 @@ well as supporting routines.
 Simulator support comes in the form of machine generated the decoder/executer
 as well as the structure that records CPU state information (i.e., registers).
 
+CGEN comes with support for both the simulator in the GDB tree
+(@pxref{GDB Simulator}),
+and the SID simulator (@pxref{SID Simulator}).
+
 @node Testing support
 @section Testing support
 

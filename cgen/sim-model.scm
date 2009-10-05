@@ -305,7 +305,7 @@ static void
 @cpu@_prepare_run (SIM_CPU *cpu)
 {
   if (CPU_IDESC (cpu) == NULL)
-    @cpu@_init_idesc_table (cpu);
+    @prefix@_init_idesc_table (cpu);
 }
 
 static const CGEN_INSN *

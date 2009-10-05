@@ -1,3 +1,8 @@
+2009-10-05  Dave Korn  <dave.korn.cygwin@googlemail.com>
+
+	* sim-model.scm (@cpu@_prepare_run): Use @prefix@, not @cpu@,
+	for @foo@_init_idesc_table.
+
 2009-09-30  Doug Evans  <dje@sebabeach.org>
 
 	* doc/intro.texi: Mention SID.

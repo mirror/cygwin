@@ -1,5 +1,13 @@
 2009-10-08  Keith Seitz  <keiths@redhat.com>
 
+	* library/srctextwin.ith (ExecutableLineLimit): Define.
+	* library/srctextwin.itb (insertBreakTag): Search for next
+	executable line, just in case they changed.
+	When there are no tags on a line, the proper index is
+	line.4, not just 4.
+
+2009-10-08  Keith Seitz  <keiths@redhat.com>
+
 	* library/interface.tcl (gdbtk_tcl_warning): Add warnings for some
 	too frequently occurring DWARF complaints.
 

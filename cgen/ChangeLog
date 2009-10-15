@@ -1,3 +1,10 @@
+2009-10-14  Doug Evans  <dje@sebabeach.org>
+
+	* ifield.scm (<ifield>, value): Provide default initial value.
+	(ifield-encode-mode): Delete
+	(ifield-decode-mode): Delete duplicate definition.
+	(<derived-ifield>, 'make!): Initialize members encode, decode.
+
 2009-10-05  Dave Korn  <dave.korn.cygwin@googlemail.com>
 
 	* sim-model.scm (@cpu@_prepare_run): Use @prefix@, not @cpu@,

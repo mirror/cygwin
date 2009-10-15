@@ -51,9 +51,9 @@
 		; here and partially in the operand.
 		encode decode
 
-		; Value of field, if there is one.
+		; Value of field, if there is one, or #f.
 		; Possible types are: integer, <operand>, ???
-		value
+		(value . #f)
 		)
 	      nil)
 )
@@ -78,22 +78,18 @@
 (define (ifld-word-offset f) (bitrange-word-offset (/ifld-bitrange f)))
 (define (ifld-word-length f) (bitrange-word-length (/ifld-bitrange f)))
 
-; Return the mode of the value passed to the encode rtl.
-; This is the mode of the result of the decode rtl.
+; Return the mode of the decoded value of <ifield> F.
+; ??? This is made easy because we require the decode expression to have
+; an explicit mode.
 
-(define (ifld-encode-mode f)
-  (if (ifld-decode f)
-      ; cadr/cadr gets WI in ((value pc) (sra WI ...))
-      ; FIXME: That's wrong for a fully canonical expression like
-      ; ((value pc) (sra () WI ...)).
-      (mode:lookup (cadr (cadr (ifld-decode f))))
-      (ifld-mode f))
+(define (ifld-decode-mode f)
+  (assert (elm-bound? f 'decode))
+  (let ((d (ifld-decode f)))
+    (if d
+	;; FIXME: Does this work with canonicalized rtl?
+	(mode:lookup (cadr (cadr d)))
+	(ifld-mode f)))
 )
-
-; Return the mode of the value passed to the decode rtl.
-; This is the mode of the field.
-
-(define (ifld-decode-mode f) (ifld-mode f))
 
 ; Return start of ifield.
 
@@ -1059,6 +1055,8 @@ Define an instruction multi-field, all arguments specified.
    (elm-set! self 'attrs attrs)
    (elm-set! self 'mode UINT)
    (elm-set! self 'bitrange (make <bitrange> 0 0 0 0 #f))
+   (elm-set! self 'encode #f)
+   (elm-set! self 'decode #f)
    (elm-set! self 'owner owner)
    (elm-set! self 'subfields subfields)
    self)
@@ -1159,19 +1157,6 @@ Define an instruction multi-field, all arguments specified.
 
 (define (ifld-beyond-base? f)
   (> (ifld-word-offset f) 0)
-)
-
-; Return the mode of the decoded value of <ifield> F.
-; ??? This is made easy because we require the decode expression to have
-; an explicit mode.
-
-(define (ifld-decode-mode f)
-  (if (not (elm-bound? f 'decode))
-      (ifld-mode f)
-      (let ((d (ifld-decode f)))
-	(if d
-	    (mode:lookup (cadr (cadr d)))
-	    (ifld-mode f))))
 )
 
 ; Return <hardware> object to use to hold value of <ifield> F.

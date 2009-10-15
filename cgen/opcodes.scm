@@ -126,7 +126,7 @@
 			       (value (if (symbol? (caar encode)) (caar encode) (cadr (caar encode))))
 			       (pc (if (symbol? (cadar encode)) (cadar encode) (cadr (cadar encode)))))
 			   (rtl-c DFLT expr
-				  (list (list value (obj:name (ifld-encode-mode self)) "value")
+				  (list (list value (obj:name (ifld-decode-mode self)) "value")
 					(list pc 'IAI "pc"))))
 			 ";\n")
 	  "")
@@ -236,7 +236,7 @@
 			       (value (caar encode))
 			       (pc (cadar encode)))
 			   (rtl-c DFLT expr
-				  (list (list value (obj:name (ifld-encode-mode self)) varname)
+				  (list (list value (obj:name (ifld-decode-mode self)) varname)
 					(list pc 'IAI "pc"))))
 			 ";\n")
 	  "")

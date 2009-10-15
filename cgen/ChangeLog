@@ -4,7 +4,10 @@
 	(ifield-encode-mode): Delete
 	(ifield-decode-mode): Delete duplicate definition.
 	(<derived-ifield>, 'make!): Initialize members encode, decode.
-
+	* opcode.scm (<ifield>, 'gen-insert): Use ifld-decode-mode instead of
+	ifld-encode-mode.
+	(<multi-ifield>, 'gen-insert): Ditto.
+	
 2009-10-05  Dave Korn  <dave.korn.cygwin@googlemail.com>
 
 	* sim-model.scm (@cpu@_prepare_run): Use @prefix@, not @cpu@,

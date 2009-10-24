@@ -389,7 +389,9 @@
   (object-assq model-name (current-model-list))
 )
 
-; Hardware elements.
+;; Hardware elements.
+;;
+;; NOTE: Hardware elements must be uniquely named across all machs and isas.
 
 (define (current-hw-list) (arch-hw-list CURRENT-ARCH))
 
@@ -410,7 +412,10 @@
 		  (current-hw-list)))
 )
 
-; Instruction fields.
+;; Instruction fields.
+;;
+;; NOTE: Instruction fields must be uniquely named across all machs,
+;; but isas may share ifields with the same name.
 
 (define (current-ifld-list)
   (/ident-object-table->list (arch-ifld-table CURRENT-ARCH))
@@ -469,7 +474,10 @@
 	#f))
 )
 
-; Operands.
+;; Operands.
+;;
+;; NOTE: Operands must be uniquely named across all machs,
+;; but isas may share operands with the same name.
 
 (define (current-op-list)
   (/ident-object-table->list (arch-op-table CURRENT-ARCH))
@@ -528,7 +536,10 @@
 
 (define (current-sfmt-list) (arch-sfmt-list CURRENT-ARCH))
 
-; Instructions.
+;; Instructions.
+;;
+;; NOTE: Instructions must be uniquely named across all machs,
+;; but isas may share instructions with the same name.
 
 (define (current-insn-list)
   (/ident-object-table->list (arch-insn-table CURRENT-ARCH))
@@ -579,7 +590,10 @@
 	#f))
 )
 
-; Macro instructions.
+;; Macro instructions.
+;;
+;; NOTE: Instructions must be uniquely named across all machs,
+;; but isas may share instructions with the same name.
 
 (define (current-minsn-list)
   (/ident-object-table->list (arch-minsn-table CURRENT-ARCH))

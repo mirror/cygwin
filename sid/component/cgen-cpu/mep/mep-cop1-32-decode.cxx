@@ -41,10 +41,10 @@ mepcop1_32_idesc mepcop1_32_idesc::idesc_table[MEPCOP1_32_INSN_CPSMSBSLLA1_W_C3 
   { mepcop1_32_sem_cpor3_C3, "CPOR3_C3", MEPCOP1_32_INSN_CPOR3_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_VECT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpnor3_C3, "CPNOR3_C3", MEPCOP1_32_INSN_CPNOR3_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_VECT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpxor3_C3, "CPXOR3_C3", MEPCOP1_32_INSN_CPXOR3_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_VECT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpsel_C3, "CPSEL_C3", MEPCOP1_32_INSN_CPSEL_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpsel_C3, "CPSEL_C3", MEPCOP1_32_INSN_CPSEL_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpfsftbi_C3, "CPFSFTBI_C3", MEPCOP1_32_INSN_CPFSFTBI_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpfsftbs0_C3, "CPFSFTBS0_C3", MEPCOP1_32_INSN_CPFSFTBS0_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpfsftbs1_C3, "CPFSFTBS1_C3", MEPCOP1_32_INSN_CPFSFTBS1_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpfsftbs0_C3, "CPFSFTBS0_C3", MEPCOP1_32_INSN_CPFSFTBS0_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpfsftbs1_C3, "CPFSFTBS1_C3", MEPCOP1_32_INSN_CPFSFTBS1_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpunpacku_b_C3, "CPUNPACKU_B_C3", MEPCOP1_32_INSN_CPUNPACKU_B_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8UQI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpunpacku_h_C3, "CPUNPACKU_H_C3", MEPCOP1_32_INSN_CPUNPACKU_H_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4UHI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpunpacku_w_C3, "CPUNPACKU_W_C3", MEPCOP1_32_INSN_CPUNPACKU_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2USI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
@@ -75,12 +75,12 @@ mepcop1_32_idesc mepcop1_32_idesc::idesc_table[MEPCOP1_32_INSN_CPSMSBSLLA1_W_C3 
   { mepcop1_32_sem_cpsll3_w_C3, "CPSLL3_W_C3", MEPCOP1_32_INSN_CPSLL3_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpssll3_w_C3, "CPSSLL3_W_C3", MEPCOP1_32_INSN_CPSSLL3_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cdsll3_C3, "CDSLL3_C3", MEPCOP1_32_INSN_CDSLL3_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpsla3_h_C3, "CPSLA3_H_C3", MEPCOP1_32_INSN_CPSLA3_H_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpsla3_w_C3, "CPSLA3_W_C3", MEPCOP1_32_INSN_CPSLA3_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpsadd3_h_C3, "CPSADD3_H_C3", MEPCOP1_32_INSN_CPSADD3_H_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpsadd3_w_C3, "CPSADD3_W_C3", MEPCOP1_32_INSN_CPSADD3_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpssub3_h_C3, "CPSSUB3_H_C3", MEPCOP1_32_INSN_CPSSUB3_H_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpssub3_w_C3, "CPSSUB3_W_C3", MEPCOP1_32_INSN_CPSSUB3_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpsla3_h_C3, "CPSLA3_H_C3", MEPCOP1_32_INSN_CPSLA3_H_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpsla3_w_C3, "CPSLA3_W_C3", MEPCOP1_32_INSN_CPSLA3_W_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpsadd3_h_C3, "CPSADD3_H_C3", MEPCOP1_32_INSN_CPSADD3_H_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpsadd3_w_C3, "CPSADD3_W_C3", MEPCOP1_32_INSN_CPSADD3_W_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpssub3_h_C3, "CPSSUB3_H_C3", MEPCOP1_32_INSN_CPSSUB3_H_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpssub3_w_C3, "CPSSUB3_W_C3", MEPCOP1_32_INSN_CPSSUB3_W_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpextuaddu3_b_C3, "CPEXTUADDU3_B_C3", MEPCOP1_32_INSN_CPEXTUADDU3_B_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpextuadd3_b_C3, "CPEXTUADD3_B_C3", MEPCOP1_32_INSN_CPEXTUADD3_B_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpextladdu3_b_C3, "CPEXTLADDU3_B_C3", MEPCOP1_32_INSN_CPEXTLADDU3_B_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
@@ -110,12 +110,12 @@ mepcop1_32_idesc mepcop1_32_idesc::idesc_table[MEPCOP1_32_INSN_CPSMSBSLLA1_W_C3 
   { mepcop1_32_sem_cpmin3_h_C3, "CPMIN3_H_C3", MEPCOP1_32_INSN_CPMIN3_H_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpminu3_w_C3, "CPMINU3_W_C3", MEPCOP1_32_INSN_CPMINU3_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpmin3_w_C3, "CPMIN3_W_C3", MEPCOP1_32_INSN_CPMIN3_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmovfrcsar0_C3, "CPMOVFRCSAR0_C3", MEPCOP1_32_INSN_CPMOVFRCSAR0_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmovfrcsar1_C3, "CPMOVFRCSAR1_C3", MEPCOP1_32_INSN_CPMOVFRCSAR1_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmovfrcc_C3, "CPMOVFRCC_C3", MEPCOP1_32_INSN_CPMOVFRCC_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmovtocsar0_C3, "CPMOVTOCSAR0_C3", MEPCOP1_32_INSN_CPMOVTOCSAR0_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmovtocsar1_C3, "CPMOVTOCSAR1_C3", MEPCOP1_32_INSN_CPMOVTOCSAR1_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmovtocc_C3, "CPMOVTOCC_C3", MEPCOP1_32_INSN_CPMOVTOCC_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmovfrcsar0_C3, "CPMOVFRCSAR0_C3", MEPCOP1_32_INSN_CPMOVFRCSAR0_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmovfrcsar1_C3, "CPMOVFRCSAR1_C3", MEPCOP1_32_INSN_CPMOVFRCSAR1_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmovfrcc_C3, "CPMOVFRCC_C3", MEPCOP1_32_INSN_CPMOVFRCC_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmovtocsar0_C3, "CPMOVTOCSAR0_C3", MEPCOP1_32_INSN_CPMOVTOCSAR0_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmovtocsar1_C3, "CPMOVTOCSAR1_C3", MEPCOP1_32_INSN_CPMOVTOCSAR1_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmovtocc_C3, "CPMOVTOCC_C3", MEPCOP1_32_INSN_CPMOVTOCC_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpmov_C3, "CPMOV_C3", MEPCOP1_32_INSN_CPMOV_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpabsz_b_C3, "CPABSZ_B_C3", MEPCOP1_32_INSN_CPABSZ_B_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpabsz_h_C3, "CPABSZ_H_C3", MEPCOP1_32_INSN_CPABSZ_H_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
@@ -128,7 +128,7 @@ mepcop1_32_idesc mepcop1_32_idesc::idesc_table[MEPCOP1_32_INSN_CPSMSBSLLA1_W_C3 
   { mepcop1_32_sem_cphadd_b_C3, "CPHADD_B_C3", MEPCOP1_32_INSN_CPHADD_B_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cphadd_h_C3, "CPHADD_H_C3", MEPCOP1_32_INSN_CPHADD_H_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cphadd_w_C3, "CPHADD_W_C3", MEPCOP1_32_INSN_CPHADD_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpccadd_b_C3, "CPCCADD_B_C3", MEPCOP1_32_INSN_CPCCADD_B_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8QI, CRET_FIRSTCOPY, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpccadd_b_C3, "CPCCADD_B_C3", MEPCOP1_32_INSN_CPCCADD_B_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8QI, CRET_FIRSTCOPY, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpbcast_b_C3, "CPBCAST_B_C3", MEPCOP1_32_INSN_CPBCAST_B_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpbcast_h_C3, "CPBCAST_H_C3", MEPCOP1_32_INSN_CPBCAST_H_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpbcast_w_C3, "CPBCAST_W_C3", MEPCOP1_32_INSN_CPBCAST_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
@@ -209,8 +209,8 @@ mepcop1_32_idesc mepcop1_32_idesc::idesc_table[MEPCOP1_32_INSN_CPSMSBSLLA1_W_C3 
   { mepcop1_32_sem_cpslli3_h_C3, "CPSLLI3_H_C3", MEPCOP1_32_INSN_CPSLLI3_H_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpslli3_w_C3, "CPSLLI3_W_C3", MEPCOP1_32_INSN_CPSLLI3_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cdslli3_C3, "CDSLLI3_C3", MEPCOP1_32_INSN_CDSLLI3_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpslai3_h_C3, "CPSLAI3_H_C3", MEPCOP1_32_INSN_CPSLAI3_H_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpslai3_w_C3, "CPSLAI3_W_C3", MEPCOP1_32_INSN_CPSLAI3_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpslai3_h_C3, "CPSLAI3_H_C3", MEPCOP1_32_INSN_CPSLAI3_H_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpslai3_w_C3, "CPSLAI3_W_C3", MEPCOP1_32_INSN_CPSLAI3_W_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpclipiu3_w_C3, "CPCLIPIU3_W_C3", MEPCOP1_32_INSN_CPCLIPIU3_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpclipi3_w_C3, "CPCLIPI3_W_C3", MEPCOP1_32_INSN_CPCLIPI3_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cdclipiu3_C3, "CDCLIPIU3_C3", MEPCOP1_32_INSN_CDCLIPIU3_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
@@ -249,21 +249,21 @@ mepcop1_32_idesc mepcop1_32_idesc::idesc_table[MEPCOP1_32_INSN_CPSMSBSLLA1_W_C3 
   { mepcop1_32_sem_cpseta1_h_C3, "CPSETA1_H_C3", MEPCOP1_32_INSN_CPSETA1_H_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpsetua1_w_C3, "CPSETUA1_W_C3", MEPCOP1_32_INSN_CPSETUA1_W_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpsetla1_w_C3, "CPSETLA1_W_C3", MEPCOP1_32_INSN_CPSETLA1_W_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmova1_b_C3, "CPMOVA1_B_C3", MEPCOP1_32_INSN_CPMOVA1_B_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmovua1_h_C3, "CPMOVUA1_H_C3", MEPCOP1_32_INSN_CPMOVUA1_H_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmovla1_h_C3, "CPMOVLA1_H_C3", MEPCOP1_32_INSN_CPMOVLA1_H_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmovuua1_w_C3, "CPMOVUUA1_W_C3", MEPCOP1_32_INSN_CPMOVUUA1_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmovula1_w_C3, "CPMOVULA1_W_C3", MEPCOP1_32_INSN_CPMOVULA1_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmovlua1_w_C3, "CPMOVLUA1_W_C3", MEPCOP1_32_INSN_CPMOVLUA1_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmovlla1_w_C3, "CPMOVLLA1_W_C3", MEPCOP1_32_INSN_CPMOVLLA1_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cppacka1u_b_C3, "CPPACKA1U_B_C3", MEPCOP1_32_INSN_CPPACKA1U_B_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8UQI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cppacka1_b_C3, "CPPACKA1_B_C3", MEPCOP1_32_INSN_CPPACKA1_B_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cppackua1_h_C3, "CPPACKUA1_H_C3", MEPCOP1_32_INSN_CPPACKUA1_H_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cppackla1_h_C3, "CPPACKLA1_H_C3", MEPCOP1_32_INSN_CPPACKLA1_H_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cppackua1_w_C3, "CPPACKUA1_W_C3", MEPCOP1_32_INSN_CPPACKUA1_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cppackla1_w_C3, "CPPACKLA1_W_C3", MEPCOP1_32_INSN_CPPACKLA1_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmovhua1_w_C3, "CPMOVHUA1_W_C3", MEPCOP1_32_INSN_CPMOVHUA1_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
-  { mepcop1_32_sem_cpmovhla1_w_C3, "CPMOVHLA1_W_C3", MEPCOP1_32_INSN_CPMOVHLA1_W_C3, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmova1_b_C3, "CPMOVA1_B_C3", MEPCOP1_32_INSN_CPMOVA1_B_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmovua1_h_C3, "CPMOVUA1_H_C3", MEPCOP1_32_INSN_CPMOVUA1_H_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmovla1_h_C3, "CPMOVLA1_H_C3", MEPCOP1_32_INSN_CPMOVLA1_H_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmovuua1_w_C3, "CPMOVUUA1_W_C3", MEPCOP1_32_INSN_CPMOVUUA1_W_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmovula1_w_C3, "CPMOVULA1_W_C3", MEPCOP1_32_INSN_CPMOVULA1_W_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmovlua1_w_C3, "CPMOVLUA1_W_C3", MEPCOP1_32_INSN_CPMOVLUA1_W_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmovlla1_w_C3, "CPMOVLLA1_W_C3", MEPCOP1_32_INSN_CPMOVLLA1_W_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cppacka1u_b_C3, "CPPACKA1U_B_C3", MEPCOP1_32_INSN_CPPACKA1U_B_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8UQI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cppacka1_b_C3, "CPPACKA1_B_C3", MEPCOP1_32_INSN_CPPACKA1_B_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cppackua1_h_C3, "CPPACKUA1_H_C3", MEPCOP1_32_INSN_CPPACKUA1_H_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cppackla1_h_C3, "CPPACKLA1_H_C3", MEPCOP1_32_INSN_CPPACKLA1_H_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cppackua1_w_C3, "CPPACKUA1_W_C3", MEPCOP1_32_INSN_CPPACKUA1_W_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cppackla1_w_C3, "CPPACKLA1_W_C3", MEPCOP1_32_INSN_CPPACKLA1_W_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmovhua1_w_C3, "CPMOVHUA1_W_C3", MEPCOP1_32_INSN_CPMOVHUA1_W_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
+  { mepcop1_32_sem_cpmovhla1_w_C3, "CPMOVHLA1_W_C3", MEPCOP1_32_INSN_CPMOVHLA1_W_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpsrla1_C3, "CPSRLA1_C3", MEPCOP1_32_INSN_CPSRLA1_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpsraa1_C3, "CPSRAA1_C3", MEPCOP1_32_INSN_CPSRAA1_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
   { mepcop1_32_sem_cpslla1_C3, "CPSLLA1_C3", MEPCOP1_32_INSN_CPSLLA1_C3, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x10" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_C3) } },
@@ -355,6 +355,10 @@ static void
 mepcop1_32_extract_sfmt_cpmovfrcsar0_C3 (mepcop1_32_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_32_insn_word base_insn, mepcop1_32_insn_word entire_insn);
 static void
 mepcop1_32_extract_sfmt_cpmovtocsar0_C3 (mepcop1_32_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_32_insn_word base_insn, mepcop1_32_insn_word entire_insn);
+static void
+mepcop1_32_extract_sfmt_cpmovtocsar1_C3 (mepcop1_32_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_32_insn_word base_insn, mepcop1_32_insn_word entire_insn);
+static void
+mepcop1_32_extract_sfmt_cpmovtocc_C3 (mepcop1_32_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_32_insn_word base_insn, mepcop1_32_insn_word entire_insn);
 static void
 mepcop1_32_extract_sfmt_cpmov_C3 (mepcop1_32_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_32_insn_word base_insn, mepcop1_32_insn_word entire_insn);
 static void
@@ -682,11 +686,11 @@ mepcop1_32_scache::decode (mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_32_insn
             itype = MEPCOP1_32_INSN_X_INVALID; mepcop1_32_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 17 :
             if ((entire_insn & 0xfffff83f) == 0xf0078022)
-              { itype = MEPCOP1_32_INSN_CPMOVTOCC_C3; mepcop1_32_extract_sfmt_cpmovtocsar0_C3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+              { itype = MEPCOP1_32_INSN_CPMOVTOCC_C3; mepcop1_32_extract_sfmt_cpmovtocc_C3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCOP1_32_INSN_X_INVALID; mepcop1_32_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 31 :
             if ((entire_insn & 0xfffff83f) == 0xf007803e)
-              { itype = MEPCOP1_32_INSN_CPMOVTOCSAR1_C3; mepcop1_32_extract_sfmt_cpmovtocsar0_C3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+              { itype = MEPCOP1_32_INSN_CPMOVTOCSAR1_C3; mepcop1_32_extract_sfmt_cpmovtocsar1_C3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCOP1_32_INSN_X_INVALID; mepcop1_32_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEPCOP1_32_INSN_X_INVALID; mepcop1_32_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
@@ -2678,6 +2682,56 @@ mepcop1_32_extract_sfmt_cpmovtocsar0_C3 (mepcop1_32_scache* abuf, mep_ext1_cpu* 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_cpmovtocsar0_C3)\t"
+        << " f_ivc2_5u21:0x" << hex << f_ivc2_5u21 << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+    }
+#undef FLD
+}
+
+void
+mepcop1_32_extract_sfmt_cpmovtocsar1_C3 (mepcop1_32_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_32_insn_word base_insn, mepcop1_32_insn_word entire_insn){
+    mepcop1_32_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_cpmoviu_h_C3.f
+    UINT f_ivc2_5u21;
+
+    f_ivc2_5u21 = EXTRACT_MSB0_UINT (insn, 32, 21, 5);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_ivc2_5u21) = f_ivc2_5u21;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_cpmovtocsar1_C3)\t"
+        << " f_ivc2_5u21:0x" << hex << f_ivc2_5u21 << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+    }
+#undef FLD
+}
+
+void
+mepcop1_32_extract_sfmt_cpmovtocc_C3 (mepcop1_32_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_32_insn_word base_insn, mepcop1_32_insn_word entire_insn){
+    mepcop1_32_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_cpmoviu_h_C3.f
+    UINT f_ivc2_5u21;
+
+    f_ivc2_5u21 = EXTRACT_MSB0_UINT (insn, 32, 21, 5);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_ivc2_5u21) = f_ivc2_5u21;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_cpmovtocc_C3)\t"
         << " f_ivc2_5u21:0x" << hex << f_ivc2_5u21 << dec
         << endl;
     }

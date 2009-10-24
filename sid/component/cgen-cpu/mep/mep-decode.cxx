@@ -358,10 +358,6 @@ mep_extract_sfmt_lw24 (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, 
 static void
 mep_extract_sfmt_extb (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_insn, mep_insn_word entire_insn);
 static void
-mep_extract_sfmt_exth (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_insn, mep_insn_word entire_insn);
-static void
-mep_extract_sfmt_extub (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_insn, mep_insn_word entire_insn);
-static void
 mep_extract_sfmt_ssarb (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_insn, mep_insn_word entire_insn);
 static void
 mep_extract_sfmt_mov (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_insn, mep_insn_word entire_insn);
@@ -484,8 +480,6 @@ mep_extract_sfmt_min (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, m
 static void
 mep_extract_sfmt_clip (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_insn, mep_insn_word entire_insn);
 static void
-mep_extract_sfmt_clipu (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_insn, mep_insn_word entire_insn);
-static void
 mep_extract_sfmt_swcp (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_insn, mep_insn_word entire_insn);
 static void
 mep_extract_sfmt_lwcp (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_insn, mep_insn_word entire_insn);
@@ -568,144 +562,88 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
       {
       case 0 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x0)
-          { itype = MEP_INSN_MOV; mep_extract_sfmt_mov (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_MOV; mep_extract_sfmt_mov (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 1 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x1)
-          { itype = MEP_INSN_NEG; mep_extract_sfmt_mov (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_NEG; mep_extract_sfmt_mov (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 2 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2)
-          { itype = MEP_INSN_SLT3; mep_extract_sfmt_advck3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SLT3; mep_extract_sfmt_advck3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 3 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3)
-          { itype = MEP_INSN_SLTU3; mep_extract_sfmt_advck3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SLTU3; mep_extract_sfmt_advck3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 4 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x4)
-          { itype = MEP_INSN_SUB; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SUB; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 5 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x5)
-          { itype = MEP_INSN_SBVCK3; mep_extract_sfmt_advck3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SBVCK3; mep_extract_sfmt_advck3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 6 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x6)
-          { itype = MEP_INSN_RI_0; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_0; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 7 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x7)
-          { itype = MEP_INSN_ADVCK3; mep_extract_sfmt_advck3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_ADVCK3; mep_extract_sfmt_advck3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 8 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x8)
-          { itype = MEP_INSN_SB; mep_extract_sfmt_sb (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SB; mep_extract_sfmt_sb (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 9 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x9)
-          { itype = MEP_INSN_SH; mep_extract_sfmt_sh (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SH; mep_extract_sfmt_sh (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 10 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xa)
-          { itype = MEP_INSN_SW; mep_extract_sfmt_sw (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SW; mep_extract_sfmt_sw (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 11 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xb)
-          { itype = MEP_INSN_LBU; mep_extract_sfmt_lbu (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_LBU; mep_extract_sfmt_lbu (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 12 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xc)
-          { itype = MEP_INSN_LB; mep_extract_sfmt_lb (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_LB; mep_extract_sfmt_lb (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 13 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xd)
-          { itype = MEP_INSN_LH; mep_extract_sfmt_lh (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_LH; mep_extract_sfmt_lh (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 14 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xe)
-          { itype = MEP_INSN_LW; mep_extract_sfmt_lw (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_LW; mep_extract_sfmt_lw (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 15 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xf)
-          { itype = MEP_INSN_LHU; mep_extract_sfmt_lhu (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_LHU; mep_extract_sfmt_lhu (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 16 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x1000)
-          { itype = MEP_INSN_OR; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_OR; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 17 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x1001)
-          { itype = MEP_INSN_AND; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_AND; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 18 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x1002)
-          { itype = MEP_INSN_XOR; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_XOR; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 19 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x1003)
-          { itype = MEP_INSN_NOR; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_NOR; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 20 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x1004)
-          { itype = MEP_INSN_MUL; mep_extract_sfmt_mul (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_MUL; mep_extract_sfmt_mul (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 21 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x1005)
-          { itype = MEP_INSN_MULU; mep_extract_sfmt_mul (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_MULU; mep_extract_sfmt_mul (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 22 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x1006)
-          { itype = MEP_INSN_MULR; mep_extract_sfmt_mulr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_MULR; mep_extract_sfmt_mulr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 23 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x1007)
-          { itype = MEP_INSN_MULRU; mep_extract_sfmt_mulr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_MULRU; mep_extract_sfmt_mulr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 24 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x1008)
-          { itype = MEP_INSN_DIV; mep_extract_sfmt_div (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_DIV; mep_extract_sfmt_div (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 25 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x1009)
-          { itype = MEP_INSN_DIVU; mep_extract_sfmt_div (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_DIVU; mep_extract_sfmt_div (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 26 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x100a)
-          { itype = MEP_INSN_RI_1; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_1; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 27 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x100b)
-          { itype = MEP_INSN_RI_2; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_2; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 28 :
         entire_insn = entire_insn >> 16;
         if ((entire_insn & 0xfc0f) == 0x100c)
@@ -724,17 +662,17 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           case 1 :
             entire_insn = entire_insn >> 16;
             if ((entire_insn & 0xf0ff) == 0x102d)
-              { itype = MEP_INSN_EXTH; mep_extract_sfmt_exth (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+              { itype = MEP_INSN_EXTH; mep_extract_sfmt_extb (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 2 :
             entire_insn = entire_insn >> 16;
             if ((entire_insn & 0xf0ff) == 0x108d)
-              { itype = MEP_INSN_EXTUB; mep_extract_sfmt_extub (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+              { itype = MEP_INSN_EXTUB; mep_extract_sfmt_extb (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 3 :
             entire_insn = entire_insn >> 16;
             if ((entire_insn & 0xf0ff) == 0x10ad)
-              { itype = MEP_INSN_EXTUH; mep_extract_sfmt_extub (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+              { itype = MEP_INSN_EXTUH; mep_extract_sfmt_extb (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
@@ -784,144 +722,88 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
         itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 36 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2004)
-          { itype = MEP_INSN_TAS; mep_extract_sfmt_tas (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_TAS; mep_extract_sfmt_tas (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 37 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2005)
-          { itype = MEP_INSN_RI_3; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_3; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 38 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2006)
-          { itype = MEP_INSN_SL1AD3; mep_extract_sfmt_sl1ad3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SL1AD3; mep_extract_sfmt_sl1ad3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 39 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2007)
-          { itype = MEP_INSN_SL2AD3; mep_extract_sfmt_sl1ad3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SL2AD3; mep_extract_sfmt_sl1ad3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 40 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2008)
-          { itype = MEP_INSN_RI_4; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_4; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 41 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2009)
-          { itype = MEP_INSN_RI_5; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_5; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 42 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x200a)
-          { itype = MEP_INSN_RI_6; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_6; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 43 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x200b)
-          { itype = MEP_INSN_RI_7; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_7; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 44 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x200c)
-          { itype = MEP_INSN_SRL; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SRL; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 45 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x200d)
-          { itype = MEP_INSN_SRA; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SRA; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 46 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x200e)
-          { itype = MEP_INSN_SLL; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SLL; mep_extract_sfmt_sub (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 47 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x200f)
-          { itype = MEP_INSN_FSFT; mep_extract_sfmt_fsft (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_FSFT; mep_extract_sfmt_fsft (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 48 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3000)
-          { itype = MEP_INSN_SWCPI; mep_extract_sfmt_swcpi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SWCPI; mep_extract_sfmt_swcpi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 49 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3001)
-          { itype = MEP_INSN_LWCPI; mep_extract_sfmt_lwcpi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_LWCPI; mep_extract_sfmt_lwcpi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 50 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3002)
-          { itype = MEP_INSN_SMCPI; mep_extract_sfmt_smcpi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SMCPI; mep_extract_sfmt_smcpi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 51 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3003)
-          { itype = MEP_INSN_LMCPI; mep_extract_sfmt_lmcpi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_LMCPI; mep_extract_sfmt_lmcpi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 52 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3004)
-          { itype = MEP_INSN_RI_8; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_8; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 53 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3005)
-          { itype = MEP_INSN_RI_9; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_9; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 54 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3006)
-          { itype = MEP_INSN_RI_10; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_10; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 55 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3007)
-          { itype = MEP_INSN_RI_11; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_11; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 56 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3008)
-          { itype = MEP_INSN_SWCP; mep_extract_sfmt_swcp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SWCP; mep_extract_sfmt_swcp (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 57 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3009)
-          { itype = MEP_INSN_LWCP; mep_extract_sfmt_lwcp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_LWCP; mep_extract_sfmt_lwcp (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 58 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x300a)
-          { itype = MEP_INSN_SMCP; mep_extract_sfmt_smcp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SMCP; mep_extract_sfmt_smcp (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 59 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x300b)
-          { itype = MEP_INSN_LMCP; mep_extract_sfmt_lmcp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_LMCP; mep_extract_sfmt_lmcp (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 60 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x300c)
-          { itype = MEP_INSN_RI_12; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_12; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 61 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x300d)
-          { itype = MEP_INSN_RI_13; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_13; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 62 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x300e)
-          { itype = MEP_INSN_RI_14; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_14; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 63 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x300f)
-          { itype = MEP_INSN_RI_15; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_15; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 64 : /* fall through */
       case 68 : /* fall through */
       case 72 : /* fall through */
@@ -932,9 +814,7 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           {
           case 0 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf083) == 0x4000)
-              { itype = MEP_INSN_ADD3I; mep_extract_sfmt_add3i (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_ADD3I; mep_extract_sfmt_add3i (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
             if ((entire_insn & 0xf880) == 0x4880)
@@ -962,19 +842,13 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           case 0 : /* fall through */
           case 2 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf083) == 0x4002)
-              { itype = MEP_INSN_SW_SP; mep_extract_sfmt_sw_sp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_SW_SP; mep_extract_sfmt_sw_sp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf883) == 0x4082)
-              { itype = MEP_INSN_SW_TP; mep_extract_sfmt_sw_tp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_SW_TP; mep_extract_sfmt_sw_tp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 3 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf880) == 0x4880)
-              { itype = MEP_INSN_LBU_TP; mep_extract_sfmt_lbu_tp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_LBU_TP; mep_extract_sfmt_lbu_tp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -989,19 +863,13 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           case 0 : /* fall through */
           case 2 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf083) == 0x4003)
-              { itype = MEP_INSN_LW_SP; mep_extract_sfmt_lw_sp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_LW_SP; mep_extract_sfmt_lw_sp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf883) == 0x4083)
-              { itype = MEP_INSN_LW_TP; mep_extract_sfmt_lw_tp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_LW_TP; mep_extract_sfmt_lw_tp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 3 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf880) == 0x4880)
-              { itype = MEP_INSN_LBU_TP; mep_extract_sfmt_lbu_tp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_LBU_TP; mep_extract_sfmt_lbu_tp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -1022,53 +890,37 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
       case 94 : /* fall through */
       case 95 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0x5000)
-          { itype = MEP_INSN_MOVI8; mep_extract_sfmt_movi8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_MOVI8; mep_extract_sfmt_movi8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 96 : /* fall through */
       case 100 : /* fall through */
       case 104 : /* fall through */
       case 108 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf003) == 0x6000)
-          { itype = MEP_INSN_ADD; mep_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_ADD; mep_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 97 : /* fall through */
       case 105 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf007) == 0x6001)
-          { itype = MEP_INSN_SLT3I; mep_extract_sfmt_slt3i (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SLT3I; mep_extract_sfmt_slt3i (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 98 : /* fall through */
       case 106 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf007) == 0x6002)
-          { itype = MEP_INSN_SRLI; mep_extract_sfmt_srai (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SRLI; mep_extract_sfmt_srai (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 99 : /* fall through */
       case 107 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf007) == 0x6003)
-          { itype = MEP_INSN_SRAI; mep_extract_sfmt_srai (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SRAI; mep_extract_sfmt_srai (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 101 : /* fall through */
       case 109 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf007) == 0x6005)
-          { itype = MEP_INSN_SLTU3I; mep_extract_sfmt_slt3i (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SLTU3I; mep_extract_sfmt_slt3i (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 102 : /* fall through */
       case 110 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf007) == 0x6006)
-          { itype = MEP_INSN_SLLI; mep_extract_sfmt_srai (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SLLI; mep_extract_sfmt_srai (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 103 : /* fall through */
       case 111 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf007) == 0x6007)
-          { itype = MEP_INSN_SLL3; mep_extract_sfmt_sll3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_SLL3; mep_extract_sfmt_sll3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 112 :
         {
           unsigned int val = (((insn >> 26) & (1 << 1)) | ((insn >> 20) & (1 << 0)));
@@ -1164,14 +1016,10 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
         }
       case 116 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x7004)
-          { itype = MEP_INSN_CACHE; mep_extract_sfmt_pref (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_CACHE; mep_extract_sfmt_pref (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 117 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x7005)
-          { itype = MEP_INSN_PREF; mep_extract_sfmt_pref (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_PREF; mep_extract_sfmt_pref (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 118 :
         entire_insn = entire_insn >> 16;
         if ((entire_insn & 0xffcf) == 0x7006)
@@ -1179,9 +1027,7 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
         itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 119 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x7007)
-          { itype = MEP_INSN_RI_17; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_17; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 120 :
         {
           unsigned int val = (((insn >> 20) & (15 << 0)));
@@ -1201,32 +1047,22 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           case 14 : /* fall through */
           case 15 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf00e) == 0x7008)
-              { itype = MEP_INSN_STC; mep_extract_sfmt_stc (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_STC; mep_extract_sfmt_stc (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf0ff) == 0x7018)
-              { itype = MEP_INSN_STC_LP; mep_extract_sfmt_stc_lp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_STC_LP; mep_extract_sfmt_stc_lp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 7 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf0ff) == 0x7078)
-              { itype = MEP_INSN_STC_HI; mep_extract_sfmt_stc_hi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_STC_HI; mep_extract_sfmt_stc_hi (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 8 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf0ff) == 0x7088)
-              { itype = MEP_INSN_STC_LO; mep_extract_sfmt_stc_lo (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_STC_LO; mep_extract_sfmt_stc_lo (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 121 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00e) == 0x7008)
-          { itype = MEP_INSN_STC; mep_extract_sfmt_stc (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_STC; mep_extract_sfmt_stc (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 122 :
         {
           unsigned int val = (((insn >> 20) & (15 << 0)));
@@ -1246,52 +1082,34 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           case 14 : /* fall through */
           case 15 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf00e) == 0x700a)
-              { itype = MEP_INSN_LDC; mep_extract_sfmt_ldc (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_LDC; mep_extract_sfmt_ldc (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf0ff) == 0x701a)
-              { itype = MEP_INSN_LDC_LP; mep_extract_sfmt_ldc_lp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_LDC_LP; mep_extract_sfmt_ldc_lp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 7 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf0ff) == 0x707a)
-              { itype = MEP_INSN_LDC_HI; mep_extract_sfmt_ldc_hi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_LDC_HI; mep_extract_sfmt_ldc_hi (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 8 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf0ff) == 0x708a)
-              { itype = MEP_INSN_LDC_LO; mep_extract_sfmt_ldc_lo (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_LDC_LO; mep_extract_sfmt_ldc_lo (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 123 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00e) == 0x700a)
-          { itype = MEP_INSN_LDC; mep_extract_sfmt_ldc (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_LDC; mep_extract_sfmt_ldc (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 124 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x700c)
-          { itype = MEP_INSN_STCB_R; mep_extract_sfmt_stcb_r (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_STCB_R; mep_extract_sfmt_stcb_r (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 125 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x700d)
-          { itype = MEP_INSN_LDCB_R; mep_extract_sfmt_ldcb_r (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_LDCB_R; mep_extract_sfmt_ldcb_r (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 126 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x700e)
-          { itype = MEP_INSN_RI_20; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_20; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 127 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x700f)
-          { itype = MEP_INSN_RI_21; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_21; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 128 : /* fall through */
       case 130 : /* fall through */
       case 132 : /* fall through */
@@ -1306,24 +1124,16 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           {
           case 0 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf880) == 0x8000)
-              { itype = MEP_INSN_SB_TP; mep_extract_sfmt_sb_tp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_SB_TP; mep_extract_sfmt_sb_tp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf881) == 0x8080)
-              { itype = MEP_INSN_SH_TP; mep_extract_sfmt_sh_tp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_SH_TP; mep_extract_sfmt_sh_tp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 2 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf880) == 0x8800)
-              { itype = MEP_INSN_LB_TP; mep_extract_sfmt_lb_tp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_LB_TP; mep_extract_sfmt_lb_tp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 3 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf881) == 0x8880)
-              { itype = MEP_INSN_LH_TP; mep_extract_sfmt_lh_tp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_LH_TP; mep_extract_sfmt_lh_tp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -1341,19 +1151,13 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           {
           case 0 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf880) == 0x8000)
-              { itype = MEP_INSN_SB_TP; mep_extract_sfmt_sb_tp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_SB_TP; mep_extract_sfmt_sb_tp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 2 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf880) == 0x8800)
-              { itype = MEP_INSN_LB_TP; mep_extract_sfmt_lb_tp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_LB_TP; mep_extract_sfmt_lb_tp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 3 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf881) == 0x8881)
-              { itype = MEP_INSN_LHU_TP; mep_extract_sfmt_lhu_tp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = MEP_INSN_LHU_TP; mep_extract_sfmt_lhu_tp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -1374,9 +1178,7 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
       case 158 : /* fall through */
       case 159 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0x9000)
-          { itype = MEP_INSN_ADD3; mep_extract_sfmt_add3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_ADD3; mep_extract_sfmt_add3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 160 : /* fall through */
       case 162 : /* fall through */
       case 164 : /* fall through */
@@ -1386,9 +1188,7 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
       case 172 : /* fall through */
       case 174 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf001) == 0xa000)
-          { itype = MEP_INSN_BEQZ; mep_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_BEQZ; mep_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 161 : /* fall through */
       case 163 : /* fall through */
       case 165 : /* fall through */
@@ -1398,9 +1198,7 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
       case 173 : /* fall through */
       case 175 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf001) == 0xa001)
-          { itype = MEP_INSN_BNEZ; mep_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_BNEZ; mep_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 176 : /* fall through */
       case 178 : /* fall through */
       case 180 : /* fall through */
@@ -1410,9 +1208,7 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
       case 188 : /* fall through */
       case 190 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf001) == 0xb000)
-          { itype = MEP_INSN_BRA; mep_extract_sfmt_bra (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_BRA; mep_extract_sfmt_bra (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 177 : /* fall through */
       case 179 : /* fall through */
       case 181 : /* fall through */
@@ -1422,13 +1218,8 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
       case 189 : /* fall through */
       case 191 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf001) == 0xb001)
-          { itype = MEP_INSN_BSR12; mep_extract_sfmt_bsr12 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 192 :
-        if ((entire_insn & 0xf00f0000) == 0xc0000000)
-          { itype = MEP_INSN_ADD3X; mep_extract_sfmt_add3x (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_BSR12; mep_extract_sfmt_bsr12 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 192 : itype = MEP_INSN_ADD3X; mep_extract_sfmt_add3x (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 193 :
         {
           unsigned int val = (((insn >> 20) & (3 << 0)));
@@ -1449,63 +1240,22 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
-      case 194 :
-        if ((entire_insn & 0xf00f0000) == 0xc0020000)
-          { itype = MEP_INSN_SLT3X; mep_extract_sfmt_slt3x (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 195 :
-        if ((entire_insn & 0xf00f0000) == 0xc0030000)
-          { itype = MEP_INSN_SLTU3X; mep_extract_sfmt_sltu3x (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 196 :
-        if ((entire_insn & 0xf00f0000) == 0xc0040000)
-          { itype = MEP_INSN_OR3; mep_extract_sfmt_or3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 197 :
-        if ((entire_insn & 0xf00f0000) == 0xc0050000)
-          { itype = MEP_INSN_AND3; mep_extract_sfmt_or3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 198 :
-        if ((entire_insn & 0xf00f0000) == 0xc0060000)
-          { itype = MEP_INSN_XOR3; mep_extract_sfmt_or3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 194 : itype = MEP_INSN_SLT3X; mep_extract_sfmt_slt3x (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 195 : itype = MEP_INSN_SLTU3X; mep_extract_sfmt_sltu3x (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 196 : itype = MEP_INSN_OR3; mep_extract_sfmt_or3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 197 : itype = MEP_INSN_AND3; mep_extract_sfmt_or3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 198 : itype = MEP_INSN_XOR3; mep_extract_sfmt_or3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 199 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xc007)
-          { itype = MEP_INSN_RI_22; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 200 :
-        if ((entire_insn & 0xf00f0000) == 0xc0080000)
-          { itype = MEP_INSN_SB16; mep_extract_sfmt_sb16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 201 :
-        if ((entire_insn & 0xf00f0000) == 0xc0090000)
-          { itype = MEP_INSN_SH16; mep_extract_sfmt_sh16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 202 :
-        if ((entire_insn & 0xf00f0000) == 0xc00a0000)
-          { itype = MEP_INSN_SW16; mep_extract_sfmt_sw16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 203 :
-        if ((entire_insn & 0xf00f0000) == 0xc00b0000)
-          { itype = MEP_INSN_LBU16; mep_extract_sfmt_lbu16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 204 :
-        if ((entire_insn & 0xf00f0000) == 0xc00c0000)
-          { itype = MEP_INSN_LB16; mep_extract_sfmt_lb16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 205 :
-        if ((entire_insn & 0xf00f0000) == 0xc00d0000)
-          { itype = MEP_INSN_LH16; mep_extract_sfmt_lh16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 206 :
-        if ((entire_insn & 0xf00f0000) == 0xc00e0000)
-          { itype = MEP_INSN_LW16; mep_extract_sfmt_lw16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 207 :
-        if ((entire_insn & 0xf00f0000) == 0xc00f0000)
-          { itype = MEP_INSN_LHU16; mep_extract_sfmt_lhu16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_22; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 200 : itype = MEP_INSN_SB16; mep_extract_sfmt_sb16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 201 : itype = MEP_INSN_SH16; mep_extract_sfmt_sh16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 202 : itype = MEP_INSN_SW16; mep_extract_sfmt_sw16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 203 : itype = MEP_INSN_LBU16; mep_extract_sfmt_lbu16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 204 : itype = MEP_INSN_LB16; mep_extract_sfmt_lb16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 205 : itype = MEP_INSN_LH16; mep_extract_sfmt_lh16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 206 : itype = MEP_INSN_LW16; mep_extract_sfmt_lw16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 207 : itype = MEP_INSN_LHU16; mep_extract_sfmt_lhu16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 208 : /* fall through */
       case 209 : /* fall through */
       case 210 : /* fall through */
@@ -1523,10 +1273,7 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           unsigned int val = (((insn >> 27) & (1 << 0)));
           switch (val)
           {
-          case 0 :
-            if ((entire_insn & 0xf8000000) == 0xd0000000)
-              { itype = MEP_INSN_MOVU24; mep_extract_sfmt_movu24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 0 : itype = MEP_INSN_MOVU24; mep_extract_sfmt_movu24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             if ((entire_insn & 0xff0f0000) == 0xd8040000)
               { itype = MEP_INSN_BCPEQ; mep_extract_sfmt_bcpeq (this, current_cpu, pc, base_insn, entire_insn); goto done; }
@@ -1539,10 +1286,7 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           unsigned int val = (((insn >> 27) & (1 << 0)));
           switch (val)
           {
-          case 0 :
-            if ((entire_insn & 0xf8000000) == 0xd0000000)
-              { itype = MEP_INSN_MOVU24; mep_extract_sfmt_movu24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 0 : itype = MEP_INSN_MOVU24; mep_extract_sfmt_movu24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             if ((entire_insn & 0xff0f0000) == 0xd8050000)
               { itype = MEP_INSN_BCPNE; mep_extract_sfmt_bcpeq (this, current_cpu, pc, base_insn, entire_insn); goto done; }
@@ -1555,10 +1299,7 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           unsigned int val = (((insn >> 27) & (1 << 0)));
           switch (val)
           {
-          case 0 :
-            if ((entire_insn & 0xf8000000) == 0xd0000000)
-              { itype = MEP_INSN_MOVU24; mep_extract_sfmt_movu24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 0 : itype = MEP_INSN_MOVU24; mep_extract_sfmt_movu24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             if ((entire_insn & 0xff0f0000) == 0xd8060000)
               { itype = MEP_INSN_BCPAT; mep_extract_sfmt_bcpeq (this, current_cpu, pc, base_insn, entire_insn); goto done; }
@@ -1571,10 +1312,7 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           unsigned int val = (((insn >> 27) & (1 << 0)));
           switch (val)
           {
-          case 0 :
-            if ((entire_insn & 0xf8000000) == 0xd0000000)
-              { itype = MEP_INSN_MOVU24; mep_extract_sfmt_movu24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 0 : itype = MEP_INSN_MOVU24; mep_extract_sfmt_movu24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             if ((entire_insn & 0xff0f0000) == 0xd8070000)
               { itype = MEP_INSN_BCPAF; mep_extract_sfmt_bcpeq (this, current_cpu, pc, base_insn, entire_insn); goto done; }
@@ -1587,14 +1325,8 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           unsigned int val = (((insn >> 27) & (1 << 0)));
           switch (val)
           {
-          case 0 :
-            if ((entire_insn & 0xf8000000) == 0xd0000000)
-              { itype = MEP_INSN_MOVU24; mep_extract_sfmt_movu24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 :
-            if ((entire_insn & 0xf80f0000) == 0xd8080000)
-              { itype = MEP_INSN_JMP24; mep_extract_sfmt_jmp24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 0 : itype = MEP_INSN_MOVU24; mep_extract_sfmt_movu24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 : itype = MEP_INSN_JMP24; mep_extract_sfmt_jmp24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -1603,14 +1335,8 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           unsigned int val = (((insn >> 27) & (1 << 0)));
           switch (val)
           {
-          case 0 :
-            if ((entire_insn & 0xf8000000) == 0xd0000000)
-              { itype = MEP_INSN_MOVU24; mep_extract_sfmt_movu24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 :
-            if ((entire_insn & 0xf80f0000) == 0xd8090000)
-              { itype = MEP_INSN_BSR24; mep_extract_sfmt_bsr24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 0 : itype = MEP_INSN_MOVU24; mep_extract_sfmt_movu24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 : itype = MEP_INSN_BSR24; mep_extract_sfmt_bsr24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -1619,51 +1345,24 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           unsigned int val = (((insn >> 27) & (1 << 0)));
           switch (val)
           {
-          case 0 :
-            if ((entire_insn & 0xf8000000) == 0xd0000000)
-              { itype = MEP_INSN_MOVU24; mep_extract_sfmt_movu24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 :
-            if ((entire_insn & 0xf80f0000) == 0xd80b0000)
-              { itype = MEP_INSN_BSRV; mep_extract_sfmt_bsr24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 0 : itype = MEP_INSN_MOVU24; mep_extract_sfmt_movu24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 : itype = MEP_INSN_BSRV; mep_extract_sfmt_bsr24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
-      case 224 :
-        if ((entire_insn & 0xf00f0000) == 0xe0000000)
-          { itype = MEP_INSN_BEQI; mep_extract_sfmt_beqi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 225 :
-        if ((entire_insn & 0xf00f0000) == 0xe0010000)
-          { itype = MEP_INSN_BEQ; mep_extract_sfmt_beq (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 224 : itype = MEP_INSN_BEQI; mep_extract_sfmt_beqi (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 225 : itype = MEP_INSN_BEQ; mep_extract_sfmt_beq (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 226 : /* fall through */
       case 230 : /* fall through */
       case 234 : /* fall through */
-      case 238 :
-        if ((entire_insn & 0xf0030000) == 0xe0020000)
-          { itype = MEP_INSN_SW24; mep_extract_sfmt_sw24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 238 : itype = MEP_INSN_SW24; mep_extract_sfmt_sw24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 227 : /* fall through */
       case 231 : /* fall through */
       case 235 : /* fall through */
-      case 239 :
-        if ((entire_insn & 0xf0030000) == 0xe0030000)
-          { itype = MEP_INSN_LW24; mep_extract_sfmt_lw24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 228 :
-        if ((entire_insn & 0xf00f0000) == 0xe0040000)
-          { itype = MEP_INSN_BNEI; mep_extract_sfmt_beqi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 229 :
-        if ((entire_insn & 0xf00f0000) == 0xe0050000)
-          { itype = MEP_INSN_BNE; mep_extract_sfmt_beq (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 232 :
-        if ((entire_insn & 0xf00f0000) == 0xe0080000)
-          { itype = MEP_INSN_BGEI; mep_extract_sfmt_beqi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 239 : itype = MEP_INSN_LW24; mep_extract_sfmt_lw24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 228 : itype = MEP_INSN_BNEI; mep_extract_sfmt_beqi (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 229 : itype = MEP_INSN_BNE; mep_extract_sfmt_beq (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 232 : itype = MEP_INSN_BGEI; mep_extract_sfmt_beqi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 233 :
         {
           unsigned int val = (((insn >> 20) & (1 << 0)));
@@ -1680,19 +1379,11 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
-      case 236 :
-        if ((entire_insn & 0xf00f0000) == 0xe00c0000)
-          { itype = MEP_INSN_BLTI; mep_extract_sfmt_beqi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 236 : itype = MEP_INSN_BLTI; mep_extract_sfmt_beqi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 237 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xe00d)
-          { itype = MEP_INSN_RI_23; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 240 :
-        if ((entire_insn & 0xf00f0000) == 0xf0000000)
-          { itype = MEP_INSN_DSP; mep_extract_sfmt_uci (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_23; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 240 : itype = MEP_INSN_DSP; mep_extract_sfmt_uci (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 241 :
         {
           unsigned int val = (((insn >> 8) & (3 << 4)) | ((insn >> 0) & (15 << 0)));
@@ -1750,7 +1441,7 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           case 17 : /* fall through */
           case 25 :
             if ((entire_insn & 0xf0ffff07) == 0xf0011001)
-              { itype = MEP_INSN_CLIPU; mep_extract_sfmt_clipu (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+              { itype = MEP_INSN_CLIPU; mep_extract_sfmt_clip (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 32 :
             if ((entire_insn & 0xf00ff0ff) == 0xf0012000)
@@ -1783,14 +1474,8 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
-      case 242 :
-        if ((entire_insn & 0xf00f0000) == 0xf0020000)
-          { itype = MEP_INSN_UCI; mep_extract_sfmt_uci (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 243 :
-        if ((entire_insn & 0xf00f0000) == 0xf0030000)
-          { itype = MEP_INSN_PREFD; mep_extract_sfmt_prefd (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 242 : itype = MEP_INSN_UCI; mep_extract_sfmt_uci (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 243 : itype = MEP_INSN_PREFD; mep_extract_sfmt_prefd (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 244 :
         {
           unsigned int val = (((insn >> 20) & (1 << 0)));
@@ -1812,126 +1497,36 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
           unsigned int val = (((insn >> 10) & (63 << 0)));
           switch (val)
           {
-          case 0 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0050000)
-              { itype = MEP_INSN_SBCPA; mep_extract_sfmt_sbcpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 2 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0050800)
-              { itype = MEP_INSN_SBCPM0; mep_extract_sfmt_sbcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 3 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0050c00)
-              { itype = MEP_INSN_SBCPM1; mep_extract_sfmt_sbcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 4 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0051000)
-              { itype = MEP_INSN_SHCPA; mep_extract_sfmt_shcpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 6 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0051800)
-              { itype = MEP_INSN_SHCPM0; mep_extract_sfmt_shcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 7 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0051c00)
-              { itype = MEP_INSN_SHCPM1; mep_extract_sfmt_shcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 8 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0052000)
-              { itype = MEP_INSN_SWCPA; mep_extract_sfmt_swcpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 10 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0052800)
-              { itype = MEP_INSN_SWCPM0; mep_extract_sfmt_swcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 11 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0052c00)
-              { itype = MEP_INSN_SWCPM1; mep_extract_sfmt_swcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 12 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0053000)
-              { itype = MEP_INSN_SMCPA; mep_extract_sfmt_smcpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 14 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0053800)
-              { itype = MEP_INSN_SMCPM0; mep_extract_sfmt_smcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 15 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0053c00)
-              { itype = MEP_INSN_SMCPM1; mep_extract_sfmt_smcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 16 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0054000)
-              { itype = MEP_INSN_LBCPA; mep_extract_sfmt_lbucpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 18 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0054800)
-              { itype = MEP_INSN_LBCPM0; mep_extract_sfmt_lbucpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 19 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0054c00)
-              { itype = MEP_INSN_LBCPM1; mep_extract_sfmt_lbucpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 20 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0055000)
-              { itype = MEP_INSN_LHCPA; mep_extract_sfmt_lhucpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 22 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0055800)
-              { itype = MEP_INSN_LHCPM0; mep_extract_sfmt_lhucpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 23 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0055c00)
-              { itype = MEP_INSN_LHCPM1; mep_extract_sfmt_lhucpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 24 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0056000)
-              { itype = MEP_INSN_LWCPA; mep_extract_sfmt_lwcpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 26 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0056800)
-              { itype = MEP_INSN_LWCPM0; mep_extract_sfmt_lwcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 27 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0056c00)
-              { itype = MEP_INSN_LWCPM1; mep_extract_sfmt_lwcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 28 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0057000)
-              { itype = MEP_INSN_LMCPA; mep_extract_sfmt_lmcpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 30 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0057800)
-              { itype = MEP_INSN_LMCPM0; mep_extract_sfmt_lmcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 31 :
-            if ((entire_insn & 0xf00ffc00) == 0xf0057c00)
-              { itype = MEP_INSN_LMCPM1; mep_extract_sfmt_lmcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 48 :
-            if ((entire_insn & 0xf00ffc00) == 0xf005c000)
-              { itype = MEP_INSN_LBUCPA; mep_extract_sfmt_lbucpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 50 :
-            if ((entire_insn & 0xf00ffc00) == 0xf005c800)
-              { itype = MEP_INSN_LBUCPM0; mep_extract_sfmt_lbucpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 51 :
-            if ((entire_insn & 0xf00ffc00) == 0xf005cc00)
-              { itype = MEP_INSN_LBUCPM1; mep_extract_sfmt_lbucpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 52 :
-            if ((entire_insn & 0xf00ffc00) == 0xf005d000)
-              { itype = MEP_INSN_LHUCPA; mep_extract_sfmt_lhucpa (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 54 :
-            if ((entire_insn & 0xf00ffc00) == 0xf005d800)
-              { itype = MEP_INSN_LHUCPM0; mep_extract_sfmt_lhucpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 55 :
-            if ((entire_insn & 0xf00ffc00) == 0xf005dc00)
-              { itype = MEP_INSN_LHUCPM1; mep_extract_sfmt_lhucpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 0 : itype = MEP_INSN_SBCPA; mep_extract_sfmt_sbcpa (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 : itype = MEP_INSN_SBCPM0; mep_extract_sfmt_sbcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 3 : itype = MEP_INSN_SBCPM1; mep_extract_sfmt_sbcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 4 : itype = MEP_INSN_SHCPA; mep_extract_sfmt_shcpa (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 6 : itype = MEP_INSN_SHCPM0; mep_extract_sfmt_shcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 7 : itype = MEP_INSN_SHCPM1; mep_extract_sfmt_shcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 8 : itype = MEP_INSN_SWCPA; mep_extract_sfmt_swcpa (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 10 : itype = MEP_INSN_SWCPM0; mep_extract_sfmt_swcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 11 : itype = MEP_INSN_SWCPM1; mep_extract_sfmt_swcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 12 : itype = MEP_INSN_SMCPA; mep_extract_sfmt_smcpa (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 14 : itype = MEP_INSN_SMCPM0; mep_extract_sfmt_smcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 15 : itype = MEP_INSN_SMCPM1; mep_extract_sfmt_smcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 16 : itype = MEP_INSN_LBCPA; mep_extract_sfmt_lbucpa (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 18 : itype = MEP_INSN_LBCPM0; mep_extract_sfmt_lbucpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 19 : itype = MEP_INSN_LBCPM1; mep_extract_sfmt_lbucpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 20 : itype = MEP_INSN_LHCPA; mep_extract_sfmt_lhucpa (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 22 : itype = MEP_INSN_LHCPM0; mep_extract_sfmt_lhucpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 23 : itype = MEP_INSN_LHCPM1; mep_extract_sfmt_lhucpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 24 : itype = MEP_INSN_LWCPA; mep_extract_sfmt_lwcpa (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 26 : itype = MEP_INSN_LWCPM0; mep_extract_sfmt_lwcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 27 : itype = MEP_INSN_LWCPM1; mep_extract_sfmt_lwcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 28 : itype = MEP_INSN_LMCPA; mep_extract_sfmt_lmcpa (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 30 : itype = MEP_INSN_LMCPM0; mep_extract_sfmt_lmcpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 31 : itype = MEP_INSN_LMCPM1; mep_extract_sfmt_lmcpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 48 : itype = MEP_INSN_LBUCPA; mep_extract_sfmt_lbucpa (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 50 : itype = MEP_INSN_LBUCPM0; mep_extract_sfmt_lbucpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 51 : itype = MEP_INSN_LBUCPM1; mep_extract_sfmt_lbucpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 52 : itype = MEP_INSN_LHUCPA; mep_extract_sfmt_lhucpa (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 54 : itype = MEP_INSN_LHUCPM0; mep_extract_sfmt_lhucpm0 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 55 : itype = MEP_INSN_LHUCPM1; mep_extract_sfmt_lhucpm1 (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -1969,25 +1564,11 @@ mep_scache::decode (mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_in
         }
       case 248 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xf008)
-          { itype = MEP_INSN_RI_26; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 252 :
-        if ((entire_insn & 0xf00f0000) == 0xf00c0000)
-          { itype = MEP_INSN_SWCP16; mep_extract_sfmt_swcp16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 253 :
-        if ((entire_insn & 0xf00f0000) == 0xf00d0000)
-          { itype = MEP_INSN_LWCP16; mep_extract_sfmt_lwcp16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 254 :
-        if ((entire_insn & 0xf00f0000) == 0xf00e0000)
-          { itype = MEP_INSN_SMCP16; mep_extract_sfmt_smcp16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 255 :
-        if ((entire_insn & 0xf00f0000) == 0xf00f0000)
-          { itype = MEP_INSN_LMCP16; mep_extract_sfmt_lmcp16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = MEP_INSN_RI_26; mep_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 252 : itype = MEP_INSN_SWCP16; mep_extract_sfmt_swcp16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 253 : itype = MEP_INSN_LWCP16; mep_extract_sfmt_lwcp16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 254 : itype = MEP_INSN_SMCP16; mep_extract_sfmt_smcp16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 255 : itype = MEP_INSN_LMCP16; mep_extract_sfmt_lmcp16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       default : itype = MEP_INSN_X_INVALID; mep_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       }
     }
@@ -3560,62 +3141,6 @@ mep_extract_sfmt_extb (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_extb)\t"
-        << " f_rn:0x" << hex << f_rn << dec
-        << endl;
-    }
-
-  /* Record the fields for profiling.  */
-  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
-    {
-      FLD (in_rn) = f_rn;
-      FLD (out_rn) = f_rn;
-    }
-#undef FLD
-}
-
-void
-mep_extract_sfmt_exth (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_insn, mep_insn_word entire_insn){
-    mep_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_clip.f
-    UINT f_rn;
-
-    f_rn = EXTRACT_MSB0_UINT (insn, 16, 4, 4);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_rn) = f_rn;
-  FLD (i_rn) = & current_cpu->hardware.h_gpr[f_rn];
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_exth)\t"
-        << " f_rn:0x" << hex << f_rn << dec
-        << endl;
-    }
-
-  /* Record the fields for profiling.  */
-  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
-    {
-      FLD (in_rn) = f_rn;
-      FLD (out_rn) = f_rn;
-    }
-#undef FLD
-}
-
-void
-mep_extract_sfmt_extub (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_insn, mep_insn_word entire_insn){
-    mep_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_clip.f
-    UINT f_rn;
-
-    f_rn = EXTRACT_MSB0_UINT (insn, 16, 4, 4);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_rn) = f_rn;
-  FLD (i_rn) = & current_cpu->hardware.h_gpr[f_rn];
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_extub)\t"
         << " f_rn:0x" << hex << f_rn << dec
         << endl;
     }
@@ -5533,38 +5058,6 @@ mep_extract_sfmt_clip (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_clip)\t"
-        << " f_5u24:0x" << hex << f_5u24 << dec
-        << " f_rn:0x" << hex << f_rn << dec
-        << endl;
-    }
-
-  /* Record the fields for profiling.  */
-  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
-    {
-      FLD (in_rn) = f_rn;
-      FLD (out_rn) = f_rn;
-    }
-#undef FLD
-}
-
-void
-mep_extract_sfmt_clipu (mep_scache* abuf, mep_basic_cpu* current_cpu, PCADDR pc, mep_insn_word base_insn, mep_insn_word entire_insn){
-    mep_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_clip.f
-    UINT f_rn;
-    UINT f_5u24;
-
-    f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
-    f_5u24 = EXTRACT_MSB0_UINT (insn, 32, 24, 5);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_5u24) = f_5u24;
-  FLD (f_rn) = f_rn;
-  FLD (i_rn) = & current_cpu->hardware.h_gpr[f_rn];
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_clipu)\t"
         << " f_5u24:0x" << hex << f_5u24 << dec
         << " f_rn:0x" << hex << f_rn << dec
         << endl;

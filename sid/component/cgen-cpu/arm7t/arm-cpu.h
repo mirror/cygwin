@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -61,6 +61,68 @@ public:
   SI h_spsr_und;
   } hardware;
 
+  void stream_cgen_hardware (std::ostream &ost) const 
+  {
+    ost << hardware.h_pc << ' ';
+    for (int i = 0; i < 16; i++)
+      ost << hardware.h_gr[i] << ' ';
+    for (int i = 0; i < 7; i++)
+      ost << hardware.h_gr_usr[i] << ' ';
+    for (int i = 0; i < 7; i++)
+      ost << hardware.h_gr_fiq[i] << ' ';
+    for (int i = 0; i < 2; i++)
+      ost << hardware.h_gr_svc[i] << ' ';
+    for (int i = 0; i < 2; i++)
+      ost << hardware.h_gr_abt[i] << ' ';
+    for (int i = 0; i < 2; i++)
+      ost << hardware.h_gr_irq[i] << ' ';
+    for (int i = 0; i < 2; i++)
+      ost << hardware.h_gr_und[i] << ' ';
+    ost << hardware.h_cbit << ' ';
+    ost << hardware.h_nbit << ' ';
+    ost << hardware.h_vbit << ' ';
+    ost << hardware.h_zbit << ' ';
+    ost << hardware.h_ibit << ' ';
+    ost << hardware.h_fbit << ' ';
+    ost << hardware.h_tbit << ' ';
+    ost << hardware.h_mbits << ' ';
+    ost << hardware.h_spsr_fiq << ' ';
+    ost << hardware.h_spsr_svc << ' ';
+    ost << hardware.h_spsr_abt << ' ';
+    ost << hardware.h_spsr_irq << ' ';
+    ost << hardware.h_spsr_und << ' ';
+  }
+  void destream_cgen_hardware (std::istream &ist) 
+  {
+    ist >> hardware.h_pc;
+    for (int i = 0; i < 16; i++)
+      ist >> hardware.h_gr[i];
+    for (int i = 0; i < 7; i++)
+      ist >> hardware.h_gr_usr[i];
+    for (int i = 0; i < 7; i++)
+      ist >> hardware.h_gr_fiq[i];
+    for (int i = 0; i < 2; i++)
+      ist >> hardware.h_gr_svc[i];
+    for (int i = 0; i < 2; i++)
+      ist >> hardware.h_gr_abt[i];
+    for (int i = 0; i < 2; i++)
+      ist >> hardware.h_gr_irq[i];
+    for (int i = 0; i < 2; i++)
+      ist >> hardware.h_gr_und[i];
+    ist >> hardware.h_cbit;
+    ist >> hardware.h_nbit;
+    ist >> hardware.h_vbit;
+    ist >> hardware.h_zbit;
+    ist >> hardware.h_ibit;
+    ist >> hardware.h_fbit;
+    ist >> hardware.h_tbit;
+    ist >> hardware.h_mbits;
+    ist >> hardware.h_spsr_fiq;
+    ist >> hardware.h_spsr_svc;
+    ist >> hardware.h_spsr_abt;
+    ist >> hardware.h_spsr_irq;
+    ist >> hardware.h_spsr_und;
+  }
   // C++ register access function templates
 #define current_cpu this
 

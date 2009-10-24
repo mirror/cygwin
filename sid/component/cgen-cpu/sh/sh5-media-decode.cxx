@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -363,8 +363,6 @@ sh5_media_extract_sfmt_mcmv (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
 static void
 sh5_media_extract_sfmt_movi (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
 static void
-sh5_media_extract_sfmt_mpermw (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
-static void
 sh5_media_extract_sfmt_nop (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
 static void
 sh5_media_extract_sfmt_ori (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
@@ -380,8 +378,6 @@ static void
 sh5_media_extract_sfmt_putcon (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
 static void
 sh5_media_extract_sfmt_shari (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
-static void
-sh5_media_extract_sfmt_sharil (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
 static void
 sh5_media_extract_sfmt_shori (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
 static void
@@ -699,7 +695,7 @@ sh5_media_scache::decode (sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word b
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 173 :
         if ((entire_insn & 0xfc0f000f) == 0x280d0000)
-          { itype = SH5_MEDIA_INSN_MPERMW; sh5_media_extract_sfmt_mpermw (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = SH5_MEDIA_INSN_MPERMW; sh5_media_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 175 :
         if ((entire_insn & 0xfc0f000f) == 0x280f0000)
@@ -1391,7 +1387,7 @@ sh5_media_scache::decode (sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word b
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 784 :
         if ((entire_insn & 0xfc0f000f) == 0xc4000000)
-          { itype = SH5_MEDIA_INSN_SHLLIL; sh5_media_extract_sfmt_sharil (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = SH5_MEDIA_INSN_SHLLIL; sh5_media_extract_sfmt_shari (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 785 :
         if ((entire_insn & 0xfc0f000f) == 0xc4010000)
@@ -1399,7 +1395,7 @@ sh5_media_scache::decode (sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word b
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 786 :
         if ((entire_insn & 0xfc0f000f) == 0xc4020000)
-          { itype = SH5_MEDIA_INSN_SHLRIL; sh5_media_extract_sfmt_sharil (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = SH5_MEDIA_INSN_SHLRIL; sh5_media_extract_sfmt_shari (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 787 :
         if ((entire_insn & 0xfc0f000f) == 0xc4030000)
@@ -1407,7 +1403,7 @@ sh5_media_scache::decode (sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word b
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 790 :
         if ((entire_insn & 0xfc0f000f) == 0xc4060000)
-          { itype = SH5_MEDIA_INSN_SHARIL; sh5_media_extract_sfmt_sharil (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = SH5_MEDIA_INSN_SHARIL; sh5_media_extract_sfmt_shari (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 791 :
         if ((entire_insn & 0xfc0f000f) == 0xc4070000)
@@ -3553,42 +3549,6 @@ sh5_media_extract_sfmt_movi (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
 }
 
 void
-sh5_media_extract_sfmt_mpermw (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn){
-    sh5_media_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_mcmv.f
-    UINT f_left;
-    UINT f_right;
-    UINT f_dest;
-
-    f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_right = EXTRACT_MSB0_UINT (insn, 32, 16, 6);
-    f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_left) = f_left;
-  FLD (f_right) = f_right;
-  FLD (f_dest) = f_dest;
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_mpermw)\t"
-        << " f_left:0x" << hex << f_left << dec
-        << " f_right:0x" << hex << f_right << dec
-        << " f_dest:0x" << hex << f_dest << dec
-        << endl;
-    }
-
-  /* Record the fields for profiling.  */
-  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
-    {
-      FLD (in_rm) = f_left;
-      FLD (in_rn) = f_right;
-      FLD (out_rd) = f_dest;
-    }
-#undef FLD
-}
-
-void
 sh5_media_extract_sfmt_nop (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn){
     sh5_media_insn_word insn = entire_insn;
 #define FLD(f) abuf->fields.fmt_empty.f
@@ -3829,41 +3789,6 @@ sh5_media_extract_sfmt_shari (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCAD
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_shari)\t"
-        << " f_left:0x" << hex << f_left << dec
-        << " f_uimm6:0x" << hex << f_uimm6 << dec
-        << " f_dest:0x" << hex << f_dest << dec
-        << endl;
-    }
-
-  /* Record the fields for profiling.  */
-  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
-    {
-      FLD (in_rm) = f_left;
-      FLD (out_rd) = f_dest;
-    }
-#undef FLD
-}
-
-void
-sh5_media_extract_sfmt_sharil (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn){
-    sh5_media_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_shari.f
-    UINT f_left;
-    UINT f_uimm6;
-    UINT f_dest;
-
-    f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_uimm6 = EXTRACT_MSB0_UINT (insn, 32, 16, 6);
-    f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_left) = f_left;
-  FLD (f_uimm6) = f_uimm6;
-  FLD (f_dest) = f_dest;
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_sharil)\t"
         << " f_left:0x" << hex << f_left << dec
         << " f_uimm6:0x" << hex << f_uimm6 << dec
         << " f_dest:0x" << hex << f_dest << dec

@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -11,6 +11,8 @@ This file is part of the Red Hat simulators.
 
 #ifndef DESC_ARM_H
 #define DESC_ARM_H
+
+#include "cgen/bitset.h"
 
 namespace arm {
 
@@ -96,10 +98,10 @@ typedef enum isa_attr {
 struct arm_insn_attr {
   unsigned int bools;
   unsigned int mach;
-  unsigned int isa;
+  CGEN_BITSET isa;
   int r15_offset;
   inline unsigned int get_mach_attr () { return mach; }
-  inline unsigned int get_isa_attr () { return isa; }
+  inline CGEN_BITSET get_isa_attr () { return isa; }
   inline int get_r15_offset_attr () { return r15_offset; }
   inline int get_alias_attr () { return (bools & (1<<CGEN_INSN_ALIAS)) != 0; }
   inline int get_virtual_attr () { return (bools & (1<<CGEN_INSN_VIRTUAL)) != 0; }

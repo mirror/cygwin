@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -12,7 +12,7 @@ This file is part of the Red Hat simulators.
 #ifndef DESC_SH_H
 #define DESC_SH_H
 
-#include "opcode/cgen-bitset.h"
+#include "cgen/bitset.h"
 
 namespace sh {
 

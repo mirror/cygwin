@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -925,7 +925,7 @@ restart:
 {
   offset = current_cpu->compute_operand2_immshift (* FLD (i_rm), FLD (f_operand2_shifttype), FLD (f_operand2_shiftimm));
   addr = * FLD (i_rn);
-if (((FLD (f_rd)) == (15))) {
+if (EQSI (FLD (f_rd), 15)) {
 npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
 * FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
@@ -948,7 +948,7 @@ npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 
 {
   addr = * FLD (i_rn);
-if (((FLD (f_reg_list)) & (((1) << (15))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
 current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
   addr = SUBSI (addr, 4);
@@ -972,49 +972,49 @@ current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)],
 
 {
   addr = * FLD (i_rn);
-if (((FLD (f_reg_list)) & (((1) << (0))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
   addr = ADDSI (addr, 4);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (1))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
   addr = ADDSI (addr, 4);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (2))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
   addr = ADDSI (addr, 4);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (3))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
   addr = ADDSI (addr, 4);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (4))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
   addr = ADDSI (addr, 4);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (5))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
   addr = ADDSI (addr, 4);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (6))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
   addr = ADDSI (addr, 4);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (7))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
   addr = ADDSI (addr, 4);
@@ -1038,49 +1038,49 @@ current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
 
 {
   addr = * FLD (i_rn);
-if (((FLD (f_reg_list)) & (((1) << (0))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (1))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (2))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (3))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (4))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (5))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (6))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (7))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
@@ -1104,7 +1104,7 @@ current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
 
 {
   addr = * FLD (i_rn);
-if (((FLD (f_reg_list)) & (((1) << (15))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = SUBSI (addr, 4);
 current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
@@ -1129,49 +1129,49 @@ current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)],
 
 {
   addr = * FLD (i_rn);
-if (((FLD (f_reg_list)) & (((1) << (0))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
 current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (1))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
 current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (2))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
 current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (3))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
 current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (4))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
 current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (5))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
 current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (6))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
 current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (7))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
 current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
@@ -1196,49 +1196,49 @@ current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
 
 {
   addr = * FLD (i_rn);
-if (((FLD (f_reg_list)) & (((1) << (0))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (1))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (2))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (3))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (4))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (5))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (6))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
-if (((FLD (f_reg_list)) & (((1) << (7))))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   addr = ADDSI (addr, 4);
 current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
@@ -1284,7 +1284,7 @@ current_cpu->SETMEMQI (pc, addr, TRUNCSIQI (* FLD (i_rd)));
 {
   offset = FLD (f_uimm12);
   addr = * FLD (i_rn);
-if (((FLD (f_rd)) == (15))) {
+if (EQSI (FLD (f_rd), 15)) {
 npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
 * FLD (i_rd) = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
@@ -1309,7 +1309,7 @@ npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABL
 {
   offset = FLD (f_uimm12);
   addr = * FLD (i_rn);
-if (((FLD (f_rd)) == (15))) {
+if (EQSI (FLD (f_rd), 15)) {
 npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
 * FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
@@ -1344,26 +1344,14 @@ npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 
 {
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 } else {
 {
 {
-  {
-    BI opval = EQSI (result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (result, 0);
+current_cpu->hardware.h_nbit = LTSI (result, 0);
 }
-  {
-    BI opval = carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = carry_out;
 }
 }
 }
@@ -1381,26 +1369,14 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 } else {
 {
 {
-  {
-    BI opval = EQSI (result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (result, 0);
+current_cpu->hardware.h_nbit = LTSI (result, 0);
 }
-  {
-    BI opval = carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = carry_out;
 }
 }
 }
@@ -1417,7 +1393,7 @@ if (EQSI (FLD (f_rd), 15)) {
       PCADDR pc = abuf->addr;
 
 {
-if (((FLD (f_rd)) == (15))) {
+if (EQSI (FLD (f_rd), 15)) {
 {
 npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
@@ -1451,7 +1427,7 @@ current_cpu->hardware.h_nbit = LTSI (result, 0);
       PCADDR pc = abuf->addr;
 
 {
-if (((FLD (f_rd)) == (15))) {
+if (EQSI (FLD (f_rd), 15)) {
 {
 npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
@@ -1488,7 +1464,7 @@ current_cpu->hardware.h_cbit = carry_out;
       PCADDR pc = abuf->addr;
 
 {
-if (((FLD (f_rd)) == (15))) {
+if (EQSI (FLD (f_rd), 15)) {
 {
 npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
@@ -1650,15 +1626,9 @@ current_cpu->hardware.h_nbit = LTDI (mul_result, 0);
 
 {
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
 }
 ((void) 0); /*nop*/
 ((void) 0); /*nop*/
@@ -1679,15 +1649,9 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
 }
 ((void) 0); /*nop*/
 ((void) 0); /*nop*/
@@ -1810,21 +1774,12 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
 }
 ((void) 0); /*nop*/
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -1842,21 +1797,12 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
 }
 ((void) 0); /*nop*/
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -1907,15 +1853,9 @@ current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
       PCADDR pc = abuf->addr;
 
 {
-  {
-    SI opval = * FLD (i_rd);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -1930,7 +1870,7 @@ current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
       PCADDR pc = abuf->addr;
 
 {
-if (((FLD (f_rd)) == (15))) {
+if (EQSI (FLD (f_rd), 15)) {
 npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
 * FLD (i_rd) = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
@@ -1987,15 +1927,9 @@ current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
       PCADDR pc = abuf->addr;
 
 {
-  {
-    SI opval = * FLD (i_rd);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -2010,7 +1944,7 @@ current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
       PCADDR pc = abuf->addr;
 
 {
-if (((FLD (f_rd)) == (15))) {
+if (EQSI (FLD (f_rd), 15)) {
 npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
 * FLD (i_rd) = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
@@ -2200,10 +2134,7 @@ npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABL
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
 
 {
-  {
-    USI opval = FLD (i_offset24);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_offset24); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -2224,14 +2155,8 @@ npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABL
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
 
 {
-  {
-    SI opval = ANDSI (ADDSI (pc, 4), -4);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
-  {
-    USI opval = FLD (i_offset24);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = ANDSI (ADDSI (pc, 4), -4);
+npc = FLD (i_offset24); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -2252,15 +2177,9 @@ npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABL
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
 
 {
-  {
-    USI opval = ANDSI (* FLD (i_bx_rn), 0xfffffffe);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ANDSI (* FLD (i_bx_rn), 0xfffffffe); br_status = BRANCH_UNCACHEABLE;
 if (ANDSI (* FLD (i_bx_rn), 1)) {
-  {
-    BI opval = 1;
-    current_cpu->h_tbit_set (opval);
-  }
+current_cpu->h_tbit_set (1);
 }
 }
 
@@ -2285,21 +2204,12 @@ if (ANDSI (* FLD (i_bx_rn), 1)) {
   offset = FLD (f_uimm12);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -2323,21 +2233,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = current_cpu->compute_operand2_immshift (* FLD (i_rm), FLD (f_operand2_shifttype), FLD (f_operand2_shiftimm));
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -2355,10 +2256,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -2376,10 +2274,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -2397,10 +2292,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -2418,10 +2310,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -2445,21 +2334,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (f_uimm12);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -2477,21 +2357,12 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -2530,15 +2401,9 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
 }
 ((void) 0); /*nop*/
 ((void) 0); /*nop*/
@@ -2565,15 +2430,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (f_uimm12);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
 }
 }
 
@@ -2626,21 +2485,12 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
 }
 ((void) 0); /*nop*/
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -2664,15 +2514,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (f_uimm12);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
 }
 }
 
@@ -2710,21 +2554,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (f_uimm12);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -2742,10 +2577,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -2763,10 +2595,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -2790,21 +2619,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (f_uimm12);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -2828,15 +2648,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (f_uimm12);
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -2854,15 +2668,9 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -2885,15 +2693,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (f_uimm12);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -2911,15 +2713,9 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -2942,15 +2738,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (f_uimm12);
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -2968,15 +2758,9 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -2999,15 +2783,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (f_uimm12);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -3025,15 +2803,9 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -3092,15 +2864,9 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (f_uimm12);
   addr = * FLD (i_rn);
-  {
-    SI opval = * FLD (i_rd);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -3120,15 +2886,9 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (f_uimm12);
   addr = * FLD (i_rn);
-  {
-    SI opval = * FLD (i_rd);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -3148,10 +2908,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (f_uimm12);
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = * FLD (i_rd);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
 }
 
 #undef FLD
@@ -3167,10 +2924,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = * FLD (i_rd);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
 }
 
 #undef FLD
@@ -3190,10 +2944,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (f_uimm12);
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = * FLD (i_rd);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
 }
 
 #undef FLD
@@ -3209,10 +2960,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = * FLD (i_rd);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
 }
 
 #undef FLD
@@ -3232,10 +2980,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (f_uimm12);
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = * FLD (i_rd);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
 }
 
 #undef FLD
@@ -3251,10 +2996,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = * FLD (i_rd);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
 }
 
 #undef FLD
@@ -3274,10 +3016,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (f_uimm12);
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = * FLD (i_rd);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
 }
 
 #undef FLD
@@ -3293,10 +3032,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = * FLD (i_rd);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, * FLD (i_rd));
 }
 
 #undef FLD
@@ -3316,15 +3052,9 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (f_uimm12);
   addr = * FLD (i_rn);
-  {
-    QI opval = TRUNCSIQI (* FLD (i_rd));
-    current_cpu->SETMEMQI (pc, addr, opval);
-  }
+current_cpu->SETMEMQI (pc, addr, TRUNCSIQI (* FLD (i_rd)));
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -3340,10 +3070,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -3359,10 +3086,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -3382,15 +3106,9 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (f_uimm12);
   addr = * FLD (i_rn);
-  {
-    QI opval = TRUNCSIQI (* FLD (i_rd));
-    current_cpu->SETMEMQI (pc, addr, opval);
-  }
+current_cpu->SETMEMQI (pc, addr, TRUNCSIQI (* FLD (i_rd)));
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -3425,10 +3143,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (f_uimm12);
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    QI opval = TRUNCSIQI (* FLD (i_rd));
-    current_cpu->SETMEMQI (pc, addr, opval);
-  }
+current_cpu->SETMEMQI (pc, addr, TRUNCSIQI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3444,10 +3159,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    QI opval = TRUNCSIQI (* FLD (i_rd));
-    current_cpu->SETMEMQI (pc, addr, opval);
-  }
+current_cpu->SETMEMQI (pc, addr, TRUNCSIQI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3467,10 +3179,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (f_uimm12);
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    QI opval = TRUNCSIQI (* FLD (i_rd));
-    current_cpu->SETMEMQI (pc, addr, opval);
-  }
+current_cpu->SETMEMQI (pc, addr, TRUNCSIQI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3490,10 +3199,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = current_cpu->compute_operand2_immshift (* FLD (i_rm), FLD (f_operand2_shifttype), FLD (f_operand2_shiftimm));
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    QI opval = TRUNCSIQI (* FLD (i_rd));
-    current_cpu->SETMEMQI (pc, addr, opval);
-  }
+current_cpu->SETMEMQI (pc, addr, TRUNCSIQI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3513,10 +3219,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (f_uimm12);
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    QI opval = TRUNCSIQI (* FLD (i_rd));
-    current_cpu->SETMEMQI (pc, addr, opval);
-  }
+current_cpu->SETMEMQI (pc, addr, TRUNCSIQI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3532,10 +3235,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    QI opval = TRUNCSIQI (* FLD (i_rd));
-    current_cpu->SETMEMQI (pc, addr, opval);
-  }
+current_cpu->SETMEMQI (pc, addr, TRUNCSIQI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3555,10 +3255,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (f_uimm12);
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    QI opval = TRUNCSIQI (* FLD (i_rd));
-    current_cpu->SETMEMQI (pc, addr, opval);
-  }
+current_cpu->SETMEMQI (pc, addr, TRUNCSIQI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3574,10 +3271,7 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    QI opval = TRUNCSIQI (* FLD (i_rd));
-    current_cpu->SETMEMQI (pc, addr, opval);
-  }
+current_cpu->SETMEMQI (pc, addr, TRUNCSIQI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3597,10 +3291,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (i_hdt_offset8);
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    HI opval = TRUNCSIHI (* FLD (i_rd));
-    current_cpu->SETMEMHI (pc, addr, opval);
-  }
+current_cpu->SETMEMHI (pc, addr, TRUNCSIHI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3620,10 +3311,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = * FLD (i_rm);
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    HI opval = TRUNCSIHI (* FLD (i_rd));
-    current_cpu->SETMEMHI (pc, addr, opval);
-  }
+current_cpu->SETMEMHI (pc, addr, TRUNCSIHI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3643,10 +3331,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (i_hdt_offset8);
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    HI opval = TRUNCSIHI (* FLD (i_rd));
-    current_cpu->SETMEMHI (pc, addr, opval);
-  }
+current_cpu->SETMEMHI (pc, addr, TRUNCSIHI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3666,10 +3351,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = * FLD (i_rm);
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    HI opval = TRUNCSIHI (* FLD (i_rd));
-    current_cpu->SETMEMHI (pc, addr, opval);
-  }
+current_cpu->SETMEMHI (pc, addr, TRUNCSIHI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3689,10 +3371,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (i_hdt_offset8);
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    HI opval = TRUNCSIHI (* FLD (i_rd));
-    current_cpu->SETMEMHI (pc, addr, opval);
-  }
+current_cpu->SETMEMHI (pc, addr, TRUNCSIHI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3712,10 +3391,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = * FLD (i_rm);
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    HI opval = TRUNCSIHI (* FLD (i_rd));
-    current_cpu->SETMEMHI (pc, addr, opval);
-  }
+current_cpu->SETMEMHI (pc, addr, TRUNCSIHI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3735,10 +3411,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (i_hdt_offset8);
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    HI opval = TRUNCSIHI (* FLD (i_rd));
-    current_cpu->SETMEMHI (pc, addr, opval);
-  }
+current_cpu->SETMEMHI (pc, addr, TRUNCSIHI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3758,10 +3431,7 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = * FLD (i_rm);
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    HI opval = TRUNCSIHI (* FLD (i_rd));
-    current_cpu->SETMEMHI (pc, addr, opval);
-  }
+current_cpu->SETMEMHI (pc, addr, TRUNCSIHI (* FLD (i_rd)));
 }
 
 #undef FLD
@@ -3781,15 +3451,9 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (i_hdt_offset8);
   addr = * FLD (i_rn);
-  {
-    HI opval = TRUNCSIHI (* FLD (i_rd));
-    current_cpu->SETMEMHI (pc, addr, opval);
-  }
+current_cpu->SETMEMHI (pc, addr, TRUNCSIHI (* FLD (i_rd)));
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -3809,15 +3473,9 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = * FLD (i_rm);
   addr = * FLD (i_rn);
-  {
-    HI opval = TRUNCSIHI (* FLD (i_rd));
-    current_cpu->SETMEMHI (pc, addr, opval);
-  }
+current_cpu->SETMEMHI (pc, addr, TRUNCSIHI (* FLD (i_rd)));
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -3837,15 +3495,9 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = FLD (i_hdt_offset8);
   addr = * FLD (i_rn);
-  {
-    HI opval = TRUNCSIHI (* FLD (i_rd));
-    current_cpu->SETMEMHI (pc, addr, opval);
-  }
+current_cpu->SETMEMHI (pc, addr, TRUNCSIHI (* FLD (i_rd)));
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -3865,15 +3517,9 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   offset = * FLD (i_rm);
   addr = * FLD (i_rn);
-  {
-    HI opval = TRUNCSIHI (* FLD (i_rd));
-    current_cpu->SETMEMHI (pc, addr, opval);
-  }
+current_cpu->SETMEMHI (pc, addr, TRUNCSIHI (* FLD (i_rd)));
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -3895,15 +3541,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -3926,15 +3566,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -3957,15 +3591,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -3988,15 +3616,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -4019,15 +3641,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -4050,15 +3666,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -4081,15 +3691,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -4112,15 +3716,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
 }
 
@@ -4143,21 +3741,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -4181,21 +3770,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -4219,21 +3799,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -4257,21 +3828,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTQISI (current_cpu->GETMEMQI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTQISI (current_cpu->GETMEMQI (pc, addr));
 }
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -4295,15 +3857,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 }
 
@@ -4326,15 +3882,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 }
 
@@ -4357,15 +3907,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 }
 
@@ -4388,15 +3932,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 }
 
@@ -4419,15 +3957,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 }
 
@@ -4450,15 +3982,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 }
 
@@ -4481,15 +4007,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 }
 
@@ -4512,15 +4032,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 }
 
@@ -4543,21 +4057,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -4581,21 +4086,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -4619,21 +4115,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -4657,21 +4144,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ZEXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = ZEXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -4695,15 +4173,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 }
 
@@ -4726,15 +4198,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 }
 
@@ -4757,15 +4223,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 }
 
@@ -4788,15 +4248,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 ((void) 0); /*nop*/
 ((void) 0); /*nop*/
@@ -4823,15 +4277,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 }
 
@@ -4854,15 +4302,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = SUBSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 }
 
@@ -4885,15 +4327,9 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 }
 
@@ -4916,21 +4352,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = ADDSI (* FLD (i_rn), offset);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
 ((void) 0); /*nop*/
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -4954,21 +4381,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -4992,21 +4410,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
   addr = SUBSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -5030,21 +4439,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = FLD (i_hdt_offset8);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -5068,21 +4468,12 @@ if (EQSI (FLD (f_rd), 15)) {
   offset = * FLD (i_rm);
   addr = * FLD (i_rn);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    USI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = EXTHISI (current_cpu->GETMEMHI (pc, addr)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = EXTHISI (current_cpu->GETMEMHI (pc, addr));
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = EXTHISI (current_cpu->GETMEMHI (pc, addr));
 }
   addr = ADDSI (* FLD (i_rn), offset);
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -5103,20 +4494,11 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
   result = MULSI (* FLD (i_rm), * FLD (i_rs));
-  {
-    SI opval = result;
-    * FLD (i_mul_rd) = opval;
-  }
+* FLD (i_mul_rd) = result;
 if (FLD (f_set_cc_)) {
 {
-  {
-    BI opval = EQSI (result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (result, 0);
+current_cpu->hardware.h_nbit = LTSI (result, 0);
 }
 }
 }
@@ -5136,20 +4518,11 @@ if (FLD (f_set_cc_)) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
 
 {
-  {
-    SI opval = ADDSI (MULSI (* FLD (i_rm), * FLD (i_rs)), * FLD (i_mul_rn));
-    * FLD (i_mul_rd) = opval;
-  }
+* FLD (i_mul_rd) = ADDSI (MULSI (* FLD (i_rm), * FLD (i_rs)), * FLD (i_mul_rn));
 if (FLD (f_set_cc_)) {
 {
-  {
-    BI opval = EQSI (result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (result, 0);
+current_cpu->hardware.h_nbit = LTSI (result, 0);
 }
 }
 }
@@ -5226,24 +4599,12 @@ if (FLD (f_set_cc_)) {
 {
   mul_result = JOINSIDI (* FLD (i_rdhi), * FLD (i_rdlo));
   mul_result = ADDDI (MULDI (EXTSIDI (* FLD (i_rs)), EXTSIDI (* FLD (i_rm))), mul_result);
-  {
-    SI opval = SUBWORDDISI (mul_result, 0);
-    * FLD (i_rdhi) = opval;
-  }
-  {
-    SI opval = SUBWORDDISI (mul_result, 1);
-    * FLD (i_rdlo) = opval;
-  }
+* FLD (i_rdhi) = SUBWORDDISI (mul_result, 0);
+* FLD (i_rdlo) = SUBWORDDISI (mul_result, 1);
 if (FLD (f_set_cc_)) {
 {
-  {
-    BI opval = EQDI (mul_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTDI (mul_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQDI (mul_result, 0);
+current_cpu->hardware.h_nbit = LTDI (mul_result, 0);
 }
 }
 }
@@ -5264,14 +4625,8 @@ if (FLD (f_set_cc_)) {
 
 {
   temp = current_cpu->GETMEMSI (pc, * FLD (i_rn));
-  {
-    SI opval = * FLD (i_rm);
-    current_cpu->SETMEMSI (pc, * FLD (i_rn), opval);
-  }
-  {
-    SI opval = temp;
-    * FLD (i_rd) = opval;
-  }
+current_cpu->SETMEMSI (pc, * FLD (i_rn), * FLD (i_rm));
+* FLD (i_rd) = temp;
 }
 
 #undef FLD
@@ -5290,14 +4645,8 @@ if (FLD (f_set_cc_)) {
 
 {
   temp = current_cpu->GETMEMQI (pc, * FLD (i_rn));
-  {
-    QI opval = * FLD (i_rm);
-    current_cpu->SETMEMQI (pc, * FLD (i_rn), opval);
-  }
-  {
-    SI opval = temp;
-    * FLD (i_rd) = opval;
-  }
+current_cpu->SETMEMQI (pc, * FLD (i_rn), * FLD (i_rm));
+* FLD (i_rd) = temp;
 }
 
 #undef FLD
@@ -5316,10 +4665,7 @@ if (FLD (f_set_cc_)) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
 
 {
-  {
-    USI opval = current_cpu->arm_swi (pc, FLD (f_swi_comment));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->arm_swi (pc, FLD (f_swi_comment)); br_status = BRANCH_UNCACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -5345,39 +4691,21 @@ if (FLD (f_set_cc_)) {
   result = ANDSI (* FLD (i_rn), operand2);
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
 {
-  {
-    BI opval = EQSI (result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (result, 0);
+current_cpu->hardware.h_nbit = LTSI (result, 0);
 }
-  {
-    BI opval = carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = carry_out;
 }
 }
 }
@@ -5654,39 +4982,21 @@ if (FLD (f_set_cc_)) {
   result = INVSI (operand2);
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
 {
-  {
-    BI opval = EQSI (result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (result, 0);
+current_cpu->hardware.h_nbit = LTSI (result, 0);
 }
-  {
-    BI opval = carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = carry_out;
 }
 }
 }
@@ -5714,33 +5024,18 @@ if (FLD (f_set_cc_)) {
   result = INVSI (FLD (f_imm12));
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
-  {
-    BI opval = EQSI (result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (result, 0);
+current_cpu->hardware.h_nbit = LTSI (result, 0);
 }
 }
 }
@@ -5766,45 +5061,24 @@ if (FLD (f_set_cc_)) {
   result = ADDSI (* FLD (i_rn), operand2);
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
   SI tmp_result;
   tmp_result = ADDCSI (temp_op1, temp_op2, 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = ADDCFSI (temp_op1, temp_op2, 0);
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = ADDOFSI (temp_op1, temp_op2, 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = ADDCFSI (temp_op1, temp_op2, 0);
+current_cpu->hardware.h_vbit = ADDOFSI (temp_op1, temp_op2, 0);
 }
 }
 }
@@ -5830,45 +5104,24 @@ if (FLD (f_set_cc_)) {
   result = ADDSI (* FLD (i_rn), operand2);
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
   SI tmp_result;
   tmp_result = ADDCSI (temp_op1, temp_op2, 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = ADDCFSI (temp_op1, temp_op2, 0);
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = ADDOFSI (temp_op1, temp_op2, 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = ADDCFSI (temp_op1, temp_op2, 0);
+current_cpu->hardware.h_vbit = ADDOFSI (temp_op1, temp_op2, 0);
 }
 }
 }
@@ -5897,15 +5150,9 @@ if (FLD (f_set_cc_)) {
 if (EQSI (FLD (f_rd), 15)) {
 {
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 }
 } else {
 {
@@ -5914,29 +5161,14 @@ if (FLD (f_set_cc_)) {
   SI tmp_result;
   tmp_result = ADDCSI (* FLD (i_rn), FLD (f_imm12), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = ADDCFSI (* FLD (i_rn), FLD (f_imm12), 0);
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = ADDOFSI (* FLD (i_rn), FLD (f_imm12), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = ADDCFSI (* FLD (i_rn), FLD (f_imm12), 0);
+current_cpu->hardware.h_vbit = ADDOFSI (* FLD (i_rn), FLD (f_imm12), 0);
 }
 }
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 }
 }
 }
@@ -5960,45 +5192,24 @@ if (FLD (f_set_cc_)) {
   result = ADDCSI (* FLD (i_rn), operand2, current_cpu->hardware.h_cbit);
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
   SI tmp_result;
   tmp_result = ADDCSI (temp_op1, temp_op2, current_cpu->hardware.h_cbit);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = ADDCFSI (temp_op1, temp_op2, current_cpu->hardware.h_cbit);
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = ADDOFSI (temp_op1, temp_op2, current_cpu->hardware.h_cbit);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = ADDCFSI (temp_op1, temp_op2, current_cpu->hardware.h_cbit);
+current_cpu->hardware.h_vbit = ADDOFSI (temp_op1, temp_op2, current_cpu->hardware.h_cbit);
 }
 }
 }
@@ -6024,45 +5235,24 @@ if (FLD (f_set_cc_)) {
   result = ADDCSI (* FLD (i_rn), operand2, current_cpu->hardware.h_cbit);
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
   SI tmp_result;
   tmp_result = ADDCSI (temp_op1, temp_op2, current_cpu->hardware.h_cbit);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = ADDCFSI (temp_op1, temp_op2, current_cpu->hardware.h_cbit);
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = ADDOFSI (temp_op1, temp_op2, current_cpu->hardware.h_cbit);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = ADDCFSI (temp_op1, temp_op2, current_cpu->hardware.h_cbit);
+current_cpu->hardware.h_vbit = ADDOFSI (temp_op1, temp_op2, current_cpu->hardware.h_cbit);
 }
 }
 }
@@ -6091,15 +5281,9 @@ if (FLD (f_set_cc_)) {
 if (EQSI (FLD (f_rd), 15)) {
 {
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 }
 } else {
 {
@@ -6108,29 +5292,14 @@ if (FLD (f_set_cc_)) {
   SI tmp_result;
   tmp_result = ADDCSI (* FLD (i_rn), FLD (f_imm12), current_cpu->hardware.h_cbit);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = ADDCFSI (* FLD (i_rn), FLD (f_imm12), current_cpu->hardware.h_cbit);
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = ADDOFSI (* FLD (i_rn), FLD (f_imm12), current_cpu->hardware.h_cbit);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = ADDCFSI (* FLD (i_rn), FLD (f_imm12), current_cpu->hardware.h_cbit);
+current_cpu->hardware.h_vbit = ADDOFSI (* FLD (i_rn), FLD (f_imm12), current_cpu->hardware.h_cbit);
 }
 }
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 }
 }
 }
@@ -6154,45 +5323,24 @@ if (FLD (f_set_cc_)) {
   result = SUBSI (* FLD (i_rn), operand2);
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
   SI tmp_result;
   tmp_result = SUBCSI (temp_op1, temp_op2, 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (temp_op1, temp_op2, 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (temp_op1, temp_op2, 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (temp_op1, temp_op2, 0));
+current_cpu->hardware.h_vbit = SUBOFSI (temp_op1, temp_op2, 0);
 }
 }
 }
@@ -6218,45 +5366,24 @@ if (FLD (f_set_cc_)) {
   result = SUBSI (* FLD (i_rn), operand2);
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
   SI tmp_result;
   tmp_result = SUBCSI (temp_op1, temp_op2, 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (temp_op1, temp_op2, 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (temp_op1, temp_op2, 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (temp_op1, temp_op2, 0));
+current_cpu->hardware.h_vbit = SUBOFSI (temp_op1, temp_op2, 0);
 }
 }
 }
@@ -6285,15 +5412,9 @@ if (FLD (f_set_cc_)) {
 if (EQSI (FLD (f_rd), 15)) {
 {
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 }
 } else {
 {
@@ -6302,29 +5423,14 @@ if (FLD (f_set_cc_)) {
   SI tmp_result;
   tmp_result = SUBCSI (* FLD (i_rn), FLD (f_imm12), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (* FLD (i_rn), FLD (f_imm12), 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (* FLD (i_rn), FLD (f_imm12), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (* FLD (i_rn), FLD (f_imm12), 0));
+current_cpu->hardware.h_vbit = SUBOFSI (* FLD (i_rn), FLD (f_imm12), 0);
 }
 }
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 }
 }
 }
@@ -6348,45 +5454,24 @@ if (FLD (f_set_cc_)) {
   result = SUBCSI (* FLD (i_rn), operand2, NOTBI (current_cpu->hardware.h_cbit));
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
   SI tmp_result;
   tmp_result = SUBCSI (temp_op1, temp_op2, NOTBI (current_cpu->hardware.h_cbit));
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (temp_op1, temp_op2, NOTBI (current_cpu->hardware.h_cbit)));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (temp_op1, temp_op2, NOTBI (current_cpu->hardware.h_cbit));
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (temp_op1, temp_op2, NOTBI (current_cpu->hardware.h_cbit)));
+current_cpu->hardware.h_vbit = SUBOFSI (temp_op1, temp_op2, NOTBI (current_cpu->hardware.h_cbit));
 }
 }
 }
@@ -6412,45 +5497,24 @@ if (FLD (f_set_cc_)) {
   result = SUBCSI (* FLD (i_rn), operand2, NOTBI (current_cpu->hardware.h_cbit));
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
   SI tmp_result;
   tmp_result = SUBCSI (temp_op1, temp_op2, NOTBI (current_cpu->hardware.h_cbit));
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (temp_op1, temp_op2, NOTBI (current_cpu->hardware.h_cbit)));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (temp_op1, temp_op2, NOTBI (current_cpu->hardware.h_cbit));
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (temp_op1, temp_op2, NOTBI (current_cpu->hardware.h_cbit)));
+current_cpu->hardware.h_vbit = SUBOFSI (temp_op1, temp_op2, NOTBI (current_cpu->hardware.h_cbit));
 }
 }
 }
@@ -6479,15 +5543,9 @@ if (FLD (f_set_cc_)) {
 if (EQSI (FLD (f_rd), 15)) {
 {
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 }
 } else {
 {
@@ -6496,29 +5554,14 @@ if (FLD (f_set_cc_)) {
   SI tmp_result;
   tmp_result = SUBCSI (* FLD (i_rn), FLD (f_imm12), NOTBI (current_cpu->hardware.h_cbit));
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (* FLD (i_rn), FLD (f_imm12), NOTBI (current_cpu->hardware.h_cbit)));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (* FLD (i_rn), FLD (f_imm12), NOTBI (current_cpu->hardware.h_cbit));
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (* FLD (i_rn), FLD (f_imm12), NOTBI (current_cpu->hardware.h_cbit)));
+current_cpu->hardware.h_vbit = SUBOFSI (* FLD (i_rn), FLD (f_imm12), NOTBI (current_cpu->hardware.h_cbit));
 }
 }
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 }
 }
 }
@@ -6542,45 +5585,24 @@ if (FLD (f_set_cc_)) {
   result = SUBSI (operand2, * FLD (i_rn));
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
   SI tmp_result;
   tmp_result = SUBCSI (temp_op2, temp_op1, 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (temp_op2, temp_op1, 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (temp_op2, temp_op1, 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (temp_op2, temp_op1, 0));
+current_cpu->hardware.h_vbit = SUBOFSI (temp_op2, temp_op1, 0);
 }
 }
 }
@@ -6606,45 +5628,24 @@ if (FLD (f_set_cc_)) {
   result = SUBSI (operand2, * FLD (i_rn));
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
   SI tmp_result;
   tmp_result = SUBCSI (temp_op2, temp_op1, 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (temp_op2, temp_op1, 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (temp_op2, temp_op1, 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (temp_op2, temp_op1, 0));
+current_cpu->hardware.h_vbit = SUBOFSI (temp_op2, temp_op1, 0);
 }
 }
 }
@@ -6673,15 +5674,9 @@ if (FLD (f_set_cc_)) {
 if (EQSI (FLD (f_rd), 15)) {
 {
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 }
 } else {
 {
@@ -6690,29 +5685,14 @@ if (FLD (f_set_cc_)) {
   SI tmp_result;
   tmp_result = SUBCSI (FLD (f_imm12), * FLD (i_rn), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (FLD (f_imm12), * FLD (i_rn), 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (FLD (f_imm12), * FLD (i_rn), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (FLD (f_imm12), * FLD (i_rn), 0));
+current_cpu->hardware.h_vbit = SUBOFSI (FLD (f_imm12), * FLD (i_rn), 0);
 }
 }
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 }
 }
 }
@@ -6736,45 +5716,24 @@ if (FLD (f_set_cc_)) {
   result = SUBCSI (operand2, * FLD (i_rn), NOTBI (current_cpu->hardware.h_cbit));
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
   SI tmp_result;
   tmp_result = SUBCSI (temp_op2, temp_op1, NOTBI (current_cpu->hardware.h_cbit));
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (temp_op2, temp_op1, NOTBI (current_cpu->hardware.h_cbit)));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (temp_op2, temp_op1, NOTBI (current_cpu->hardware.h_cbit));
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (temp_op2, temp_op1, NOTBI (current_cpu->hardware.h_cbit)));
+current_cpu->hardware.h_vbit = SUBOFSI (temp_op2, temp_op1, NOTBI (current_cpu->hardware.h_cbit));
 }
 }
 }
@@ -6800,45 +5759,24 @@ if (FLD (f_set_cc_)) {
   result = SUBCSI (operand2, * FLD (i_rn), NOTBI (current_cpu->hardware.h_cbit));
 if (EQSI (FLD (f_rd), 15)) {
 {
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 } else {
 {
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 if (FLD (f_set_cc_)) {
 {
   SI tmp_result;
   tmp_result = SUBCSI (temp_op2, temp_op1, NOTBI (current_cpu->hardware.h_cbit));
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (temp_op2, temp_op1, NOTBI (current_cpu->hardware.h_cbit)));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (temp_op2, temp_op1, NOTBI (current_cpu->hardware.h_cbit));
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (temp_op2, temp_op1, NOTBI (current_cpu->hardware.h_cbit)));
+current_cpu->hardware.h_vbit = SUBOFSI (temp_op2, temp_op1, NOTBI (current_cpu->hardware.h_cbit));
 }
 }
 }
@@ -6867,15 +5805,9 @@ if (FLD (f_set_cc_)) {
 if (EQSI (FLD (f_rd), 15)) {
 {
 if (FLD (f_set_cc_)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
-  {
-    USI opval = result;
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = result; br_status = BRANCH_UNCACHEABLE;
 }
 } else {
 {
@@ -6884,29 +5816,14 @@ if (FLD (f_set_cc_)) {
   SI tmp_result;
   tmp_result = SUBCSI (FLD (f_imm12), * FLD (i_rn), NOTBI (current_cpu->hardware.h_cbit));
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (FLD (f_imm12), * FLD (i_rn), NOTBI (current_cpu->hardware.h_cbit)));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (FLD (f_imm12), * FLD (i_rn), NOTBI (current_cpu->hardware.h_cbit));
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (FLD (f_imm12), * FLD (i_rn), NOTBI (current_cpu->hardware.h_cbit)));
+current_cpu->hardware.h_vbit = SUBOFSI (FLD (f_imm12), * FLD (i_rn), NOTBI (current_cpu->hardware.h_cbit));
 }
 }
-  {
-    SI opval = result;
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = result;
 }
 }
 }
@@ -6927,26 +5844,14 @@ if (FLD (f_set_cc_)) {
 {
   result = ANDSI (* FLD (i_rn), operand2);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 } else {
 {
 {
-  {
-    BI opval = EQSI (result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (result, 0);
+current_cpu->hardware.h_nbit = LTSI (result, 0);
 }
-  {
-    BI opval = carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = carry_out;
 }
 }
 }
@@ -6988,19 +5893,10 @@ if (EQSI (FLD (f_ror_imm8_rotate), 0)) {
 }
 {
 {
-  {
-    BI opval = EQSI (ANDSI (* FLD (i_rn), FLD (f_ror_imm8)), 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (ANDSI (* FLD (i_rn), FLD (f_ror_imm8)), 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (ANDSI (* FLD (i_rn), FLD (f_ror_imm8)), 0);
+current_cpu->hardware.h_nbit = LTSI (ANDSI (* FLD (i_rn), FLD (f_ror_imm8)), 0);
 }
-  {
-    BI opval = carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = carry_out;
 }
 }
 
@@ -7033,26 +5929,14 @@ if (EQSI (FLD (f_ror_imm8_rotate), 0)) {
 {
   result = XORSI (* FLD (i_rn), operand2);
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 } else {
 {
 {
-  {
-    BI opval = EQSI (result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (result, 0);
+current_cpu->hardware.h_nbit = LTSI (result, 0);
 }
-  {
-    BI opval = carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = carry_out;
 }
 }
 }
@@ -7079,19 +5963,10 @@ if (EQSI (FLD (f_ror_imm8_rotate), 0)) {
 }
 {
 {
-  {
-    BI opval = EQSI (XORSI (* FLD (i_rn), FLD (f_ror_imm8)), 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (XORSI (* FLD (i_rn), FLD (f_ror_imm8)), 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (XORSI (* FLD (i_rn), FLD (f_ror_imm8)), 0);
+current_cpu->hardware.h_nbit = LTSI (XORSI (* FLD (i_rn), FLD (f_ror_imm8)), 0);
 }
-  {
-    BI opval = carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = carry_out;
 }
 }
 
@@ -7108,32 +5983,17 @@ if (EQSI (FLD (f_ror_imm8_rotate), 0)) {
 
 {
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 } else {
 {
   SI tmp_result;
   tmp_result = SUBCSI (* FLD (i_rn), operand2, 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (* FLD (i_rn), operand2, 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (* FLD (i_rn), operand2, 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (* FLD (i_rn), operand2, 0));
+current_cpu->hardware.h_vbit = SUBOFSI (* FLD (i_rn), operand2, 0);
 }
 }
 }
@@ -7151,32 +6011,17 @@ if (EQSI (FLD (f_rd), 15)) {
 
 {
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 } else {
 {
   SI tmp_result;
   tmp_result = SUBCSI (* FLD (i_rn), operand2, 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (* FLD (i_rn), operand2, 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (* FLD (i_rn), operand2, 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (* FLD (i_rn), operand2, 0));
+current_cpu->hardware.h_vbit = SUBOFSI (* FLD (i_rn), operand2, 0);
 }
 }
 }
@@ -7198,23 +6043,11 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   result = SUBCSI (* FLD (i_rn), FLD (f_imm12), 0);
 {
-  {
-    BI opval = EQSI (result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (result, 0);
+current_cpu->hardware.h_nbit = LTSI (result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (* FLD (i_rn), FLD (f_imm12), 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (* FLD (i_rn), FLD (f_imm12), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (* FLD (i_rn), FLD (f_imm12), 0));
+current_cpu->hardware.h_vbit = SUBOFSI (* FLD (i_rn), FLD (f_imm12), 0);
 }
 
 #undef FLD
@@ -7234,32 +6067,17 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   operand2 = current_cpu->compute_operand2_immshift (* FLD (i_rm), FLD (f_operand2_shifttype), FLD (f_operand2_shiftimm));
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 } else {
 {
   SI tmp_result;
   tmp_result = ADDCSI (* FLD (i_rn), operand2, 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = ADDCFSI (* FLD (i_rn), operand2, 0);
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = ADDOFSI (* FLD (i_rn), operand2, 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = ADDCFSI (* FLD (i_rn), operand2, 0);
+current_cpu->hardware.h_vbit = ADDOFSI (* FLD (i_rn), operand2, 0);
 }
 }
 }
@@ -7281,32 +6099,17 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   operand2 = current_cpu->compute_operand2_regshift (* FLD (i_rm), FLD (f_operand2_shifttype), * FLD (i_operand2_shiftreg));
 if (EQSI (FLD (f_rd), 15)) {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 } else {
 {
   SI tmp_result;
   tmp_result = ADDCSI (* FLD (i_rn), operand2, 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = ADDCFSI (* FLD (i_rn), operand2, 0);
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = ADDOFSI (* FLD (i_rn), operand2, 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = ADDCFSI (* FLD (i_rn), operand2, 0);
+current_cpu->hardware.h_vbit = ADDOFSI (* FLD (i_rn), operand2, 0);
 }
 }
 }
@@ -7328,23 +6131,11 @@ if (EQSI (FLD (f_rd), 15)) {
 {
   result = ADDCSI (* FLD (i_rn), FLD (f_imm12), 0);
 {
-  {
-    BI opval = EQSI (result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (result, 0);
+current_cpu->hardware.h_nbit = LTSI (result, 0);
 }
-  {
-    BI opval = ADDCFSI (* FLD (i_rn), FLD (f_imm12), 0);
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = ADDOFSI (* FLD (i_rn), FLD (f_imm12), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = ADDCFSI (* FLD (i_rn), FLD (f_imm12), 0);
+current_cpu->hardware.h_vbit = ADDOFSI (* FLD (i_rn), FLD (f_imm12), 0);
 }
 
 #undef FLD
@@ -7366,145 +6157,97 @@ if (EQSI (FLD (f_rd), 15)) {
   addr = * FLD (i_rn);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
@@ -7531,29 +6274,17 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
   addr = * FLD (i_rn);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (addr, 4);
 }
@@ -7561,15 +6292,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (addr, 4);
 }
@@ -7577,15 +6302,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (addr, 4);
 }
@@ -7593,15 +6312,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (addr, 4);
 }
@@ -7609,15 +6322,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (addr, 4);
 }
@@ -7625,15 +6332,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (addr, 4);
 }
@@ -7641,88 +6342,58 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
@@ -7749,152 +6420,101 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
   addr = * FLD (i_rn);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -7918,29 +6538,17 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
   addr = * FLD (i_rn);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (addr, 4);
 }
@@ -7948,15 +6556,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (addr, 4);
 }
@@ -7964,15 +6566,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (addr, 4);
 }
@@ -7980,15 +6576,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (addr, 4);
 }
@@ -7996,15 +6586,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (addr, 4);
 }
@@ -8012,15 +6596,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (addr, 4);
 }
@@ -8028,95 +6606,62 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
   addr = SUBSI (addr, 4);
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -8141,145 +6686,97 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 }
 }
 }
@@ -8302,15 +6799,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -8318,15 +6809,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -8334,15 +6819,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -8350,15 +6829,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -8366,15 +6839,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -8382,15 +6849,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -8398,29 +6859,17 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 }
@@ -8442,79 +6891,52 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -8539,88 +6961,58 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -8628,15 +7020,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -8644,15 +7030,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -8660,15 +7040,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -8676,15 +7050,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -8692,15 +7060,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -8708,35 +7070,20 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -8760,145 +7107,97 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   addr = * FLD (i_rn);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
   addr = ADDSI (addr, 4);
 }
 }
@@ -8921,15 +7220,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (addr, 4);
 }
@@ -8937,15 +7230,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (addr, 4);
 }
@@ -8953,15 +7240,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (addr, 4);
 }
@@ -8969,15 +7250,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (addr, 4);
 }
@@ -8985,15 +7260,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (addr, 4);
 }
@@ -9001,15 +7270,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (addr, 4);
 }
@@ -9017,30 +7280,18 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 }
@@ -9061,80 +7312,53 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
   addr = ADDSI (addr, 4);
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -9158,88 +7382,58 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   addr = * FLD (i_rn);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (addr, 4);
 }
@@ -9247,15 +7441,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (addr, 4);
 }
@@ -9263,15 +7451,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (addr, 4);
 }
@@ -9279,15 +7461,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (addr, 4);
 }
@@ -9295,15 +7471,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (addr, 4);
 }
@@ -9311,15 +7481,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (addr, 4);
 }
@@ -9327,36 +7491,21 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -9381,145 +7530,97 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -9546,29 +7647,17 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -9576,15 +7665,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -9592,15 +7675,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -9608,15 +7685,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -9624,15 +7695,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -9640,15 +7705,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -9656,88 +7715,58 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -9764,151 +7793,100 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -9933,29 +7911,17 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    USI opval = current_cpu->GETMEMSI (pc, addr);
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    current_cpu->h_cpsr_set (opval);
-  }
+npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
+current_cpu->h_cpsr_set (current_cpu->h_spsr_get ());
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 14)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -9963,15 +7929,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 13)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -9979,15 +7939,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 12)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -9995,15 +7949,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 11)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -10011,15 +7959,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 10)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -10027,15 +7969,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 9)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
@@ -10043,94 +7979,61 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 8)] = current_cpu->GETMEMSI (pc, addr);
 } else {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
-  }
+current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->GETMEMSI (pc, addr);
-    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
-  }
+current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
       pbb_br_npc = npc;
@@ -10154,145 +8057,97 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
 }
 }
 }
@@ -10313,15 +8168,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (14, 8)]);
 }
 }
 }
@@ -10329,15 +8178,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (13, 8)]);
 }
 }
 }
@@ -10345,15 +8188,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (12, 8)]);
 }
 }
 }
@@ -10361,15 +8198,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (11, 8)]);
 }
 }
 }
@@ -10377,15 +8208,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (10, 8)]);
 }
 }
 }
@@ -10393,15 +8218,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (9, 8)]);
 }
 }
 }
@@ -10409,88 +8228,58 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (8, 8)]);
 }
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
 }
 }
 }
@@ -10510,142 +8299,94 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -10667,25 +8408,16 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (14, 8)]);
 }
 }
 }
@@ -10693,15 +8425,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (13, 8)]);
 }
 }
 }
@@ -10709,15 +8435,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (12, 8)]);
 }
 }
 }
@@ -10725,15 +8445,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (11, 8)]);
 }
 }
 }
@@ -10741,15 +8455,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (10, 8)]);
 }
 }
 }
@@ -10757,15 +8465,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (9, 8)]);
 }
 }
 }
@@ -10773,94 +8475,61 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = SUBSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (8, 8)]);
 }
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
   addr = SUBSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -10882,145 +8551,97 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
 }
 }
 }
@@ -11041,15 +8662,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (8, 8)]);
 }
 }
 }
@@ -11057,15 +8672,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (9, 8)]);
 }
 }
 }
@@ -11073,15 +8682,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (10, 8)]);
 }
 }
 }
@@ -11089,15 +8692,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (11, 8)]);
 }
 }
 }
@@ -11105,15 +8702,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (12, 8)]);
 }
 }
 }
@@ -11121,15 +8712,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (13, 8)]);
 }
 }
 }
@@ -11137,25 +8722,16 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (14, 8)]);
 }
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
 }
 }
 }
@@ -11175,79 +8751,52 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -11269,88 +8818,58 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (8, 8)]);
 }
 }
 }
@@ -11358,15 +8877,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (9, 8)]);
 }
 }
 }
@@ -11374,15 +8887,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (10, 8)]);
 }
 }
 }
@@ -11390,15 +8897,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (11, 8)]);
 }
 }
 }
@@ -11406,15 +8907,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (12, 8)]);
 }
 }
 }
@@ -11422,15 +8917,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (13, 8)]);
 }
 }
 }
@@ -11438,31 +8927,19 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = ADDSI (addr, 4);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (14, 8)]);
 }
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
   addr = ADDSI (addr, 4);
-  {
-    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -11483,145 +8960,97 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   addr = * FLD (i_rn);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
-  {
-    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
   addr = ADDSI (addr, 4);
 }
 }
@@ -11642,15 +9071,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (8, 8)]);
 }
   addr = ADDSI (addr, 4);
 }
@@ -11658,15 +9081,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (9, 8)]);
 }
   addr = ADDSI (addr, 4);
 }
@@ -11674,15 +9091,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (10, 8)]);
 }
   addr = ADDSI (addr, 4);
 }
@@ -11690,15 +9101,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (11, 8)]);
 }
   addr = ADDSI (addr, 4);
 }
@@ -11706,15 +9111,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (12, 8)]);
 }
   addr = ADDSI (addr, 4);
 }
@@ -11722,15 +9121,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (13, 8)]);
 }
   addr = ADDSI (addr, 4);
 }
@@ -11738,25 +9131,16 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (14, 8)]);
 }
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
-  {
-    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
   addr = ADDSI (addr, 4);
 }
 }
@@ -11776,80 +9160,53 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
-  {
-    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
   addr = ADDSI (addr, 4);
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -11870,88 +9227,58 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   addr = * FLD (i_rn);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (8, 8)]);
 }
   addr = ADDSI (addr, 4);
 }
@@ -11959,15 +9286,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (9, 8)]);
 }
   addr = ADDSI (addr, 4);
 }
@@ -11975,15 +9296,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (10, 8)]);
 }
   addr = ADDSI (addr, 4);
 }
@@ -11991,15 +9306,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (11, 8)]);
 }
   addr = ADDSI (addr, 4);
 }
@@ -12007,15 +9316,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (12, 8)]);
 }
   addr = ADDSI (addr, 4);
 }
@@ -12023,15 +9326,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (13, 8)]);
 }
   addr = ADDSI (addr, 4);
 }
@@ -12039,32 +9336,20 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (14, 8)]);
 }
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
-  {
-    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
   addr = ADDSI (addr, 4);
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -12085,145 +9370,97 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   addr = * FLD (i_rn);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
-  {
-    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
   addr = SUBSI (addr, 4);
 }
 }
@@ -12244,15 +9481,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (14, 8)]);
 }
   addr = SUBSI (addr, 4);
 }
@@ -12260,15 +9491,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (13, 8)]);
 }
   addr = SUBSI (addr, 4);
 }
@@ -12276,15 +9501,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (12, 8)]);
 }
   addr = SUBSI (addr, 4);
 }
@@ -12292,15 +9511,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (11, 8)]);
 }
   addr = SUBSI (addr, 4);
 }
@@ -12308,15 +9521,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (10, 8)]);
 }
   addr = SUBSI (addr, 4);
 }
@@ -12324,15 +9531,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (9, 8)]);
 }
   addr = SUBSI (addr, 4);
 }
@@ -12340,88 +9541,58 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (8, 8)]);
 }
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
   addr = SUBSI (addr, 4);
 }
 }
@@ -12441,143 +9612,95 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
   addr = SUBSI (addr, 4);
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -12598,25 +9721,16 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
   addr = * FLD (i_rn);
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 {
-  {
-    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 14)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (14, 8)]);
 }
   addr = SUBSI (addr, 4);
 }
@@ -12624,15 +9738,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 13)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (13, 8)]);
 }
   addr = SUBSI (addr, 4);
 }
@@ -12640,15 +9748,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 12)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (12, 8)]);
 }
   addr = SUBSI (addr, 4);
 }
@@ -12656,15 +9758,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 11)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (11, 8)]);
 }
   addr = SUBSI (addr, 4);
 }
@@ -12672,15 +9768,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 10)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (10, 8)]);
 }
   addr = SUBSI (addr, 4);
 }
@@ -12688,15 +9778,9 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 9)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (9, 8)]);
 }
   addr = SUBSI (addr, 4);
 }
@@ -12704,95 +9788,62 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 8)]);
 } else {
-  {
-    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr_usr[SUBSI (8, 8)]);
 }
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
   addr = SUBSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
-    current_cpu->SETMEMSI (pc, addr, opval);
-  }
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
   addr = SUBSI (addr, 4);
 }
 }
-  {
-    SI opval = addr;
-    * FLD (i_rn) = opval;
-  }
+* FLD (i_rn) = addr;
 }
 
 #undef FLD
@@ -12810,10 +9861,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
 
 {
-  {
-    SI opval = current_cpu->h_cpsr_get ();
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = current_cpu->h_cpsr_get ();
 }
 
 #undef FLD
@@ -12831,10 +9879,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
 
 {
-  {
-    SI opval = current_cpu->h_spsr_get ();
-    * FLD (i_rd) = opval;
-  }
+* FLD (i_rd) = current_cpu->h_spsr_get ();
 }
 
 #undef FLD
@@ -12852,10 +9897,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
 
 {
-  {
-    SI opval = * FLD (i_rm);
-    current_cpu->h_cpsr_set (opval);
-  }
+current_cpu->h_cpsr_set (* FLD (i_rm));
 }
 
 #undef FLD
@@ -12873,10 +9915,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
 
 {
-  {
-    SI opval = * FLD (i_rm);
-    current_cpu->h_spsr_set (opval);
-  }
+current_cpu->h_spsr_set (* FLD (i_rm));
 }
 
 #undef FLD

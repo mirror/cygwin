@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -384,7 +384,7 @@ if (FLD (f_op2m)) {
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, current_cpu->h_gr_get (FLD (f_Rs))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMQI (pc, current_cpu->h_gr_get (FLD (f_Rs))));
   {
     HI opval = tmp_nvalue;
     if (UNLIKELY(current_cpu->trace_result_p))
@@ -437,7 +437,7 @@ if (FLD (f_op2m)) {
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, current_cpu->h_gr_get (FLD (f_Rs))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMQI (pc, current_cpu->h_gr_get (FLD (f_Rs))));
   {
     HI opval = tmp_nvalue;
     if (UNLIKELY(current_cpu->trace_result_p))
@@ -503,7 +503,7 @@ if (FLD (f_op2m)) {
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, current_cpu->h_gr_get (FLD (f_Rs))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMQI (pc, current_cpu->h_gr_get (FLD (f_Rs))));
   {
     HI opval = tmp_nvalue;
     if (UNLIKELY(current_cpu->trace_result_p))
@@ -700,7 +700,7 @@ if (FLD (f_op2m)) {
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMQI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12))));
   {
     HI opval = tmp_nvalue;
     if (UNLIKELY(current_cpu->trace_result_p))
@@ -753,7 +753,7 @@ if (FLD (f_op2m)) {
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMQI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12))));
   {
     HI opval = tmp_nvalue;
     if (UNLIKELY(current_cpu->trace_result_p))
@@ -819,7 +819,7 @@ if (FLD (f_op2m)) {
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMQI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12))));
   {
     HI opval = tmp_nvalue;
     if (UNLIKELY(current_cpu->trace_result_p))
@@ -1214,7 +1214,7 @@ if (FLD (f_op2m)) {
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, ORSI (SLLSI (current_cpu->h_gr_get (((UINT) 8)), 16), current_cpu->h_gr_get (FLD (f_Rs)))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMQI (pc, ORSI (SLLSI (current_cpu->h_gr_get (((UINT) 8)), 16), current_cpu->h_gr_get (FLD (f_Rs)))));
   {
     HI opval = tmp_nvalue;
     if (UNLIKELY(current_cpu->trace_result_p))
@@ -1267,7 +1267,7 @@ if (FLD (f_op2m)) {
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs)))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMQI (pc, JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs)))));
   {
     HI opval = tmp_nvalue;
     if (UNLIKELY(current_cpu->trace_result_p))
@@ -1333,7 +1333,7 @@ if (FLD (f_op2m)) {
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs)))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMQI (pc, JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs)))));
   {
     HI opval = tmp_nvalue;
     if (UNLIKELY(current_cpu->trace_result_p))
@@ -1530,7 +1530,7 @@ if (FLD (f_op2m)) {
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))));
   {
     HI opval = tmp_nvalue;
     if (UNLIKELY(current_cpu->trace_result_p))
@@ -1583,7 +1583,7 @@ if (FLD (f_op2m)) {
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))));
   {
     HI opval = tmp_nvalue;
     if (UNLIKELY(current_cpu->trace_result_p))
@@ -1649,7 +1649,7 @@ if (FLD (f_op2m)) {
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))));
   {
     HI opval = tmp_nvalue;
     if (UNLIKELY(current_cpu->trace_result_p))

@@ -24,6 +24,7 @@ cpu/ip2k.cpu
 cpu/mep.cpu
 ../cpu/mt.cpu
 cpu/openrisc.cpu
+cpu/sh.cpu
 cpu/xstormy16.cpu
 "
 

@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -294,25 +294,13 @@ restart:
 {
   BI tmp_carry_out;
   tmp_carry_out = current_cpu->compute_carry_out_immshift (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), SHIFT_TYPE_LSL, FLD (f_offset5), current_cpu->hardware.h_cbit);
-  {
-    SI opval = SLLSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset5));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), SLLSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset5)));
 {
 {
-  {
-    BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
+current_cpu->hardware.h_nbit = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
 }
-  {
-    BI opval = tmp_carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = tmp_carry_out;
 }
 }
 
@@ -333,25 +321,13 @@ restart:
 {
   BI tmp_carry_out;
   tmp_carry_out = current_cpu->compute_carry_out_immshift (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), SHIFT_TYPE_LSR, FLD (f_offset5), current_cpu->hardware.h_cbit);
-  {
-    SI opval = SRLSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset5));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), SRLSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset5)));
 {
 {
-  {
-    BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
+current_cpu->hardware.h_nbit = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
 }
-  {
-    BI opval = tmp_carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = tmp_carry_out;
 }
 }
 
@@ -372,25 +348,13 @@ restart:
 {
   BI tmp_carry_out;
   tmp_carry_out = current_cpu->compute_carry_out_immshift (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), SHIFT_TYPE_ASR, FLD (f_offset5), current_cpu->hardware.h_cbit);
-  {
-    SI opval = SRASI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset5));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), SRASI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset5)));
 {
 {
-  {
-    BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
+current_cpu->hardware.h_nbit = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
 }
-  {
-    BI opval = tmp_carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = tmp_carry_out;
 }
 }
 
@@ -413,28 +377,13 @@ restart:
   SI tmp_result;
   tmp_result = ADDCSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)), 0);
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)), 0);
+current_cpu->hardware.h_vbit = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)), 0);
 }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn))));
 }
 
 #undef FLD
@@ -456,28 +405,13 @@ restart:
   SI tmp_result;
   tmp_result = ADDCSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3), 0);
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3), 0);
+current_cpu->hardware.h_vbit = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3), 0);
 }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3)));
 }
 
 #undef FLD
@@ -499,28 +433,13 @@ restart:
   SI tmp_result;
   tmp_result = SUBCSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)), 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)), 0));
+current_cpu->hardware.h_vbit = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)), 0);
 }
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), SUBSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn))));
 }
 
 #undef FLD
@@ -542,28 +461,13 @@ restart:
   SI tmp_result;
   tmp_result = SUBCSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3), 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3), 0));
+current_cpu->hardware.h_vbit = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3), 0);
 }
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), SUBSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3)));
 }
 
 #undef FLD
@@ -581,19 +485,10 @@ restart:
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 {
-  {
-    SI opval = FLD (f_offset8);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), FLD (f_offset8));
 {
-  {
-    BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), 0);
+current_cpu->hardware.h_nbit = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), 0);
 }
 }
 
@@ -615,23 +510,11 @@ restart:
   SI tmp_result;
   tmp_result = SUBCSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0));
+current_cpu->hardware.h_vbit = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
 }
 
 #undef FLD
@@ -653,28 +536,13 @@ restart:
   SI tmp_result;
   tmp_result = ADDCSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
+current_cpu->hardware.h_vbit = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
 }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8));
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8)));
 }
 
 #undef FLD
@@ -696,28 +564,13 @@ restart:
   SI tmp_result;
   tmp_result = SUBCSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0));
+current_cpu->hardware.h_vbit = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
 }
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8));
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), SUBSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8)));
 }
 
 #undef FLD
@@ -735,19 +588,10 @@ restart:
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 {
-  {
-    SI opval = ANDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), ANDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs))));
 {
-  {
-    BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
+current_cpu->hardware.h_nbit = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
 }
 }
 
@@ -766,19 +610,10 @@ restart:
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 {
-  {
-    SI opval = XORSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), XORSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs))));
 {
-  {
-    BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
+current_cpu->hardware.h_nbit = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
 }
 }
 
@@ -801,25 +636,13 @@ restart:
   SI tmp_result;
   tmp_carry_out = current_cpu->compute_carry_out_regshift (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), SHIFT_TYPE_LSL, current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->hardware.h_cbit);
   tmp_result = SLLSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
-  {
-    SI opval = tmp_result;
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), tmp_result);
 {
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = tmp_carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = tmp_carry_out;
 }
 }
 
@@ -842,25 +665,13 @@ restart:
   SI tmp_result;
   tmp_carry_out = current_cpu->compute_carry_out_regshift (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), SHIFT_TYPE_LSR, current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->hardware.h_cbit);
   tmp_result = SRLSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
-  {
-    SI opval = tmp_result;
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), tmp_result);
 {
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = tmp_carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = tmp_carry_out;
 }
 }
 
@@ -883,25 +694,13 @@ restart:
   SI tmp_result;
   tmp_carry_out = current_cpu->compute_carry_out_regshift (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), SHIFT_TYPE_ASR, current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->hardware.h_cbit);
   tmp_result = SRASI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
-  {
-    SI opval = tmp_result;
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), tmp_result);
 {
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = tmp_carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = tmp_carry_out;
 }
 }
 
@@ -924,25 +723,13 @@ restart:
   SI tmp_result;
   tmp_carry_out = current_cpu->compute_carry_out_regshift (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), SHIFT_TYPE_ROR, current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->hardware.h_cbit);
   tmp_result = RORSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
-  {
-    SI opval = tmp_result;
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), tmp_result);
 {
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = tmp_carry_out;
-    current_cpu->hardware.h_cbit = opval;
-  }
+current_cpu->hardware.h_cbit = tmp_carry_out;
 }
 }
 
@@ -967,28 +754,13 @@ restart:
   SI tmp_result;
   tmp_result = ADDCSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->hardware.h_cbit);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->hardware.h_cbit);
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->hardware.h_cbit);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->hardware.h_cbit);
+current_cpu->hardware.h_vbit = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->hardware.h_cbit);
 }
-  {
-    SI opval = tmp_result;
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), tmp_result);
 }
 
 #undef FLD
@@ -1012,28 +784,13 @@ restart:
   SI tmp_result;
   tmp_result = SUBCSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), NOTBI (current_cpu->hardware.h_cbit));
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), NOTBI (current_cpu->hardware.h_cbit)));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), NOTBI (current_cpu->hardware.h_cbit));
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), NOTBI (current_cpu->hardware.h_cbit)));
+current_cpu->hardware.h_vbit = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), NOTBI (current_cpu->hardware.h_cbit));
 }
-  {
-    SI opval = tmp_result;
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), tmp_result);
 }
 
 #undef FLD
@@ -1054,14 +811,8 @@ restart:
   SI tmp_x;
   tmp_x = ANDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
 {
-  {
-    BI opval = EQSI (tmp_x, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_x, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_x, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_x, 0);
 }
 }
 
@@ -1086,28 +837,13 @@ restart:
   SI tmp_result;
   tmp_result = SUBCSI (0, current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (0, current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (0, current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (0, current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0));
+current_cpu->hardware.h_vbit = SUBOFSI (0, current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
 }
-  {
-    SI opval = tmp_result;
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), tmp_result);
 }
 
 #undef FLD
@@ -1128,23 +864,11 @@ restart:
   SI tmp_result;
   tmp_result = SUBCSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0));
+current_cpu->hardware.h_vbit = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
 }
 
 #undef FLD
@@ -1165,23 +889,11 @@ restart:
   SI tmp_result;
   tmp_result = ADDCSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
+current_cpu->hardware.h_vbit = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
 }
 
 #undef FLD
@@ -1199,19 +911,10 @@ restart:
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 {
-  {
-    SI opval = ORSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), ORSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs))));
 {
-  {
-    BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
+current_cpu->hardware.h_nbit = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
 }
 }
 
@@ -1230,19 +933,10 @@ restart:
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 {
-  {
-    SI opval = MULSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), MULSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs))));
 {
-  {
-    BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
+current_cpu->hardware.h_nbit = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
 }
 }
 
@@ -1261,19 +955,10 @@ restart:
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 {
-  {
-    SI opval = ANDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), INVSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs))));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), ANDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), INVSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)))));
 {
-  {
-    BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
+current_cpu->hardware.h_nbit = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
 }
 }
 
@@ -1292,19 +977,10 @@ restart:
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 {
-  {
-    SI opval = INVSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), INVSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs))));
 {
-  {
-    BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
+current_cpu->hardware.h_nbit = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
 }
 }
 
@@ -1322,10 +998,7 @@ restart:
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs))));
 
 #undef FLD
     }
@@ -1344,15 +1017,9 @@ restart:
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (EQSI (FLD (f_rd), 7)) {
-  {
-    USI opval = ADDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ADDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs))); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
-    current_cpu->thumb_h_hiregs_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_hiregs_set (FLD (f_rd), ADDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs))));
 }
 
       pbb_br_npc = npc;
@@ -1374,15 +1041,9 @@ if (EQSI (FLD (f_rd), 7)) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (EQSI (FLD (f_rd), 7)) {
-  {
-    USI opval = ADDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = ADDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs))); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)));
-    current_cpu->thumb_h_hiregs_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_hiregs_set (FLD (f_rd), ADDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs))));
 }
 
       pbb_br_npc = npc;
@@ -1405,23 +1066,11 @@ if (EQSI (FLD (f_rd), 7)) {
   SI tmp_result;
   tmp_result = SUBCSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 0));
+current_cpu->hardware.h_vbit = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 0);
 }
 
 #undef FLD
@@ -1442,23 +1091,11 @@ if (EQSI (FLD (f_rd), 7)) {
   SI tmp_result;
   tmp_result = SUBCSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0));
+current_cpu->hardware.h_vbit = SUBOFSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
 }
 
 #undef FLD
@@ -1479,23 +1116,11 @@ if (EQSI (FLD (f_rd), 7)) {
   SI tmp_result;
   tmp_result = SUBCSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 0);
 {
-  {
-    BI opval = EQSI (tmp_result, 0);
-    current_cpu->hardware.h_zbit = opval;
-  }
-  {
-    BI opval = LTSI (tmp_result, 0);
-    current_cpu->hardware.h_nbit = opval;
-  }
+current_cpu->hardware.h_zbit = EQSI (tmp_result, 0);
+current_cpu->hardware.h_nbit = LTSI (tmp_result, 0);
 }
-  {
-    BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 0));
-    current_cpu->hardware.h_cbit = opval;
-  }
-  {
-    BI opval = SUBOFSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 0);
-    current_cpu->hardware.h_vbit = opval;
-  }
+current_cpu->hardware.h_cbit = NOTBI (SUBCFSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 0));
+current_cpu->hardware.h_vbit = SUBOFSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 0);
 }
 
 #undef FLD
@@ -1512,10 +1137,7 @@ if (EQSI (FLD (f_rd), 7)) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = current_cpu->thumb_h_hiregs_get (FLD (f_rs));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), current_cpu->thumb_h_hiregs_get (FLD (f_rs)));
 
 #undef FLD
     }
@@ -1534,15 +1156,9 @@ if (EQSI (FLD (f_rd), 7)) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (EQSI (FLD (f_rd), 7)) {
-  {
-    USI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rs));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->thumb_h_gr_t_get (FLD (f_rs)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rs));
-    current_cpu->thumb_h_hiregs_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_hiregs_set (FLD (f_rd), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
 }
 
       pbb_br_npc = npc;
@@ -1564,15 +1180,9 @@ if (EQSI (FLD (f_rd), 7)) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (EQSI (FLD (f_rd), 7)) {
-  {
-    USI opval = current_cpu->thumb_h_hiregs_get (FLD (f_rs));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->thumb_h_hiregs_get (FLD (f_rs)); br_status = BRANCH_UNCACHEABLE;
 } else {
-  {
-    SI opval = current_cpu->thumb_h_hiregs_get (FLD (f_rs));
-    current_cpu->thumb_h_hiregs_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_hiregs_set (FLD (f_rd), current_cpu->thumb_h_hiregs_get (FLD (f_rs)));
 }
 
       pbb_br_npc = npc;
@@ -1594,15 +1204,9 @@ if (EQSI (FLD (f_rd), 7)) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 {
-  {
-    USI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rs));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->thumb_h_gr_t_get (FLD (f_rs)); br_status = BRANCH_UNCACHEABLE;
 if (NOTSI (ANDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 1))) {
-  {
-    BI opval = 0;
-    current_cpu->h_tbit_set (opval);
-  }
+current_cpu->h_tbit_set (0);
 }
 }
 
@@ -1625,15 +1229,9 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 1))) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 {
-  {
-    USI opval = current_cpu->thumb_h_hiregs_get (FLD (f_rs));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->thumb_h_hiregs_get (FLD (f_rs)); br_status = BRANCH_UNCACHEABLE;
 if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
-  {
-    BI opval = 0;
-    current_cpu->h_tbit_set (opval);
-  }
+current_cpu->h_tbit_set (0);
 }
 }
 
@@ -1653,10 +1251,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = current_cpu->GETMEMSI (pc, ADDSI (ANDSI (ADDSI (pc, 4), -4), FLD (f_word8)));
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), current_cpu->GETMEMSI (pc, ADDSI (ANDSI (ADDSI (pc, 4), -4), FLD (f_word8))));
 
 #undef FLD
     }
@@ -1672,10 +1267,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rd));
-    current_cpu->SETMEMSI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))), opval);
-  }
+current_cpu->SETMEMSI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))), current_cpu->thumb_h_gr_t_get (FLD (f_rd)));
 
 #undef FLD
     }
@@ -1691,10 +1283,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    QI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rd));
-    current_cpu->SETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))), opval);
-  }
+current_cpu->SETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))), current_cpu->thumb_h_gr_t_get (FLD (f_rd)));
 
 #undef FLD
     }
@@ -1710,10 +1299,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = current_cpu->GETMEMSI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), current_cpu->GETMEMSI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro)))));
 
 #undef FLD
     }
@@ -1729,10 +1315,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro)))));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), ZEXTQISI (current_cpu->GETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))))));
 
 #undef FLD
     }
@@ -1748,10 +1331,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    HI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rd));
-    current_cpu->SETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))), opval);
-  }
+current_cpu->SETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))), current_cpu->thumb_h_gr_t_get (FLD (f_rd)));
 
 #undef FLD
     }
@@ -1767,10 +1347,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro)))));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), ZEXTHISI (current_cpu->GETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))))));
 
 #undef FLD
     }
@@ -1786,10 +1363,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = EXTQISI (current_cpu->GETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro)))));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), EXTQISI (current_cpu->GETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))))));
 
 #undef FLD
     }
@@ -1805,10 +1379,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = EXTHISI (current_cpu->GETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro)))));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), EXTHISI (current_cpu->GETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))))));
 
 #undef FLD
     }
@@ -1824,10 +1395,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rd));
-    current_cpu->SETMEMSI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5_7)), opval);
-  }
+current_cpu->SETMEMSI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5_7)), current_cpu->thumb_h_gr_t_get (FLD (f_rd)));
 
 #undef FLD
     }
@@ -1843,10 +1411,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = current_cpu->GETMEMSI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5_7)));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), current_cpu->GETMEMSI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5_7))));
 
 #undef FLD
     }
@@ -1862,10 +1427,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    QI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rd));
-    current_cpu->SETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5)), opval);
-  }
+current_cpu->SETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5)), current_cpu->thumb_h_gr_t_get (FLD (f_rd)));
 
 #undef FLD
     }
@@ -1881,10 +1443,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5))));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), ZEXTQISI (current_cpu->GETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5)))));
 
 #undef FLD
     }
@@ -1900,10 +1459,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    HI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rd));
-    current_cpu->SETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5_6)), opval);
-  }
+current_cpu->SETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5_6)), current_cpu->thumb_h_gr_t_get (FLD (f_rd)));
 
 #undef FLD
     }
@@ -1919,10 +1475,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5_6))));
-    current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_rd), ZEXTHISI (current_cpu->GETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5_6)))));
 
 #undef FLD
     }
@@ -1938,10 +1491,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd));
-    current_cpu->SETMEMSI (pc, ADDSI (current_cpu->thumb_h_sp_t_get (), FLD (f_word8)), opval);
-  }
+current_cpu->SETMEMSI (pc, ADDSI (current_cpu->thumb_h_sp_t_get (), FLD (f_word8)), current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)));
 
 #undef FLD
     }
@@ -1957,10 +1507,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = current_cpu->GETMEMSI (pc, ADDSI (current_cpu->thumb_h_sp_t_get (), FLD (f_word8)));
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), current_cpu->GETMEMSI (pc, ADDSI (current_cpu->thumb_h_sp_t_get (), FLD (f_word8))));
 
 #undef FLD
     }
@@ -1976,10 +1523,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = ADDSI (ANDSI (ADDSI (pc, 4), -4), FLD (f_word8));
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), ADDSI (ANDSI (ADDSI (pc, 4), -4), FLD (f_word8)));
 
 #undef FLD
     }
@@ -1995,10 +1539,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), FLD (f_word8));
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), opval);
-  }
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), ADDSI (current_cpu->thumb_h_sp_t_get (), FLD (f_word8)));
 
 #undef FLD
     }
@@ -2014,10 +1555,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), FLD (f_sword7));
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), FLD (f_sword7)));
 
 #undef FLD
     }
@@ -2033,10 +1571,7 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), FLD (f_sword7));
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), FLD (f_sword7)));
 
 #undef FLD
     }
@@ -2055,98 +1590,50 @@ if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
 {
 if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 7));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 7)));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 6))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 6));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 6)));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 5))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 5));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 5)));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 4))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 4));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 4)));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 3))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 3));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 3)));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 2))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 2));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 2)));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 1))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 1));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 1)));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 0))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 0));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 0)));
 }
 }
 }
@@ -2166,108 +1653,54 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 0))) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_lr_t_get ();
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_lr_t_get ());
 if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 7));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 7)));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 6))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 6));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 6)));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 5))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 5));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 5)));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 4))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 4));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 4)));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 3))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 3));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 3)));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 2))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 2));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 2)));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 1))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 1));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 1)));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 0))) {
 {
-  {
-    SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 0));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-  }
+current_cpu->thumb_h_sp_t_set (SUBSI (current_cpu->thumb_h_sp_t_get (), 4));
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), current_cpu->thumb_h_gr_t_get (((UINT) 0)));
 }
 }
 }
@@ -2289,98 +1722,50 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 0))) {
 {
 if (ANDSI (FLD (f_rlist), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 0), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 0), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 1), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 1), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 2), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 2), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 3), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 3), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 4), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 4), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 5), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 5), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 6), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 6), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 7), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 7), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 }
@@ -2404,108 +1789,54 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
 {
 if (ANDSI (FLD (f_rlist), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 0), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 0), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 1), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 1), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 2), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 2), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 3), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 3), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 4), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 4), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 5), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 5), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 6), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 6), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    current_cpu->thumb_h_gr_t_set (((UINT) 7), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 7), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()));
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 }
-  {
-    USI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
-    current_cpu->thumb_h_sp_t_set (opval);
-  }
+npc = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ()); br_status = BRANCH_UNCACHEABLE;
+current_cpu->thumb_h_sp_t_set (ADDSI (current_cpu->thumb_h_sp_t_get (), 4));
 }
 
       pbb_br_npc = npc;
@@ -2527,98 +1858,50 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
 {
 if (ANDSI (FLD (f_rlist), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 0));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), current_cpu->thumb_h_gr_t_get (((UINT) 0)));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 1));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), current_cpu->thumb_h_gr_t_get (((UINT) 1)));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 2));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), current_cpu->thumb_h_gr_t_get (((UINT) 2)));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 3));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), current_cpu->thumb_h_gr_t_get (((UINT) 3)));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 4));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), current_cpu->thumb_h_gr_t_get (((UINT) 4)));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 5));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), current_cpu->thumb_h_gr_t_get (((UINT) 5)));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 6));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), current_cpu->thumb_h_gr_t_get (((UINT) 6)));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 7));
-    current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), current_cpu->thumb_h_gr_t_get (((UINT) 7)));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 }
@@ -2640,98 +1923,50 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
 {
 if (ANDSI (FLD (f_rlist), SLLSI (1, 0))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
-    current_cpu->thumb_h_gr_t_set (((UINT) 0), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 0), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb))));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 1))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
-    current_cpu->thumb_h_gr_t_set (((UINT) 1), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 1), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb))));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 2))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
-    current_cpu->thumb_h_gr_t_set (((UINT) 2), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 2), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb))));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 3))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
-    current_cpu->thumb_h_gr_t_set (((UINT) 3), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 3), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb))));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 4))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
-    current_cpu->thumb_h_gr_t_set (((UINT) 4), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 4), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb))));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 5))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
-    current_cpu->thumb_h_gr_t_set (((UINT) 5), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 5), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb))));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 6))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
-    current_cpu->thumb_h_gr_t_set (((UINT) 6), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 6), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb))));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
 {
-  {
-    SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
-    current_cpu->thumb_h_gr_t_set (((UINT) 7), opval);
-  }
-  {
-    SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
-    current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-  }
+current_cpu->thumb_h_gr_t_set (((UINT) 7), current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb))));
+current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4));
 }
 }
 }
@@ -2753,10 +1988,7 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (current_cpu->hardware.h_zbit) {
-  {
-    USI opval = FLD (i_soffset8);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_soffset8); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -2778,10 +2010,7 @@ if (current_cpu->hardware.h_zbit) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (NOTBI (current_cpu->hardware.h_zbit)) {
-  {
-    USI opval = FLD (i_soffset8);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_soffset8); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -2803,10 +2032,7 @@ if (NOTBI (current_cpu->hardware.h_zbit)) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (current_cpu->hardware.h_cbit) {
-  {
-    USI opval = FLD (i_soffset8);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_soffset8); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -2828,10 +2054,7 @@ if (current_cpu->hardware.h_cbit) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (NOTBI (current_cpu->hardware.h_cbit)) {
-  {
-    USI opval = FLD (i_soffset8);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_soffset8); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -2853,10 +2076,7 @@ if (NOTBI (current_cpu->hardware.h_cbit)) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (current_cpu->hardware.h_nbit) {
-  {
-    USI opval = FLD (i_soffset8);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_soffset8); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -2878,10 +2098,7 @@ if (current_cpu->hardware.h_nbit) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (NOTBI (current_cpu->hardware.h_nbit)) {
-  {
-    USI opval = FLD (i_soffset8);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_soffset8); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -2903,10 +2120,7 @@ if (NOTBI (current_cpu->hardware.h_nbit)) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (current_cpu->hardware.h_vbit) {
-  {
-    USI opval = FLD (i_soffset8);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_soffset8); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -2928,10 +2142,7 @@ if (current_cpu->hardware.h_vbit) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (NOTBI (current_cpu->hardware.h_vbit)) {
-  {
-    USI opval = FLD (i_soffset8);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_soffset8); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -2953,10 +2164,7 @@ if (NOTBI (current_cpu->hardware.h_vbit)) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (ANDBI (current_cpu->hardware.h_cbit, NOTBI (current_cpu->hardware.h_zbit))) {
-  {
-    USI opval = FLD (i_soffset8);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_soffset8); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -2978,10 +2186,7 @@ if (ANDBI (current_cpu->hardware.h_cbit, NOTBI (current_cpu->hardware.h_zbit))) 
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (ORBI (NOTBI (current_cpu->hardware.h_cbit), current_cpu->hardware.h_zbit)) {
-  {
-    USI opval = FLD (i_soffset8);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_soffset8); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -3003,10 +2208,7 @@ if (ORBI (NOTBI (current_cpu->hardware.h_cbit), current_cpu->hardware.h_zbit)) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (NOTBI (XORBI (current_cpu->hardware.h_nbit, current_cpu->hardware.h_vbit))) {
-  {
-    USI opval = FLD (i_soffset8);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_soffset8); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -3028,10 +2230,7 @@ if (NOTBI (XORBI (current_cpu->hardware.h_nbit, current_cpu->hardware.h_vbit))) 
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (XORBI (current_cpu->hardware.h_nbit, current_cpu->hardware.h_vbit)) {
-  {
-    USI opval = FLD (i_soffset8);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_soffset8); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -3053,10 +2252,7 @@ if (XORBI (current_cpu->hardware.h_nbit, current_cpu->hardware.h_vbit)) {
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (NOTBI (ORBI (current_cpu->hardware.h_zbit, XORBI (current_cpu->hardware.h_nbit, current_cpu->hardware.h_vbit)))) {
-  {
-    USI opval = FLD (i_soffset8);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_soffset8); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -3078,10 +2274,7 @@ if (NOTBI (ORBI (current_cpu->hardware.h_zbit, XORBI (current_cpu->hardware.h_nb
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
 if (ORBI (current_cpu->hardware.h_zbit, XORBI (current_cpu->hardware.h_nbit, current_cpu->hardware.h_vbit))) {
-  {
-    USI opval = FLD (i_soffset8);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_soffset8); br_status = BRANCH_CACHEABLE;
 }
 
       pbb_br_npc = npc;
@@ -3102,10 +2295,7 @@ if (ORBI (current_cpu->hardware.h_zbit, XORBI (current_cpu->hardware.h_nbit, cur
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    USI opval = current_cpu->thumb_swi (pc, FLD (f_value8));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
+npc = current_cpu->thumb_swi (pc, FLD (f_value8)); br_status = BRANCH_UNCACHEABLE;
 
       pbb_br_npc = npc;
       pbb_br_status = br_status;
@@ -3125,10 +2315,7 @@ if (ORBI (current_cpu->hardware.h_zbit, XORBI (current_cpu->hardware.h_nbit, cur
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    USI opval = FLD (i_offset11);
-    npc = opval; br_status = BRANCH_CACHEABLE;
-  }
+npc = FLD (i_offset11); br_status = BRANCH_CACHEABLE;
 
       pbb_br_npc = npc;
       pbb_br_status = br_status;
@@ -3146,10 +2333,7 @@ if (ORBI (current_cpu->hardware.h_zbit, XORBI (current_cpu->hardware.h_nbit, cur
       vpc = vpc + 1;
       current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, 4);
 
-  {
-    SI opval = ADDSI (ADDSI (pc, 4), SLLSI (FLD (f_lbwl_hi), 12));
-    current_cpu->thumb_h_lr_t_set (opval);
-  }
+current_cpu->thumb_h_lr_t_set (ADDSI (ADDSI (pc, 4), SLLSI (FLD (f_lbwl_hi), 12)));
 
 #undef FLD
     }
@@ -3170,14 +2354,8 @@ if (ORBI (current_cpu->hardware.h_zbit, XORBI (current_cpu->hardware.h_nbit, cur
 {
   SI tmp_cur_pc;
   tmp_cur_pc = pc;
-  {
-    USI opval = ADDSI (current_cpu->thumb_h_lr_t_get (), SLLSI (FLD (f_lbwl_lo), 1));
-    npc = opval; br_status = BRANCH_UNCACHEABLE;
-  }
-  {
-    SI opval = ORSI (ADDSI (tmp_cur_pc, 2), 1);
-    current_cpu->thumb_h_lr_t_set (opval);
-  }
+npc = ADDSI (current_cpu->thumb_h_lr_t_get (), SLLSI (FLD (f_lbwl_lo), 1)); br_status = BRANCH_UNCACHEABLE;
+current_cpu->thumb_h_lr_t_set (ORSI (ADDSI (tmp_cur_pc, 2), 1));
 }
 
       pbb_br_npc = npc;

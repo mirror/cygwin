@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -115,7 +115,7 @@ current_cpu->hardware.h_pc = ANDDI (newval, INVDI (1));
 }
  }
 
-  inline DI h_gr_get (UINT regno) const { return ((((regno) == (63))) ? (0) : (current_cpu->hardware.h_gr[regno])); }
+  inline DI h_gr_get (UINT regno) const { return ((((regno) == (63))) ? (MAKEDI (0, 0)) : (current_cpu->hardware.h_gr[regno])); }
   inline void h_gr_set (UINT regno, DI newval) { if (((regno) != (63))) {
 current_cpu->hardware.h_gr[regno] = newval;
 } else {

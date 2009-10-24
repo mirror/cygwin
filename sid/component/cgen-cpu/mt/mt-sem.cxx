@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -807,7 +807,7 @@ mt_sem_brlt (mt_cpu* current_cpu, mt_scache* sem, const int tick,
   PCADDR npc = pc + 4;
 
 {
-if (LTSI (current_cpu->hardware.h_spr[FLD (f_sr1)], current_cpu->hardware.h_spr[FLD (f_sr2)])) {
+if (LTUSI (current_cpu->hardware.h_spr[FLD (f_sr1)], current_cpu->hardware.h_spr[FLD (f_sr2)])) {
   {
     USI opval = ADDSI (pc, EXTSISI (FLD (f_imm16s)));
     buf.h_pc_writes [(tick + 1) % mt::pipe_sz].push (mt::write<USI>(pc, opval));
@@ -835,7 +835,7 @@ mt_sem_brle (mt_cpu* current_cpu, mt_scache* sem, const int tick,
   PCADDR npc = pc + 4;
 
 {
-if (LESI (current_cpu->hardware.h_spr[FLD (f_sr1)], current_cpu->hardware.h_spr[FLD (f_sr2)])) {
+if (LEUSI (current_cpu->hardware.h_spr[FLD (f_sr1)], current_cpu->hardware.h_spr[FLD (f_sr2)])) {
   {
     USI opval = ADDSI (pc, EXTSISI (FLD (f_imm16s)));
     buf.h_pc_writes [(tick + 1) % mt::pipe_sz].push (mt::write<USI>(pc, opval));

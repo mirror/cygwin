@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -27,221 +27,221 @@ bool arm_idesc::idesc_table_initialized_p = false;
 
 arm_idesc arm_idesc::idesc_table[ARM_INSN_MSR_S + 1] =
 {
-  { 0, 0, "X_COND", ARM_INSN_X_COND, { 0|(1<<CGEN_INSN_PBB)|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, 0, "X_AFTER", ARM_INSN_X_AFTER, { 0|(1<<CGEN_INSN_PBB)|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, 0, "X_BEFORE", ARM_INSN_X_BEFORE, { 0|(1<<CGEN_INSN_PBB)|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, 0, "X_CTI_CHAIN", ARM_INSN_X_CTI_CHAIN, { 0|(1<<CGEN_INSN_PBB)|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, 0, "X_CHAIN", ARM_INSN_X_CHAIN, { 0|(1<<CGEN_INSN_PBB)|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, 0, "X_BEGIN", ARM_INSN_X_BEGIN, { 0|(1<<CGEN_INSN_PBB)|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_x_invalid, "X_INVALID", ARM_INSN_X_INVALID, { 0|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_b, "B", ARM_INSN_B, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_bl, "BL", ARM_INSN_BL, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_bx, "BX", ARM_INSN_BX, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_post_dec_imm_offset, "LDR_POST_DEC_IMM_OFFSET", ARM_INSN_LDR_POST_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_post_dec_reg_offset, "LDR_POST_DEC_REG_OFFSET", ARM_INSN_LDR_POST_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_post_inc_imm_offset, "LDR_POST_INC_IMM_OFFSET", ARM_INSN_LDR_POST_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_post_inc_reg_offset, "LDR_POST_INC_REG_OFFSET", ARM_INSN_LDR_POST_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_post_dec_nonpriv_imm_offset, "LDR_POST_DEC_NONPRIV_IMM_OFFSET", ARM_INSN_LDR_POST_DEC_NONPRIV_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_post_dec_nonpriv_reg_offset, "LDR_POST_DEC_NONPRIV_REG_OFFSET", ARM_INSN_LDR_POST_DEC_NONPRIV_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_post_inc_nonpriv_imm_offset, "LDR_POST_INC_NONPRIV_IMM_OFFSET", ARM_INSN_LDR_POST_INC_NONPRIV_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_post_inc_nonpriv_reg_offset, "LDR_POST_INC_NONPRIV_REG_OFFSET", ARM_INSN_LDR_POST_INC_NONPRIV_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_pre_dec_imm_offset, "LDR_PRE_DEC_IMM_OFFSET", ARM_INSN_LDR_PRE_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_pre_dec_reg_offset, "LDR_PRE_DEC_REG_OFFSET", ARM_INSN_LDR_PRE_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_pre_inc_imm_offset, "LDR_PRE_INC_IMM_OFFSET", ARM_INSN_LDR_PRE_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_pre_inc_reg_offset, "LDR_PRE_INC_REG_OFFSET", ARM_INSN_LDR_PRE_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_pre_dec_wb_imm_offset, "LDR_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_LDR_PRE_DEC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_pre_dec_wb_reg_offset, "LDR_PRE_DEC_WB_REG_OFFSET", ARM_INSN_LDR_PRE_DEC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_pre_inc_wb_imm_offset, "LDR_PRE_INC_WB_IMM_OFFSET", ARM_INSN_LDR_PRE_INC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldr_pre_inc_wb_reg_offset, "LDR_PRE_INC_WB_REG_OFFSET", ARM_INSN_LDR_PRE_INC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_post_dec_imm_offset, "LDRB_POST_DEC_IMM_OFFSET", ARM_INSN_LDRB_POST_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_post_dec_reg_offset, "LDRB_POST_DEC_REG_OFFSET", ARM_INSN_LDRB_POST_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_post_inc_imm_offset, "LDRB_POST_INC_IMM_OFFSET", ARM_INSN_LDRB_POST_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_post_inc_reg_offset, "LDRB_POST_INC_REG_OFFSET", ARM_INSN_LDRB_POST_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_post_dec_nonpriv_imm_offset, "LDRB_POST_DEC_NONPRIV_IMM_OFFSET", ARM_INSN_LDRB_POST_DEC_NONPRIV_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_post_dec_nonpriv_reg_offset, "LDRB_POST_DEC_NONPRIV_REG_OFFSET", ARM_INSN_LDRB_POST_DEC_NONPRIV_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_post_inc_nonpriv_imm_offset, "LDRB_POST_INC_NONPRIV_IMM_OFFSET", ARM_INSN_LDRB_POST_INC_NONPRIV_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_post_inc_nonpriv_reg_offset, "LDRB_POST_INC_NONPRIV_REG_OFFSET", ARM_INSN_LDRB_POST_INC_NONPRIV_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_pre_dec_imm_offset, "LDRB_PRE_DEC_IMM_OFFSET", ARM_INSN_LDRB_PRE_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_pre_dec_reg_offset, "LDRB_PRE_DEC_REG_OFFSET", ARM_INSN_LDRB_PRE_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_pre_inc_imm_offset, "LDRB_PRE_INC_IMM_OFFSET", ARM_INSN_LDRB_PRE_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_pre_inc_reg_offset, "LDRB_PRE_INC_REG_OFFSET", ARM_INSN_LDRB_PRE_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_pre_dec_wb_imm_offset, "LDRB_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_LDRB_PRE_DEC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_pre_dec_wb_reg_offset, "LDRB_PRE_DEC_WB_REG_OFFSET", ARM_INSN_LDRB_PRE_DEC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_pre_inc_wb_imm_offset, "LDRB_PRE_INC_WB_IMM_OFFSET", ARM_INSN_LDRB_PRE_INC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrb_pre_inc_wb_reg_offset, "LDRB_PRE_INC_WB_REG_OFFSET", ARM_INSN_LDRB_PRE_INC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_post_dec_imm_offset, "STR_POST_DEC_IMM_OFFSET", ARM_INSN_STR_POST_DEC_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_post_dec_reg_offset, "STR_POST_DEC_REG_OFFSET", ARM_INSN_STR_POST_DEC_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_post_inc_imm_offset, "STR_POST_INC_IMM_OFFSET", ARM_INSN_STR_POST_INC_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_post_inc_reg_offset, "STR_POST_INC_REG_OFFSET", ARM_INSN_STR_POST_INC_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_post_dec_nonpriv_imm_offset, "STR_POST_DEC_NONPRIV_IMM_OFFSET", ARM_INSN_STR_POST_DEC_NONPRIV_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_post_dec_nonpriv_reg_offset, "STR_POST_DEC_NONPRIV_REG_OFFSET", ARM_INSN_STR_POST_DEC_NONPRIV_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_post_inc_nonpriv_imm_offset, "STR_POST_INC_NONPRIV_IMM_OFFSET", ARM_INSN_STR_POST_INC_NONPRIV_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_post_inc_nonpriv_reg_offset, "STR_POST_INC_NONPRIV_REG_OFFSET", ARM_INSN_STR_POST_INC_NONPRIV_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_pre_dec_imm_offset, "STR_PRE_DEC_IMM_OFFSET", ARM_INSN_STR_PRE_DEC_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_pre_dec_reg_offset, "STR_PRE_DEC_REG_OFFSET", ARM_INSN_STR_PRE_DEC_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_pre_inc_imm_offset, "STR_PRE_INC_IMM_OFFSET", ARM_INSN_STR_PRE_INC_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_pre_inc_reg_offset, "STR_PRE_INC_REG_OFFSET", ARM_INSN_STR_PRE_INC_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_pre_dec_wb_imm_offset, "STR_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_STR_PRE_DEC_WB_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_pre_dec_wb_reg_offset, "STR_PRE_DEC_WB_REG_OFFSET", ARM_INSN_STR_PRE_DEC_WB_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_pre_inc_wb_imm_offset, "STR_PRE_INC_WB_IMM_OFFSET", ARM_INSN_STR_PRE_INC_WB_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_str_pre_inc_wb_reg_offset, "STR_PRE_INC_WB_REG_OFFSET", ARM_INSN_STR_PRE_INC_WB_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_post_dec_imm_offset, "STRB_POST_DEC_IMM_OFFSET", ARM_INSN_STRB_POST_DEC_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_post_dec_reg_offset, "STRB_POST_DEC_REG_OFFSET", ARM_INSN_STRB_POST_DEC_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_post_inc_imm_offset, "STRB_POST_INC_IMM_OFFSET", ARM_INSN_STRB_POST_INC_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_post_inc_reg_offset, "STRB_POST_INC_REG_OFFSET", ARM_INSN_STRB_POST_INC_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_post_dec_nonpriv_imm_offset, "STRB_POST_DEC_NONPRIV_IMM_OFFSET", ARM_INSN_STRB_POST_DEC_NONPRIV_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_post_dec_nonpriv_reg_offset, "STRB_POST_DEC_NONPRIV_REG_OFFSET", ARM_INSN_STRB_POST_DEC_NONPRIV_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_post_inc_nonpriv_imm_offset, "STRB_POST_INC_NONPRIV_IMM_OFFSET", ARM_INSN_STRB_POST_INC_NONPRIV_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_post_inc_nonpriv_reg_offset, "STRB_POST_INC_NONPRIV_REG_OFFSET", ARM_INSN_STRB_POST_INC_NONPRIV_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_pre_dec_imm_offset, "STRB_PRE_DEC_IMM_OFFSET", ARM_INSN_STRB_PRE_DEC_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_pre_dec_reg_offset, "STRB_PRE_DEC_REG_OFFSET", ARM_INSN_STRB_PRE_DEC_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_pre_inc_imm_offset, "STRB_PRE_INC_IMM_OFFSET", ARM_INSN_STRB_PRE_INC_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_pre_inc_reg_offset, "STRB_PRE_INC_REG_OFFSET", ARM_INSN_STRB_PRE_INC_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_pre_dec_wb_imm_offset, "STRB_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_STRB_PRE_DEC_WB_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_pre_dec_wb_reg_offset, "STRB_PRE_DEC_WB_REG_OFFSET", ARM_INSN_STRB_PRE_DEC_WB_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_pre_inc_wb_imm_offset, "STRB_PRE_INC_WB_IMM_OFFSET", ARM_INSN_STRB_PRE_INC_WB_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strb_pre_inc_wb_reg_offset, "STRB_PRE_INC_WB_REG_OFFSET", ARM_INSN_STRB_PRE_INC_WB_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strh_pre_dec_imm_offset, "STRH_PRE_DEC_IMM_OFFSET", ARM_INSN_STRH_PRE_DEC_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strh_pre_dec_reg_offset, "STRH_PRE_DEC_REG_OFFSET", ARM_INSN_STRH_PRE_DEC_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strh_pre_inc_imm_offset, "STRH_PRE_INC_IMM_OFFSET", ARM_INSN_STRH_PRE_INC_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strh_pre_inc_reg_offset, "STRH_PRE_INC_REG_OFFSET", ARM_INSN_STRH_PRE_INC_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strh_pre_dec_wb_imm_offset, "STRH_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_STRH_PRE_DEC_WB_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strh_pre_dec_wb_reg_offset, "STRH_PRE_DEC_WB_REG_OFFSET", ARM_INSN_STRH_PRE_DEC_WB_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strh_pre_inc_wb_imm_offset, "STRH_PRE_INC_WB_IMM_OFFSET", ARM_INSN_STRH_PRE_INC_WB_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strh_pre_inc_wb_reg_offset, "STRH_PRE_INC_WB_REG_OFFSET", ARM_INSN_STRH_PRE_INC_WB_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strh_post_dec_imm_offset, "STRH_POST_DEC_IMM_OFFSET", ARM_INSN_STRH_POST_DEC_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strh_post_dec_reg_offset, "STRH_POST_DEC_REG_OFFSET", ARM_INSN_STRH_POST_DEC_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strh_post_inc_imm_offset, "STRH_POST_INC_IMM_OFFSET", ARM_INSN_STRH_POST_INC_IMM_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_strh_post_inc_reg_offset, "STRH_POST_INC_REG_OFFSET", ARM_INSN_STRH_POST_INC_REG_OFFSET, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsb_pre_dec_imm_offset, "LDRSB_PRE_DEC_IMM_OFFSET", ARM_INSN_LDRSB_PRE_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsb_pre_dec_reg_offset, "LDRSB_PRE_DEC_REG_OFFSET", ARM_INSN_LDRSB_PRE_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsb_pre_inc_imm_offset, "LDRSB_PRE_INC_IMM_OFFSET", ARM_INSN_LDRSB_PRE_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsb_pre_inc_reg_offset, "LDRSB_PRE_INC_REG_OFFSET", ARM_INSN_LDRSB_PRE_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsb_pre_dec_wb_imm_offset, "LDRSB_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_LDRSB_PRE_DEC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsb_pre_dec_wb_reg_offset, "LDRSB_PRE_DEC_WB_REG_OFFSET", ARM_INSN_LDRSB_PRE_DEC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsb_pre_inc_wb_imm_offset, "LDRSB_PRE_INC_WB_IMM_OFFSET", ARM_INSN_LDRSB_PRE_INC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsb_pre_inc_wb_reg_offset, "LDRSB_PRE_INC_WB_REG_OFFSET", ARM_INSN_LDRSB_PRE_INC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsb_post_dec_imm_offset, "LDRSB_POST_DEC_IMM_OFFSET", ARM_INSN_LDRSB_POST_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsb_post_dec_reg_offset, "LDRSB_POST_DEC_REG_OFFSET", ARM_INSN_LDRSB_POST_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsb_post_inc_imm_offset, "LDRSB_POST_INC_IMM_OFFSET", ARM_INSN_LDRSB_POST_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsb_post_inc_reg_offset, "LDRSB_POST_INC_REG_OFFSET", ARM_INSN_LDRSB_POST_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrh_pre_dec_imm_offset, "LDRH_PRE_DEC_IMM_OFFSET", ARM_INSN_LDRH_PRE_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrh_pre_dec_reg_offset, "LDRH_PRE_DEC_REG_OFFSET", ARM_INSN_LDRH_PRE_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrh_pre_inc_imm_offset, "LDRH_PRE_INC_IMM_OFFSET", ARM_INSN_LDRH_PRE_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrh_pre_inc_reg_offset, "LDRH_PRE_INC_REG_OFFSET", ARM_INSN_LDRH_PRE_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrh_pre_dec_wb_imm_offset, "LDRH_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_LDRH_PRE_DEC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrh_pre_dec_wb_reg_offset, "LDRH_PRE_DEC_WB_REG_OFFSET", ARM_INSN_LDRH_PRE_DEC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrh_pre_inc_wb_imm_offset, "LDRH_PRE_INC_WB_IMM_OFFSET", ARM_INSN_LDRH_PRE_INC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrh_pre_inc_wb_reg_offset, "LDRH_PRE_INC_WB_REG_OFFSET", ARM_INSN_LDRH_PRE_INC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrh_post_dec_imm_offset, "LDRH_POST_DEC_IMM_OFFSET", ARM_INSN_LDRH_POST_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrh_post_dec_reg_offset, "LDRH_POST_DEC_REG_OFFSET", ARM_INSN_LDRH_POST_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrh_post_inc_imm_offset, "LDRH_POST_INC_IMM_OFFSET", ARM_INSN_LDRH_POST_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrh_post_inc_reg_offset, "LDRH_POST_INC_REG_OFFSET", ARM_INSN_LDRH_POST_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsh_pre_dec_imm_offset, "LDRSH_PRE_DEC_IMM_OFFSET", ARM_INSN_LDRSH_PRE_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsh_pre_dec_reg_offset, "LDRSH_PRE_DEC_REG_OFFSET", ARM_INSN_LDRSH_PRE_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsh_pre_inc_imm_offset, "LDRSH_PRE_INC_IMM_OFFSET", ARM_INSN_LDRSH_PRE_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsh_pre_inc_reg_offset, "LDRSH_PRE_INC_REG_OFFSET", ARM_INSN_LDRSH_PRE_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsh_pre_dec_wb_imm_offset, "LDRSH_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_LDRSH_PRE_DEC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsh_pre_dec_wb_reg_offset, "LDRSH_PRE_DEC_WB_REG_OFFSET", ARM_INSN_LDRSH_PRE_DEC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsh_pre_inc_wb_imm_offset, "LDRSH_PRE_INC_WB_IMM_OFFSET", ARM_INSN_LDRSH_PRE_INC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsh_pre_inc_wb_reg_offset, "LDRSH_PRE_INC_WB_REG_OFFSET", ARM_INSN_LDRSH_PRE_INC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsh_post_dec_imm_offset, "LDRSH_POST_DEC_IMM_OFFSET", ARM_INSN_LDRSH_POST_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsh_post_dec_reg_offset, "LDRSH_POST_DEC_REG_OFFSET", ARM_INSN_LDRSH_POST_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsh_post_inc_imm_offset, "LDRSH_POST_INC_IMM_OFFSET", ARM_INSN_LDRSH_POST_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldrsh_post_inc_reg_offset, "LDRSH_POST_INC_REG_OFFSET", ARM_INSN_LDRSH_POST_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_mul, "MUL", ARM_INSN_MUL, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_mla, "MLA", ARM_INSN_MLA, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_umull, "UMULL", ARM_INSN_UMULL, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_umlal, "UMLAL", ARM_INSN_UMLAL, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_smull, "SMULL", ARM_INSN_SMULL, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_smlal, "SMLAL", ARM_INSN_SMLAL, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_swp, "SWP", ARM_INSN_SWP, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_swpb, "SWPB", ARM_INSN_SWPB, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_swi, "SWI", ARM_INSN_SWI, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_and_reg_imm_shift, "AND_REG_IMM_SHIFT", ARM_INSN_AND_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_and_reg_reg_shift, "AND_REG_REG_SHIFT", ARM_INSN_AND_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_and_imm, "AND_IMM", ARM_INSN_AND_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_orr_reg_imm_shift, "ORR_REG_IMM_SHIFT", ARM_INSN_ORR_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_orr_reg_reg_shift, "ORR_REG_REG_SHIFT", ARM_INSN_ORR_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_orr_imm, "ORR_IMM", ARM_INSN_ORR_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_eor_reg_imm_shift, "EOR_REG_IMM_SHIFT", ARM_INSN_EOR_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_eor_reg_reg_shift, "EOR_REG_REG_SHIFT", ARM_INSN_EOR_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_eor_imm, "EOR_IMM", ARM_INSN_EOR_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_mov_reg_imm_shift, "MOV_REG_IMM_SHIFT", ARM_INSN_MOV_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_mov_reg_reg_shift, "MOV_REG_REG_SHIFT", ARM_INSN_MOV_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_mov_imm, "MOV_IMM", ARM_INSN_MOV_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_bic_reg_imm_shift, "BIC_REG_IMM_SHIFT", ARM_INSN_BIC_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_bic_reg_reg_shift, "BIC_REG_REG_SHIFT", ARM_INSN_BIC_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_bic_imm, "BIC_IMM", ARM_INSN_BIC_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_mvn_reg_imm_shift, "MVN_REG_IMM_SHIFT", ARM_INSN_MVN_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_mvn_reg_reg_shift, "MVN_REG_REG_SHIFT", ARM_INSN_MVN_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_mvn_imm, "MVN_IMM", ARM_INSN_MVN_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_add_reg_imm_shift, "ADD_REG_IMM_SHIFT", ARM_INSN_ADD_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_add_reg_reg_shift, "ADD_REG_REG_SHIFT", ARM_INSN_ADD_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_add_imm, "ADD_IMM", ARM_INSN_ADD_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_adc_reg_imm_shift, "ADC_REG_IMM_SHIFT", ARM_INSN_ADC_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_adc_reg_reg_shift, "ADC_REG_REG_SHIFT", ARM_INSN_ADC_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_adc_imm, "ADC_IMM", ARM_INSN_ADC_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_sub_reg_imm_shift, "SUB_REG_IMM_SHIFT", ARM_INSN_SUB_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_sub_reg_reg_shift, "SUB_REG_REG_SHIFT", ARM_INSN_SUB_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_sub_imm, "SUB_IMM", ARM_INSN_SUB_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_sbc_reg_imm_shift, "SBC_REG_IMM_SHIFT", ARM_INSN_SBC_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_sbc_reg_reg_shift, "SBC_REG_REG_SHIFT", ARM_INSN_SBC_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_sbc_imm, "SBC_IMM", ARM_INSN_SBC_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_rsb_reg_imm_shift, "RSB_REG_IMM_SHIFT", ARM_INSN_RSB_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_rsb_reg_reg_shift, "RSB_REG_REG_SHIFT", ARM_INSN_RSB_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_rsb_imm, "RSB_IMM", ARM_INSN_RSB_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_rsc_reg_imm_shift, "RSC_REG_IMM_SHIFT", ARM_INSN_RSC_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_rsc_reg_reg_shift, "RSC_REG_REG_SHIFT", ARM_INSN_RSC_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_rsc_imm, "RSC_IMM", ARM_INSN_RSC_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_tst_reg_imm_shift, "TST_REG_IMM_SHIFT", ARM_INSN_TST_REG_IMM_SHIFT, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_tst_reg_reg_shift, "TST_REG_REG_SHIFT", ARM_INSN_TST_REG_REG_SHIFT, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_tst_imm, "TST_IMM", ARM_INSN_TST_IMM, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_teq_reg_imm_shift, "TEQ_REG_IMM_SHIFT", ARM_INSN_TEQ_REG_IMM_SHIFT, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_teq_reg_reg_shift, "TEQ_REG_REG_SHIFT", ARM_INSN_TEQ_REG_REG_SHIFT, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_teq_imm, "TEQ_IMM", ARM_INSN_TEQ_IMM, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_cmp_reg_imm_shift, "CMP_REG_IMM_SHIFT", ARM_INSN_CMP_REG_IMM_SHIFT, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_cmp_reg_reg_shift, "CMP_REG_REG_SHIFT", ARM_INSN_CMP_REG_REG_SHIFT, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_cmp_imm, "CMP_IMM", ARM_INSN_CMP_IMM, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_cmn_reg_imm_shift, "CMN_REG_IMM_SHIFT", ARM_INSN_CMN_REG_IMM_SHIFT, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_cmn_reg_reg_shift, "CMN_REG_REG_SHIFT", ARM_INSN_CMN_REG_REG_SHIFT, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 12 } },
-  { 0, arm_sem_cmn_imm, "CMN_IMM", ARM_INSN_CMN_IMM, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmda, "LDMDA", ARM_INSN_LDMDA, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmda_sw, "LDMDA_SW", ARM_INSN_LDMDA_SW, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmda_wb, "LDMDA_WB", ARM_INSN_LDMDA_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmda_sw_wb, "LDMDA_SW_WB", ARM_INSN_LDMDA_SW_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmib, "LDMIB", ARM_INSN_LDMIB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmib_sw, "LDMIB_SW", ARM_INSN_LDMIB_SW, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmib_wb, "LDMIB_WB", ARM_INSN_LDMIB_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmib_sw_wb, "LDMIB_SW_WB", ARM_INSN_LDMIB_SW_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmia, "LDMIA", ARM_INSN_LDMIA, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmia_sw, "LDMIA_SW", ARM_INSN_LDMIA_SW, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmia_wb, "LDMIA_WB", ARM_INSN_LDMIA_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmia_sw_wb, "LDMIA_SW_WB", ARM_INSN_LDMIA_SW_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmdb, "LDMDB", ARM_INSN_LDMDB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmdb_sw, "LDMDB_SW", ARM_INSN_LDMDB_SW, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmdb_wb, "LDMDB_WB", ARM_INSN_LDMDB_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_ldmdb_sw_wb, "LDMDB_SW_WB", ARM_INSN_LDMDB_SW_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmdb, "STMDB", ARM_INSN_STMDB, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmdb_sw, "STMDB_SW", ARM_INSN_STMDB_SW, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmdb_wb, "STMDB_WB", ARM_INSN_STMDB_WB, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmdb_sw_wb, "STMDB_SW_WB", ARM_INSN_STMDB_SW_WB, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmib, "STMIB", ARM_INSN_STMIB, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmib_sw, "STMIB_SW", ARM_INSN_STMIB_SW, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmib_wb, "STMIB_WB", ARM_INSN_STMIB_WB, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmib_sw_wb, "STMIB_SW_WB", ARM_INSN_STMIB_SW_WB, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmia, "STMIA", ARM_INSN_STMIA, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmia_sw, "STMIA_SW", ARM_INSN_STMIA_SW, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmia_wb, "STMIA_WB", ARM_INSN_STMIA_WB, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmia_sw_wb, "STMIA_SW_WB", ARM_INSN_STMIA_SW_WB, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmda, "STMDA", ARM_INSN_STMDA, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmda_sw, "STMDA_SW", ARM_INSN_STMDA_SW, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmda_wb, "STMDA_WB", ARM_INSN_STMDA_WB, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_stmda_sw_wb, "STMDA_SW_WB", ARM_INSN_STMDA_SW_WB, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_mrs_c, "MRS_C", ARM_INSN_MRS_C, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_mrs_s, "MRS_S", ARM_INSN_MRS_S, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_msr_c, "MSR_C", ARM_INSN_MSR_C, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
-  { 0, arm_sem_msr_s, "MSR_S", ARM_INSN_MSR_S, { 0, (1<<MACH_BASE), (1<<ISA_ARM), 8 } },
+  { 0, 0, "X_COND", ARM_INSN_X_COND, { 0|(1<<CGEN_INSN_PBB)|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, 0, "X_AFTER", ARM_INSN_X_AFTER, { 0|(1<<CGEN_INSN_PBB)|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, 0, "X_BEFORE", ARM_INSN_X_BEFORE, { 0|(1<<CGEN_INSN_PBB)|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, 0, "X_CTI_CHAIN", ARM_INSN_X_CTI_CHAIN, { 0|(1<<CGEN_INSN_PBB)|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, 0, "X_CHAIN", ARM_INSN_X_CHAIN, { 0|(1<<CGEN_INSN_PBB)|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, 0, "X_BEGIN", ARM_INSN_X_BEGIN, { 0|(1<<CGEN_INSN_PBB)|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_x_invalid, "X_INVALID", ARM_INSN_X_INVALID, { 0|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_b, "B", ARM_INSN_B, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_bl, "BL", ARM_INSN_BL, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_bx, "BX", ARM_INSN_BX, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_post_dec_imm_offset, "LDR_POST_DEC_IMM_OFFSET", ARM_INSN_LDR_POST_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_post_dec_reg_offset, "LDR_POST_DEC_REG_OFFSET", ARM_INSN_LDR_POST_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_post_inc_imm_offset, "LDR_POST_INC_IMM_OFFSET", ARM_INSN_LDR_POST_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_post_inc_reg_offset, "LDR_POST_INC_REG_OFFSET", ARM_INSN_LDR_POST_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_post_dec_nonpriv_imm_offset, "LDR_POST_DEC_NONPRIV_IMM_OFFSET", ARM_INSN_LDR_POST_DEC_NONPRIV_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_post_dec_nonpriv_reg_offset, "LDR_POST_DEC_NONPRIV_REG_OFFSET", ARM_INSN_LDR_POST_DEC_NONPRIV_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_post_inc_nonpriv_imm_offset, "LDR_POST_INC_NONPRIV_IMM_OFFSET", ARM_INSN_LDR_POST_INC_NONPRIV_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_post_inc_nonpriv_reg_offset, "LDR_POST_INC_NONPRIV_REG_OFFSET", ARM_INSN_LDR_POST_INC_NONPRIV_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_pre_dec_imm_offset, "LDR_PRE_DEC_IMM_OFFSET", ARM_INSN_LDR_PRE_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_pre_dec_reg_offset, "LDR_PRE_DEC_REG_OFFSET", ARM_INSN_LDR_PRE_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_pre_inc_imm_offset, "LDR_PRE_INC_IMM_OFFSET", ARM_INSN_LDR_PRE_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_pre_inc_reg_offset, "LDR_PRE_INC_REG_OFFSET", ARM_INSN_LDR_PRE_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_pre_dec_wb_imm_offset, "LDR_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_LDR_PRE_DEC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_pre_dec_wb_reg_offset, "LDR_PRE_DEC_WB_REG_OFFSET", ARM_INSN_LDR_PRE_DEC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_pre_inc_wb_imm_offset, "LDR_PRE_INC_WB_IMM_OFFSET", ARM_INSN_LDR_PRE_INC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldr_pre_inc_wb_reg_offset, "LDR_PRE_INC_WB_REG_OFFSET", ARM_INSN_LDR_PRE_INC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_post_dec_imm_offset, "LDRB_POST_DEC_IMM_OFFSET", ARM_INSN_LDRB_POST_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_post_dec_reg_offset, "LDRB_POST_DEC_REG_OFFSET", ARM_INSN_LDRB_POST_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_post_inc_imm_offset, "LDRB_POST_INC_IMM_OFFSET", ARM_INSN_LDRB_POST_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_post_inc_reg_offset, "LDRB_POST_INC_REG_OFFSET", ARM_INSN_LDRB_POST_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_post_dec_nonpriv_imm_offset, "LDRB_POST_DEC_NONPRIV_IMM_OFFSET", ARM_INSN_LDRB_POST_DEC_NONPRIV_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_post_dec_nonpriv_reg_offset, "LDRB_POST_DEC_NONPRIV_REG_OFFSET", ARM_INSN_LDRB_POST_DEC_NONPRIV_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_post_inc_nonpriv_imm_offset, "LDRB_POST_INC_NONPRIV_IMM_OFFSET", ARM_INSN_LDRB_POST_INC_NONPRIV_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_post_inc_nonpriv_reg_offset, "LDRB_POST_INC_NONPRIV_REG_OFFSET", ARM_INSN_LDRB_POST_INC_NONPRIV_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_pre_dec_imm_offset, "LDRB_PRE_DEC_IMM_OFFSET", ARM_INSN_LDRB_PRE_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_pre_dec_reg_offset, "LDRB_PRE_DEC_REG_OFFSET", ARM_INSN_LDRB_PRE_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_pre_inc_imm_offset, "LDRB_PRE_INC_IMM_OFFSET", ARM_INSN_LDRB_PRE_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_pre_inc_reg_offset, "LDRB_PRE_INC_REG_OFFSET", ARM_INSN_LDRB_PRE_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_pre_dec_wb_imm_offset, "LDRB_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_LDRB_PRE_DEC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_pre_dec_wb_reg_offset, "LDRB_PRE_DEC_WB_REG_OFFSET", ARM_INSN_LDRB_PRE_DEC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_pre_inc_wb_imm_offset, "LDRB_PRE_INC_WB_IMM_OFFSET", ARM_INSN_LDRB_PRE_INC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrb_pre_inc_wb_reg_offset, "LDRB_PRE_INC_WB_REG_OFFSET", ARM_INSN_LDRB_PRE_INC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_post_dec_imm_offset, "STR_POST_DEC_IMM_OFFSET", ARM_INSN_STR_POST_DEC_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_post_dec_reg_offset, "STR_POST_DEC_REG_OFFSET", ARM_INSN_STR_POST_DEC_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_post_inc_imm_offset, "STR_POST_INC_IMM_OFFSET", ARM_INSN_STR_POST_INC_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_post_inc_reg_offset, "STR_POST_INC_REG_OFFSET", ARM_INSN_STR_POST_INC_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_post_dec_nonpriv_imm_offset, "STR_POST_DEC_NONPRIV_IMM_OFFSET", ARM_INSN_STR_POST_DEC_NONPRIV_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_post_dec_nonpriv_reg_offset, "STR_POST_DEC_NONPRIV_REG_OFFSET", ARM_INSN_STR_POST_DEC_NONPRIV_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_post_inc_nonpriv_imm_offset, "STR_POST_INC_NONPRIV_IMM_OFFSET", ARM_INSN_STR_POST_INC_NONPRIV_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_post_inc_nonpriv_reg_offset, "STR_POST_INC_NONPRIV_REG_OFFSET", ARM_INSN_STR_POST_INC_NONPRIV_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_pre_dec_imm_offset, "STR_PRE_DEC_IMM_OFFSET", ARM_INSN_STR_PRE_DEC_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_pre_dec_reg_offset, "STR_PRE_DEC_REG_OFFSET", ARM_INSN_STR_PRE_DEC_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_pre_inc_imm_offset, "STR_PRE_INC_IMM_OFFSET", ARM_INSN_STR_PRE_INC_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_pre_inc_reg_offset, "STR_PRE_INC_REG_OFFSET", ARM_INSN_STR_PRE_INC_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_pre_dec_wb_imm_offset, "STR_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_STR_PRE_DEC_WB_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_pre_dec_wb_reg_offset, "STR_PRE_DEC_WB_REG_OFFSET", ARM_INSN_STR_PRE_DEC_WB_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_pre_inc_wb_imm_offset, "STR_PRE_INC_WB_IMM_OFFSET", ARM_INSN_STR_PRE_INC_WB_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_str_pre_inc_wb_reg_offset, "STR_PRE_INC_WB_REG_OFFSET", ARM_INSN_STR_PRE_INC_WB_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_post_dec_imm_offset, "STRB_POST_DEC_IMM_OFFSET", ARM_INSN_STRB_POST_DEC_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_post_dec_reg_offset, "STRB_POST_DEC_REG_OFFSET", ARM_INSN_STRB_POST_DEC_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_post_inc_imm_offset, "STRB_POST_INC_IMM_OFFSET", ARM_INSN_STRB_POST_INC_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_post_inc_reg_offset, "STRB_POST_INC_REG_OFFSET", ARM_INSN_STRB_POST_INC_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_post_dec_nonpriv_imm_offset, "STRB_POST_DEC_NONPRIV_IMM_OFFSET", ARM_INSN_STRB_POST_DEC_NONPRIV_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_post_dec_nonpriv_reg_offset, "STRB_POST_DEC_NONPRIV_REG_OFFSET", ARM_INSN_STRB_POST_DEC_NONPRIV_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_post_inc_nonpriv_imm_offset, "STRB_POST_INC_NONPRIV_IMM_OFFSET", ARM_INSN_STRB_POST_INC_NONPRIV_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_post_inc_nonpriv_reg_offset, "STRB_POST_INC_NONPRIV_REG_OFFSET", ARM_INSN_STRB_POST_INC_NONPRIV_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_pre_dec_imm_offset, "STRB_PRE_DEC_IMM_OFFSET", ARM_INSN_STRB_PRE_DEC_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_pre_dec_reg_offset, "STRB_PRE_DEC_REG_OFFSET", ARM_INSN_STRB_PRE_DEC_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_pre_inc_imm_offset, "STRB_PRE_INC_IMM_OFFSET", ARM_INSN_STRB_PRE_INC_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_pre_inc_reg_offset, "STRB_PRE_INC_REG_OFFSET", ARM_INSN_STRB_PRE_INC_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_pre_dec_wb_imm_offset, "STRB_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_STRB_PRE_DEC_WB_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_pre_dec_wb_reg_offset, "STRB_PRE_DEC_WB_REG_OFFSET", ARM_INSN_STRB_PRE_DEC_WB_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_pre_inc_wb_imm_offset, "STRB_PRE_INC_WB_IMM_OFFSET", ARM_INSN_STRB_PRE_INC_WB_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strb_pre_inc_wb_reg_offset, "STRB_PRE_INC_WB_REG_OFFSET", ARM_INSN_STRB_PRE_INC_WB_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strh_pre_dec_imm_offset, "STRH_PRE_DEC_IMM_OFFSET", ARM_INSN_STRH_PRE_DEC_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strh_pre_dec_reg_offset, "STRH_PRE_DEC_REG_OFFSET", ARM_INSN_STRH_PRE_DEC_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strh_pre_inc_imm_offset, "STRH_PRE_INC_IMM_OFFSET", ARM_INSN_STRH_PRE_INC_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strh_pre_inc_reg_offset, "STRH_PRE_INC_REG_OFFSET", ARM_INSN_STRH_PRE_INC_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strh_pre_dec_wb_imm_offset, "STRH_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_STRH_PRE_DEC_WB_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strh_pre_dec_wb_reg_offset, "STRH_PRE_DEC_WB_REG_OFFSET", ARM_INSN_STRH_PRE_DEC_WB_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strh_pre_inc_wb_imm_offset, "STRH_PRE_INC_WB_IMM_OFFSET", ARM_INSN_STRH_PRE_INC_WB_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strh_pre_inc_wb_reg_offset, "STRH_PRE_INC_WB_REG_OFFSET", ARM_INSN_STRH_PRE_INC_WB_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strh_post_dec_imm_offset, "STRH_POST_DEC_IMM_OFFSET", ARM_INSN_STRH_POST_DEC_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strh_post_dec_reg_offset, "STRH_POST_DEC_REG_OFFSET", ARM_INSN_STRH_POST_DEC_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strh_post_inc_imm_offset, "STRH_POST_INC_IMM_OFFSET", ARM_INSN_STRH_POST_INC_IMM_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_strh_post_inc_reg_offset, "STRH_POST_INC_REG_OFFSET", ARM_INSN_STRH_POST_INC_REG_OFFSET, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsb_pre_dec_imm_offset, "LDRSB_PRE_DEC_IMM_OFFSET", ARM_INSN_LDRSB_PRE_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsb_pre_dec_reg_offset, "LDRSB_PRE_DEC_REG_OFFSET", ARM_INSN_LDRSB_PRE_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsb_pre_inc_imm_offset, "LDRSB_PRE_INC_IMM_OFFSET", ARM_INSN_LDRSB_PRE_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsb_pre_inc_reg_offset, "LDRSB_PRE_INC_REG_OFFSET", ARM_INSN_LDRSB_PRE_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsb_pre_dec_wb_imm_offset, "LDRSB_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_LDRSB_PRE_DEC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsb_pre_dec_wb_reg_offset, "LDRSB_PRE_DEC_WB_REG_OFFSET", ARM_INSN_LDRSB_PRE_DEC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsb_pre_inc_wb_imm_offset, "LDRSB_PRE_INC_WB_IMM_OFFSET", ARM_INSN_LDRSB_PRE_INC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsb_pre_inc_wb_reg_offset, "LDRSB_PRE_INC_WB_REG_OFFSET", ARM_INSN_LDRSB_PRE_INC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsb_post_dec_imm_offset, "LDRSB_POST_DEC_IMM_OFFSET", ARM_INSN_LDRSB_POST_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsb_post_dec_reg_offset, "LDRSB_POST_DEC_REG_OFFSET", ARM_INSN_LDRSB_POST_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsb_post_inc_imm_offset, "LDRSB_POST_INC_IMM_OFFSET", ARM_INSN_LDRSB_POST_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsb_post_inc_reg_offset, "LDRSB_POST_INC_REG_OFFSET", ARM_INSN_LDRSB_POST_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrh_pre_dec_imm_offset, "LDRH_PRE_DEC_IMM_OFFSET", ARM_INSN_LDRH_PRE_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrh_pre_dec_reg_offset, "LDRH_PRE_DEC_REG_OFFSET", ARM_INSN_LDRH_PRE_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrh_pre_inc_imm_offset, "LDRH_PRE_INC_IMM_OFFSET", ARM_INSN_LDRH_PRE_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrh_pre_inc_reg_offset, "LDRH_PRE_INC_REG_OFFSET", ARM_INSN_LDRH_PRE_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrh_pre_dec_wb_imm_offset, "LDRH_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_LDRH_PRE_DEC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrh_pre_dec_wb_reg_offset, "LDRH_PRE_DEC_WB_REG_OFFSET", ARM_INSN_LDRH_PRE_DEC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrh_pre_inc_wb_imm_offset, "LDRH_PRE_INC_WB_IMM_OFFSET", ARM_INSN_LDRH_PRE_INC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrh_pre_inc_wb_reg_offset, "LDRH_PRE_INC_WB_REG_OFFSET", ARM_INSN_LDRH_PRE_INC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrh_post_dec_imm_offset, "LDRH_POST_DEC_IMM_OFFSET", ARM_INSN_LDRH_POST_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrh_post_dec_reg_offset, "LDRH_POST_DEC_REG_OFFSET", ARM_INSN_LDRH_POST_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrh_post_inc_imm_offset, "LDRH_POST_INC_IMM_OFFSET", ARM_INSN_LDRH_POST_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrh_post_inc_reg_offset, "LDRH_POST_INC_REG_OFFSET", ARM_INSN_LDRH_POST_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsh_pre_dec_imm_offset, "LDRSH_PRE_DEC_IMM_OFFSET", ARM_INSN_LDRSH_PRE_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsh_pre_dec_reg_offset, "LDRSH_PRE_DEC_REG_OFFSET", ARM_INSN_LDRSH_PRE_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsh_pre_inc_imm_offset, "LDRSH_PRE_INC_IMM_OFFSET", ARM_INSN_LDRSH_PRE_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsh_pre_inc_reg_offset, "LDRSH_PRE_INC_REG_OFFSET", ARM_INSN_LDRSH_PRE_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsh_pre_dec_wb_imm_offset, "LDRSH_PRE_DEC_WB_IMM_OFFSET", ARM_INSN_LDRSH_PRE_DEC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsh_pre_dec_wb_reg_offset, "LDRSH_PRE_DEC_WB_REG_OFFSET", ARM_INSN_LDRSH_PRE_DEC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsh_pre_inc_wb_imm_offset, "LDRSH_PRE_INC_WB_IMM_OFFSET", ARM_INSN_LDRSH_PRE_INC_WB_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsh_pre_inc_wb_reg_offset, "LDRSH_PRE_INC_WB_REG_OFFSET", ARM_INSN_LDRSH_PRE_INC_WB_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsh_post_dec_imm_offset, "LDRSH_POST_DEC_IMM_OFFSET", ARM_INSN_LDRSH_POST_DEC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsh_post_dec_reg_offset, "LDRSH_POST_DEC_REG_OFFSET", ARM_INSN_LDRSH_POST_DEC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsh_post_inc_imm_offset, "LDRSH_POST_INC_IMM_OFFSET", ARM_INSN_LDRSH_POST_INC_IMM_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldrsh_post_inc_reg_offset, "LDRSH_POST_INC_REG_OFFSET", ARM_INSN_LDRSH_POST_INC_REG_OFFSET, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_mul, "MUL", ARM_INSN_MUL, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_mla, "MLA", ARM_INSN_MLA, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_umull, "UMULL", ARM_INSN_UMULL, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_umlal, "UMLAL", ARM_INSN_UMLAL, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_smull, "SMULL", ARM_INSN_SMULL, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_smlal, "SMLAL", ARM_INSN_SMLAL, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_swp, "SWP", ARM_INSN_SWP, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_swpb, "SWPB", ARM_INSN_SWPB, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_swi, "SWI", ARM_INSN_SWI, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_and_reg_imm_shift, "AND_REG_IMM_SHIFT", ARM_INSN_AND_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_and_reg_reg_shift, "AND_REG_REG_SHIFT", ARM_INSN_AND_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_and_imm, "AND_IMM", ARM_INSN_AND_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_orr_reg_imm_shift, "ORR_REG_IMM_SHIFT", ARM_INSN_ORR_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_orr_reg_reg_shift, "ORR_REG_REG_SHIFT", ARM_INSN_ORR_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_orr_imm, "ORR_IMM", ARM_INSN_ORR_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_eor_reg_imm_shift, "EOR_REG_IMM_SHIFT", ARM_INSN_EOR_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_eor_reg_reg_shift, "EOR_REG_REG_SHIFT", ARM_INSN_EOR_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_eor_imm, "EOR_IMM", ARM_INSN_EOR_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_mov_reg_imm_shift, "MOV_REG_IMM_SHIFT", ARM_INSN_MOV_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_mov_reg_reg_shift, "MOV_REG_REG_SHIFT", ARM_INSN_MOV_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_mov_imm, "MOV_IMM", ARM_INSN_MOV_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_bic_reg_imm_shift, "BIC_REG_IMM_SHIFT", ARM_INSN_BIC_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_bic_reg_reg_shift, "BIC_REG_REG_SHIFT", ARM_INSN_BIC_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_bic_imm, "BIC_IMM", ARM_INSN_BIC_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_mvn_reg_imm_shift, "MVN_REG_IMM_SHIFT", ARM_INSN_MVN_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_mvn_reg_reg_shift, "MVN_REG_REG_SHIFT", ARM_INSN_MVN_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_mvn_imm, "MVN_IMM", ARM_INSN_MVN_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_add_reg_imm_shift, "ADD_REG_IMM_SHIFT", ARM_INSN_ADD_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_add_reg_reg_shift, "ADD_REG_REG_SHIFT", ARM_INSN_ADD_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_add_imm, "ADD_IMM", ARM_INSN_ADD_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_adc_reg_imm_shift, "ADC_REG_IMM_SHIFT", ARM_INSN_ADC_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_adc_reg_reg_shift, "ADC_REG_REG_SHIFT", ARM_INSN_ADC_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_adc_imm, "ADC_IMM", ARM_INSN_ADC_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_sub_reg_imm_shift, "SUB_REG_IMM_SHIFT", ARM_INSN_SUB_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_sub_reg_reg_shift, "SUB_REG_REG_SHIFT", ARM_INSN_SUB_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_sub_imm, "SUB_IMM", ARM_INSN_SUB_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_sbc_reg_imm_shift, "SBC_REG_IMM_SHIFT", ARM_INSN_SBC_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_sbc_reg_reg_shift, "SBC_REG_REG_SHIFT", ARM_INSN_SBC_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_sbc_imm, "SBC_IMM", ARM_INSN_SBC_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_rsb_reg_imm_shift, "RSB_REG_IMM_SHIFT", ARM_INSN_RSB_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_rsb_reg_reg_shift, "RSB_REG_REG_SHIFT", ARM_INSN_RSB_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_rsb_imm, "RSB_IMM", ARM_INSN_RSB_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_rsc_reg_imm_shift, "RSC_REG_IMM_SHIFT", ARM_INSN_RSC_REG_IMM_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_rsc_reg_reg_shift, "RSC_REG_REG_SHIFT", ARM_INSN_RSC_REG_REG_SHIFT, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_rsc_imm, "RSC_IMM", ARM_INSN_RSC_IMM, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_tst_reg_imm_shift, "TST_REG_IMM_SHIFT", ARM_INSN_TST_REG_IMM_SHIFT, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_tst_reg_reg_shift, "TST_REG_REG_SHIFT", ARM_INSN_TST_REG_REG_SHIFT, { 0, (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_tst_imm, "TST_IMM", ARM_INSN_TST_IMM, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_teq_reg_imm_shift, "TEQ_REG_IMM_SHIFT", ARM_INSN_TEQ_REG_IMM_SHIFT, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_teq_reg_reg_shift, "TEQ_REG_REG_SHIFT", ARM_INSN_TEQ_REG_REG_SHIFT, { 0, (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_teq_imm, "TEQ_IMM", ARM_INSN_TEQ_IMM, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_cmp_reg_imm_shift, "CMP_REG_IMM_SHIFT", ARM_INSN_CMP_REG_IMM_SHIFT, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_cmp_reg_reg_shift, "CMP_REG_REG_SHIFT", ARM_INSN_CMP_REG_REG_SHIFT, { 0, (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_cmp_imm, "CMP_IMM", ARM_INSN_CMP_IMM, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_cmn_reg_imm_shift, "CMN_REG_IMM_SHIFT", ARM_INSN_CMN_REG_IMM_SHIFT, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_cmn_reg_reg_shift, "CMN_REG_REG_SHIFT", ARM_INSN_CMN_REG_REG_SHIFT, { 0, (1<<MACH_BASE), { 1, "\x80" }, 12 } },
+  { 0, arm_sem_cmn_imm, "CMN_IMM", ARM_INSN_CMN_IMM, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmda, "LDMDA", ARM_INSN_LDMDA, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmda_sw, "LDMDA_SW", ARM_INSN_LDMDA_SW, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmda_wb, "LDMDA_WB", ARM_INSN_LDMDA_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmda_sw_wb, "LDMDA_SW_WB", ARM_INSN_LDMDA_SW_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmib, "LDMIB", ARM_INSN_LDMIB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmib_sw, "LDMIB_SW", ARM_INSN_LDMIB_SW, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmib_wb, "LDMIB_WB", ARM_INSN_LDMIB_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmib_sw_wb, "LDMIB_SW_WB", ARM_INSN_LDMIB_SW_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmia, "LDMIA", ARM_INSN_LDMIA, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmia_sw, "LDMIA_SW", ARM_INSN_LDMIA_SW, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmia_wb, "LDMIA_WB", ARM_INSN_LDMIA_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmia_sw_wb, "LDMIA_SW_WB", ARM_INSN_LDMIA_SW_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmdb, "LDMDB", ARM_INSN_LDMDB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmdb_sw, "LDMDB_SW", ARM_INSN_LDMDB_SW, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmdb_wb, "LDMDB_WB", ARM_INSN_LDMDB_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_ldmdb_sw_wb, "LDMDB_SW_WB", ARM_INSN_LDMDB_SW_WB, { 0|(1<<CGEN_INSN_COND_CTI), (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmdb, "STMDB", ARM_INSN_STMDB, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmdb_sw, "STMDB_SW", ARM_INSN_STMDB_SW, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmdb_wb, "STMDB_WB", ARM_INSN_STMDB_WB, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmdb_sw_wb, "STMDB_SW_WB", ARM_INSN_STMDB_SW_WB, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmib, "STMIB", ARM_INSN_STMIB, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmib_sw, "STMIB_SW", ARM_INSN_STMIB_SW, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmib_wb, "STMIB_WB", ARM_INSN_STMIB_WB, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmib_sw_wb, "STMIB_SW_WB", ARM_INSN_STMIB_SW_WB, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmia, "STMIA", ARM_INSN_STMIA, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmia_sw, "STMIA_SW", ARM_INSN_STMIA_SW, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmia_wb, "STMIA_WB", ARM_INSN_STMIA_WB, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmia_sw_wb, "STMIA_SW_WB", ARM_INSN_STMIA_SW_WB, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmda, "STMDA", ARM_INSN_STMDA, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmda_sw, "STMDA_SW", ARM_INSN_STMDA_SW, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmda_wb, "STMDA_WB", ARM_INSN_STMDA_WB, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_stmda_sw_wb, "STMDA_SW_WB", ARM_INSN_STMDA_SW_WB, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_mrs_c, "MRS_C", ARM_INSN_MRS_C, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_mrs_s, "MRS_S", ARM_INSN_MRS_S, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_msr_c, "MSR_C", ARM_INSN_MSR_C, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
+  { 0, arm_sem_msr_s, "MSR_S", ARM_INSN_MSR_S, { 0, (1<<MACH_BASE), { 1, "\x80" }, 8 } },
 
 };
 
@@ -450,11 +450,23 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 23 : itype = ARM_INSN_AND_REG_REG_SHIFT; arm_extract_sfmt_and_reg_reg_shift (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 9 : /* fall through */
           case 25 : itype = ARM_INSN_MUL; arm_extract_sfmt_mul (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 11 : itype = ARM_INSN_STRH_POST_DEC_REG_OFFSET; arm_extract_sfmt_strh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 27 : itype = ARM_INSN_LDRH_POST_DEC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 29 : itype = ARM_INSN_LDRSB_POST_DEC_REG_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 31 : itype = ARM_INSN_LDRSH_POST_DEC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 11 :
+            if ((entire_insn & 0xff00ff0) == 0xb0)
+              { itype = ARM_INSN_STRH_POST_DEC_REG_OFFSET; arm_extract_sfmt_strh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 27 :
+            if ((entire_insn & 0xff00ff0) == 0x1000b0)
+              { itype = ARM_INSN_LDRH_POST_DEC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 29 :
+            if ((entire_insn & 0xff00ff0) == 0x1000d0)
+              { itype = ARM_INSN_LDRSB_POST_DEC_REG_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 31 :
+            if ((entire_insn & 0xff00ff0) == 0x1000f0)
+              { itype = ARM_INSN_LDRSH_POST_DEC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 1 :
@@ -465,8 +477,11 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 0 : /* fall through */
           case 2 : itype = ARM_INSN_EOR_REG_IMM_SHIFT; arm_extract_sfmt_and_reg_imm_shift (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_EOR_REG_REG_SHIFT; arm_extract_sfmt_and_reg_reg_shift (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 3 : itype = ARM_INSN_MLA; arm_extract_sfmt_mla (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 3 :
+            if ((entire_insn & 0xfe000f0) == 0x200090)
+              { itype = ARM_INSN_MLA; arm_extract_sfmt_mla (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 2 :
@@ -502,7 +517,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 27 : itype = ARM_INSN_LDRH_POST_DEC_IMM_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 29 : itype = ARM_INSN_LDRSB_POST_DEC_IMM_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_wb_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 31 : itype = ARM_INSN_LDRSH_POST_DEC_IMM_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 3 :
@@ -511,8 +526,11 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           switch (val)
           {
           case 0 : itype = ARM_INSN_RSB_REG_IMM_SHIFT; arm_extract_sfmt_add_reg_imm_shift (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_RSB_REG_REG_SHIFT; arm_extract_sfmt_add_reg_reg_shift (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 1 :
+            if ((entire_insn & 0xfe00090) == 0x600010)
+              { itype = ARM_INSN_RSB_REG_REG_SHIFT; arm_extract_sfmt_add_reg_reg_shift (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 4 :
@@ -546,11 +564,23 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 23 : itype = ARM_INSN_ADD_REG_REG_SHIFT; arm_extract_sfmt_add_reg_reg_shift (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 9 : /* fall through */
           case 25 : itype = ARM_INSN_UMULL; arm_extract_sfmt_umull (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 11 : itype = ARM_INSN_STRH_POST_INC_REG_OFFSET; arm_extract_sfmt_strh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 27 : itype = ARM_INSN_LDRH_POST_INC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 29 : itype = ARM_INSN_LDRSB_POST_INC_REG_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 31 : itype = ARM_INSN_LDRSH_POST_INC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 11 :
+            if ((entire_insn & 0xff00ff0) == 0x8000b0)
+              { itype = ARM_INSN_STRH_POST_INC_REG_OFFSET; arm_extract_sfmt_strh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 27 :
+            if ((entire_insn & 0xff00ff0) == 0x9000b0)
+              { itype = ARM_INSN_LDRH_POST_INC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 29 :
+            if ((entire_insn & 0xff00ff0) == 0x9000d0)
+              { itype = ARM_INSN_LDRSB_POST_INC_REG_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 31 :
+            if ((entire_insn & 0xff00ff0) == 0x9000f0)
+              { itype = ARM_INSN_LDRSH_POST_INC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 5 :
@@ -561,8 +591,11 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 0 : /* fall through */
           case 2 : itype = ARM_INSN_ADC_REG_IMM_SHIFT; arm_extract_sfmt_adc_reg_imm_shift (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_ADC_REG_REG_SHIFT; arm_extract_sfmt_adc_reg_reg_shift (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 3 : itype = ARM_INSN_UMLAL; arm_extract_sfmt_umlal (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 3 :
+            if ((entire_insn & 0xfe000f0) == 0xa00090)
+              { itype = ARM_INSN_UMLAL; arm_extract_sfmt_umlal (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 6 :
@@ -600,7 +633,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 27 : itype = ARM_INSN_LDRH_POST_INC_IMM_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 29 : itype = ARM_INSN_LDRSB_POST_INC_IMM_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_wb_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 31 : itype = ARM_INSN_LDRSH_POST_INC_IMM_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 7 :
@@ -611,8 +644,11 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 0 : /* fall through */
           case 2 : itype = ARM_INSN_RSC_REG_IMM_SHIFT; arm_extract_sfmt_adc_reg_imm_shift (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_RSC_REG_REG_SHIFT; arm_extract_sfmt_adc_reg_reg_shift (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 3 : itype = ARM_INSN_SMLAL; arm_extract_sfmt_umlal (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 3 :
+            if ((entire_insn & 0xfe000f0) == 0xe00090)
+              { itype = ARM_INSN_SMLAL; arm_extract_sfmt_umlal (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 8 :
@@ -620,9 +656,18 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 16) & (1 << 4)) | ((insn >> 4) & (15 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_MRS_C; arm_extract_sfmt_mrs_c (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 9 : itype = ARM_INSN_SWP; arm_extract_sfmt_swp (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 11 : itype = ARM_INSN_STRH_PRE_DEC_REG_OFFSET; arm_extract_sfmt_strh_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 0 :
+            if ((entire_insn & 0xfff0fff) == 0x10f0000)
+              { itype = ARM_INSN_MRS_C; arm_extract_sfmt_mrs_c (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 9 :
+            if ((entire_insn & 0xff00ff0) == 0x1000090)
+              { itype = ARM_INSN_SWP; arm_extract_sfmt_swp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 11 :
+            if ((entire_insn & 0xff00ff0) == 0x10000b0)
+              { itype = ARM_INSN_STRH_PRE_DEC_REG_OFFSET; arm_extract_sfmt_strh_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 16 : /* fall through */
           case 18 : /* fall through */
           case 20 : /* fall through */
@@ -635,10 +680,19 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 19 : /* fall through */
           case 21 : /* fall through */
           case 23 : itype = ARM_INSN_TST_REG_REG_SHIFT; arm_extract_sfmt_tst_reg_reg_shift (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 27 : itype = ARM_INSN_LDRH_PRE_DEC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 29 : itype = ARM_INSN_LDRSB_PRE_DEC_REG_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 31 : itype = ARM_INSN_LDRSH_PRE_DEC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 27 :
+            if ((entire_insn & 0xff00ff0) == 0x11000b0)
+              { itype = ARM_INSN_LDRH_PRE_DEC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 29 :
+            if ((entire_insn & 0xff00ff0) == 0x11000d0)
+              { itype = ARM_INSN_LDRSB_PRE_DEC_REG_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 31 :
+            if ((entire_insn & 0xff00ff0) == 0x11000f0)
+              { itype = ARM_INSN_LDRSH_PRE_DEC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 9 :
@@ -646,9 +700,18 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 14) & (1 << 6)) | ((insn >> 4) & (63 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_MSR_C; arm_extract_sfmt_msr_c (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 11 : itype = ARM_INSN_STRH_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_strh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 49 : itype = ARM_INSN_BX; arm_extract_sfmt_bx (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 0 :
+            if ((entire_insn & 0xffffff0) == 0x129f000)
+              { itype = ARM_INSN_MSR_C; arm_extract_sfmt_msr_c (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 11 :
+            if ((entire_insn & 0xff00ff0) == 0x12000b0)
+              { itype = ARM_INSN_STRH_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_strh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 49 :
+            if ((entire_insn & 0xffffff0) == 0x12fff10)
+              { itype = ARM_INSN_BX; arm_extract_sfmt_bx (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 64 : /* fall through */
           case 66 : /* fall through */
           case 68 : /* fall through */
@@ -697,10 +760,19 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 115 : /* fall through */
           case 117 : /* fall through */
           case 119 : itype = ARM_INSN_TEQ_REG_REG_SHIFT; arm_extract_sfmt_tst_reg_reg_shift (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 75 : itype = ARM_INSN_LDRH_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 77 : itype = ARM_INSN_LDRSB_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 79 : itype = ARM_INSN_LDRSH_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 75 :
+            if ((entire_insn & 0xff00ff0) == 0x13000b0)
+              { itype = ARM_INSN_LDRH_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 77 :
+            if ((entire_insn & 0xff00ff0) == 0x13000d0)
+              { itype = ARM_INSN_LDRSB_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 79 :
+            if ((entire_insn & 0xff00ff0) == 0x13000f0)
+              { itype = ARM_INSN_LDRSH_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 10 :
@@ -708,8 +780,14 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 16) & (1 << 4)) | ((insn >> 4) & (15 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_MRS_S; arm_extract_sfmt_mrs_s (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 9 : itype = ARM_INSN_SWPB; arm_extract_sfmt_swpb (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 0 :
+            if ((entire_insn & 0xfff0fff) == 0x14f0000)
+              { itype = ARM_INSN_MRS_S; arm_extract_sfmt_mrs_s (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 9 :
+            if ((entire_insn & 0xff00ff0) == 0x1400090)
+              { itype = ARM_INSN_SWPB; arm_extract_sfmt_swpb (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 11 : itype = ARM_INSN_STRH_PRE_DEC_IMM_OFFSET; arm_extract_sfmt_strh_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 16 : /* fall through */
           case 18 : /* fall through */
@@ -726,7 +804,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 27 : itype = ARM_INSN_LDRH_PRE_DEC_IMM_OFFSET; arm_extract_sfmt_ldrh_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 29 : itype = ARM_INSN_LDRSB_PRE_DEC_IMM_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 31 : itype = ARM_INSN_LDRSH_PRE_DEC_IMM_OFFSET; arm_extract_sfmt_ldrh_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 11 :
@@ -734,7 +812,10 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 16) & (1 << 4)) | ((insn >> 4) & (15 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_MSR_S; arm_extract_sfmt_msr_s (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 0 :
+            if ((entire_insn & 0xffffff0) == 0x169f000)
+              { itype = ARM_INSN_MSR_S; arm_extract_sfmt_msr_s (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 11 : itype = ARM_INSN_STRH_PRE_DEC_WB_IMM_OFFSET; arm_extract_sfmt_strh_pre_dec_wb_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 16 : /* fall through */
           case 18 : /* fall through */
@@ -751,7 +832,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 27 : itype = ARM_INSN_LDRH_PRE_DEC_WB_IMM_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 29 : itype = ARM_INSN_LDRSB_PRE_DEC_WB_IMM_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_wb_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 31 : itype = ARM_INSN_LDRSH_PRE_DEC_WB_IMM_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 12 :
@@ -783,11 +864,23 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 19 : /* fall through */
           case 21 : /* fall through */
           case 23 : itype = ARM_INSN_ORR_REG_REG_SHIFT; arm_extract_sfmt_and_reg_reg_shift (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 11 : itype = ARM_INSN_STRH_PRE_INC_REG_OFFSET; arm_extract_sfmt_strh_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 27 : itype = ARM_INSN_LDRH_PRE_INC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 29 : itype = ARM_INSN_LDRSB_PRE_INC_REG_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 31 : itype = ARM_INSN_LDRSH_PRE_INC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 11 :
+            if ((entire_insn & 0xff00ff0) == 0x18000b0)
+              { itype = ARM_INSN_STRH_PRE_INC_REG_OFFSET; arm_extract_sfmt_strh_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 27 :
+            if ((entire_insn & 0xff00ff0) == 0x19000b0)
+              { itype = ARM_INSN_LDRH_PRE_INC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 29 :
+            if ((entire_insn & 0xff00ff0) == 0x19000d0)
+              { itype = ARM_INSN_LDRSB_PRE_INC_REG_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 31 :
+            if ((entire_insn & 0xff00ff0) == 0x19000f0)
+              { itype = ARM_INSN_LDRSH_PRE_INC_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 13 :
@@ -819,11 +912,23 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 19 : /* fall through */
           case 21 : /* fall through */
           case 23 : itype = ARM_INSN_MOV_REG_REG_SHIFT; arm_extract_sfmt_mov_reg_reg_shift (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 11 : itype = ARM_INSN_STRH_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_strh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 27 : itype = ARM_INSN_LDRH_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 29 : itype = ARM_INSN_LDRSB_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 31 : itype = ARM_INSN_LDRSH_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 11 :
+            if ((entire_insn & 0xff00ff0) == 0x1a000b0)
+              { itype = ARM_INSN_STRH_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_strh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 27 :
+            if ((entire_insn & 0xff00ff0) == 0x1b000b0)
+              { itype = ARM_INSN_LDRH_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 29 :
+            if ((entire_insn & 0xff00ff0) == 0x1b000d0)
+              { itype = ARM_INSN_LDRSB_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 31 :
+            if ((entire_insn & 0xff00ff0) == 0x1b000f0)
+              { itype = ARM_INSN_LDRSH_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 14 :
@@ -859,7 +964,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 27 : itype = ARM_INSN_LDRH_PRE_INC_IMM_OFFSET; arm_extract_sfmt_ldrh_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 29 : itype = ARM_INSN_LDRSB_PRE_INC_IMM_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 31 : itype = ARM_INSN_LDRSH_PRE_INC_IMM_OFFSET; arm_extract_sfmt_ldrh_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 15 :
@@ -895,7 +1000,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           case 27 : itype = ARM_INSN_LDRH_PRE_INC_WB_IMM_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 29 : itype = ARM_INSN_LDRSB_PRE_INC_WB_IMM_OFFSET; arm_extract_sfmt_ldrsb_pre_dec_wb_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 31 : itype = ARM_INSN_LDRSH_PRE_INC_WB_IMM_OFFSET; arm_extract_sfmt_ldrh_pre_dec_wb_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 16 : itype = ARM_INSN_AND_IMM; arm_extract_sfmt_and_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
@@ -906,10 +1011,22 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
       case 21 : itype = ARM_INSN_ADC_IMM; arm_extract_sfmt_adc_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 22 : itype = ARM_INSN_SBC_IMM; arm_extract_sfmt_adc_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 23 : itype = ARM_INSN_RSC_IMM; arm_extract_sfmt_adc_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 24 : itype = ARM_INSN_TST_IMM; arm_extract_sfmt_tst_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 25 : itype = ARM_INSN_TEQ_IMM; arm_extract_sfmt_tst_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 26 : itype = ARM_INSN_CMP_IMM; arm_extract_sfmt_cmp_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 27 : itype = ARM_INSN_CMN_IMM; arm_extract_sfmt_cmp_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 24 :
+        if ((entire_insn & 0xff00000) == 0x3100000)
+          { itype = ARM_INSN_TST_IMM; arm_extract_sfmt_tst_imm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 25 :
+        if ((entire_insn & 0xff00000) == 0x3300000)
+          { itype = ARM_INSN_TEQ_IMM; arm_extract_sfmt_tst_imm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 26 :
+        if ((entire_insn & 0xff00000) == 0x3500000)
+          { itype = ARM_INSN_CMP_IMM; arm_extract_sfmt_cmp_imm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 27 :
+        if ((entire_insn & 0xff00000) == 0x3700000)
+          { itype = ARM_INSN_CMN_IMM; arm_extract_sfmt_cmp_imm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 28 : itype = ARM_INSN_ORR_IMM; arm_extract_sfmt_and_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 29 : itype = ARM_INSN_MOV_IMM; arm_extract_sfmt_mov_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 30 : itype = ARM_INSN_BIC_IMM; arm_extract_sfmt_and_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
@@ -921,7 +1038,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STR_POST_DEC_IMM_OFFSET; arm_extract_sfmt_str_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDR_POST_DEC_IMM_OFFSET; arm_extract_sfmt_ldr_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 33 :
@@ -931,7 +1048,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STR_POST_DEC_NONPRIV_IMM_OFFSET; arm_extract_sfmt_str_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDR_POST_DEC_NONPRIV_IMM_OFFSET; arm_extract_sfmt_ldr_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 34 :
@@ -941,7 +1058,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STRB_POST_DEC_IMM_OFFSET; arm_extract_sfmt_strb_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDRB_POST_DEC_IMM_OFFSET; arm_extract_sfmt_ldrb_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 35 :
@@ -951,7 +1068,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STRB_POST_DEC_NONPRIV_IMM_OFFSET; arm_extract_sfmt_strb_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDRB_POST_DEC_NONPRIV_IMM_OFFSET; arm_extract_sfmt_ldrb_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 36 :
@@ -961,7 +1078,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STR_POST_INC_IMM_OFFSET; arm_extract_sfmt_str_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDR_POST_INC_IMM_OFFSET; arm_extract_sfmt_ldr_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 37 :
@@ -971,7 +1088,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STR_POST_INC_NONPRIV_IMM_OFFSET; arm_extract_sfmt_str_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDR_POST_INC_NONPRIV_IMM_OFFSET; arm_extract_sfmt_ldr_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 38 :
@@ -981,7 +1098,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STRB_POST_INC_IMM_OFFSET; arm_extract_sfmt_strb_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDRB_POST_INC_IMM_OFFSET; arm_extract_sfmt_ldrb_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 39 :
@@ -991,7 +1108,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STRB_POST_INC_NONPRIV_IMM_OFFSET; arm_extract_sfmt_strb_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDRB_POST_INC_NONPRIV_IMM_OFFSET; arm_extract_sfmt_ldrb_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 40 :
@@ -1001,7 +1118,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STR_PRE_DEC_IMM_OFFSET; arm_extract_sfmt_str_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDR_PRE_DEC_IMM_OFFSET; arm_extract_sfmt_ldr_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 41 :
@@ -1011,7 +1128,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STR_PRE_DEC_WB_IMM_OFFSET; arm_extract_sfmt_str_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDR_PRE_DEC_WB_IMM_OFFSET; arm_extract_sfmt_ldr_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 42 :
@@ -1021,7 +1138,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STRB_PRE_DEC_IMM_OFFSET; arm_extract_sfmt_strb_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDRB_PRE_DEC_IMM_OFFSET; arm_extract_sfmt_ldrb_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 43 :
@@ -1031,7 +1148,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STRB_PRE_DEC_WB_IMM_OFFSET; arm_extract_sfmt_strb_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDRB_PRE_DEC_WB_IMM_OFFSET; arm_extract_sfmt_ldrb_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 44 :
@@ -1041,7 +1158,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STR_PRE_INC_IMM_OFFSET; arm_extract_sfmt_str_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDR_PRE_INC_IMM_OFFSET; arm_extract_sfmt_ldr_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 45 :
@@ -1051,7 +1168,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STR_PRE_INC_WB_IMM_OFFSET; arm_extract_sfmt_str_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDR_PRE_INC_WB_IMM_OFFSET; arm_extract_sfmt_ldr_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 46 :
@@ -1061,7 +1178,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STRB_PRE_INC_IMM_OFFSET; arm_extract_sfmt_strb_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDRB_PRE_INC_IMM_OFFSET; arm_extract_sfmt_ldrb_pre_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 47 :
@@ -1071,7 +1188,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STRB_PRE_INC_WB_IMM_OFFSET; arm_extract_sfmt_strb_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDRB_PRE_INC_WB_IMM_OFFSET; arm_extract_sfmt_ldrb_post_dec_imm_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 48 :
@@ -1079,9 +1196,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STR_POST_DEC_REG_OFFSET; arm_extract_sfmt_str_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDR_POST_DEC_REG_OFFSET; arm_extract_sfmt_ldr_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x6000000)
+              { itype = ARM_INSN_STR_POST_DEC_REG_OFFSET; arm_extract_sfmt_str_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x6100000)
+              { itype = ARM_INSN_LDR_POST_DEC_REG_OFFSET; arm_extract_sfmt_ldr_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 49 :
@@ -1089,9 +1212,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STR_POST_DEC_NONPRIV_REG_OFFSET; arm_extract_sfmt_str_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDR_POST_DEC_NONPRIV_REG_OFFSET; arm_extract_sfmt_ldr_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x6200000)
+              { itype = ARM_INSN_STR_POST_DEC_NONPRIV_REG_OFFSET; arm_extract_sfmt_str_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x6300000)
+              { itype = ARM_INSN_LDR_POST_DEC_NONPRIV_REG_OFFSET; arm_extract_sfmt_ldr_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 50 :
@@ -1099,9 +1228,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STRB_POST_DEC_REG_OFFSET; arm_extract_sfmt_strb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDRB_POST_DEC_REG_OFFSET; arm_extract_sfmt_ldrb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x6400000)
+              { itype = ARM_INSN_STRB_POST_DEC_REG_OFFSET; arm_extract_sfmt_strb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x6500000)
+              { itype = ARM_INSN_LDRB_POST_DEC_REG_OFFSET; arm_extract_sfmt_ldrb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 51 :
@@ -1109,9 +1244,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STRB_POST_DEC_NONPRIV_REG_OFFSET; arm_extract_sfmt_strb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDRB_POST_DEC_NONPRIV_REG_OFFSET; arm_extract_sfmt_ldrb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x6600000)
+              { itype = ARM_INSN_STRB_POST_DEC_NONPRIV_REG_OFFSET; arm_extract_sfmt_strb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x6700000)
+              { itype = ARM_INSN_LDRB_POST_DEC_NONPRIV_REG_OFFSET; arm_extract_sfmt_ldrb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 52 :
@@ -1119,9 +1260,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STR_POST_INC_REG_OFFSET; arm_extract_sfmt_str_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDR_POST_INC_REG_OFFSET; arm_extract_sfmt_ldr_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x6800000)
+              { itype = ARM_INSN_STR_POST_INC_REG_OFFSET; arm_extract_sfmt_str_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x6900000)
+              { itype = ARM_INSN_LDR_POST_INC_REG_OFFSET; arm_extract_sfmt_ldr_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 53 :
@@ -1129,9 +1276,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STR_POST_INC_NONPRIV_REG_OFFSET; arm_extract_sfmt_str_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDR_POST_INC_NONPRIV_REG_OFFSET; arm_extract_sfmt_ldr_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x6a00000)
+              { itype = ARM_INSN_STR_POST_INC_NONPRIV_REG_OFFSET; arm_extract_sfmt_str_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x6b00000)
+              { itype = ARM_INSN_LDR_POST_INC_NONPRIV_REG_OFFSET; arm_extract_sfmt_ldr_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 54 :
@@ -1139,9 +1292,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STRB_POST_INC_REG_OFFSET; arm_extract_sfmt_strb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDRB_POST_INC_REG_OFFSET; arm_extract_sfmt_ldrb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x6c00000)
+              { itype = ARM_INSN_STRB_POST_INC_REG_OFFSET; arm_extract_sfmt_strb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x6d00000)
+              { itype = ARM_INSN_LDRB_POST_INC_REG_OFFSET; arm_extract_sfmt_ldrb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 55 :
@@ -1149,9 +1308,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STRB_POST_INC_NONPRIV_REG_OFFSET; arm_extract_sfmt_strb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDRB_POST_INC_NONPRIV_REG_OFFSET; arm_extract_sfmt_ldrb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x6e00000)
+              { itype = ARM_INSN_STRB_POST_INC_NONPRIV_REG_OFFSET; arm_extract_sfmt_strb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x6f00000)
+              { itype = ARM_INSN_LDRB_POST_INC_NONPRIV_REG_OFFSET; arm_extract_sfmt_ldrb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 56 :
@@ -1159,9 +1324,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STR_PRE_DEC_REG_OFFSET; arm_extract_sfmt_str_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDR_PRE_DEC_REG_OFFSET; arm_extract_sfmt_ldr_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x7000000)
+              { itype = ARM_INSN_STR_PRE_DEC_REG_OFFSET; arm_extract_sfmt_str_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x7100000)
+              { itype = ARM_INSN_LDR_PRE_DEC_REG_OFFSET; arm_extract_sfmt_ldr_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 57 :
@@ -1169,9 +1340,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STR_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_str_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDR_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_ldr_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x7200000)
+              { itype = ARM_INSN_STR_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_str_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x7300000)
+              { itype = ARM_INSN_LDR_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_ldr_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 58 :
@@ -1179,9 +1356,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STRB_PRE_DEC_REG_OFFSET; arm_extract_sfmt_strb_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDRB_PRE_DEC_REG_OFFSET; arm_extract_sfmt_ldrb_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x7400000)
+              { itype = ARM_INSN_STRB_PRE_DEC_REG_OFFSET; arm_extract_sfmt_strb_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x7500000)
+              { itype = ARM_INSN_LDRB_PRE_DEC_REG_OFFSET; arm_extract_sfmt_ldrb_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 59 :
@@ -1189,9 +1372,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STRB_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_strb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDRB_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_ldrb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x7600000)
+              { itype = ARM_INSN_STRB_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_strb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x7700000)
+              { itype = ARM_INSN_LDRB_PRE_DEC_WB_REG_OFFSET; arm_extract_sfmt_ldrb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 60 :
@@ -1199,9 +1388,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STR_PRE_INC_REG_OFFSET; arm_extract_sfmt_str_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDR_PRE_INC_REG_OFFSET; arm_extract_sfmt_ldr_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x7800000)
+              { itype = ARM_INSN_STR_PRE_INC_REG_OFFSET; arm_extract_sfmt_str_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x7900000)
+              { itype = ARM_INSN_LDR_PRE_INC_REG_OFFSET; arm_extract_sfmt_ldr_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 61 :
@@ -1209,9 +1404,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STR_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_str_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDR_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_ldr_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x7a00000)
+              { itype = ARM_INSN_STR_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_str_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x7b00000)
+              { itype = ARM_INSN_LDR_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_ldr_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 62 :
@@ -1219,9 +1420,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STRB_PRE_INC_REG_OFFSET; arm_extract_sfmt_strb_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDRB_PRE_INC_REG_OFFSET; arm_extract_sfmt_ldrb_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x7c00000)
+              { itype = ARM_INSN_STRB_PRE_INC_REG_OFFSET; arm_extract_sfmt_strb_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x7d00000)
+              { itype = ARM_INSN_LDRB_PRE_INC_REG_OFFSET; arm_extract_sfmt_ldrb_pre_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 63 :
@@ -1229,9 +1436,15 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           unsigned int val = (((insn >> 20) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = ARM_INSN_STRB_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_strb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = ARM_INSN_LDRB_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_ldrb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff00010) == 0x7e00000)
+              { itype = ARM_INSN_STRB_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_strb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff00010) == 0x7f00000)
+              { itype = ARM_INSN_LDRB_PRE_INC_WB_REG_OFFSET; arm_extract_sfmt_ldrb_post_dec_reg_offset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 64 :
@@ -1241,7 +1454,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMDA; arm_extract_sfmt_stmdb (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMDA; arm_extract_sfmt_ldmda (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 65 :
@@ -1251,7 +1464,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMDA_WB; arm_extract_sfmt_stmdb_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMDA_WB; arm_extract_sfmt_ldmda_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 66 :
@@ -1261,7 +1474,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMDA_SW; arm_extract_sfmt_stmdb_sw (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMDA_SW; arm_extract_sfmt_ldmda_sw (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 67 :
@@ -1271,7 +1484,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMDA_SW_WB; arm_extract_sfmt_stmdb_sw_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMDA_SW_WB; arm_extract_sfmt_ldmda_sw_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 68 :
@@ -1281,7 +1494,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMIA; arm_extract_sfmt_stmdb (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMIA; arm_extract_sfmt_ldmda (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 69 :
@@ -1291,7 +1504,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMIA_WB; arm_extract_sfmt_stmdb_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMIA_WB; arm_extract_sfmt_ldmda_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 70 :
@@ -1301,7 +1514,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMIA_SW; arm_extract_sfmt_stmdb_sw (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMIA_SW; arm_extract_sfmt_ldmda_sw (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 71 :
@@ -1311,7 +1524,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMIA_SW_WB; arm_extract_sfmt_stmdb_sw_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMIA_SW_WB; arm_extract_sfmt_ldmda_sw_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 72 :
@@ -1321,7 +1534,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMDB; arm_extract_sfmt_stmdb (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMDB; arm_extract_sfmt_ldmda (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 73 :
@@ -1331,7 +1544,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMDB_WB; arm_extract_sfmt_stmdb_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMDB_WB; arm_extract_sfmt_ldmda_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 74 :
@@ -1341,7 +1554,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMDB_SW; arm_extract_sfmt_stmdb_sw (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMDB_SW; arm_extract_sfmt_ldmda_sw (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 75 :
@@ -1351,7 +1564,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMDB_SW_WB; arm_extract_sfmt_stmdb_sw_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMDB_SW_WB; arm_extract_sfmt_ldmda_sw_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 76 :
@@ -1361,7 +1574,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMIB; arm_extract_sfmt_stmdb (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMIB; arm_extract_sfmt_ldmda (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 77 :
@@ -1371,7 +1584,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMIB_WB; arm_extract_sfmt_stmdb_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMIB_WB; arm_extract_sfmt_ldmda_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 78 :
@@ -1381,7 +1594,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMIB_SW; arm_extract_sfmt_stmdb_sw (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMIB_SW; arm_extract_sfmt_ldmda_sw (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 79 :
@@ -1391,7 +1604,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
           {
           case 0 : itype = ARM_INSN_STMIB_SW_WB; arm_extract_sfmt_stmdb_sw_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = ARM_INSN_LDMIB_SW_WB; arm_extract_sfmt_ldmda_sw_wb (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 80 : /* fall through */
@@ -1418,7 +1631,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
       case 125 : /* fall through */
       case 126 : /* fall through */
       case 127 : itype = ARM_INSN_SWI; arm_extract_sfmt_swi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      default : itype = ARM_INSN_X_INVALID; arm_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       }
     }
 

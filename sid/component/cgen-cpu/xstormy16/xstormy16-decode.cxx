@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -261,13 +261,7 @@ xstormy16_extract_sfmt_andimm8 (xstormy16_scache* abuf, xstormy16_cpu* current_c
 static void
 xstormy16_extract_sfmt_andgrimm16 (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
-xstormy16_extract_sfmt_addgrgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
-static void
 xstormy16_extract_sfmt_addgrimm4 (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
-static void
-xstormy16_extract_sfmt_addimm8 (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
-static void
-xstormy16_extract_sfmt_addgrimm16 (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
 xstormy16_extract_sfmt_adcgrgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
@@ -279,19 +273,9 @@ xstormy16_extract_sfmt_adcgrimm16 (xstormy16_scache* abuf, xstormy16_cpu* curren
 static void
 xstormy16_extract_sfmt_incgrimm2 (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
-xstormy16_extract_sfmt_rrcgrgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
-static void
-xstormy16_extract_sfmt_rrcgrimm4 (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
-static void
 xstormy16_extract_sfmt_shrgrgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
 xstormy16_extract_sfmt_shrgrimm (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
-static void
-xstormy16_extract_sfmt_asrgrgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
-static void
-xstormy16_extract_sfmt_asrgrimm (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
-static void
-xstormy16_extract_sfmt_set1grimm (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
 xstormy16_extract_sfmt_set1lmemimm (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
@@ -341,8 +325,6 @@ xstormy16_extract_sfmt_ret (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, 
 static void
 xstormy16_extract_sfmt_mul (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
-xstormy16_extract_sfmt_sdiv (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
-static void
 xstormy16_extract_sfmt_sdivlh (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
 xstormy16_extract_sfmt_reset (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
@@ -368,29 +350,19 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           {
           case 0 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xffff) == 0x0)
-              { itype = XSTORMY16_INSN_NOP; xstormy16_extract_sfmt_reset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_NOP; xstormy16_extract_sfmt_reset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xffff) == 0x1)
-              { itype = XSTORMY16_INSN_SYSCALL; xstormy16_extract_sfmt_reset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_SYSCALL; xstormy16_extract_sfmt_reset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 2 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xffff) == 0x2)
-              { itype = XSTORMY16_INSN_IRET; xstormy16_extract_sfmt_iret (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_IRET; xstormy16_extract_sfmt_iret (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 3 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xffff) == 0x3)
-              { itype = XSTORMY16_INSN_RET; xstormy16_extract_sfmt_ret (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_RET; xstormy16_extract_sfmt_ret (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 5 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xffff) == 0x5)
-              { itype = XSTORMY16_INSN_BRK; xstormy16_extract_sfmt_reset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_BRK; xstormy16_extract_sfmt_reset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 8 : /* fall through */
           case 9 : /* fall through */
           case 10 : /* fall through */
@@ -400,9 +372,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           case 14 : /* fall through */
           case 15 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x10)
-              { itype = XSTORMY16_INSN_CALLRGR; xstormy16_extract_sfmt_callrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_CALLRGR; xstormy16_extract_sfmt_callrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 16 : /* fall through */
           case 17 : /* fall through */
           case 18 : /* fall through */
@@ -412,9 +382,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           case 22 : /* fall through */
           case 23 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x20)
-              { itype = XSTORMY16_INSN_BGR; xstormy16_extract_sfmt_bgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_BGR; xstormy16_extract_sfmt_bgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 24 : /* fall through */
           case 25 : /* fall through */
           case 26 : /* fall through */
@@ -424,9 +392,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           case 30 : /* fall through */
           case 31 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x30)
-              { itype = XSTORMY16_INSN_ICALLRGR; xstormy16_extract_sfmt_icallrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_ICALLRGR; xstormy16_extract_sfmt_icallrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -437,24 +403,16 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           {
           case 0 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xffff) == 0x8)
-              { itype = XSTORMY16_INSN_HALT; xstormy16_extract_sfmt_reset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_HALT; xstormy16_extract_sfmt_reset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 2 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xffff) == 0xa)
-              { itype = XSTORMY16_INSN_HOLD; xstormy16_extract_sfmt_reset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_HOLD; xstormy16_extract_sfmt_reset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 3 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xffff) == 0xb)
-              { itype = XSTORMY16_INSN_HOLDX; xstormy16_extract_sfmt_reset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_HOLDX; xstormy16_extract_sfmt_reset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 7 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xffff) == 0xf)
-              { itype = XSTORMY16_INSN_RESET; xstormy16_extract_sfmt_reset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_RESET; xstormy16_extract_sfmt_reset (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 8 : /* fall through */
           case 9 : /* fall through */
           case 10 : /* fall through */
@@ -464,9 +422,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           case 14 : /* fall through */
           case 15 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x10)
-              { itype = XSTORMY16_INSN_CALLRGR; xstormy16_extract_sfmt_callrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_CALLRGR; xstormy16_extract_sfmt_callrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 16 : /* fall through */
           case 17 : /* fall through */
           case 18 : /* fall through */
@@ -476,9 +432,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           case 22 : /* fall through */
           case 23 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x20)
-              { itype = XSTORMY16_INSN_BGR; xstormy16_extract_sfmt_bgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_BGR; xstormy16_extract_sfmt_bgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 24 : /* fall through */
           case 25 : /* fall through */
           case 26 : /* fall through */
@@ -488,9 +442,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           case 30 : /* fall through */
           case 31 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x30)
-              { itype = XSTORMY16_INSN_ICALLRGR; xstormy16_extract_sfmt_icallrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_ICALLRGR; xstormy16_extract_sfmt_icallrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -502,14 +454,10 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           {
           case 0 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xffe0) == 0x40)
-              { itype = XSTORMY16_INSN_JMP; xstormy16_extract_sfmt_jmp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_JMP; xstormy16_extract_sfmt_jmp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xffe0) == 0x60)
-              { itype = XSTORMY16_INSN_ICALLGR; xstormy16_extract_sfmt_icallgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_ICALLGR; xstormy16_extract_sfmt_icallgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -521,20 +469,14 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           {
           case 0 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x80)
-              { itype = XSTORMY16_INSN_PUSHGR; xstormy16_extract_sfmt_pushgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_PUSHGR; xstormy16_extract_sfmt_pushgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x90)
-              { itype = XSTORMY16_INSN_POPGR; xstormy16_extract_sfmt_popgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_POPGR; xstormy16_extract_sfmt_popgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 2 : /* fall through */
           case 3 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xffe0) == 0xa0)
-              { itype = XSTORMY16_INSN_CALLGR; xstormy16_extract_sfmt_callgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_CALLGR; xstormy16_extract_sfmt_callgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -569,7 +511,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           case 0 :
             entire_insn = entire_insn >> 16;
             if ((entire_insn & 0xffff) == 0xc8)
-              { itype = XSTORMY16_INSN_SDIV; xstormy16_extract_sfmt_sdiv (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+              { itype = XSTORMY16_INSN_SDIV; xstormy16_extract_sfmt_mul (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
@@ -586,10 +528,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 12 : /* fall through */
       case 13 : /* fall through */
       case 14 : /* fall through */
-      case 15 :
-        if ((entire_insn & 0xff000000) == 0x1000000)
-          { itype = XSTORMY16_INSN_CALLFIMM; xstormy16_extract_sfmt_callfimm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 15 : itype = XSTORMY16_INSN_CALLFIMM; xstormy16_extract_sfmt_callfimm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 16 : /* fall through */
       case 17 : /* fall through */
       case 18 : /* fall through */
@@ -597,10 +536,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 20 : /* fall through */
       case 21 : /* fall through */
       case 22 : /* fall through */
-      case 23 :
-        if ((entire_insn & 0xff000000) == 0x2000000)
-          { itype = XSTORMY16_INSN_JMPF; xstormy16_extract_sfmt_jmpf (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 23 : itype = XSTORMY16_INSN_JMPF; xstormy16_extract_sfmt_jmpf (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 24 : /* fall through */
       case 25 : /* fall through */
       case 26 : /* fall through */
@@ -608,10 +544,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 28 : /* fall through */
       case 29 : /* fall through */
       case 30 : /* fall through */
-      case 31 :
-        if ((entire_insn & 0xff000000) == 0x3000000)
-          { itype = XSTORMY16_INSN_ICALLFIMM; xstormy16_extract_sfmt_icallfimm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 31 : itype = XSTORMY16_INSN_ICALLFIMM; xstormy16_extract_sfmt_icallfimm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 32 : /* fall through */
       case 33 : /* fall through */
       case 34 : /* fall through */
@@ -665,9 +598,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 70 : /* fall through */
       case 71 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x800)
-          { itype = XSTORMY16_INSN_CLR1GRIMM; xstormy16_extract_sfmt_set1grimm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_CLR1GRIMM; xstormy16_extract_sfmt_addgrimm4 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 72 : /* fall through */
       case 73 : /* fall through */
       case 74 : /* fall through */
@@ -677,9 +608,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 78 : /* fall through */
       case 79 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x900)
-          { itype = XSTORMY16_INSN_SET1GRIMM; xstormy16_extract_sfmt_set1grimm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SET1GRIMM; xstormy16_extract_sfmt_addgrimm4 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 80 : /* fall through */
       case 81 : /* fall through */
       case 82 : /* fall through */
@@ -689,9 +618,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 86 : /* fall through */
       case 87 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0xa00)
-          { itype = XSTORMY16_INSN_CLR1GRGR; xstormy16_extract_sfmt_andgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_CLR1GRGR; xstormy16_extract_sfmt_andgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 88 : /* fall through */
       case 89 : /* fall through */
       case 90 : /* fall through */
@@ -701,9 +628,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 94 : /* fall through */
       case 95 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0xb00)
-          { itype = XSTORMY16_INSN_SET1GRGR; xstormy16_extract_sfmt_andgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SET1GRGR; xstormy16_extract_sfmt_andgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 104 : /* fall through */
       case 105 : /* fall through */
       case 106 : /* fall through */
@@ -711,10 +636,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 108 : /* fall through */
       case 109 : /* fall through */
       case 110 : /* fall through */
-      case 111 :
-        if ((entire_insn & 0xff000000) == 0xd000000)
-          { itype = XSTORMY16_INSN_BCCGRGR; xstormy16_extract_sfmt_bccgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 111 : itype = XSTORMY16_INSN_BCCGRGR; xstormy16_extract_sfmt_bccgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 128 : /* fall through */
       case 129 : /* fall through */
       case 130 : /* fall through */
@@ -849,14 +771,10 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           {
           case 0 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf001) == 0x1000)
-              { itype = XSTORMY16_INSN_BR; xstormy16_extract_sfmt_br (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_BR; xstormy16_extract_sfmt_br (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xf001) == 0x1001)
-              { itype = XSTORMY16_INSN_CALLRIMM; xstormy16_extract_sfmt_callrimm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_CALLRIMM; xstormy16_extract_sfmt_callrimm (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -923,10 +841,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 372 : /* fall through */
       case 373 : /* fall through */
       case 374 : /* fall through */
-      case 375 :
-        if ((entire_insn & 0xf1000000) == 0x20000000)
-          { itype = XSTORMY16_INSN_BCCGRIMM8; xstormy16_extract_sfmt_bccgrimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 375 : itype = XSTORMY16_INSN_BCCGRIMM8; xstormy16_extract_sfmt_bccgrimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 264 : /* fall through */
       case 265 : /* fall through */
       case 266 : /* fall through */
@@ -992,21 +907,15 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 382 : /* fall through */
       case 383 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf100) == 0x2100)
-          { itype = XSTORMY16_INSN_MOVWGRIMM8; xstormy16_extract_sfmt_movwgrimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVWGRIMM8; xstormy16_extract_sfmt_movwgrimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 384 : /* fall through */
       case 385 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xffc0) == 0x3000)
-          { itype = XSTORMY16_INSN_INCGRIMM2; xstormy16_extract_sfmt_incgrimm2 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_INCGRIMM2; xstormy16_extract_sfmt_incgrimm2 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 386 : /* fall through */
       case 387 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xffc0) == 0x3040)
-          { itype = XSTORMY16_INSN_DECGRIMM2; xstormy16_extract_sfmt_incgrimm2 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_DECGRIMM2; xstormy16_extract_sfmt_incgrimm2 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 388 : /* fall through */
       case 389 :
         {
@@ -1015,24 +924,16 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           {
           case 0 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x3080)
-              { itype = XSTORMY16_INSN_SWPB; xstormy16_extract_sfmt_swpn (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_SWPB; xstormy16_extract_sfmt_swpn (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x3090)
-              { itype = XSTORMY16_INSN_SWPN; xstormy16_extract_sfmt_swpn (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_SWPN; xstormy16_extract_sfmt_swpn (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 2 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x30a0)
-              { itype = XSTORMY16_INSN_CBWGR; xstormy16_extract_sfmt_swpn (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_CBWGR; xstormy16_extract_sfmt_swpn (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 3 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x30b0)
-              { itype = XSTORMY16_INSN_NOTGR; xstormy16_extract_sfmt_swpn (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_NOTGR; xstormy16_extract_sfmt_swpn (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -1044,23 +945,14 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           {
           case 0 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x30c0)
-              { itype = XSTORMY16_INSN_MOVLOWGR; xstormy16_extract_sfmt_movlowgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_MOVLOWGR; xstormy16_extract_sfmt_movlowgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x30d0)
-              { itype = XSTORMY16_INSN_MOVHIGHGR; xstormy16_extract_sfmt_movlowgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 2 :
-            if ((entire_insn & 0xfff00000) == 0x30e00000)
-              { itype = XSTORMY16_INSN_MASKGRIMM16; xstormy16_extract_sfmt_maskgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_MOVHIGHGR; xstormy16_extract_sfmt_movlowgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 : itype = XSTORMY16_INSN_MASKGRIMM16; xstormy16_extract_sfmt_maskgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 3 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xfff0) == 0x30f0)
-              { itype = XSTORMY16_INSN_REVGR; xstormy16_extract_sfmt_swpn (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = XSTORMY16_INSN_REVGR; xstormy16_extract_sfmt_swpn (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -1070,22 +962,10 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           unsigned int val = (((insn >> 20) & (3 << 0)));
           switch (val)
           {
-          case 0 :
-            if ((entire_insn & 0xfff00000) == 0x31000000)
-              { itype = XSTORMY16_INSN_ANDGRIMM16; xstormy16_extract_sfmt_andgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 :
-            if ((entire_insn & 0xfff00000) == 0x31100000)
-              { itype = XSTORMY16_INSN_ORGRIMM16; xstormy16_extract_sfmt_andgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 2 :
-            if ((entire_insn & 0xfff00000) == 0x31200000)
-              { itype = XSTORMY16_INSN_XORGRIMM16; xstormy16_extract_sfmt_andgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 3 :
-            if ((entire_insn & 0xfff00000) == 0x31300000)
-              { itype = XSTORMY16_INSN_MOVWGRIMM16; xstormy16_extract_sfmt_movwgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 0 : itype = XSTORMY16_INSN_ANDGRIMM16; xstormy16_extract_sfmt_andgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 : itype = XSTORMY16_INSN_ORGRIMM16; xstormy16_extract_sfmt_andgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 : itype = XSTORMY16_INSN_XORGRIMM16; xstormy16_extract_sfmt_andgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 3 : itype = XSTORMY16_INSN_MOVWGRIMM16; xstormy16_extract_sfmt_movwgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -1095,22 +975,10 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           unsigned int val = (((insn >> 20) & (3 << 0)));
           switch (val)
           {
-          case 0 :
-            if ((entire_insn & 0xfff00000) == 0x31400000)
-              { itype = XSTORMY16_INSN_ADDGRIMM16; xstormy16_extract_sfmt_addgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 :
-            if ((entire_insn & 0xfff00000) == 0x31500000)
-              { itype = XSTORMY16_INSN_ADCGRIMM16; xstormy16_extract_sfmt_adcgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 2 :
-            if ((entire_insn & 0xfff00000) == 0x31600000)
-              { itype = XSTORMY16_INSN_SUBGRIMM16; xstormy16_extract_sfmt_addgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 3 :
-            if ((entire_insn & 0xfff00000) == 0x31700000)
-              { itype = XSTORMY16_INSN_SBCGRIMM16; xstormy16_extract_sfmt_adcgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 0 : itype = XSTORMY16_INSN_ADDGRIMM16; xstormy16_extract_sfmt_andgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 : itype = XSTORMY16_INSN_ADCGRIMM16; xstormy16_extract_sfmt_adcgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 : itype = XSTORMY16_INSN_SUBGRIMM16; xstormy16_extract_sfmt_andgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 3 : itype = XSTORMY16_INSN_SBCGRIMM16; xstormy16_extract_sfmt_adcgrimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -1123,9 +991,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 406 : /* fall through */
       case 407 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x3200)
-          { itype = XSTORMY16_INSN_SWPW; xstormy16_extract_sfmt_swpw (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SWPW; xstormy16_extract_sfmt_swpw (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 408 : /* fall through */
       case 409 : /* fall through */
       case 410 : /* fall through */
@@ -1135,9 +1001,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 414 : /* fall through */
       case 415 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x3300)
-          { itype = XSTORMY16_INSN_MASKGRGR; xstormy16_extract_sfmt_maskgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MASKGRGR; xstormy16_extract_sfmt_maskgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 432 : /* fall through */
       case 433 : /* fall through */
       case 434 : /* fall through */
@@ -1147,9 +1011,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 438 : /* fall through */
       case 439 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x3600)
-          { itype = XSTORMY16_INSN_ASRGRGR; xstormy16_extract_sfmt_asrgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_ASRGRGR; xstormy16_extract_sfmt_shrgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 440 : /* fall through */
       case 441 : /* fall through */
       case 442 : /* fall through */
@@ -1159,9 +1021,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 446 : /* fall through */
       case 447 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x3700)
-          { itype = XSTORMY16_INSN_ASRGRIMM; xstormy16_extract_sfmt_asrgrimm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_ASRGRIMM; xstormy16_extract_sfmt_shrgrimm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 448 : /* fall through */
       case 449 : /* fall through */
       case 450 : /* fall through */
@@ -1171,9 +1031,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 454 : /* fall through */
       case 455 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x3800)
-          { itype = XSTORMY16_INSN_RRCGRGR; xstormy16_extract_sfmt_rrcgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_RRCGRGR; xstormy16_extract_sfmt_adcgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 456 : /* fall through */
       case 457 : /* fall through */
       case 458 : /* fall through */
@@ -1183,9 +1041,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 462 : /* fall through */
       case 463 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x3900)
-          { itype = XSTORMY16_INSN_RRCGRIMM4; xstormy16_extract_sfmt_rrcgrimm4 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_RRCGRIMM4; xstormy16_extract_sfmt_adcgrimm4 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 464 : /* fall through */
       case 465 : /* fall through */
       case 466 : /* fall through */
@@ -1195,9 +1051,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 470 : /* fall through */
       case 471 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x3a00)
-          { itype = XSTORMY16_INSN_RLCGRGR; xstormy16_extract_sfmt_rrcgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_RLCGRGR; xstormy16_extract_sfmt_adcgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 472 : /* fall through */
       case 473 : /* fall through */
       case 474 : /* fall through */
@@ -1207,9 +1061,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 478 : /* fall through */
       case 479 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x3b00)
-          { itype = XSTORMY16_INSN_RLCGRIMM4; xstormy16_extract_sfmt_rrcgrimm4 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_RLCGRIMM4; xstormy16_extract_sfmt_adcgrimm4 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 480 : /* fall through */
       case 481 : /* fall through */
       case 482 : /* fall through */
@@ -1219,9 +1071,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 486 : /* fall through */
       case 487 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x3c00)
-          { itype = XSTORMY16_INSN_SHRGRGR; xstormy16_extract_sfmt_shrgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SHRGRGR; xstormy16_extract_sfmt_shrgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 488 : /* fall through */
       case 489 : /* fall through */
       case 490 : /* fall through */
@@ -1231,9 +1081,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 494 : /* fall through */
       case 495 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x3d00)
-          { itype = XSTORMY16_INSN_SHRGRIMM; xstormy16_extract_sfmt_shrgrimm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SHRGRIMM; xstormy16_extract_sfmt_shrgrimm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 496 : /* fall through */
       case 497 : /* fall through */
       case 498 : /* fall through */
@@ -1243,9 +1091,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 502 : /* fall through */
       case 503 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x3e00)
-          { itype = XSTORMY16_INSN_SHLGRGR; xstormy16_extract_sfmt_shrgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SHLGRGR; xstormy16_extract_sfmt_shrgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 504 : /* fall through */
       case 505 : /* fall through */
       case 506 : /* fall through */
@@ -1255,9 +1101,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 510 : /* fall through */
       case 511 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x3f00)
-          { itype = XSTORMY16_INSN_SHLGRIMM; xstormy16_extract_sfmt_shrgrimm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SHLGRIMM; xstormy16_extract_sfmt_shrgrimm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 512 : /* fall through */
       case 513 : /* fall through */
       case 514 : /* fall through */
@@ -1267,9 +1111,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 518 : /* fall through */
       case 519 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x4000)
-          { itype = XSTORMY16_INSN_ANDGRGR; xstormy16_extract_sfmt_andgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_ANDGRGR; xstormy16_extract_sfmt_andgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 520 : /* fall through */
       case 521 : /* fall through */
       case 522 : /* fall through */
@@ -1279,9 +1121,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 526 : /* fall through */
       case 527 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x4100)
-          { itype = XSTORMY16_INSN_ANDIMM8; xstormy16_extract_sfmt_andimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_ANDIMM8; xstormy16_extract_sfmt_andimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 528 : /* fall through */
       case 529 : /* fall through */
       case 530 : /* fall through */
@@ -1291,9 +1131,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 534 : /* fall through */
       case 535 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x4200)
-          { itype = XSTORMY16_INSN_ORGRGR; xstormy16_extract_sfmt_andgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_ORGRGR; xstormy16_extract_sfmt_andgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 536 : /* fall through */
       case 537 : /* fall through */
       case 538 : /* fall through */
@@ -1303,9 +1141,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 542 : /* fall through */
       case 543 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x4300)
-          { itype = XSTORMY16_INSN_ORIMM8; xstormy16_extract_sfmt_andimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_ORIMM8; xstormy16_extract_sfmt_andimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 544 : /* fall through */
       case 545 : /* fall through */
       case 546 : /* fall through */
@@ -1315,9 +1151,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 550 : /* fall through */
       case 551 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x4400)
-          { itype = XSTORMY16_INSN_XORGRGR; xstormy16_extract_sfmt_andgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_XORGRGR; xstormy16_extract_sfmt_andgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 552 : /* fall through */
       case 553 : /* fall through */
       case 554 : /* fall through */
@@ -1327,9 +1161,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 558 : /* fall through */
       case 559 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x4500)
-          { itype = XSTORMY16_INSN_XORIMM8; xstormy16_extract_sfmt_andimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_XORIMM8; xstormy16_extract_sfmt_andimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 560 : /* fall through */
       case 561 : /* fall through */
       case 562 : /* fall through */
@@ -1339,9 +1171,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 566 : /* fall through */
       case 567 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x4600)
-          { itype = XSTORMY16_INSN_MOVGRGR; xstormy16_extract_sfmt_movgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVGRGR; xstormy16_extract_sfmt_movgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 568 : /* fall through */
       case 569 : /* fall through */
       case 570 : /* fall through */
@@ -1351,9 +1181,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 574 : /* fall through */
       case 575 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x4700)
-          { itype = XSTORMY16_INSN_MOVWIMM8; xstormy16_extract_sfmt_movwimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVWIMM8; xstormy16_extract_sfmt_movwimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 584 : /* fall through */
       case 585 : /* fall through */
       case 586 : /* fall through */
@@ -1363,9 +1191,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 590 : /* fall through */
       case 591 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x4900)
-          { itype = XSTORMY16_INSN_ADDGRGR; xstormy16_extract_sfmt_addgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_ADDGRGR; xstormy16_extract_sfmt_andgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 600 : /* fall through */
       case 601 : /* fall through */
       case 602 : /* fall through */
@@ -1375,9 +1201,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 606 : /* fall through */
       case 607 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x4b00)
-          { itype = XSTORMY16_INSN_ADCGRGR; xstormy16_extract_sfmt_adcgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_ADCGRGR; xstormy16_extract_sfmt_adcgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 616 : /* fall through */
       case 617 : /* fall through */
       case 618 : /* fall through */
@@ -1387,9 +1211,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 622 : /* fall through */
       case 623 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x4d00)
-          { itype = XSTORMY16_INSN_SUBGRGR; xstormy16_extract_sfmt_addgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SUBGRGR; xstormy16_extract_sfmt_andgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 632 : /* fall through */
       case 633 : /* fall through */
       case 634 : /* fall through */
@@ -1399,9 +1221,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 638 : /* fall through */
       case 639 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x4f00)
-          { itype = XSTORMY16_INSN_SBCGRGR; xstormy16_extract_sfmt_adcgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SBCGRGR; xstormy16_extract_sfmt_adcgrgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 648 : /* fall through */
       case 649 : /* fall through */
       case 650 : /* fall through */
@@ -1411,9 +1231,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 654 : /* fall through */
       case 655 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x5100)
-          { itype = XSTORMY16_INSN_ADDGRIMM4; xstormy16_extract_sfmt_addgrimm4 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_ADDGRIMM4; xstormy16_extract_sfmt_addgrimm4 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 664 : /* fall through */
       case 665 : /* fall through */
       case 666 : /* fall through */
@@ -1423,9 +1241,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 670 : /* fall through */
       case 671 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x5300)
-          { itype = XSTORMY16_INSN_ADCGRIMM4; xstormy16_extract_sfmt_adcgrimm4 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_ADCGRIMM4; xstormy16_extract_sfmt_adcgrimm4 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 680 : /* fall through */
       case 681 : /* fall through */
       case 682 : /* fall through */
@@ -1435,9 +1251,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 686 : /* fall through */
       case 687 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x5500)
-          { itype = XSTORMY16_INSN_SUBGRIMM4; xstormy16_extract_sfmt_addgrimm4 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SUBGRIMM4; xstormy16_extract_sfmt_addgrimm4 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 696 : /* fall through */
       case 697 : /* fall through */
       case 698 : /* fall through */
@@ -1447,9 +1261,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 702 : /* fall through */
       case 703 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x5700)
-          { itype = XSTORMY16_INSN_SBCGRIMM4; xstormy16_extract_sfmt_adcgrimm4 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SBCGRIMM4; xstormy16_extract_sfmt_adcgrimm4 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 712 : /* fall through */
       case 713 : /* fall through */
       case 714 : /* fall through */
@@ -1459,9 +1271,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 718 : /* fall through */
       case 719 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x5900)
-          { itype = XSTORMY16_INSN_ADDIMM8; xstormy16_extract_sfmt_addimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_ADDIMM8; xstormy16_extract_sfmt_andimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 728 : /* fall through */
       case 729 : /* fall through */
       case 730 : /* fall through */
@@ -1471,9 +1281,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 734 : /* fall through */
       case 735 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x5b00)
-          { itype = XSTORMY16_INSN_ADCIMM8; xstormy16_extract_sfmt_adcimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_ADCIMM8; xstormy16_extract_sfmt_adcimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 744 : /* fall through */
       case 745 : /* fall through */
       case 746 : /* fall through */
@@ -1483,9 +1291,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 750 : /* fall through */
       case 751 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x5d00)
-          { itype = XSTORMY16_INSN_SUBIMM8; xstormy16_extract_sfmt_addimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SUBIMM8; xstormy16_extract_sfmt_andimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 760 : /* fall through */
       case 761 : /* fall through */
       case 762 : /* fall through */
@@ -1495,9 +1301,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 766 : /* fall through */
       case 767 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xff00) == 0x5f00)
-          { itype = XSTORMY16_INSN_SBCGRIMM8; xstormy16_extract_sfmt_adcimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SBCGRIMM8; xstormy16_extract_sfmt_adcimm8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 768 : /* fall through */
       case 770 : /* fall through */
       case 772 : /* fall through */
@@ -1507,9 +1311,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 780 : /* fall through */
       case 782 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xfe08) == 0x6000)
-          { itype = XSTORMY16_INSN_MOVGRGRIPOSTINC; xstormy16_extract_sfmt_movgrgripostinc (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVGRGRIPOSTINC; xstormy16_extract_sfmt_movgrgripostinc (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 769 : /* fall through */
       case 771 : /* fall through */
       case 773 : /* fall through */
@@ -1530,9 +1332,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 796 : /* fall through */
       case 798 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xfe08) == 0x6200)
-          { itype = XSTORMY16_INSN_MOVGRIPOSTINCGR; xstormy16_extract_sfmt_movgripostincgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVGRIPOSTINCGR; xstormy16_extract_sfmt_movgripostincgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 785 : /* fall through */
       case 787 : /* fall through */
       case 789 : /* fall through */
@@ -1553,9 +1353,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 812 : /* fall through */
       case 814 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xfe08) == 0x6400)
-          { itype = XSTORMY16_INSN_MOVFGRGRIPOSTINC; xstormy16_extract_sfmt_movfgrgripostinc (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVFGRGRIPOSTINC; xstormy16_extract_sfmt_movfgrgripostinc (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 801 : /* fall through */
       case 803 : /* fall through */
       case 805 : /* fall through */
@@ -1576,9 +1374,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 828 : /* fall through */
       case 830 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xfe08) == 0x6600)
-          { itype = XSTORMY16_INSN_MOVFGRIPOSTINCGR; xstormy16_extract_sfmt_movfgripostincgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVFGRIPOSTINCGR; xstormy16_extract_sfmt_movfgripostincgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 817 : /* fall through */
       case 819 : /* fall through */
       case 821 : /* fall through */
@@ -1599,9 +1395,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 844 : /* fall through */
       case 846 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xfe08) == 0x6800)
-          { itype = XSTORMY16_INSN_MOVGRGRIPREDEC; xstormy16_extract_sfmt_movgrgripredec (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVGRGRIPREDEC; xstormy16_extract_sfmt_movgrgripredec (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 833 : /* fall through */
       case 835 : /* fall through */
       case 837 : /* fall through */
@@ -1622,9 +1416,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 860 : /* fall through */
       case 862 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xfe08) == 0x6a00)
-          { itype = XSTORMY16_INSN_MOVGRIPREDECGR; xstormy16_extract_sfmt_movgripredecgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVGRIPREDECGR; xstormy16_extract_sfmt_movgripredecgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 849 : /* fall through */
       case 851 : /* fall through */
       case 853 : /* fall through */
@@ -1645,9 +1437,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 876 : /* fall through */
       case 878 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xfe08) == 0x6c00)
-          { itype = XSTORMY16_INSN_MOVFGRGRIPREDEC; xstormy16_extract_sfmt_movfgrgripredec (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVFGRGRIPREDEC; xstormy16_extract_sfmt_movfgrgripredec (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 865 : /* fall through */
       case 867 : /* fall through */
       case 869 : /* fall through */
@@ -1668,9 +1458,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 892 : /* fall through */
       case 894 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xfe08) == 0x6e00)
-          { itype = XSTORMY16_INSN_MOVFGRIPREDECGR; xstormy16_extract_sfmt_movfgripredecgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVFGRIPREDECGR; xstormy16_extract_sfmt_movfgripredecgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 881 : /* fall through */
       case 883 : /* fall through */
       case 885 : /* fall through */
@@ -1691,9 +1479,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 908 : /* fall through */
       case 910 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xfe08) == 0x7000)
-          { itype = XSTORMY16_INSN_MOVGRGRI; xstormy16_extract_sfmt_movgrgri (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVGRGRI; xstormy16_extract_sfmt_movgrgri (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 897 : /* fall through */
       case 899 : /* fall through */
       case 901 : /* fall through */
@@ -1714,9 +1500,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 924 : /* fall through */
       case 926 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xfe08) == 0x7200)
-          { itype = XSTORMY16_INSN_MOVGRIGR; xstormy16_extract_sfmt_movgrigr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVGRIGR; xstormy16_extract_sfmt_movgrigr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 913 : /* fall through */
       case 915 : /* fall through */
       case 917 : /* fall through */
@@ -1737,9 +1521,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 940 : /* fall through */
       case 942 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xfe08) == 0x7400)
-          { itype = XSTORMY16_INSN_MOVFGRGRI; xstormy16_extract_sfmt_movfgrgri (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVFGRGRI; xstormy16_extract_sfmt_movfgrgri (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 929 : /* fall through */
       case 931 : /* fall through */
       case 933 : /* fall through */
@@ -1760,9 +1542,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 956 : /* fall through */
       case 958 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xfe08) == 0x7600)
-          { itype = XSTORMY16_INSN_MOVFGRIGR; xstormy16_extract_sfmt_movfgrigr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVFGRIGR; xstormy16_extract_sfmt_movfgrigr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 945 : /* fall through */
       case 947 : /* fall through */
       case 949 : /* fall through */
@@ -1789,10 +1569,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 972 : /* fall through */
       case 973 : /* fall through */
       case 974 : /* fall through */
-      case 975 :
-        if ((entire_insn & 0xfe000000) == 0x78000000)
-          { itype = XSTORMY16_INSN_MOVLMEMIMM; xstormy16_extract_sfmt_movlmemimm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 975 : itype = XSTORMY16_INSN_MOVLMEMIMM; xstormy16_extract_sfmt_movlmemimm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 976 : /* fall through */
       case 977 : /* fall through */
       case 978 : /* fall through */
@@ -1808,10 +1585,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 988 : /* fall through */
       case 989 : /* fall through */
       case 990 : /* fall through */
-      case 991 :
-        if ((entire_insn & 0xfe000000) == 0x7a000000)
-          { itype = XSTORMY16_INSN_MOVHMEMIMM; xstormy16_extract_sfmt_movhmemimm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 991 : itype = XSTORMY16_INSN_MOVHMEMIMM; xstormy16_extract_sfmt_movhmemimm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 992 : /* fall through */
       case 993 : /* fall through */
       case 994 : /* fall through */
@@ -1985,9 +1759,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 1150 : /* fall through */
       case 1151 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0x8000)
-          { itype = XSTORMY16_INSN_MOVLGRMEM; xstormy16_extract_sfmt_movlgrmem (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVLGRMEM; xstormy16_extract_sfmt_movlgrmem (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 1152 : /* fall through */
       case 1153 : /* fall through */
       case 1154 : /* fall through */
@@ -2117,9 +1889,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 1278 : /* fall through */
       case 1279 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0x9000)
-          { itype = XSTORMY16_INSN_MOVLMEMGR; xstormy16_extract_sfmt_movlmemgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVLMEMGR; xstormy16_extract_sfmt_movlmemgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 1280 : /* fall through */
       case 1281 : /* fall through */
       case 1282 : /* fall through */
@@ -2249,9 +2019,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 1406 : /* fall through */
       case 1407 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0xa000)
-          { itype = XSTORMY16_INSN_MOVHGRMEM; xstormy16_extract_sfmt_movhgrmem (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVHGRMEM; xstormy16_extract_sfmt_movhgrmem (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 1408 : /* fall through */
       case 1409 : /* fall through */
       case 1410 : /* fall through */
@@ -2381,9 +2149,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 1534 : /* fall through */
       case 1535 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0xb000)
-          { itype = XSTORMY16_INSN_MOVHMEMGR; xstormy16_extract_sfmt_movhmemgr (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_MOVHMEMGR; xstormy16_extract_sfmt_movhmemgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 1536 : /* fall through */
       case 1537 : /* fall through */
       case 1538 : /* fall through */
@@ -2511,10 +2277,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 1660 : /* fall through */
       case 1661 : /* fall through */
       case 1662 : /* fall through */
-      case 1663 :
-        if ((entire_insn & 0xf0000000) == 0xc0000000)
-          { itype = XSTORMY16_INSN_BCCIMM16; xstormy16_extract_sfmt_bccimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 1663 : itype = XSTORMY16_INSN_BCCIMM16; xstormy16_extract_sfmt_bccimm16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 1664 : /* fall through */
       case 1665 : /* fall through */
       case 1666 : /* fall through */
@@ -2644,9 +2407,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 1790 : /* fall through */
       case 1791 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0xd000)
-          { itype = XSTORMY16_INSN_BCC; xstormy16_extract_sfmt_bcc (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_BCC; xstormy16_extract_sfmt_bcc (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 1792 : /* fall through */
       case 1793 : /* fall through */
       case 1794 : /* fall through */
@@ -2712,9 +2473,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 1910 : /* fall through */
       case 1911 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf100) == 0xe000)
-          { itype = XSTORMY16_INSN_CLR1LMEMIMM; xstormy16_extract_sfmt_set1lmemimm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_CLR1LMEMIMM; xstormy16_extract_sfmt_set1lmemimm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 1800 : /* fall through */
       case 1801 : /* fall through */
       case 1802 : /* fall through */
@@ -2780,9 +2539,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 1918 : /* fall through */
       case 1919 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf100) == 0xe100)
-          { itype = XSTORMY16_INSN_SET1LMEMIMM; xstormy16_extract_sfmt_set1lmemimm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SET1LMEMIMM; xstormy16_extract_sfmt_set1lmemimm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 1920 : /* fall through */
       case 1921 : /* fall through */
       case 1922 : /* fall through */
@@ -2848,9 +2605,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 2038 : /* fall through */
       case 2039 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf100) == 0xf000)
-          { itype = XSTORMY16_INSN_CLR1HMEMIMM; xstormy16_extract_sfmt_set1hmemimm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_CLR1HMEMIMM; xstormy16_extract_sfmt_set1hmemimm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 1928 : /* fall through */
       case 1929 : /* fall through */
       case 1930 : /* fall through */
@@ -2916,9 +2671,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 2046 : /* fall through */
       case 2047 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf100) == 0xf100)
-          { itype = XSTORMY16_INSN_SET1HMEMIMM; xstormy16_extract_sfmt_set1hmemimm (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = XSTORMY16_INSN_SET1HMEMIMM; xstormy16_extract_sfmt_set1hmemimm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       default : itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       }
     }
@@ -4221,31 +3974,6 @@ xstormy16_extract_sfmt_andgrimm16 (xstormy16_scache* abuf, xstormy16_cpu* curren
 }
 
 void
-xstormy16_extract_sfmt_addgrgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
-    xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_bccgrgr.f
-    UINT f_Rs;
-    UINT f_Rd;
-
-    f_Rs = EXTRACT_MSB0_UINT (insn, 16, 8, 4);
-    f_Rd = EXTRACT_MSB0_UINT (insn, 16, 12, 4);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_Rd) = f_Rd;
-  FLD (f_Rs) = f_Rs;
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_addgrgr)\t"
-        << " f_Rd:0x" << hex << f_Rd << dec
-        << " f_Rs:0x" << hex << f_Rs << dec
-        << endl;
-    }
-
-#undef FLD
-}
-
-void
 xstormy16_extract_sfmt_addgrimm4 (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
     xstormy16_insn_word insn = entire_insn;
 #define FLD(f) abuf->fields.sfmt_bngrimm4.f
@@ -4264,52 +3992,6 @@ xstormy16_extract_sfmt_addgrimm4 (xstormy16_scache* abuf, xstormy16_cpu* current
         << "0x" << hex << pc << dec << " (sfmt_addgrimm4)\t"
         << " f_Rd:0x" << hex << f_Rd << dec
         << " f_imm4:0x" << hex << f_imm4 << dec
-        << endl;
-    }
-
-#undef FLD
-}
-
-void
-xstormy16_extract_sfmt_addimm8 (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
-    xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_bccgrimm8.f
-    UINT f_imm8;
-
-    f_imm8 = EXTRACT_MSB0_UINT (insn, 16, 8, 8);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_imm8) = f_imm8;
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_addimm8)\t"
-        << " f_imm8:0x" << hex << f_imm8 << dec
-        << endl;
-    }
-
-#undef FLD
-}
-
-void
-xstormy16_extract_sfmt_addgrimm16 (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
-    xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_movwgrimm16.f
-    UINT f_Rd;
-    UINT f_imm16;
-
-    f_Rd = EXTRACT_MSB0_UINT (insn, 32, 12, 4);
-    f_imm16 = EXTRACT_MSB0_UINT (insn, 32, 16, 16);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_Rd) = f_Rd;
-  FLD (f_imm16) = f_imm16;
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_addgrimm16)\t"
-        << " f_Rd:0x" << hex << f_Rd << dec
-        << " f_imm16:0x" << hex << f_imm16 << dec
         << endl;
     }
 
@@ -4438,56 +4120,6 @@ xstormy16_extract_sfmt_incgrimm2 (xstormy16_scache* abuf, xstormy16_cpu* current
 }
 
 void
-xstormy16_extract_sfmt_rrcgrgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
-    xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_bccgrgr.f
-    UINT f_Rs;
-    UINT f_Rd;
-
-    f_Rs = EXTRACT_MSB0_UINT (insn, 16, 8, 4);
-    f_Rd = EXTRACT_MSB0_UINT (insn, 16, 12, 4);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_Rd) = f_Rd;
-  FLD (f_Rs) = f_Rs;
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_rrcgrgr)\t"
-        << " f_Rd:0x" << hex << f_Rd << dec
-        << " f_Rs:0x" << hex << f_Rs << dec
-        << endl;
-    }
-
-#undef FLD
-}
-
-void
-xstormy16_extract_sfmt_rrcgrimm4 (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
-    xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_bngrimm4.f
-    UINT f_imm4;
-    UINT f_Rd;
-
-    f_imm4 = EXTRACT_MSB0_UINT (insn, 16, 8, 4);
-    f_Rd = EXTRACT_MSB0_UINT (insn, 16, 12, 4);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_Rd) = f_Rd;
-  FLD (f_imm4) = f_imm4;
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_rrcgrimm4)\t"
-        << " f_Rd:0x" << hex << f_Rd << dec
-        << " f_imm4:0x" << hex << f_imm4 << dec
-        << endl;
-    }
-
-#undef FLD
-}
-
-void
 xstormy16_extract_sfmt_shrgrgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
     xstormy16_insn_word insn = entire_insn;
 #define FLD(f) abuf->fields.sfmt_bccgrgr.f
@@ -4529,81 +4161,6 @@ xstormy16_extract_sfmt_shrgrimm (xstormy16_scache* abuf, xstormy16_cpu* current_
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_shrgrimm)\t"
-        << " f_Rd:0x" << hex << f_Rd << dec
-        << " f_imm4:0x" << hex << f_imm4 << dec
-        << endl;
-    }
-
-#undef FLD
-}
-
-void
-xstormy16_extract_sfmt_asrgrgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
-    xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_bccgrgr.f
-    UINT f_Rs;
-    UINT f_Rd;
-
-    f_Rs = EXTRACT_MSB0_UINT (insn, 16, 8, 4);
-    f_Rd = EXTRACT_MSB0_UINT (insn, 16, 12, 4);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_Rd) = f_Rd;
-  FLD (f_Rs) = f_Rs;
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_asrgrgr)\t"
-        << " f_Rd:0x" << hex << f_Rd << dec
-        << " f_Rs:0x" << hex << f_Rs << dec
-        << endl;
-    }
-
-#undef FLD
-}
-
-void
-xstormy16_extract_sfmt_asrgrimm (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
-    xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_bngrimm4.f
-    UINT f_imm4;
-    UINT f_Rd;
-
-    f_imm4 = EXTRACT_MSB0_UINT (insn, 16, 8, 4);
-    f_Rd = EXTRACT_MSB0_UINT (insn, 16, 12, 4);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_Rd) = f_Rd;
-  FLD (f_imm4) = f_imm4;
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_asrgrimm)\t"
-        << " f_Rd:0x" << hex << f_Rd << dec
-        << " f_imm4:0x" << hex << f_imm4 << dec
-        << endl;
-    }
-
-#undef FLD
-}
-
-void
-xstormy16_extract_sfmt_set1grimm (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
-    xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_bngrimm4.f
-    UINT f_imm4;
-    UINT f_Rd;
-
-    f_imm4 = EXTRACT_MSB0_UINT (insn, 16, 8, 4);
-    f_Rd = EXTRACT_MSB0_UINT (insn, 16, 12, 4);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_Rd) = f_Rd;
-  FLD (f_imm4) = f_imm4;
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_set1grimm)\t"
         << " f_Rd:0x" << hex << f_Rd << dec
         << " f_imm4:0x" << hex << f_imm4 << dec
         << endl;
@@ -5198,23 +4755,6 @@ xstormy16_extract_sfmt_mul (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_mul)\t"
-        << endl;
-    }
-
-#undef FLD
-}
-
-void
-xstormy16_extract_sfmt_sdiv (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
-    xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
-
-
-  /* Record the fields for the semantic handler.  */
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_sdiv)\t"
         << endl;
     }
 

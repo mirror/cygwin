@@ -33,9 +33,9 @@ mepcop1_16_idesc mepcop1_16_idesc::idesc_table[MEPCOP1_16_INSN_CPMOVI_B_P0S_P1 +
   { mepcop1_16_sem_cpunpackl_b_P0S_P1, "CPUNPACKL_B_P0S_P1", MEPCOP1_16_INSN_CPUNPACKL_B_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cpunpackl_h_P0S_P1, "CPUNPACKL_H_P0S_P1", MEPCOP1_16_INSN_CPUNPACKL_H_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cpunpackl_w_P0S_P1, "CPUNPACKL_W_P0S_P1", MEPCOP1_16_INSN_CPUNPACKL_W_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
-  { mepcop1_16_sem_cpsel_P0S_P1, "CPSEL_P0S_P1", MEPCOP1_16_INSN_CPSEL_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
-  { mepcop1_16_sem_cpfsftbs0_P0S_P1, "CPFSFTBS0_P0S_P1", MEPCOP1_16_INSN_CPFSFTBS0_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
-  { mepcop1_16_sem_cpfsftbs1_P0S_P1, "CPFSFTBS1_P0S_P1", MEPCOP1_16_INSN_CPFSFTBS1_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
+  { mepcop1_16_sem_cpsel_P0S_P1, "CPSEL_P0S_P1", MEPCOP1_16_INSN_CPSEL_P0S_P1, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
+  { mepcop1_16_sem_cpfsftbs0_P0S_P1, "CPFSFTBS0_P0S_P1", MEPCOP1_16_INSN_CPFSFTBS0_P0S_P1, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
+  { mepcop1_16_sem_cpfsftbs1_P0S_P1, "CPFSFTBS1_P0S_P1", MEPCOP1_16_INSN_CPFSFTBS1_P0S_P1, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cpmov_P0S_P1, "CPMOV_P0S_P1", MEPCOP1_16_INSN_CPMOV_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cpabsz_b_P0S_P1, "CPABSZ_B_P0S_P1", MEPCOP1_16_INSN_CPABSZ_B_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cpabsz_h_P0S_P1, "CPABSZ_H_P0S_P1", MEPCOP1_16_INSN_CPABSZ_H_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
@@ -48,7 +48,7 @@ mepcop1_16_idesc mepcop1_16_idesc::idesc_table[MEPCOP1_16_INSN_CPMOVI_B_P0S_P1 +
   { mepcop1_16_sem_cphadd_b_P0S_P1, "CPHADD_B_P0S_P1", MEPCOP1_16_INSN_CPHADD_B_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cphadd_h_P0S_P1, "CPHADD_H_P0S_P1", MEPCOP1_16_INSN_CPHADD_H_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cphadd_w_P0S_P1, "CPHADD_W_P0S_P1", MEPCOP1_16_INSN_CPHADD_W_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
-  { mepcop1_16_sem_cpccadd_b_P0S_P1, "CPCCADD_B_P0S_P1", MEPCOP1_16_INSN_CPCCADD_B_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V8QI, CRET_FIRSTCOPY, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
+  { mepcop1_16_sem_cpccadd_b_P0S_P1, "CPCCADD_B_P0S_P1", MEPCOP1_16_INSN_CPCCADD_B_P0S_P1, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V8QI, CRET_FIRSTCOPY, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cpbcast_b_P0S_P1, "CPBCAST_B_P0S_P1", MEPCOP1_16_INSN_CPBCAST_B_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cpbcast_h_P0S_P1, "CPBCAST_H_P0S_P1", MEPCOP1_16_INSN_CPBCAST_H_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cpbcast_w_P0S_P1, "CPBCAST_W_P0S_P1", MEPCOP1_16_INSN_CPBCAST_W_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
@@ -68,12 +68,12 @@ mepcop1_16_idesc mepcop1_16_idesc::idesc_table[MEPCOP1_16_INSN_CPMOVI_B_P0S_P1 +
   { mepcop1_16_sem_cpcasth_w_P0S_P1, "CPCASTH_W_P0S_P1", MEPCOP1_16_INSN_CPCASTH_W_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cdcastuw_P0S_P1, "CDCASTUW_P0S_P1", MEPCOP1_16_INSN_CDCASTUW_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cdcastw_P0S_P1, "CDCASTW_P0S_P1", MEPCOP1_16_INSN_CDCASTW_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
-  { mepcop1_16_sem_cpmovfrcsar0_P0S_P1, "CPMOVFRCSAR0_P0S_P1", MEPCOP1_16_INSN_CPMOVFRCSAR0_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
-  { mepcop1_16_sem_cpmovfrcsar1_P0S_P1, "CPMOVFRCSAR1_P0S_P1", MEPCOP1_16_INSN_CPMOVFRCSAR1_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
-  { mepcop1_16_sem_cpmovfrcc_P0S_P1, "CPMOVFRCC_P0S_P1", MEPCOP1_16_INSN_CPMOVFRCC_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
-  { mepcop1_16_sem_cpmovtocsar0_P0S_P1, "CPMOVTOCSAR0_P0S_P1", MEPCOP1_16_INSN_CPMOVTOCSAR0_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
-  { mepcop1_16_sem_cpmovtocsar1_P0S_P1, "CPMOVTOCSAR1_P0S_P1", MEPCOP1_16_INSN_CPMOVTOCSAR1_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
-  { mepcop1_16_sem_cpmovtocc_P0S_P1, "CPMOVTOCC_P0S_P1", MEPCOP1_16_INSN_CPMOVTOCC_P0S_P1, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
+  { mepcop1_16_sem_cpmovfrcsar0_P0S_P1, "CPMOVFRCSAR0_P0S_P1", MEPCOP1_16_INSN_CPMOVFRCSAR0_P0S_P1, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
+  { mepcop1_16_sem_cpmovfrcsar1_P0S_P1, "CPMOVFRCSAR1_P0S_P1", MEPCOP1_16_INSN_CPMOVFRCSAR1_P0S_P1, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
+  { mepcop1_16_sem_cpmovfrcc_P0S_P1, "CPMOVFRCC_P0S_P1", MEPCOP1_16_INSN_CPMOVFRCC_P0S_P1, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
+  { mepcop1_16_sem_cpmovtocsar0_P0S_P1, "CPMOVTOCSAR0_P0S_P1", MEPCOP1_16_INSN_CPMOVTOCSAR0_P0S_P1, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
+  { mepcop1_16_sem_cpmovtocsar1_P0S_P1, "CPMOVTOCSAR1_P0S_P1", MEPCOP1_16_INSN_CPMOVTOCSAR1_P0S_P1, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
+  { mepcop1_16_sem_cpmovtocc_P0S_P1, "CPMOVTOCC_P0S_P1", MEPCOP1_16_INSN_CPMOVTOCC_P0S_P1, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cpcmpeqz_b_P0S_P1, "CPCMPEQZ_B_P0S_P1", MEPCOP1_16_INSN_CPCMPEQZ_B_P0S_P1, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V8QI, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cpcmpeq_b_P0S_P1, "CPCMPEQ_B_P0S_P1", MEPCOP1_16_INSN_CPCMPEQ_B_P0S_P1, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V8QI, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
   { mepcop1_16_sem_cpcmpeq_h_P0S_P1, "CPCMPEQ_H_P0S_P1", MEPCOP1_16_INSN_CPCMPEQ_H_P0S_P1, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x24" }, CPTYPE_V4HI, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S)|(1<<SLOTS_P1) } },
@@ -118,21 +118,21 @@ mepcop1_16_idesc mepcop1_16_idesc::idesc_table[MEPCOP1_16_INSN_CPMOVI_B_P0S_P1 +
   { mepcop1_16_sem_cpseta0_h_P0S, "CPSETA0_H_P0S", MEPCOP1_16_INSN_CPSETA0_H_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V4HI, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
   { mepcop1_16_sem_cpsetua0_w_P0S, "CPSETUA0_W_P0S", MEPCOP1_16_INSN_CPSETUA0_W_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
   { mepcop1_16_sem_cpsetla0_w_P0S, "CPSETLA0_W_P0S", MEPCOP1_16_INSN_CPSETLA0_W_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cpmova0_b_P0S, "CPMOVA0_B_P0S", MEPCOP1_16_INSN_CPMOVA0_B_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cpmovua0_h_P0S, "CPMOVUA0_H_P0S", MEPCOP1_16_INSN_CPMOVUA0_H_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cpmovla0_h_P0S, "CPMOVLA0_H_P0S", MEPCOP1_16_INSN_CPMOVLA0_H_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cpmovuua0_w_P0S, "CPMOVUUA0_W_P0S", MEPCOP1_16_INSN_CPMOVUUA0_W_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cpmovula0_w_P0S, "CPMOVULA0_W_P0S", MEPCOP1_16_INSN_CPMOVULA0_W_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cpmovlua0_w_P0S, "CPMOVLUA0_W_P0S", MEPCOP1_16_INSN_CPMOVLUA0_W_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cpmovlla0_w_P0S, "CPMOVLLA0_W_P0S", MEPCOP1_16_INSN_CPMOVLLA0_W_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cppacka0u_b_P0S, "CPPACKA0U_B_P0S", MEPCOP1_16_INSN_CPPACKA0U_B_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V8UQI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cppacka0_b_P0S, "CPPACKA0_B_P0S", MEPCOP1_16_INSN_CPPACKA0_B_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cppackua0_h_P0S, "CPPACKUA0_H_P0S", MEPCOP1_16_INSN_CPPACKUA0_H_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cppackla0_h_P0S, "CPPACKLA0_H_P0S", MEPCOP1_16_INSN_CPPACKLA0_H_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cppackua0_w_P0S, "CPPACKUA0_W_P0S", MEPCOP1_16_INSN_CPPACKUA0_W_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cppackla0_w_P0S, "CPPACKLA0_W_P0S", MEPCOP1_16_INSN_CPPACKLA0_W_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cpmovhua0_w_P0S, "CPMOVHUA0_W_P0S", MEPCOP1_16_INSN_CPMOVHUA0_W_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
-  { mepcop1_16_sem_cpmovhla0_w_P0S, "CPMOVHLA0_W_P0S", MEPCOP1_16_INSN_CPMOVHLA0_W_P0S, { 0|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cpmova0_b_P0S, "CPMOVA0_B_P0S", MEPCOP1_16_INSN_CPMOVA0_B_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cpmovua0_h_P0S, "CPMOVUA0_H_P0S", MEPCOP1_16_INSN_CPMOVUA0_H_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cpmovla0_h_P0S, "CPMOVLA0_H_P0S", MEPCOP1_16_INSN_CPMOVLA0_H_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cpmovuua0_w_P0S, "CPMOVUUA0_W_P0S", MEPCOP1_16_INSN_CPMOVUUA0_W_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cpmovula0_w_P0S, "CPMOVULA0_W_P0S", MEPCOP1_16_INSN_CPMOVULA0_W_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cpmovlua0_w_P0S, "CPMOVLUA0_W_P0S", MEPCOP1_16_INSN_CPMOVLUA0_W_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cpmovlla0_w_P0S, "CPMOVLLA0_W_P0S", MEPCOP1_16_INSN_CPMOVLLA0_W_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cppacka0u_b_P0S, "CPPACKA0U_B_P0S", MEPCOP1_16_INSN_CPPACKA0U_B_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V8UQI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cppacka0_b_P0S, "CPPACKA0_B_P0S", MEPCOP1_16_INSN_CPPACKA0_B_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V8QI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cppackua0_h_P0S, "CPPACKUA0_H_P0S", MEPCOP1_16_INSN_CPPACKUA0_H_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cppackla0_h_P0S, "CPPACKLA0_H_P0S", MEPCOP1_16_INSN_CPPACKLA0_H_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V4HI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cppackua0_w_P0S, "CPPACKUA0_W_P0S", MEPCOP1_16_INSN_CPPACKUA0_W_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cppackla0_w_P0S, "CPPACKLA0_W_P0S", MEPCOP1_16_INSN_CPPACKLA0_W_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cpmovhua0_w_P0S, "CPMOVHUA0_W_P0S", MEPCOP1_16_INSN_CPMOVHUA0_W_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
+  { mepcop1_16_sem_cpmovhla0_w_P0S, "CPMOVHLA0_W_P0S", MEPCOP1_16_INSN_CPMOVHLA0_W_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_V2SI, CRET_FIRST, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
   { mepcop1_16_sem_cpacsuma0_P0S, "CPACSUMA0_P0S", MEPCOP1_16_INSN_CPACSUMA0_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
   { mepcop1_16_sem_cpaccpa0_P0S, "CPACCPA0_P0S", MEPCOP1_16_INSN_CPACCPA0_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
   { mepcop1_16_sem_cpsrla0_P0S, "CPSRLA0_P0S", MEPCOP1_16_INSN_CPSRLA0_P0S, { 0|(1<<CGEN_INSN_VOLATILE)|(1<<CGEN_INSN_OPTIONAL_CP_INSN), (1<<MACH_BASE), { 1, "\x20" }, CPTYPE_CP_DATA_BUS_INT, CRET_VOID, 0, CONFIG_NONE, (1<<SLOTS_P0S) } },
@@ -191,6 +191,10 @@ static void
 mepcop1_16_extract_sfmt_cpmovfrcsar0_P0S_P1 (mepcop1_16_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_16_insn_word base_insn, mepcop1_16_insn_word entire_insn);
 static void
 mepcop1_16_extract_sfmt_cpmovtocsar0_P0S_P1 (mepcop1_16_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_16_insn_word base_insn, mepcop1_16_insn_word entire_insn);
+static void
+mepcop1_16_extract_sfmt_cpmovtocsar1_P0S_P1 (mepcop1_16_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_16_insn_word base_insn, mepcop1_16_insn_word entire_insn);
+static void
+mepcop1_16_extract_sfmt_cpmovtocc_P0S_P1 (mepcop1_16_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_16_insn_word base_insn, mepcop1_16_insn_word entire_insn);
 static void
 mepcop1_16_extract_sfmt_cpcmpeqz_b_P0S_P1 (mepcop1_16_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_16_insn_word base_insn, mepcop1_16_insn_word entire_insn);
 static void
@@ -1330,7 +1334,7 @@ mepcop1_16_scache::decode (mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_16_insn
             itype = MEPCOP1_16_INSN_X_INVALID; mepcop1_16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 3 :
             if ((entire_insn & 0xfff83fff) == 0x882200)
-              { itype = MEPCOP1_16_INSN_CPMOVTOCC_P0S_P1; mepcop1_16_extract_sfmt_cpmovtocsar0_P0S_P1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+              { itype = MEPCOP1_16_INSN_CPMOVTOCC_P0S_P1; mepcop1_16_extract_sfmt_cpmovtocc_P0S_P1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCOP1_16_INSN_X_INVALID; mepcop1_16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEPCOP1_16_INSN_X_INVALID; mepcop1_16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
@@ -1392,7 +1396,7 @@ mepcop1_16_scache::decode (mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_16_insn
             itype = MEPCOP1_16_INSN_X_INVALID; mepcop1_16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             if ((entire_insn & 0xfff83fff) == 0x883e00)
-              { itype = MEPCOP1_16_INSN_CPMOVTOCSAR1_P0S_P1; mepcop1_16_extract_sfmt_cpmovtocsar0_P0S_P1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+              { itype = MEPCOP1_16_INSN_CPMOVTOCSAR1_P0S_P1; mepcop1_16_extract_sfmt_cpmovtocsar1_P0S_P1 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
             itype = MEPCOP1_16_INSN_X_INVALID; mepcop1_16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = MEPCOP1_16_INSN_X_INVALID; mepcop1_16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
@@ -2202,6 +2206,56 @@ mepcop1_16_extract_sfmt_cpmovtocsar0_P0S_P1 (mepcop1_16_scache* abuf, mep_ext1_c
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_cpmovtocsar0_P0S_P1)\t"
+        << " f_ivc2_5u13:0x" << hex << f_ivc2_5u13 << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+    }
+#undef FLD
+}
+
+void
+mepcop1_16_extract_sfmt_cpmovtocsar1_P0S_P1 (mepcop1_16_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_16_insn_word base_insn, mepcop1_16_insn_word entire_insn){
+    mepcop1_16_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
+    UINT f_ivc2_5u13;
+
+    f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_ivc2_5u13) = f_ivc2_5u13;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_cpmovtocsar1_P0S_P1)\t"
+        << " f_ivc2_5u13:0x" << hex << f_ivc2_5u13 << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+    }
+#undef FLD
+}
+
+void
+mepcop1_16_extract_sfmt_cpmovtocc_P0S_P1 (mepcop1_16_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_16_insn_word base_insn, mepcop1_16_insn_word entire_insn){
+    mepcop1_16_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_cpmovi_b_P0S_P1.f
+    UINT f_ivc2_5u13;
+
+    f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_ivc2_5u13) = f_ivc2_5u13;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_cpmovtocc_P0S_P1)\t"
         << " f_ivc2_5u13:0x" << hex << f_ivc2_5u13 << dec
         << endl;
     }

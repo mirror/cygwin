@@ -12,7 +12,7 @@ This file is part of the Red Hat simulators.
 #ifndef DESC_MEP_H
 #define DESC_MEP_H
 
-#include "opcode/cgen-bitset.h"
+#include "cgen/bitset.h"
 
 namespace mep {
 

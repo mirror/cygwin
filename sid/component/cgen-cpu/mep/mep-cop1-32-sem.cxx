@@ -2480,6 +2480,12 @@ mepcop1_32_sem_cpmovtocsar0_C3 (mep_ext1_cpu* current_cpu, mepcop1_32_scache* se
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 0), opval);
+  }
 current_cpu->ivc2_cpmovtocsar0 (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u21)]);
 }
 
@@ -2502,6 +2508,12 @@ mepcop1_32_sem_cpmovtocsar1_C3 (mep_ext1_cpu* current_cpu, mepcop1_32_scache* se
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 15) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 15), opval);
+  }
 current_cpu->ivc2_cpmovtocsar1 (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u21)]);
 }
 
@@ -2524,6 +2536,12 @@ mepcop1_32_sem_cpmovtocc_C3 (mep_ext1_cpu* current_cpu, mepcop1_32_scache* sem)
 
 {
 current_cpu->check_option_cp (pc);
+  {
+    SI opval = 0;
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "ccr-ivc2" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->h_ccr_ivc2_set (((UINT) 1), opval);
+  }
 current_cpu->ivc2_cpmovtocc (pc, current_cpu->hardware.h_cr64[FLD (f_ivc2_5u21)]);
 }
 

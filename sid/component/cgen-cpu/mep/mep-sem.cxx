@@ -4146,7 +4146,7 @@ mep_sem_btstm (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
 current_cpu->check_option_bit (pc);
   {
-    SI opval = ZEXTQISI (ANDQI (current_cpu->GETMEMQI (pc, * FLD (i_rma)), SLLSI (1, FLD (f_3u5))));
+    SI opval = ZEXTQISI (ANDQI (current_cpu->GETMEMUQI (pc, * FLD (i_rma)), SLLSI (1, FLD (f_3u5))));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gpr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
     current_cpu->hardware.h_gpr[((UINT) 0)] = opval;

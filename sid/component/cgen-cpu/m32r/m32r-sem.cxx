@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -2559,7 +2559,7 @@ m32rbf_sem_clrpsw (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
   PCADDR npc = pc + 2;
 
   {
-    SI opval = ANDSI (current_cpu->h_cr_get (((UINT) 0)), ORSI (INVBI (FLD (f_uimm8)), 65280));
+    USI opval = ANDSI (current_cpu->h_cr_get (((UINT) 0)), ORSI (ZEXTQISI (INVQI (FLD (f_uimm8))), 65280));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
     current_cpu->h_cr_set (((UINT) 0), opval);
@@ -2582,7 +2582,7 @@ m32rbf_sem_setpsw (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
   PCADDR npc = pc + 2;
 
   {
-    SI opval = FLD (f_uimm8);
+    USI opval = FLD (f_uimm8);
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
     current_cpu->h_cr_set (((UINT) 0), opval);
@@ -2605,7 +2605,7 @@ m32rbf_sem_bset (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
   PCADDR npc = pc + 4;
 
   {
-    QI opval = ORQI (current_cpu->GETMEMQI (pc, ADDSI (* FLD (i_sr), FLD (f_simm16))), SLLSI (1, SUBSI (7, FLD (f_uimm3))));
+    QI opval = ORQI (current_cpu->GETMEMQI (pc, ADDSI (* FLD (i_sr), FLD (f_simm16))), SLLQI (1, SUBSI (7, FLD (f_uimm3))));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (* FLD (i_sr), FLD (f_simm16)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
     current_cpu->SETMEMQI (pc, ADDSI (* FLD (i_sr), FLD (f_simm16)), opval);
@@ -2628,7 +2628,7 @@ m32rbf_sem_bclr (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
   PCADDR npc = pc + 4;
 
   {
-    QI opval = ANDQI (current_cpu->GETMEMQI (pc, ADDSI (* FLD (i_sr), FLD (f_simm16))), INVQI (SLLSI (1, SUBSI (7, FLD (f_uimm3)))));
+    QI opval = ANDQI (current_cpu->GETMEMQI (pc, ADDSI (* FLD (i_sr), FLD (f_simm16))), INVQI (SLLQI (1, SUBSI (7, FLD (f_uimm3)))));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (* FLD (i_sr), FLD (f_simm16)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
     current_cpu->SETMEMQI (pc, ADDSI (* FLD (i_sr), FLD (f_simm16)), opval);
@@ -2651,7 +2651,7 @@ m32rbf_sem_btst (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
   PCADDR npc = pc + 2;
 
   {
-    BI opval = ANDQI (SRLSI (* FLD (i_sr), SUBSI (7, FLD (f_uimm3))), 1);
+    BI opval = ANDQI (SRLQI (* FLD (i_sr), SUBSI (7, FLD (f_uimm3))), 1);
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cond" << ":=0x" << hex << opval << dec << "  ";
     current_cpu->hardware.h_cond = opval;

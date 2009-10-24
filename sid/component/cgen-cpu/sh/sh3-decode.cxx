@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -422,33 +422,25 @@ sh3_scache::decode (sh3_cpu* current_cpu, PCADDR pc, sh3_insn_word base_insn, sh
       case 36 : /* fall through */
       case 52 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x4)
-          { itype = SH3_INSN_MOVB3_COMPACT; sh3_extract_sfmt_movb3_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVB3_COMPACT; sh3_extract_sfmt_movb3_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 5 : /* fall through */
       case 21 : /* fall through */
       case 37 : /* fall through */
       case 53 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x5)
-          { itype = SH3_INSN_MOVW3_COMPACT; sh3_extract_sfmt_movw3_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVW3_COMPACT; sh3_extract_sfmt_movw3_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 6 : /* fall through */
       case 22 : /* fall through */
       case 38 : /* fall through */
       case 54 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x6)
-          { itype = SH3_INSN_MOVL3_COMPACT; sh3_extract_sfmt_movl3_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVL3_COMPACT; sh3_extract_sfmt_movl3_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 7 : /* fall through */
       case 23 : /* fall through */
       case 39 : /* fall through */
       case 55 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x7)
-          { itype = SH3_INSN_MULL_COMPACT; sh3_extract_sfmt_mull_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MULL_COMPACT; sh3_extract_sfmt_mull_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 8 :
         {
           unsigned int val = (((insn >> 22) & (1 << 0)));
@@ -487,33 +479,25 @@ sh3_scache::decode (sh3_cpu* current_cpu, PCADDR pc, sh3_insn_word base_insn, sh
       case 44 : /* fall through */
       case 60 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xc)
-          { itype = SH3_INSN_MOVB8_COMPACT; sh3_extract_sfmt_movb8_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVB8_COMPACT; sh3_extract_sfmt_movb8_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 13 : /* fall through */
       case 29 : /* fall through */
       case 45 : /* fall through */
       case 61 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xd)
-          { itype = SH3_INSN_MOVW8_COMPACT; sh3_extract_sfmt_movw8_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVW8_COMPACT; sh3_extract_sfmt_movw8_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 14 : /* fall through */
       case 30 : /* fall through */
       case 46 : /* fall through */
       case 62 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xe)
-          { itype = SH3_INSN_MOVL8_COMPACT; sh3_extract_sfmt_movl8_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVL8_COMPACT; sh3_extract_sfmt_movl8_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 15 : /* fall through */
       case 31 : /* fall through */
       case 47 : /* fall through */
       case 63 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0xf)
-          { itype = SH3_INSN_MACL_COMPACT; sh3_extract_sfmt_macl_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MACL_COMPACT; sh3_extract_sfmt_macl_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 18 :
         entire_insn = entire_insn >> 16;
         if ((entire_insn & 0xf0ff) == 0x12)
@@ -637,241 +621,181 @@ sh3_scache::decode (sh3_cpu* current_cpu, PCADDR pc, sh3_insn_word base_insn, sh
       case 126 : /* fall through */
       case 127 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0x1000)
-          { itype = SH3_INSN_MOVL5_COMPACT; sh3_extract_sfmt_movl5_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVL5_COMPACT; sh3_extract_sfmt_movl5_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 128 : /* fall through */
       case 144 : /* fall through */
       case 160 : /* fall through */
       case 176 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2000)
-          { itype = SH3_INSN_MOVB1_COMPACT; sh3_extract_sfmt_movb1_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVB1_COMPACT; sh3_extract_sfmt_movb1_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 129 : /* fall through */
       case 145 : /* fall through */
       case 161 : /* fall through */
       case 177 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2001)
-          { itype = SH3_INSN_MOVW1_COMPACT; sh3_extract_sfmt_movw1_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVW1_COMPACT; sh3_extract_sfmt_movw1_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 130 : /* fall through */
       case 146 : /* fall through */
       case 162 : /* fall through */
       case 178 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2002)
-          { itype = SH3_INSN_MOVL1_COMPACT; sh3_extract_sfmt_movl1_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVL1_COMPACT; sh3_extract_sfmt_movl1_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 132 : /* fall through */
       case 148 : /* fall through */
       case 164 : /* fall through */
       case 180 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2004)
-          { itype = SH3_INSN_MOVB2_COMPACT; sh3_extract_sfmt_movb2_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVB2_COMPACT; sh3_extract_sfmt_movb2_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 133 : /* fall through */
       case 149 : /* fall through */
       case 165 : /* fall through */
       case 181 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2005)
-          { itype = SH3_INSN_MOVW2_COMPACT; sh3_extract_sfmt_movw2_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVW2_COMPACT; sh3_extract_sfmt_movw2_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 134 : /* fall through */
       case 150 : /* fall through */
       case 166 : /* fall through */
       case 182 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2006)
-          { itype = SH3_INSN_MOVL2_COMPACT; sh3_extract_sfmt_movl2_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVL2_COMPACT; sh3_extract_sfmt_movl2_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 135 : /* fall through */
       case 151 : /* fall through */
       case 167 : /* fall through */
       case 183 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2007)
-          { itype = SH3_INSN_DIV0S_COMPACT; sh3_extract_sfmt_div0s_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_DIV0S_COMPACT; sh3_extract_sfmt_div0s_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 136 : /* fall through */
       case 152 : /* fall through */
       case 168 : /* fall through */
       case 184 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2008)
-          { itype = SH3_INSN_TST_COMPACT; sh3_extract_sfmt_cmpeq_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_TST_COMPACT; sh3_extract_sfmt_cmpeq_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 137 : /* fall through */
       case 153 : /* fall through */
       case 169 : /* fall through */
       case 185 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x2009)
-          { itype = SH3_INSN_AND_COMPACT; sh3_extract_sfmt_and_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_AND_COMPACT; sh3_extract_sfmt_and_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 138 : /* fall through */
       case 154 : /* fall through */
       case 170 : /* fall through */
       case 186 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x200a)
-          { itype = SH3_INSN_XOR_COMPACT; sh3_extract_sfmt_and_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_XOR_COMPACT; sh3_extract_sfmt_and_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 139 : /* fall through */
       case 155 : /* fall through */
       case 171 : /* fall through */
       case 187 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x200b)
-          { itype = SH3_INSN_OR_COMPACT; sh3_extract_sfmt_and_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_OR_COMPACT; sh3_extract_sfmt_and_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 140 : /* fall through */
       case 156 : /* fall through */
       case 172 : /* fall through */
       case 188 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x200c)
-          { itype = SH3_INSN_CMPSTR_COMPACT; sh3_extract_sfmt_cmpeq_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_CMPSTR_COMPACT; sh3_extract_sfmt_cmpeq_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 141 : /* fall through */
       case 157 : /* fall through */
       case 173 : /* fall through */
       case 189 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x200d)
-          { itype = SH3_INSN_XTRCT_COMPACT; sh3_extract_sfmt_add_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_XTRCT_COMPACT; sh3_extract_sfmt_add_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 142 : /* fall through */
       case 158 : /* fall through */
       case 174 : /* fall through */
       case 190 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x200e)
-          { itype = SH3_INSN_MULUW_COMPACT; sh3_extract_sfmt_mull_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MULUW_COMPACT; sh3_extract_sfmt_mull_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 143 : /* fall through */
       case 159 : /* fall through */
       case 175 : /* fall through */
       case 191 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x200f)
-          { itype = SH3_INSN_MULSW_COMPACT; sh3_extract_sfmt_mull_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MULSW_COMPACT; sh3_extract_sfmt_mull_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 192 : /* fall through */
       case 208 : /* fall through */
       case 224 : /* fall through */
       case 240 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3000)
-          { itype = SH3_INSN_CMPEQ_COMPACT; sh3_extract_sfmt_cmpeq_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_CMPEQ_COMPACT; sh3_extract_sfmt_cmpeq_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 194 : /* fall through */
       case 210 : /* fall through */
       case 226 : /* fall through */
       case 242 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3002)
-          { itype = SH3_INSN_CMPHS_COMPACT; sh3_extract_sfmt_cmpeq_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_CMPHS_COMPACT; sh3_extract_sfmt_cmpeq_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 195 : /* fall through */
       case 211 : /* fall through */
       case 227 : /* fall through */
       case 243 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3003)
-          { itype = SH3_INSN_CMPGE_COMPACT; sh3_extract_sfmt_cmpeq_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_CMPGE_COMPACT; sh3_extract_sfmt_cmpeq_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 196 : /* fall through */
       case 212 : /* fall through */
       case 228 : /* fall through */
       case 244 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3004)
-          { itype = SH3_INSN_DIV1_COMPACT; sh3_extract_sfmt_div1_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_DIV1_COMPACT; sh3_extract_sfmt_div1_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 197 : /* fall through */
       case 213 : /* fall through */
       case 229 : /* fall through */
       case 245 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3005)
-          { itype = SH3_INSN_DMULUL_COMPACT; sh3_extract_sfmt_dmulsl_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_DMULUL_COMPACT; sh3_extract_sfmt_dmulsl_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 198 : /* fall through */
       case 214 : /* fall through */
       case 230 : /* fall through */
       case 246 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3006)
-          { itype = SH3_INSN_CMPHI_COMPACT; sh3_extract_sfmt_cmpeq_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_CMPHI_COMPACT; sh3_extract_sfmt_cmpeq_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 199 : /* fall through */
       case 215 : /* fall through */
       case 231 : /* fall through */
       case 247 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3007)
-          { itype = SH3_INSN_CMPGT_COMPACT; sh3_extract_sfmt_cmpeq_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_CMPGT_COMPACT; sh3_extract_sfmt_cmpeq_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 200 : /* fall through */
       case 216 : /* fall through */
       case 232 : /* fall through */
       case 248 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x3008)
-          { itype = SH3_INSN_SUB_COMPACT; sh3_extract_sfmt_add_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_SUB_COMPACT; sh3_extract_sfmt_add_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 202 : /* fall through */
       case 218 : /* fall through */
       case 234 : /* fall through */
       case 250 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x300a)
-          { itype = SH3_INSN_SUBC_COMPACT; sh3_extract_sfmt_addc_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_SUBC_COMPACT; sh3_extract_sfmt_addc_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 203 : /* fall through */
       case 219 : /* fall through */
       case 235 : /* fall through */
       case 251 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x300b)
-          { itype = SH3_INSN_SUBV_COMPACT; sh3_extract_sfmt_addv_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_SUBV_COMPACT; sh3_extract_sfmt_addv_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 204 : /* fall through */
       case 220 : /* fall through */
       case 236 : /* fall through */
       case 252 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x300c)
-          { itype = SH3_INSN_ADD_COMPACT; sh3_extract_sfmt_add_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_ADD_COMPACT; sh3_extract_sfmt_add_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 205 : /* fall through */
       case 221 : /* fall through */
       case 237 : /* fall through */
       case 253 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x300d)
-          { itype = SH3_INSN_DMULSL_COMPACT; sh3_extract_sfmt_dmulsl_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_DMULSL_COMPACT; sh3_extract_sfmt_dmulsl_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 206 : /* fall through */
       case 222 : /* fall through */
       case 238 : /* fall through */
       case 254 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x300e)
-          { itype = SH3_INSN_ADDC_COMPACT; sh3_extract_sfmt_addc_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_ADDC_COMPACT; sh3_extract_sfmt_addc_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 207 : /* fall through */
       case 223 : /* fall through */
       case 239 : /* fall through */
       case 255 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x300f)
-          { itype = SH3_INSN_ADDV_COMPACT; sh3_extract_sfmt_addv_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_ADDV_COMPACT; sh3_extract_sfmt_addv_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 256 :
         entire_insn = entire_insn >> 16;
         if ((entire_insn & 0xf0ff) == 0x4000)
@@ -927,17 +851,13 @@ sh3_scache::decode (sh3_cpu* current_cpu, PCADDR pc, sh3_insn_word base_insn, sh
       case 300 : /* fall through */
       case 316 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x400c)
-          { itype = SH3_INSN_SHAD_COMPACT; sh3_extract_sfmt_shad_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_SHAD_COMPACT; sh3_extract_sfmt_shad_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 269 : /* fall through */
       case 285 : /* fall through */
       case 301 : /* fall through */
       case 317 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x400d)
-          { itype = SH3_INSN_SHLD_COMPACT; sh3_extract_sfmt_shad_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_SHLD_COMPACT; sh3_extract_sfmt_shad_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 270 :
         entire_insn = entire_insn >> 16;
         if ((entire_insn & 0xf0ff) == 0x400e)
@@ -948,9 +868,7 @@ sh3_scache::decode (sh3_cpu* current_cpu, PCADDR pc, sh3_insn_word base_insn, sh
       case 303 : /* fall through */
       case 319 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x400f)
-          { itype = SH3_INSN_MACW_COMPACT; sh3_extract_sfmt_macw_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MACW_COMPACT; sh3_extract_sfmt_macw_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 272 :
         entire_insn = entire_insn >> 16;
         if ((entire_insn & 0xf0ff) == 0x4010)
@@ -1141,137 +1059,103 @@ sh3_scache::decode (sh3_cpu* current_cpu, PCADDR pc, sh3_insn_word base_insn, sh
       case 382 : /* fall through */
       case 383 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0x5000)
-          { itype = SH3_INSN_MOVL11_COMPACT; sh3_extract_sfmt_movl11_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVL11_COMPACT; sh3_extract_sfmt_movl11_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 384 : /* fall through */
       case 400 : /* fall through */
       case 416 : /* fall through */
       case 432 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x6000)
-          { itype = SH3_INSN_MOVB6_COMPACT; sh3_extract_sfmt_movb6_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVB6_COMPACT; sh3_extract_sfmt_movb6_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 385 : /* fall through */
       case 401 : /* fall through */
       case 417 : /* fall through */
       case 433 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x6001)
-          { itype = SH3_INSN_MOVW6_COMPACT; sh3_extract_sfmt_movw6_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVW6_COMPACT; sh3_extract_sfmt_movw6_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 386 : /* fall through */
       case 402 : /* fall through */
       case 418 : /* fall through */
       case 434 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x6002)
-          { itype = SH3_INSN_MOVL6_COMPACT; sh3_extract_sfmt_movl6_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVL6_COMPACT; sh3_extract_sfmt_movl6_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 387 : /* fall through */
       case 403 : /* fall through */
       case 419 : /* fall through */
       case 435 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x6003)
-          { itype = SH3_INSN_MOV_COMPACT; sh3_extract_sfmt_mov_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOV_COMPACT; sh3_extract_sfmt_mov_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 388 : /* fall through */
       case 404 : /* fall through */
       case 420 : /* fall through */
       case 436 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x6004)
-          { itype = SH3_INSN_MOVB7_COMPACT; sh3_extract_sfmt_movb7_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVB7_COMPACT; sh3_extract_sfmt_movb7_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 389 : /* fall through */
       case 405 : /* fall through */
       case 421 : /* fall through */
       case 437 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x6005)
-          { itype = SH3_INSN_MOVW7_COMPACT; sh3_extract_sfmt_movw7_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVW7_COMPACT; sh3_extract_sfmt_movw7_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 390 : /* fall through */
       case 406 : /* fall through */
       case 422 : /* fall through */
       case 438 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x6006)
-          { itype = SH3_INSN_MOVL7_COMPACT; sh3_extract_sfmt_movl7_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVL7_COMPACT; sh3_extract_sfmt_movl7_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 391 : /* fall through */
       case 407 : /* fall through */
       case 423 : /* fall through */
       case 439 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x6007)
-          { itype = SH3_INSN_NOT_COMPACT; sh3_extract_sfmt_mov_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_NOT_COMPACT; sh3_extract_sfmt_mov_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 392 : /* fall through */
       case 408 : /* fall through */
       case 424 : /* fall through */
       case 440 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x6008)
-          { itype = SH3_INSN_SWAPB_COMPACT; sh3_extract_sfmt_extsb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_SWAPB_COMPACT; sh3_extract_sfmt_extsb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 393 : /* fall through */
       case 409 : /* fall through */
       case 425 : /* fall through */
       case 441 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x6009)
-          { itype = SH3_INSN_SWAPW_COMPACT; sh3_extract_sfmt_extsb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_SWAPW_COMPACT; sh3_extract_sfmt_extsb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 394 : /* fall through */
       case 410 : /* fall through */
       case 426 : /* fall through */
       case 442 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x600a)
-          { itype = SH3_INSN_NEGC_COMPACT; sh3_extract_sfmt_negc_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_NEGC_COMPACT; sh3_extract_sfmt_negc_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 395 : /* fall through */
       case 411 : /* fall through */
       case 427 : /* fall through */
       case 443 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x600b)
-          { itype = SH3_INSN_NEG_COMPACT; sh3_extract_sfmt_extsb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_NEG_COMPACT; sh3_extract_sfmt_extsb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 396 : /* fall through */
       case 412 : /* fall through */
       case 428 : /* fall through */
       case 444 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x600c)
-          { itype = SH3_INSN_EXTUB_COMPACT; sh3_extract_sfmt_extsb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_EXTUB_COMPACT; sh3_extract_sfmt_extsb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 397 : /* fall through */
       case 413 : /* fall through */
       case 429 : /* fall through */
       case 445 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x600d)
-          { itype = SH3_INSN_EXTUW_COMPACT; sh3_extract_sfmt_extsb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_EXTUW_COMPACT; sh3_extract_sfmt_extsb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 398 : /* fall through */
       case 414 : /* fall through */
       case 430 : /* fall through */
       case 446 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x600e)
-          { itype = SH3_INSN_EXTSB_COMPACT; sh3_extract_sfmt_extsb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_EXTSB_COMPACT; sh3_extract_sfmt_extsb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 399 : /* fall through */
       case 415 : /* fall through */
       case 431 : /* fall through */
       case 447 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf00f) == 0x600f)
-          { itype = SH3_INSN_EXTSW_COMPACT; sh3_extract_sfmt_extsb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_EXTSW_COMPACT; sh3_extract_sfmt_extsb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 448 : /* fall through */
       case 449 : /* fall through */
       case 450 : /* fall through */
@@ -1337,9 +1221,7 @@ sh3_scache::decode (sh3_cpu* current_cpu, PCADDR pc, sh3_insn_word base_insn, sh
       case 510 : /* fall through */
       case 511 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0x7000)
-          { itype = SH3_INSN_ADDI_COMPACT; sh3_extract_sfmt_addi_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_ADDI_COMPACT; sh3_extract_sfmt_addi_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 512 : /* fall through */
       case 513 : /* fall through */
       case 514 : /* fall through */
@@ -1410,49 +1292,31 @@ sh3_scache::decode (sh3_cpu* current_cpu, PCADDR pc, sh3_insn_word base_insn, sh
           {
           case 0 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0x8000)
-              { itype = SH3_INSN_MOVB5_COMPACT; sh3_extract_sfmt_movb5_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_MOVB5_COMPACT; sh3_extract_sfmt_movb5_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0x8100)
-              { itype = SH3_INSN_MOVW5_COMPACT; sh3_extract_sfmt_movw5_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_MOVW5_COMPACT; sh3_extract_sfmt_movw5_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 4 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0x8400)
-              { itype = SH3_INSN_MOVB10_COMPACT; sh3_extract_sfmt_movb10_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_MOVB10_COMPACT; sh3_extract_sfmt_movb10_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 5 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0x8500)
-              { itype = SH3_INSN_MOVW11_COMPACT; sh3_extract_sfmt_movw11_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_MOVW11_COMPACT; sh3_extract_sfmt_movw11_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 8 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0x8800)
-              { itype = SH3_INSN_CMPEQI_COMPACT; sh3_extract_sfmt_cmpeqi_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_CMPEQI_COMPACT; sh3_extract_sfmt_cmpeqi_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 9 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0x8900)
-              { itype = SH3_INSN_BT_COMPACT; sh3_extract_sfmt_bf_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_BT_COMPACT; sh3_extract_sfmt_bf_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 11 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0x8b00)
-              { itype = SH3_INSN_BF_COMPACT; sh3_extract_sfmt_bf_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_BF_COMPACT; sh3_extract_sfmt_bf_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 13 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0x8d00)
-              { itype = SH3_INSN_BTS_COMPACT; sh3_extract_sfmt_bfs_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_BTS_COMPACT; sh3_extract_sfmt_bfs_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 15 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0x8f00)
-              { itype = SH3_INSN_BFS_COMPACT; sh3_extract_sfmt_bfs_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_BFS_COMPACT; sh3_extract_sfmt_bfs_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -1521,9 +1385,7 @@ sh3_scache::decode (sh3_cpu* current_cpu, PCADDR pc, sh3_insn_word base_insn, sh
       case 638 : /* fall through */
       case 639 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0x9000)
-          { itype = SH3_INSN_MOVW10_COMPACT; sh3_extract_sfmt_movw10_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVW10_COMPACT; sh3_extract_sfmt_movw10_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 640 : /* fall through */
       case 641 : /* fall through */
       case 642 : /* fall through */
@@ -1589,9 +1451,7 @@ sh3_scache::decode (sh3_cpu* current_cpu, PCADDR pc, sh3_insn_word base_insn, sh
       case 702 : /* fall through */
       case 703 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0xa000)
-          { itype = SH3_INSN_BRA_COMPACT; sh3_extract_sfmt_bra_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_BRA_COMPACT; sh3_extract_sfmt_bra_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 704 : /* fall through */
       case 705 : /* fall through */
       case 706 : /* fall through */
@@ -1657,9 +1517,7 @@ sh3_scache::decode (sh3_cpu* current_cpu, PCADDR pc, sh3_insn_word base_insn, sh
       case 766 : /* fall through */
       case 767 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0xb000)
-          { itype = SH3_INSN_BSR_COMPACT; sh3_extract_sfmt_bsr_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_BSR_COMPACT; sh3_extract_sfmt_bsr_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 768 : /* fall through */
       case 769 : /* fall through */
       case 770 : /* fall through */
@@ -1730,84 +1588,52 @@ sh3_scache::decode (sh3_cpu* current_cpu, PCADDR pc, sh3_insn_word base_insn, sh
           {
           case 0 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xc000)
-              { itype = SH3_INSN_MOVB4_COMPACT; sh3_extract_sfmt_movb4_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_MOVB4_COMPACT; sh3_extract_sfmt_movb4_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xc100)
-              { itype = SH3_INSN_MOVW4_COMPACT; sh3_extract_sfmt_movw4_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_MOVW4_COMPACT; sh3_extract_sfmt_movw4_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 2 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xc200)
-              { itype = SH3_INSN_MOVL4_COMPACT; sh3_extract_sfmt_movl4_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_MOVL4_COMPACT; sh3_extract_sfmt_movl4_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 3 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xc300)
-              { itype = SH3_INSN_TRAPA_COMPACT; sh3_extract_sfmt_trapa_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_TRAPA_COMPACT; sh3_extract_sfmt_trapa_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 4 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xc400)
-              { itype = SH3_INSN_MOVB9_COMPACT; sh3_extract_sfmt_movb9_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_MOVB9_COMPACT; sh3_extract_sfmt_movb9_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 5 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xc500)
-              { itype = SH3_INSN_MOVW9_COMPACT; sh3_extract_sfmt_movw9_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_MOVW9_COMPACT; sh3_extract_sfmt_movw9_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 6 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xc600)
-              { itype = SH3_INSN_MOVL9_COMPACT; sh3_extract_sfmt_movl9_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_MOVL9_COMPACT; sh3_extract_sfmt_movl9_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 7 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xc700)
-              { itype = SH3_INSN_MOVA_COMPACT; sh3_extract_sfmt_mova_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_MOVA_COMPACT; sh3_extract_sfmt_mova_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 8 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xc800)
-              { itype = SH3_INSN_TSTI_COMPACT; sh3_extract_sfmt_tsti_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_TSTI_COMPACT; sh3_extract_sfmt_tsti_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 9 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xc900)
-              { itype = SH3_INSN_ANDI_COMPACT; sh3_extract_sfmt_andi_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_ANDI_COMPACT; sh3_extract_sfmt_andi_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 10 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xca00)
-              { itype = SH3_INSN_XORI_COMPACT; sh3_extract_sfmt_andi_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_XORI_COMPACT; sh3_extract_sfmt_andi_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 11 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xcb00)
-              { itype = SH3_INSN_ORI_COMPACT; sh3_extract_sfmt_andi_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_ORI_COMPACT; sh3_extract_sfmt_andi_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 12 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xcc00)
-              { itype = SH3_INSN_TSTB_COMPACT; sh3_extract_sfmt_tstb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_TSTB_COMPACT; sh3_extract_sfmt_tstb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 13 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xcd00)
-              { itype = SH3_INSN_ANDB_COMPACT; sh3_extract_sfmt_andb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_ANDB_COMPACT; sh3_extract_sfmt_andb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 14 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xce00)
-              { itype = SH3_INSN_XORB_COMPACT; sh3_extract_sfmt_andb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_XORB_COMPACT; sh3_extract_sfmt_andb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 15 :
             entire_insn = entire_insn >> 16;
-            if ((entire_insn & 0xff00) == 0xcf00)
-              { itype = SH3_INSN_ORB_COMPACT; sh3_extract_sfmt_andb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-            itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+            itype = SH3_INSN_ORB_COMPACT; sh3_extract_sfmt_andb_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
@@ -1876,9 +1702,7 @@ sh3_scache::decode (sh3_cpu* current_cpu, PCADDR pc, sh3_insn_word base_insn, sh
       case 894 : /* fall through */
       case 895 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0xd000)
-          { itype = SH3_INSN_MOVL10_COMPACT; sh3_extract_sfmt_movl10_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVL10_COMPACT; sh3_extract_sfmt_movl10_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 896 : /* fall through */
       case 897 : /* fall through */
       case 898 : /* fall through */
@@ -1944,9 +1768,7 @@ sh3_scache::decode (sh3_cpu* current_cpu, PCADDR pc, sh3_insn_word base_insn, sh
       case 958 : /* fall through */
       case 959 :
         entire_insn = entire_insn >> 16;
-        if ((entire_insn & 0xf000) == 0xe000)
-          { itype = SH3_INSN_MOVI_COMPACT; sh3_extract_sfmt_movi_compact (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = SH3_INSN_X_INVALID; sh3_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = SH3_INSN_MOVI_COMPACT; sh3_extract_sfmt_movi_compact (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 1021 :
         {
           unsigned int val = (((insn >> 27) & (1 << 0)));

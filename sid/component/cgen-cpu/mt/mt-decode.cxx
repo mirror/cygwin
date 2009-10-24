@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2009 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -121,19 +121,13 @@ mt_extract_sfmt_empty (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_
 static void
 mt_extract_sfmt_add (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn);
 static void
-mt_extract_sfmt_addu (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn);
-static void
 mt_extract_sfmt_addi (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn);
 static void
 mt_extract_sfmt_addui (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn);
 static void
-mt_extract_sfmt_andi (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn);
-static void
 mt_extract_sfmt_nop (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn);
 static void
 mt_extract_sfmt_ldui (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn);
-static void
-mt_extract_sfmt_lsl (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn);
 static void
 mt_extract_sfmt_brlt (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn);
 static void
@@ -171,50 +165,32 @@ mt_scache::decode (mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_in
         if ((entire_insn & 0xff000fff) == 0x0)
           { itype = MT_INSN_ADD; mt_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 1 :
-        if ((entire_insn & 0xff000000) == 0x1000000)
-          { itype = MT_INSN_ADDI; mt_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 1 : itype = MT_INSN_ADDI; mt_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 2 :
         if ((entire_insn & 0xff000fff) == 0x2000000)
-          { itype = MT_INSN_ADDU; mt_extract_sfmt_addu (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = MT_INSN_ADDU; mt_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 3 :
-        if ((entire_insn & 0xff000000) == 0x3000000)
-          { itype = MT_INSN_ADDUI; mt_extract_sfmt_addui (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 3 : itype = MT_INSN_ADDUI; mt_extract_sfmt_addui (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 4 :
         if ((entire_insn & 0xff000fff) == 0x4000000)
           { itype = MT_INSN_SUB; mt_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 5 :
-        if ((entire_insn & 0xff000000) == 0x5000000)
-          { itype = MT_INSN_SUBI; mt_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 5 : itype = MT_INSN_SUBI; mt_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 6 :
         if ((entire_insn & 0xff000fff) == 0x6000000)
-          { itype = MT_INSN_SUBU; mt_extract_sfmt_addu (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = MT_INSN_SUBU; mt_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 7 :
-        if ((entire_insn & 0xff000000) == 0x7000000)
-          { itype = MT_INSN_SUBUI; mt_extract_sfmt_addui (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 7 : itype = MT_INSN_SUBUI; mt_extract_sfmt_addui (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 8 :
         if ((entire_insn & 0xff000fff) == 0x8000000)
           { itype = MT_INSN_MUL; mt_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 9 :
-        if ((entire_insn & 0xff000000) == 0x9000000)
-          { itype = MT_INSN_MULI; mt_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 9 : itype = MT_INSN_MULI; mt_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 16 :
         if ((entire_insn & 0xff000fff) == 0x10000000)
           { itype = MT_INSN_AND; mt_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 17 :
-        if ((entire_insn & 0xff000000) == 0x11000000)
-          { itype = MT_INSN_ANDI; mt_extract_sfmt_andi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 17 : itype = MT_INSN_ANDI; mt_extract_sfmt_addui (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 18 :
         {
           unsigned int val = (((insn >> 12) & (127 << 0)));
@@ -399,82 +375,49 @@ mt_scache::decode (mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_in
           default : itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
-      case 19 :
-        if ((entire_insn & 0xff000000) == 0x13000000)
-          { itype = MT_INSN_ORI; mt_extract_sfmt_andi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 19 : itype = MT_INSN_ORI; mt_extract_sfmt_addui (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 20 :
         if ((entire_insn & 0xff000fff) == 0x14000000)
           { itype = MT_INSN_XOR; mt_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 21 :
-        if ((entire_insn & 0xff000000) == 0x15000000)
-          { itype = MT_INSN_XORI; mt_extract_sfmt_andi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 21 : itype = MT_INSN_XORI; mt_extract_sfmt_addui (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 22 :
         if ((entire_insn & 0xff000fff) == 0x16000000)
           { itype = MT_INSN_NAND; mt_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 23 :
-        if ((entire_insn & 0xff000000) == 0x17000000)
-          { itype = MT_INSN_NANDI; mt_extract_sfmt_andi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 23 : itype = MT_INSN_NANDI; mt_extract_sfmt_addui (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 24 :
         if ((entire_insn & 0xff000fff) == 0x18000000)
           { itype = MT_INSN_NOR; mt_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 25 :
-        if ((entire_insn & 0xff000000) == 0x19000000)
-          { itype = MT_INSN_NORI; mt_extract_sfmt_andi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 25 : itype = MT_INSN_NORI; mt_extract_sfmt_addui (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 26 :
         if ((entire_insn & 0xff000fff) == 0x1a000000)
           { itype = MT_INSN_XNOR; mt_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 27 :
-        if ((entire_insn & 0xff000000) == 0x1b000000)
-          { itype = MT_INSN_XNORI; mt_extract_sfmt_andi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 27 : itype = MT_INSN_XNORI; mt_extract_sfmt_addui (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 29 :
         if ((entire_insn & 0xfff00000) == 0x1d000000)
           { itype = MT_INSN_LDUI; mt_extract_sfmt_ldui (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 32 :
         if ((entire_insn & 0xff000fff) == 0x20000000)
-          { itype = MT_INSN_LSL; mt_extract_sfmt_lsl (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = MT_INSN_LSL; mt_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 33 :
-        if ((entire_insn & 0xff000000) == 0x21000000)
-          { itype = MT_INSN_LSLI; mt_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 33 : itype = MT_INSN_LSLI; mt_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 34 :
         if ((entire_insn & 0xff000fff) == 0x22000000)
-          { itype = MT_INSN_LSR; mt_extract_sfmt_lsl (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = MT_INSN_LSR; mt_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 35 :
-        if ((entire_insn & 0xff000000) == 0x23000000)
-          { itype = MT_INSN_LSRI; mt_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 35 : itype = MT_INSN_LSRI; mt_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 36 :
         if ((entire_insn & 0xff000fff) == 0x24000000)
-          { itype = MT_INSN_ASR; mt_extract_sfmt_lsl (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = MT_INSN_ASR; mt_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 37 :
-        if ((entire_insn & 0xff000000) == 0x25000000)
-          { itype = MT_INSN_ASRI; mt_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 49 :
-        if ((entire_insn & 0xff000000) == 0x31000000)
-          { itype = MT_INSN_BRLT; mt_extract_sfmt_brlt (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 51 :
-        if ((entire_insn & 0xff000000) == 0x33000000)
-          { itype = MT_INSN_BRLE; mt_extract_sfmt_brlt (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 53 :
-        if ((entire_insn & 0xff000000) == 0x35000000)
-          { itype = MT_INSN_BREQ; mt_extract_sfmt_brlt (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 37 : itype = MT_INSN_ASRI; mt_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 49 : itype = MT_INSN_BRLT; mt_extract_sfmt_brlt (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 51 : itype = MT_INSN_BRLE; mt_extract_sfmt_brlt (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 53 : itype = MT_INSN_BREQ; mt_extract_sfmt_brlt (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 55 :
         if ((entire_insn & 0xffff0000) == 0x37000000)
           { itype = MT_INSN_JMP; mt_extract_sfmt_jmp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
@@ -483,22 +426,13 @@ mt_scache::decode (mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_in
         if ((entire_insn & 0xff0f0fff) == 0x38000000)
           { itype = MT_INSN_JAL; mt_extract_sfmt_jal (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 59 :
-        if ((entire_insn & 0xff000000) == 0x3b000000)
-          { itype = MT_INSN_BRNE; mt_extract_sfmt_brlt (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 59 : itype = MT_INSN_BRNE; mt_extract_sfmt_brlt (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 61 :
         if ((entire_insn & 0xff0f0000) == 0x3d000000)
           { itype = MT_INSN_DBNZ; mt_extract_sfmt_dbnz (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 65 :
-        if ((entire_insn & 0xff000000) == 0x41000000)
-          { itype = MT_INSN_LDW; mt_extract_sfmt_ldw (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 67 :
-        if ((entire_insn & 0xff000000) == 0x43000000)
-          { itype = MT_INSN_STW; mt_extract_sfmt_stw (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 65 : itype = MT_INSN_LDW; mt_extract_sfmt_ldw (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 67 : itype = MT_INSN_STW; mt_extract_sfmt_stw (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 96 :
         if ((entire_insn & 0xffffffff) == 0x60000000)
           { itype = MT_INSN_EI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
@@ -540,66 +474,39 @@ mt_scache::decode (mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_in
       case 148 : /* fall through */
       case 149 : /* fall through */
       case 150 : /* fall through */
-      case 151 :
-        if ((entire_insn & 0xfc000000) == 0x94000000)
-          { itype = MT_INSN_FBCCI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 151 : itype = MT_INSN_FBCCI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 152 : /* fall through */
       case 153 : /* fall through */
       case 154 : /* fall through */
-      case 155 :
-        if ((entire_insn & 0xfc000000) == 0x98000000)
-          { itype = MT_INSN_FBRCI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 155 : itype = MT_INSN_FBRCI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 156 : /* fall through */
       case 157 : /* fall through */
       case 158 : /* fall through */
-      case 159 :
-        if ((entire_insn & 0xfc000000) == 0x9c000000)
-          { itype = MT_INSN_FBCRI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 159 : itype = MT_INSN_FBCRI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 160 : /* fall through */
       case 161 : /* fall through */
       case 162 : /* fall through */
-      case 163 :
-        if ((entire_insn & 0xfc000000) == 0xa0000000)
-          { itype = MT_INSN_FBRRI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 163 : itype = MT_INSN_FBRRI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 164 : /* fall through */
       case 165 : /* fall through */
       case 166 : /* fall through */
-      case 167 :
-        if ((entire_insn & 0xfc000000) == 0xa4000000)
-          { itype = MT_INSN_MFBCCI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 167 : itype = MT_INSN_MFBCCI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 168 : /* fall through */
       case 169 : /* fall through */
       case 170 : /* fall through */
-      case 171 :
-        if ((entire_insn & 0xfc000000) == 0xa8000000)
-          { itype = MT_INSN_MFBRCI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 171 : itype = MT_INSN_MFBRCI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 172 : /* fall through */
       case 173 : /* fall through */
       case 174 : /* fall through */
-      case 175 :
-        if ((entire_insn & 0xfc000000) == 0xac000000)
-          { itype = MT_INSN_MFBCRI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 175 : itype = MT_INSN_MFBCRI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 176 : /* fall through */
       case 177 : /* fall through */
       case 178 : /* fall through */
-      case 179 :
-        if ((entire_insn & 0xfc000000) == 0xb0000000)
-          { itype = MT_INSN_MFBRRI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 179 : itype = MT_INSN_MFBRRI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 180 : /* fall through */
       case 181 : /* fall through */
       case 182 : /* fall through */
-      case 183 :
-        if ((entire_insn & 0xfc000000) == 0xb4000000)
-          { itype = MT_INSN_FBCBDR; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 183 : itype = MT_INSN_FBCBDR; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 184 : /* fall through */
       case 185 : /* fall through */
       case 186 : /* fall through */
@@ -624,17 +531,11 @@ mt_scache::decode (mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_in
       case 196 : /* fall through */
       case 197 : /* fall through */
       case 198 : /* fall through */
-      case 199 :
-        if ((entire_insn & 0xfc000000) == 0xc4000000)
-          { itype = MT_INSN_DUPCBCAST; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 199 : itype = MT_INSN_DUPCBCAST; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 200 : /* fall through */
       case 201 : /* fall through */
       case 202 : /* fall through */
-      case 203 :
-        if ((entire_insn & 0xfc000000) == 0xc8000000)
-          { itype = MT_INSN_WFBI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 203 : itype = MT_INSN_WFBI; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 204 :
         if ((entire_insn & 0xff000040) == 0xcc000000)
           { itype = MT_INSN_WFB; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
@@ -649,17 +550,11 @@ mt_scache::decode (mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_in
       case 212 : /* fall through */
       case 213 : /* fall through */
       case 214 : /* fall through */
-      case 215 :
-        if ((entire_insn & 0xfc000000) == 0xd4000000)
-          { itype = MT_INSN_FBCBINC; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 215 : itype = MT_INSN_FBCBINC; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 216 : /* fall through */
       case 217 : /* fall through */
       case 218 : /* fall through */
-      case 219 :
-        if ((entire_insn & 0xfc000000) == 0xd8000000)
-          { itype = MT_INSN_RCXMODE; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 219 : itype = MT_INSN_RCXMODE; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 220 : /* fall through */
       case 221 : /* fall through */
       case 222 : /* fall through */
@@ -670,45 +565,27 @@ mt_scache::decode (mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_in
       case 224 : /* fall through */
       case 225 : /* fall through */
       case 226 : /* fall through */
-      case 227 :
-        if ((entire_insn & 0xfc000000) == 0xe0000000)
-          { itype = MT_INSN_WFBINC; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 227 : itype = MT_INSN_WFBINC; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 228 : /* fall through */
       case 229 : /* fall through */
       case 230 : /* fall through */
-      case 231 :
-        if ((entire_insn & 0xfc000000) == 0xe4000000)
-          { itype = MT_INSN_MWFBINC; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 231 : itype = MT_INSN_MWFBINC; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 232 : /* fall through */
       case 233 : /* fall through */
       case 234 : /* fall through */
-      case 235 :
-        if ((entire_insn & 0xfc000000) == 0xe8000000)
-          { itype = MT_INSN_WFBINCR; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 235 : itype = MT_INSN_WFBINCR; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 236 : /* fall through */
       case 237 : /* fall through */
       case 238 : /* fall through */
-      case 239 :
-        if ((entire_insn & 0xfc000000) == 0xec000000)
-          { itype = MT_INSN_MWFBINCR; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 239 : itype = MT_INSN_MWFBINCR; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 240 : /* fall through */
       case 241 : /* fall through */
       case 242 : /* fall through */
-      case 243 :
-        if ((entire_insn & 0xfc000000) == 0xf0000000)
-          { itype = MT_INSN_FBCBINCS; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 243 : itype = MT_INSN_FBCBINCS; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 244 : /* fall through */
       case 245 : /* fall through */
       case 246 : /* fall through */
-      case 247 :
-        if ((entire_insn & 0xfc000000) == 0xf4000000)
-          { itype = MT_INSN_MFBCBINCS; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
-        itype = MT_INSN_X_INVALID; mt_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 247 : itype = MT_INSN_MFBCBINCS; mt_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 248 : /* fall through */
       case 249 : /* fall through */
       case 250 : /* fall through */
@@ -786,35 +663,6 @@ mt_extract_sfmt_add (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_wo
 }
 
 void
-mt_extract_sfmt_addu (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn){
-    mt_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_add.f
-    UINT f_sr1;
-    UINT f_sr2;
-    UINT f_drrr;
-
-    f_sr1 = EXTRACT_LSB0_UINT (insn, 32, 23, 4);
-    f_sr2 = EXTRACT_LSB0_UINT (insn, 32, 19, 4);
-    f_drrr = EXTRACT_LSB0_UINT (insn, 32, 15, 4);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_sr1) = f_sr1;
-  FLD (f_sr2) = f_sr2;
-  FLD (f_drrr) = f_drrr;
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_addu)\t"
-        << " f_sr1:0x" << hex << f_sr1 << dec
-        << " f_sr2:0x" << hex << f_sr2 << dec
-        << " f_drrr:0x" << hex << f_drrr << dec
-        << endl;
-    }
-
-#undef FLD
-}
-
-void
 mt_extract_sfmt_addi (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn){
     mt_insn_word insn = entire_insn;
 #define FLD(f) abuf->fields.sfmt_addi.f
@@ -873,35 +721,6 @@ mt_extract_sfmt_addui (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_
 }
 
 void
-mt_extract_sfmt_andi (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn){
-    mt_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_addui.f
-    UINT f_sr1;
-    UINT f_dr;
-    UINT f_imm16u;
-
-    f_sr1 = EXTRACT_LSB0_UINT (insn, 32, 23, 4);
-    f_dr = EXTRACT_LSB0_UINT (insn, 32, 19, 4);
-    f_imm16u = EXTRACT_LSB0_UINT (insn, 32, 15, 16);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_sr1) = f_sr1;
-  FLD (f_imm16u) = f_imm16u;
-  FLD (f_dr) = f_dr;
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_andi)\t"
-        << " f_sr1:0x" << hex << f_sr1 << dec
-        << " f_imm16u:0x" << hex << f_imm16u << dec
-        << " f_dr:0x" << hex << f_dr << dec
-        << endl;
-    }
-
-#undef FLD
-}
-
-void
 mt_extract_sfmt_nop (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn){
     mt_insn_word insn = entire_insn;
 #define FLD(f) abuf->fields.fmt_empty.f
@@ -937,35 +756,6 @@ mt_extract_sfmt_ldui (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_w
         << "0x" << hex << pc << dec << " (sfmt_ldui)\t"
         << " f_imm16u:0x" << hex << f_imm16u << dec
         << " f_dr:0x" << hex << f_dr << dec
-        << endl;
-    }
-
-#undef FLD
-}
-
-void
-mt_extract_sfmt_lsl (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn){
-    mt_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_add.f
-    UINT f_sr1;
-    UINT f_sr2;
-    UINT f_drrr;
-
-    f_sr1 = EXTRACT_LSB0_UINT (insn, 32, 23, 4);
-    f_sr2 = EXTRACT_LSB0_UINT (insn, 32, 19, 4);
-    f_drrr = EXTRACT_LSB0_UINT (insn, 32, 15, 4);
-
-  /* Record the fields for the semantic handler.  */
-  FLD (f_sr1) = f_sr1;
-  FLD (f_sr2) = f_sr2;
-  FLD (f_drrr) = f_drrr;
-  if (UNLIKELY(current_cpu->trace_extract_p))
-    {
-      current_cpu->trace_stream 
-        << "0x" << hex << pc << dec << " (sfmt_lsl)\t"
-        << " f_sr1:0x" << hex << f_sr1 << dec
-        << " f_sr2:0x" << hex << f_sr2 << dec
-        << " f_drrr:0x" << hex << f_drrr << dec
         << endl;
     }
 

@@ -1,6 +1,6 @@
 #include "bfd.h"
 #include "dis-asm.h"
-#include "opcode/cgen-bitset.h"
+#include "cgen/bitset.h"
 
 // ansidecl.h interferes with this perfectly ordinary word
 #undef AND

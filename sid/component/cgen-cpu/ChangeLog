@@ -1,3 +1,8 @@
+2009-10-23  Doug Evans  <dje@sebabeach.org>
+
+	* cgen-cpu.h: Update for new location of cgen/bitset.h.
+	* tracedis.h: Ditto.
+
 2009-02-03  DJ Delorie  <dj@redhat.com>
 
 	* compCGEN.cxx: Update to new MeP configuration.

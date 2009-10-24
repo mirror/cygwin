@@ -716,7 +716,8 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 (define (/gen-sem-case insn parallel?)
   (logit 2 "Processing "
 	 (if parallel? "parallel " "")
-	 "semantic switch case for \"" (insn-syntax insn) "\" ...\n")
+	 "semantic switch case for " (obj:name insn) ": \""
+	 (insn-syntax insn) "\" ...\n")
   (set! /with-profile? /with-profile-sw?)
   (let ((cti? (insn-cti? insn))
 	(insn-len (insn-length-bytes insn)))

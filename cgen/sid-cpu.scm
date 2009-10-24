@@ -860,7 +860,8 @@ using namespace @prefix@; // FIXME: namespace organization still wip\n"))
 (define (/gen-sem-case insn parallel?)
   (logit 2 "Processing "
 	 (if parallel? "parallel " "")
-	 "semantic switch case for \"" (insn-syntax insn) "\" ...\n")
+	 "semantic switch case for " (obj:name insn) ": \""
+	 (insn-syntax insn) "\" ...\n")
   (set! /with-profile? /with-profile-sw?)
   (let ((cti? (insn-cti? insn))
 	(insn-len (insn-length-bytes insn)))
@@ -1147,7 +1148,7 @@ struct @prefix@_pbb_label {
 	(parallel? (sfrag-parallel? frag)))
     (logit 2 "Processing "
 	   (if parallel? "parallel " "")
-	   "semantic switch case for \"" (obj:name frag) "\" ...\n")
+	   "semantic switch case for " (obj:name frag) " ...\n")
     (string-list
      ; FRAG_ is prepended here and not elsewhere to avoid name collisions
      ; with symbols like AND, etc.

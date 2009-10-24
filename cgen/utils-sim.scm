@@ -508,7 +508,8 @@
 ;         gen-decoder [our entry point]
 ;             decode-build-table
 ;             /gen-decoder-switch
-;                 /gen-decoder-switch
+;                 /gen-decode-table-entry
+;                     /gen-decoder-switch
 ;
 ; decode-build-table is called to construct a tree of "table-guts" elements
 ; (??? Need better name obviously),
@@ -587,27 +588,80 @@
      ")"))
 )
 
-; Convert decoder table into C code.
+; Return code to set `itype' and branch to the extraction phase.
 
-; Return code for the default entry of each switch table
-;
-(define (/gen-decode-default-entry indent invalid-insn fn?)
+(define (/gen-set-itype-and-extract insn-enum fmt-name fn?)
   (string-append
    "itype = "
-   (gen-cpu-insn-enum (current-cpu) invalid-insn)
-   ";"
+   insn-enum
+   "; "
    (if (with-scache?)
        (if fn?
-	   " @prefix@_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;\n"
-	   " goto extract_sfmt_empty;\n")
-       " goto done;\n")
-  )
+	   (string-append "@prefix@_extract_" fmt-name
+			  " (this, current_cpu, pc, base_insn, entire_insn);"
+			  " goto done;")
+	   (string-append "goto extract_" fmt-name ";"))
+       "goto done;"))
 )
 
-; Return code for one insn entry.
-; REST is the remaining entries.
+;; Return code to set `itype' and branch to the extraction phase,
+;; bracketed in { } and indented by INDENT.
 
-(define (/gen-decode-insn-entry entry rest indent invalid-insn fn?)
+(define (/gen-bracketed-set-itype-and-extract indent insn-enum fmt-name fn?)
+  (string-append
+   indent "{ "
+   (/gen-set-itype-and-extract insn-enum fmt-name fn?)
+   " }\n")
+)
+
+; Return code for the default entry of each switch table
+
+(define (/gen-decode-default-entry invalid-insn fn?)
+  (/gen-set-itype-and-extract (gen-cpu-insn-enum (current-cpu) invalid-insn)
+			      "sfmt_empty"
+			      fn?)
+)
+
+;; Subroutine of /all-opcode-bits-used? to simplify it.
+;; Given TABLE-GUTS-THUS-FAR return the mask of base its that have been
+;; examined.
+;; TABLE-GUTS-THUS-FAR is a list of dtable-guts objects.
+;; PERF: Don't compute this for each insn, but that has to wait on the
+;; base-insn-bitsize cleanup (m32r).
+
+(define (/table-guts-to-mask table-guts-thus-far base-bitsize lsb0?)
+  ;;(logit 2 "/table-guts-to-mask " (map dtable-guts-bitnums table-guts-thus-far) "\n")
+  (let guts-loop ((mask 0) (guts-list table-guts-thus-far))
+    (if (null? guts-list)
+	mask
+	(let bits-loop ((mask mask) (bits (dtable-guts-bitnums (car guts-list))))
+	  (if (null? bits)
+	      (guts-loop mask (cdr guts-list))
+	      (bits-loop (+ mask (word-bit-value (car bits) base-bitsize lsb0?))
+			 (cdr bits))))))
+)
+
+;; Subroutine of /gen-decode-insn-entry to simplify it.
+;; Return a boolean indicating if all opcode bits of INSN have been
+;; examined given TABLE-GUTS-THUS-FAR.
+;; FIXME: Examine entire insn's opcode bits.
+
+(define (/all-opcode-bits-used? insn table-guts-thus-far lsb0?)
+  (let* ((base-mask (insn-base-mask insn))
+	 ;; FIXME: This can go away when base-insn-bitsize is fixed (m32r).
+	 (base-bitsize (min (insn-base-mask-length insn) (state-base-insn-bitsize)))
+	 (table-guts-base-mask (/table-guts-to-mask table-guts-thus-far
+						    base-bitsize
+						    lsb0?)))
+    (= (cg-logand base-mask table-guts-base-mask) base-mask))
+)
+
+; Return code for one insn entry, ENTRY.
+; REST is the remaining entries.
+; TABLE-GUTS-THUS-FAR is the list of dtable-guts objects that led to this insn.
+
+(define (/gen-decode-insn-entry entry rest table-guts-thus-far
+				indent lsb0? invalid-insn fn?)
   (assert (eq? 'insn (dtable-entry-type entry)))
   (logit 3 "Generating decode insn entry for " (obj:name (dtable-entry-value entry)) " ...\n")
 
@@ -633,30 +687,46 @@
 		     " : /* fall through */\n"))
 
      (else
-      (string-append indent "  case "
-		     (number->string (dtable-entry-index entry)) " :\n"
-		     ; Compensate for base-insn-size > current-insn-size by adjusting entire_insn.
-		     ; Activate this logic only for sid simulators; they are consistent in
-		     ; interpreting base-insn-bitsize this way.
-		     (if (and (equal? APPLICATION 'SID-SIMULATOR)
-			      (> (state-base-insn-bitsize) (insn-length insn)))
-			 (string-append
-			  indent "    entire_insn = entire_insn >> "
-			  (number->string (- (state-base-insn-bitsize) (insn-length insn)))
-			  ";\n")
-			 "")
-		     ; Generate code to check that all of the opcode bits for this insn match
-		     indent "    if (("
-		     (if (adata-integral-insn? CURRENT-ARCH) "entire_insn" "base_insn")
-		     " & 0x" (number->hex (insn-base-mask insn)) ") == 0x" (number->hex (insn-value insn)) ")\n" 
-		     indent "      { itype = " (gen-cpu-insn-enum (current-cpu) insn) ";"
-		     (if (with-scache?)
-			 (if fn?
-			     (string-append " @prefix@_extract_" fmt-name " (this, current_cpu, pc, base_insn, entire_insn); goto done;")
-			     (string-append " goto extract_" fmt-name ";"))
-			 " goto done;")
-		     " }\n"
-		     indent "    " (/gen-decode-default-entry indent invalid-insn fn?)))))
+      (let ((consistent-base-insn? (and (equal? APPLICATION 'SID-SIMULATOR)
+					(> (state-base-insn-bitsize)
+					   (insn-length insn)))))
+	(string-append indent "  case "
+		       (number->string (dtable-entry-index entry)) " :"
+		       ;; Compensate for base-insn-size > current-insn-size by
+		       ;; adjusting entire_insn.
+		       ;; Activate this logic only for sid simulators; they are
+		       ;; consistent in interpreting base-insn-bitsize this way.
+		       (if consistent-base-insn?
+			   (string-append
+			    "\n"
+			    indent "    entire_insn = entire_insn >> "
+			    (number->string (- (state-base-insn-bitsize) (insn-length insn)))
+			    ";\n")
+			   "")
+		       ;; If necessary, generate code to check that all of the
+		       ;; opcode bits for this insn match.
+		       (if (/all-opcode-bits-used? insn table-guts-thus-far lsb0?)
+			   (string-append
+			    (if consistent-base-insn?
+				(string-append indent "    ")
+				" ")
+			    (/gen-set-itype-and-extract (gen-cpu-insn-enum (current-cpu) insn)
+							fmt-name fn?)
+			    "\n")
+			   (string-append
+			    (if consistent-base-insn?
+				""
+				"\n")
+			    indent "    if (("
+			    (if (adata-integral-insn? CURRENT-ARCH) "entire_insn" "base_insn")
+			    " & 0x" (number->hex (insn-base-mask insn))
+			    ") == 0x" (number->hex (insn-value insn)) ")\n" 
+			    (/gen-bracketed-set-itype-and-extract (string-append indent "      ")
+								  (gen-cpu-insn-enum (current-cpu) insn)
+								  fmt-name fn?)
+			    indent "    "
+			    (/gen-decode-default-entry invalid-insn fn?)
+			    "\n")))))))
 )
 
 ; Subroutine of /decode-expr-ifield-tracking.
@@ -744,24 +814,6 @@
   *UNSPECIFIED*
 )
 
-; Subroutine of /gen-decode-expr-entry.
-; Return code to set `itype' and branch to the extraction phase.
-
-(define (/gen-decode-expr-set-itype indent insn-enum fmt-name fn?)
-  (string-append
-   indent
-   "{ itype = "
-   insn-enum
-   "; "
-   (if (with-scache?)
-       (if fn?
-	   (string-append "@prefix@_extract_" fmt-name " (this, current_cpu, pc, base_insn, entire_insn);  goto done;")
-	   (string-append "goto extract_" fmt-name ";"))
-       "goto done;")
-   " }\n"
-   )
-)
-
 ; Generate code to decode the expression table in ENTRY.
 ; INVALID-INSN is the <insn> object of the pseudo insn to handle invalid ones.
 
@@ -789,7 +841,7 @@
 		 code
 		 (append! code
 			  (list
-			   (/gen-decode-expr-set-itype
+			   (/gen-bracketed-set-itype-and-extract
 			    indent
 			    (gen-cpu-insn-enum (current-cpu) invalid-insn)
 			    "sfmt_empty"
@@ -815,33 +867,33 @@
 
 			  ; Need this in a list for a later append!.
 			  (string-list
-			   (/gen-decode-expr-set-itype
+			   (/gen-bracketed-set-itype-and-extract
 			    indent
 			    (gen-cpu-insn-enum (current-cpu) insn)
 			    (gen-sym (insn-sfmt insn))
 			    fn?))
 
 			  ; We don't use up all ifield values, so emit a test.
-			   (let ((iflds (map current-ifld-lookup ifld-names)))
-			     (string-list
-			      indent "{\n"
-			      (gen-define-ifields iflds
+			  (let ((iflds (map current-ifld-lookup ifld-names)))
+			    (string-list
+			     indent "{\n"
+			     (gen-define-ifields iflds
+						 (insn-length insn)
+						 (string-append indent "  ")
+						 #f)
+			     (gen-extract-ifields iflds
 						  (insn-length insn)
 						  (string-append indent "  ")
 						  #f)
-			      (gen-extract-ifields iflds
-						   (insn-length insn)
-						   (string-append indent "  ")
-						   #f)
-			      indent "  if ("
-			      (rtl-c 'BI expr nil #:ifield-var? #t)
-			      ")\n"
-			      (/gen-decode-expr-set-itype
-			       (string-append indent "    ")
-			       (gen-cpu-insn-enum (current-cpu) insn)
-			       (gen-sym (insn-sfmt insn))
-			       fn?)
-			      indent "}\n")))))
+			     indent "  if ("
+			     (rtl-c 'BI expr nil #:ifield-var? #t)
+			     ")\n"
+			     (/gen-bracketed-set-itype-and-extract
+			      (string-append indent "    ")
+			      (gen-cpu-insn-enum (current-cpu) insn)
+			      (gen-sym (insn-sfmt insn))
+			      fn?)
+			     indent "}\n")))))
 
 		 (loop (cdr expr-list)
 		       (append! code next-code)))))))
@@ -850,10 +902,12 @@
 
 ; Generate code to decode TABLE.
 ; REST is the remaining entries.
-; SWITCH-NUM, STARTBIT, DECODE-BITSIZE, INDENT, LSB0?, INVALID-INSN are same
-; as for /gen-decoder-switch.
+; SWITCH-NUM, STARTBIT, DECODE-BITSIZE, TABLE-GUTS-THUS-FAR,
+; INDENT, LSB0?, INVALID-INSN are the same as for /gen-decoder-switch.
 
-(define (/gen-decode-table-entry table rest switch-num startbit decode-bitsize indent lsb0? invalid-insn fn?)
+(define (/gen-decode-table-entry table rest switch-num startbit decode-bitsize
+				 table-guts-thus-far
+				 indent lsb0? invalid-insn fn?)
   (assert (eq? 'table (dtable-entry-type table)))
   (logit 3 "Generating decode table entry for case " (dtable-entry-index table) " ...\n")
 
@@ -876,6 +930,7 @@
 			     startbit
 			     decode-bitsize
 			     (subdtable-table (dtable-entry-value table))
+			     table-guts-thus-far
 			     (string-append indent "    ")
 			     lsb0?
 			     invalid-insn
@@ -945,6 +1000,9 @@
 ; STARTBIT is the bit offset of the instruction value that C variable `insn'
 ; holds (note that this is independent of LSB0?).
 ; DECODE-BITSIZE is the number of bits of the insn that `insn' holds.
+; TABLE-GUTS-THUS-FAR is a list of the table-guts that got us here,
+; excluding TABLE-GUTS.  It is used to decide whether insns have been
+; fully decoded (i.e. all opcode bits have been examined).
 ; LSB0? is non-#f if bit number 0 is the least significant bit.
 ; INVALID-INSN is the <insn> object of the pseudo insn to handle invalid ones.
 
@@ -955,63 +1013,72 @@
 ; else {}
 ; may well be less stressful on the compiler to optimize than small switch() stmts.
 
-(define (/gen-decoder-switch switch-num startbit decode-bitsize table-guts
+(define (/gen-decoder-switch switch-num startbit decode-bitsize
+			     table-guts table-guts-thus-far
 			     indent lsb0? invalid-insn fn?)
-  ; For entries that are a single insn, we're done, otherwise recurse.
 
-  (string-list
-   indent "{\n"
-   ; Are we at the next word?
-   (if (not (= startbit (dtable-guts-startbit table-guts)))
-       (begin
-	 (set! startbit (dtable-guts-startbit table-guts))
-	 (set! decode-bitsize (dtable-guts-bitsize table-guts))
-	 ; FIXME: Bits may get fetched again during extraction.
-	 (string-append indent "  unsigned int val;\n"
-			indent "  /* Must fetch more bits.  */\n"
-			indent "  insn = "
-			(gen-ifetch "pc" startbit decode-bitsize)
-			";\n"
-			indent "  val = "))
-       (string-append indent "  unsigned int val = "))
-   (/gen-decode-bits (dtable-guts-bitnums table-guts)
-		     (dtable-guts-startbit table-guts)
-		     (dtable-guts-bitsize table-guts)
-		     "insn" "entire_insn" lsb0?)
-   ";\n"
-   indent "  switch (val)\n"
-   indent "  {\n"
+  (let ((new-table-guts-thus-far (append table-guts-thus-far (list table-guts))))
 
-   ; The code is more readable, and icache use is improved, if we collapse
-   ; common code into one case and use "fall throughs" for all but the last of
-   ; a set of common cases.
-   ; FIXME: We currently rely on /gen-decode-foo-entry to recognize the fall
-   ; through.  We should take care of it ourselves.
+    (string-list
+     indent "{\n"
+     ;; Are we at the next word?
+     (if (not (= startbit (dtable-guts-startbit table-guts)))
+	 (begin
+	   (set! startbit (dtable-guts-startbit table-guts))
+	   (set! decode-bitsize (dtable-guts-bitsize table-guts))
+	 ;; FIXME: Bits may get fetched again during extraction.
+	   (string-append indent "  unsigned int val;\n"
+			  indent "  /* Must fetch more bits.  */\n"
+			  indent "  insn = "
+			  (gen-ifetch "pc" startbit decode-bitsize)
+			  ";\n"
+			  indent "  val = "))
+	 (string-append indent "  unsigned int val = "))
+     (/gen-decode-bits (dtable-guts-bitnums table-guts)
+		       (dtable-guts-startbit table-guts)
+		       (dtable-guts-bitsize table-guts)
+		       "insn" "entire_insn" lsb0?)
+     ";\n"
+     indent "  switch (val)\n"
+     indent "  {\n"
 
-   (let loop ((entries (/decode-sort-entries (dtable-guts-entries table-guts)))
-	      (result nil))
-     (if (null? entries)
-	 (reverse! result)
-	 (loop
-	  (cdr entries)
-	  (cons (case (dtable-entry-type (car entries))
-		  ((insn)
-		   (/gen-decode-insn-entry (car entries) (cdr entries) indent invalid-insn fn?))
-		  ((expr)
-		   (/gen-decode-expr-entry (car entries) indent invalid-insn fn?))
-		  ((table)
-		   (/gen-decode-table-entry (car entries) (cdr entries)
-					    switch-num startbit decode-bitsize
-					    indent lsb0? invalid-insn fn?))
-		  )
-		result))))
+     ;; The code is more readable, and icache use is improved, if we collapse
+     ;; common code into one case and use "fall throughs" for all but the last
+     ;; of a set of common cases.
+     ;; FIXME: We currently rely on /gen-decode-foo-entry to recognize the fall
+     ;; through.  We should take care of it ourselves.
 
-   ; ??? Can delete if all cases are present.
-   indent "  default : "
-   (/gen-decode-default-entry indent invalid-insn fn?)
-   indent "  }\n"
-   indent "}\n"
-   )
+     (let loop ((entries (/decode-sort-entries (dtable-guts-entries table-guts)))
+		(result nil))
+
+       (if (null? entries)
+
+	   (reverse! result)
+
+	   (loop
+	    (cdr entries)
+	    ;; For entries that are a single insn, we're done, otherwise recurse.
+	    (cons (case (dtable-entry-type (car entries))
+		    ((insn)
+		     (/gen-decode-insn-entry (car entries) (cdr entries)
+					     new-table-guts-thus-far
+					     indent lsb0? invalid-insn fn?))
+		    ((expr)
+		     (/gen-decode-expr-entry (car entries) indent invalid-insn fn?))
+		    ((table)
+		     (/gen-decode-table-entry (car entries) (cdr entries)
+					      switch-num startbit decode-bitsize
+					      new-table-guts-thus-far
+					      indent lsb0? invalid-insn fn?))
+		    )
+		  result))))
+
+     ;; ??? Can delete if all cases are present.
+     indent "  default : "
+     (/gen-decode-default-entry invalid-insn fn?) "\n"
+     indent "  }\n"
+     indent "}\n"
+     ))
 )
 
 ; Decoder generation entry point.
@@ -1038,7 +1105,7 @@
 
     ; Now print it out.
 
-    (/gen-decoder-switch "0" 0 decode-bitsize table-guts indent lsb0?
-			 invalid-insn fn?)
-    )
+    (/gen-decoder-switch "0" 0 decode-bitsize
+			 table-guts nil
+			 indent lsb0? invalid-insn fn?))
 )

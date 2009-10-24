@@ -1,6 +1,8 @@
 2009-10-24  Doug Evans  <dje@sebabeach.org>
 
 	* gen-all-doc: Add sh.cpu.
+	* gen-all-desc: Use cpu/sh.cpu instead of ../cpu/sh.cpu
+	(until ../cpu/sh.cpu is updated and cpu/sh.cpu is deleted).
 
 	* sid-cpu.scm (/gen-sem-case): Tweaking debugging printf.
 	(/gen-sfrag-case): Ditto.

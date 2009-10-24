@@ -1,5 +1,9 @@
 2009-10-24  Doug Evans  <dje@sebabeach.org>
 
+	* sid-cpu.scm (/gen-sem-case): Tweaking debugging printf.
+	(/gen-sfrag-case): Ditto.
+	* sim-cpu.scm (/gen-sem-case): Ditto.
+
 	* doc/rtl.texi: Add note that different ifields, operands, insns,
 	and minsns may occur with the same name in different isas.
 	Add note on the canonical form of rtl expressions.

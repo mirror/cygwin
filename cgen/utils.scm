@@ -837,6 +837,15 @@
 	  (remainder (logslr value (- size (+ start length))) (integer-expt 2 length))))
 )
 
+; Return numeric value of bit N in a word of size WORD-BITSIZE.
+
+(define (word-bit-value bitnum word-bitsize lsb0?)
+  (assert (< bitnum word-bitsize))
+  (if lsb0?
+      (ash 1 bitnum)
+      (ash 1 (- word-bitsize bitnum 1)))
+)
+
 ; Return a bit mask of size SIZE beginning at the LSB.
 
 (define (mask size)

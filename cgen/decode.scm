@@ -37,12 +37,12 @@
 ; [The choice of "table-guts" is historical, a better name will come to mind
 ; eventually.]
 
-; Decoded tables data structure, termed "table guts".
+; Decoded tables data structure, termed "dtable-guts".
 ; A simple data structure of 4 elements:
 ; bitnums:  list of bits that have been used thus far to decode the insn
 ; startbit: bit offset in instruction of value in C local variable `insn'
-; bitsize:  size of value in C local variable `insn', the number
-;           of bits of the instruction read thus far
+;           (note that this is independent of LSB0?)
+; bitsize:  size of value in C local variable `insn'
 ; entries:  list of insns that match the decoding thus far,
 ;           each entry in the list is a `dtable-entry' record
 
@@ -470,7 +470,7 @@
 ; part), then the result is (#b110000 #b110001 #b110010 #b110011).
 
 (define (/opcode-slots insn bitnums lsb0?)
-  (let ((opcode (insn-value insn))
+  (let ((opcode (insn-value insn)) ;; FIXME: unused, overridden below
 	(insn-len (insn-base-mask-length insn))
 	(decode-len (length bitnums)))
     (let* ((opcode (/get-subopcode-value (insn-value insn) insn-len decode-len bitnums 0 lsb0?))
@@ -688,13 +688,11 @@
     )
 )
 
-; Given vector of insn slots, generate the guts of the decode table, recorded
-; as a list of 3 elements: bitnums, decode-bitsize, and list of entries.
-; Bitnums is recorded with the guts so that tables whose contents are
-; identical but are accessed by different bitnums are treated as separate in
-; /decode-subtables.  Not sure this will ever happen, but play it safe.
+; Given a vector of insn slots INSN-VEC, generate the guts of the decode table,
+; recorded as a "dtable-guts" data structure.
 ;
 ; BITNUMS is the list of bit numbers used to build the slot table.
+; I.e., (= (vector-length insn-vec) (ash 1 (length bitnums))).
 ; STARTBIT is the bit offset of the instruction value that C variable `insn'
 ; holds (note that this is independent of LSB0?).
 ; For example, it is initially zero.  If DECODE-BITSIZE is 16 and after
@@ -706,6 +704,10 @@
 ; pointers to other tables.
 ; LSB0? is non-#f if bit number 0 is the least significant bit.
 ; INVALID-INSN is an <insn> object representing invalid insns.
+;
+; BITNUMS is recorded with the guts so that tables whose contents are
+; identical but are accessed by different bitnums are treated as separate in
+; /decode-subtables.  Not sure this will ever happen, but play it safe.
 
 (define (/build-decode-table-guts insn-vec bitnums startbit decode-bitsize index-list lsb0? invalid-insn)
   (logit 2 "Processing decoder for bits"
@@ -714,6 +716,7 @@
 	 ", decode-bitsize " decode-bitsize
 	 ", index-list " index-list
 	 " ...\n")
+  (assert (= (vector-length insn-vec) (ash 1 (length bitnums))))
 
   (dtable-guts-make
    bitnums startbit decode-bitsize
@@ -727,6 +730,8 @@
 
 ; Entry point.
 ; Return a table that efficiently decodes INSN-LIST.
+; The table is a "dtable-guts" data structure, see dtable-guts-make.
+;
 ; BITNUMS is the set of bits to initially key off of.
 ; DECODE-BITSIZE is the number of bits of the instruction that `insn' holds.
 ; LSB0? is non-#f if bit number 0 is the least significant bit.

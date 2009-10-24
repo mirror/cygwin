@@ -32,7 +32,7 @@ cpu/mep.cpu
 ../cpu/mt.cpu
 cpu/openrisc.cpu
 cpu/powerpc.cpu
-../cpu/sh.cpu
+cpu/sh.cpu
 cpu/sparc.cpu
 ../cpu/xc16x.cpu
 cpu/xstormy16.cpu

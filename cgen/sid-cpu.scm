@@ -80,7 +80,7 @@
 #ifndef DESC_@ARCH@_H
 #define DESC_@ARCH@_H
 
-#include \"opcode/cgen-bitset.h\"
+#include \"cgen/bitset.h\"
 
 namespace @arch@ {
 \n"

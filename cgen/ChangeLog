@@ -1,5 +1,8 @@
 2009-10-23  Doug Evans  <dje@sebabeach.org>
 
+	* desc-cpu.scm (/gen-hash-defines): Remove #include of cgen-bitset.h.
+	* sid-cpu.scm (cgen-desc.h): Update location of cgen's bitset.h.
+
 	* decode.scm: Tweak various comments.
 	(/opcode-slots): Add FIXME.
 	(/build-decode-table-guts): Add assert.

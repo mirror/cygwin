@@ -1,3 +1,9 @@
+2009-10-24  Doug Evans  <dje@sebabeach.org>
+
+	* doc/rtl.texi: Add note that different ifields, operands, insns,
+	and minsns may occur with the same name in different isas.
+	Add note on the canonical form of rtl expressions.
+
 2009-10-23  Doug Evans  <dje@sebabeach.org>
 
 	* desc-cpu.scm (/gen-hash-defines): Remove #include of cgen-bitset.h.

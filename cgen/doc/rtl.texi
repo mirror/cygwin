@@ -1314,10 +1314,22 @@ or @code{handlers} specs.
 @section Instruction fields
 @cindex Instruction fields
 
-Instruction fields define the raw bitfields of each instruction.
+Instruction fields (ifields) define the raw bitfields of each instruction.
 Minimal semantic meaning is attributed to them.  Support is provided for
 mapping to and from the raw bit pattern and the usable contents, and
 other simple manipulations.
+@footnote{Whether to also provide a way to specify instruction formats is not yet
+clear.  Currently they are computed from the instructions, so there's no
+current *need* to provided them.  However, providing the ability as an
+option may simplify other tools CGEN is used to generate.  This
+simplification would come in the form of giving known names to the formats
+which CPU reference manuals often do.  Pre-specified instruction formats
+may also simplify expression of more complicated instruction sets.
+Providing instruction formats may also simplify the support of really
+complex ISAs like i386 and m68k).}
+
+Instruction fields must be uniquely named within an instruction set,
+but different instruction sets (ISAs) may have ifields with the same name.
 
 The syntax for defining instruction fields is:
 
@@ -1338,24 +1350,13 @@ The syntax for defining instruction fields is:
 @end example
 
 The required elements are: @samp{name}, @samp{start}, @samp{length}.
-
-(*Note: Whether to also provide a way to specify instruction formats is not yet
-clear.  Currently they are computed from the instructions, so there's no
-current *need* to provided them.  However, providing the ability as an
-option may simplify other tools CGEN is used to generate.  This
-simplification would come in the form of giving known names to the formats
-which CPU reference manuals often do.  Pre-specified instruction formats
-may also simplify expression of more complicated instruction sets.
-Providing instruction formats may also simplify the support of really
-complex ISAs like i386 and m68k).
-
-(*Note: Positional specification simplifies instruction description somewhat
+@footnote{Positional specification simplifies instruction description somewhat
 in that there is no required order of fields, and a disjunct set of fields can
 be referred to as one.  On the other hand it can require knowledge of the length
 of the instruction which is inappropriate in cases like the M32R where
 the main fields have the same name and "position" regardless of the length
 of the instruction.  Moving positional specification into instruction formats,
-whether machine generated or programmer specified, may be done.)
+whether machine generated or programmer specified, may be done.}
 
 Convention requires @samp{field-name} begin with @samp{f-}.
 
@@ -1846,6 +1847,9 @@ the semantic code
 @c More?
 @end itemize
 
+Instruction operands must be uniquely named within an instruction set,
+but different instruction sets (ISAs) may have operands with the same name.
+
 The syntax for defining an operand is:
 
 @example
@@ -2160,14 +2164,18 @@ The operand may be "any of" the specified choices.
 @cindex Instructions
 
 Each instruction in the instruction set has an entry in the description
-file.  For complicated instruction sets this is a lot of typing.  However,
+file.
+@footnote{For complicated instruction sets this is a lot of typing.  However,
 macros can reduce a lot of that typing.  The real question is given the
 amount of information that must be expressed, how succinct can one express
 it and still be clean and usable?  I'm open to opinions on how to improve
 this, but such improvements must take everything CGEN wishes to be into
 account.
 (*Note: Of course no claim is made that the current design is the
-be-all and end-all or that there is one be-all and end-all.)
+be-all and end-all or that there is one be-all and end-all.)}
+
+Instructions must be uniquely named within an instruction set,
+but different instruction sets (ISAs) may have instructions with the same name.
 
 The syntax for defining an instruction is:
 
@@ -2374,7 +2382,13 @@ Example:
 @cindex Instructions, macro
 
 Macro-instructions are for the assembler side of things and are not used
-by the simulator.  The syntax for defining a macro-instruction is:
+by the simulator.
+
+Macro-instructions must be uniquely named within an instruction set,
+but different instruction sets (ISAs) may have macro-instructions
+with the same name.
+
+The syntax for defining a macro-instruction is:
 
 @example
 (define-macro-insn
@@ -2553,11 +2567,18 @@ in GCC @code{(function:MODE arg1 ...)} is written in CGEN as
 GCC RTL allows flags to be recorded with RTL (e.g. MEM_VOLATILE_P).
 This is supported in CGEN RTL by prefixing each RTL function's arguments
 with an optional list of modifiers:
-@code{(function (:mod1 :mod2) MODE arg1 ...)}.
-The list is a set of modifier names prefixed with ':'.  They can take
+@code{(function (#:mod1 #:mod2) MODE arg1 ...)}.
+The list is a set of modifier names prefixed with '#:'.  They can take
 arguments.
 ??? Modifiers are supported by the RTL traversing code, but no use is
 made of them yet.
+
+The mode may be elided if it can be deduced from the operands.
+For example, while the full form of @code{add} is
+@samp{(add () MODE arg1 arg2)},
+it may be written as @samp{(add arg1 arg2)}, with the mode being
+taken from the mode of @samp{arg1}.
+The fully specified version is called the ``canonical'' form.
 
 The currently defined semantic functions are:
 

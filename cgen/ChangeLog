@@ -1,5 +1,7 @@
 2009-10-24  Doug Evans  <dje@sebabeach.org>
 
+	* gen-all-doc: Add sh.cpu.
+
 	* sid-cpu.scm (/gen-sem-case): Tweaking debugging printf.
 	(/gen-sfrag-case): Ditto.
 	* sim-cpu.scm (/gen-sem-case): Ditto.

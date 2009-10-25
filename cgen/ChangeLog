@@ -1,3 +1,10 @@
+2009-10-25  Doug Evans  <dje@sebabeach.org>
+
+	Change internal representation of rtx attribute values.
+	* attr.scm (/attr-val-is-rtx?): New function.
+	(attr-value): Call it.
+	(atlist-attr-value-no-default, attr-lookup-default): Ditto.
+
 2009-10-24  Doug Evans  <dje@sebabeach.org>
 
 	* gen-all-doc: Add sh.cpu.

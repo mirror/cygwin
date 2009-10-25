@@ -195,9 +195,10 @@
 
 (define (enum-attr-make name value) (cons name value))
 
-;;; Return a procedure to parse an attribute.
-;;; RIGHT-TYPE? is a procedure that verifies the value is the right type.
-;;; MESSAGE is printed if there is an error.
+;; Return a procedure to parse an attribute.
+;; RIGHT-TYPE? is a procedure that verifies the value is the right type.
+;; MESSAGE is printed if there is an error.
+;; The result of the parsed attribute is (name . value).
 
 (define (/parse-simple-attribute right-type? message)
   (lambda (self context val)
@@ -488,6 +489,17 @@
   (send atlist 'attr-present? attr)
 )
 
+;; Return #t if attribute value VAL is an rtx expression.
+;; RTXs in attributes are recorded as a list of one element
+;; which is the rtx.
+;; I.e., ((rtx foo bar)).
+
+(define (/attr-val-is-rtx? val)
+  (and (pair? val)
+       (null? (cdr val))
+       (pair? (car val))) ;; pair? -> cheap non-null-list?
+)
+
 ; Expand attribute value ATVAL, which is an rtx expression.
 ; OWNER is the containing object or #f if there is none.
 ; OWNER is needed if an attribute is defined in terms of other attributes.
@@ -509,7 +521,7 @@
 (define (attr-value alist attr owner)
   (let ((a (assq-ref alist attr)))
     (if a
-	(if (pair? a) ; pair? -> cheap non-null-list?
+	(if (/attr-val-is-rtx? a)
 	    (/attr-eval a owner)
 	    a)
 	(attr-lookup-default attr owner)))
@@ -527,7 +539,7 @@
 (define (atlist-attr-value-no-default atlist attr owner)
   (let ((a (assq-ref (atlist-attrs atlist) attr)))
     (if a
-	(if (pair? a) ; pair? -> cheap non-null-list?
+	(if (/attr-val-is-rtx? a)
 	    (/attr-eval a owner)
 	    a)
 	nil))
@@ -545,7 +557,7 @@
 	    #f
 	    (let ((deflt (attr-default at)))
 	      (if deflt
-		  (if (pair? deflt) ; pair? -> cheap non-null-list?
+		  (if (/attr-val-is-rtx? deflt)
 		      (/attr-eval deflt owner)
 		      deflt)
 		  ; If no default was provided, use the first value.

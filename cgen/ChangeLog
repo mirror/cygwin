@@ -1,5 +1,29 @@
 2009-10-25  Doug Evans  <dje@sebabeach.org>
 
+	Record bitset attributes internally as a list.
+	Record rtx attribute values internally as ((rtx-expr)).
+	* attr.scm (bitset-attr?): Delete, unused.
+	(<bitset-attribute> parse-value): Rewrite.
+	(/attr-parse): Rewrite bitset default value processing.
+	(/attr-read): Pick out values of scalar attributes to distinguish
+	them from bitset values which are a list.
+	Fix spelling errors for processing of default values.
+	Handle string attributes.
+	(bitset-attr->list): Delete, all callers updated.
+	(/bitset-attr->charmask): Renamed from bitset-attr->charmask.
+	All callers updated.
+	(atlist-source-form): Rewrite.
+	* hardware.scm (<hardware-base> 'get-isas): Update recognition
+	of all isas.
+	(hardware-builtin!): Update spec of ISA attribute, (ISA foo,bar)
+	-> (ISA foo bar).
+	* intrinsics.scm (target:belongs-to-group?): Update, bitset attribute
+	values are now lists.
+	* mach.scm (def-isa-attr!): Update, bitset attribute values,
+	including the default, are now lists.
+	(all-isas-attr-value): Result is now a list.
+	* doc/rtl.texi: Clean up pass over attribute docs.
+
 	Change internal representation of rtx attribute values.
 	* attr.scm (/attr-val-is-rtx?): New function.
 	(attr-value): Call it.

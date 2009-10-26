@@ -111,7 +111,7 @@ namespace @arch@ {
 	(name (obj:name hw))
 	(getter (hw-getter hw))
 	(setter (hw-setter hw))
-	(isas (bitset-attr->list (obj-attr-value hw 'ISA)))
+	(isas (obj-attr-value hw 'ISA))
 	(type (gen-type hw)))
     (let ((get-code (if getter
 			(let ((mode (hw-mode hw))

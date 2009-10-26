@@ -638,7 +638,7 @@
   (let ((machs (atlist-attr-value-no-default atlist 'MACH obj)))
     (if (null? machs)
 	#t
-	(keep-mach? (bitset-attr->list machs))))
+	(keep-mach? machs)))
 )
 
 ; Return a boolean indicating if the object containing ATLIST is to be kept.
@@ -754,7 +754,7 @@
 
 (define (keep-isa-atlist? atlist obj)
   (let ((isas (atlist-attr-value atlist 'ISA obj)))
-    (keep-isa? (bitset-attr->list isas)))
+    (keep-isa? isas))
 )
 
 ; Return non-#f if object OBJ is to be kept, according to its ISA attribute.

@@ -3,9 +3,11 @@
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
-; There are 4 kinds of attributes: boolean, integer, enum, and bitset.  Boolean
-; attributes are really enum attributes with two possible values, but they
-; occur frequently enough that they are special cased.
+; There are 5 kinds of attributes: boolean, integer, enum, bitset, and string.
+; Boolean attributes are really enum attributes with two possible values,
+; but they occur frequently enough that they are special cased.
+; String attributes are intentionally not documented in the manual as
+; being supported - they're still a bit of work-in-progress.
 ;
 ; All objects that use attributes must have two methods:
 ; - 'get-atlist - returns the object's attr-list
@@ -15,21 +17,25 @@
 ; Boolean attributes are specified as (NAME #t) or (NAME #f),
 ; but for convenience ATTR and !ATTR are also supported.
 ; integer/enum attrs are specified as (ATTR value).
-; string attrs are specified as (ATTR value).
-; Bitset attrs are specified as (ATTR val1,val2,val3).
+; string attrs are specified as (ATTR "value").
+; Bitset attrs are specified as (ATTR val1 val2 val3), each value must be
+; a valid Scheme symbol (stick with valid C symbols + "-" and you'll be fine).
+; For backwards compatibility (ATTR val1,val2,val3) and
+; (ATTR "val1,val2,val3") are also supported for bitset values.
+; val1,val2,val3 is not portable (e.g. mzscheme will reject it).
 ; In all cases the value needn't be constant, and can be an expression,
 ; though expressions are currently only supported for META-attributes
 ; (attributes that don't appear in any generated code).
 ;
 ; Example:
-; (FOO1 !FOO2 (BAR 3) (FOO3 X) (MACH sparc,sparclite))
+; (FOO1 !FOO2 (BAR 3) (FOO3 X) (MACH sparc sparclite))
 ;
 ; ??? Implementation of expressions is being postponed as long
 ; as possible, avoiding adding complications for complication's sake, and
 ; because I'm not completely sure how I want to do them.
 ; The syntax for an expression value is (ATTR (rtx-func ...)).
 ;
-; ??? May wish to allow a bitset attribute like (ATTR val1,!val2), where `!'
+; ??? May wish to allow a bitset attribute like (ATTR val1 !val2), where `!'
 ; means to turn off that particular bit (or bits if val2 refers to several).
 ;
 ; ??? May wish to allow specifying enum attributes by only having to
@@ -148,10 +154,6 @@
 
 (define (bool-attr? x) (class-instance? <boolean-attribute> x))
 
-; Return a boolean indicating if X is a <bitset-attribute> object.
-
-(define (bitset-attr? x) (class-instance? <bitset-attribute> x))
-
 ; Return a symbol indicating the kind of attribute ATTR is.
 ; The result is one of boolean,integer,enum,bitset or string.
 
@@ -181,9 +183,8 @@
 
 (define (bool-attr-make name value) (cons name value))
 
-; VALUES must be a comma separated list of symbols
-; (e.g. val1,val2 not (val1 val2)).
-; FIXME: require values to be a string (i.e. "val1,val2")
+; VALUES must be a list of symbols.
+; E.g., (val1 val2) not val1,val2.
 
 (define (bitset-attr-make name values) (cons name values))
 
@@ -220,7 +221,11 @@
  <string-attribute> 'parse-value
  (/parse-simple-attribute string? "invalid argument to string attribute"))
 
-; A bitset attribute's value is a comma separated list of elements.
+; A bitset attribute's value is a list of symbols.
+; For backwards compatibility (ATTR val1,val2,val3) and
+; (ATTR "val1,val2,val3") are also supported for bitset values.
+; val1,val2,val3 is not portable (e.g. mzscheme will reject it).
+;
 ; We don't validate the values.  In the case of the MACH attribute,
 ; there's no current mechanism to create it after all define-mach's have
 ; been read in.
@@ -232,8 +237,16 @@
 
 (method-make!
  <bitset-attribute> 'parse-value
- (/parse-simple-attribute (lambda (x) (or (symbol? x) (string? x)))
-			  "improper bitset attribute")
+ (lambda (self context val)
+   (let ((value (if (and (= (length val) 1)
+			 (or (symbol? (car val)) (string? (car val))))
+		    (map string->symbol (string-cut (->string (car val)) #\,))
+		    val))
+	 (message "improper bitset attribute"))
+     ;; NOTE: An empty list is ok.
+     (if (all-true? (map symbol? value))
+	 (cons (obj:name self) value)
+	 (parse-error context message (cons (obj:name self) val)))))
 )
 
 ; An integer attribute's value is a number
@@ -263,8 +276,8 @@
        (parse-error context "boolean value list must be (#f #t)" values)))
 )
 
-; Ignore values for strings.  We can't do any error checking since
-; the default value is (#f #t).
+; Ignore values for strings.
+; They're not supported and /attr-read catches this.
 
 (method-make!
  <string-attribute> 'parse-value-def
@@ -272,22 +285,24 @@
 )
 
 ; Parse a bitset attribute's value definition.
-; FIXME: treated as enum?
 
 (method-make!
  <bitset-attribute> 'parse-value-def
  (lambda (self context values)
+   ;; parse-enum-vals works well enough
    (parse-enum-vals context "" values))
 )
 
 ; Parse an integer attribute's value definition.
 ; VALUES may be #f which means any value is ok.
+; A fixed set of VALUES is work-in-progress.
 
 (method-make!
  <integer-attribute> 'parse-value-def
  (lambda (self context values)
    (if values
        (for-each (lambda (val)
+		   ;; A list entry is for providing a sanitization key.
 		   (if (or (not (list? val))
 			   (not (number? (car val))))
 		       (parse-error context
@@ -316,8 +331,10 @@
 ; All arguments are in raw (non-evaluated) form.
 ; TYPE-CLASS is the class of the object to create.
 ; i.e. one of <{boolean,bitset,integer,enum,string}-attribute>.
-; If DEFAULT is #f, use the first value.
-; ??? Allowable values for integer attributes is wip.
+; For enum attributes, if DEFAULT is #f use the first value.
+; For all other attribute kinds, we use what /attr-read gives us.
+; ??? Allowable values for integer attributes is wip,
+; for now it is the portable set of integers (int32_t).
 
 (define (/attr-parse context type-class name comment attrs for default values)
   (logit 2 "Processing attribute " name " ...\n")
@@ -333,9 +350,12 @@
     (elm-xset! result 'attrs (atlist-parse context attrs ""))
     (elm-xset! result 'for for)
 
-    ; Set the default.
+    ;; Set the default.
+    ;; FIXME: Clean up with /attr-read.
     (case (class-name type-class)
       ((<boolean-attribute>)
+       ;; ??? docs say default must be #f, but we want to allow an rtx to
+       ;; specify the default.
        (if (and (not (memq default '(#f #t)))
 		(not (/attr-val-is-rtx? default)))
 	   (parse-error context "invalid default" default))
@@ -359,12 +379,17 @@
 	     (parse-error context "invalid default" default))
 	 (elm-xset! result 'default default)))
       ((<bitset-attribute>)
-       (let ((default (if default default (caar parsed-values))))
+       ;; bitset attributes must specify a default, /attr-read catches this
+       (assert default)
+       ;; It's also /attr-read's job to ensure it is a list.
+       (assert (list? default))
+       (let ((default default))
 	 ;; NOTE: We don't allow an rtx for bitset attributes,
 	 ;; the rtl language currently doesn't support them.
 	 (if (/attr-val-is-rtx? default)
 	     (parse-error context "invalid default, rtx not supported for bitset" default))
-	 (if (not (assq default parsed-values))
+	 (if (not (all-true? (map (lambda (v) (assq v parsed-values))
+				  default)))
 	     (parse-error context "invalid default" default))
 	 (elm-xset! result 'default default))))
 
@@ -381,79 +406,95 @@
 
 (define (/attr-read context . arg-list)
   (let (
-	(type-class 'not-set) ; attribute type
+	(type 'not-set) ;; attribute type
+	(type-class 'not-set) ;; attribute class
 	(name #f)
 	(comment "")
 	(attrs nil)
-	(for #f) ; assume for everything
-	(default #f) ; #f indicates "not set"
-	(values #f) ; #f indicates "not set"
+	(for #f) ;; assume for everything
+	(default #f) ;; #f indicates "not set"
+	(values #f) ;; #f indicates "not set"
 	)
 
-    ; Loop over each element in ARG-LIST, recording what's found.
+    ;; Loop over each element in ARG-LIST, recording what's found.
     (let loop ((arg-list arg-list))
       (if (null? arg-list)
 	  nil
 	  (let ((arg (car arg-list))
 		(elm-name (caar arg-list)))
 	    (case elm-name
-	      ((type) (set! type-class (case (cadr arg)
-					((boolean) <boolean-attribute>)
-					((string) <string-attribute>)
-					((bitset) <bitset-attribute>)
-					((integer) <integer-attribute>)
-					((enum) <enum-attribute>)
-					(else (parse-error
-					       context
-					       "invalid attribute type"
-					       (cadr arg))))))
+	      ((type)
+	       (set! type-class (case (cadr arg)
+				  ((boolean) <boolean-attribute>)
+				  ((string) <string-attribute>)
+				  ((bitset) <bitset-attribute>)
+				  ((integer) <integer-attribute>)
+				  ((enum) <enum-attribute>)
+				  (else (parse-error
+					 context
+					 "invalid attribute type"
+					 (cadr arg)))))
+	       (set! type (cadr arg)))
 	      ((name) (set! name (cadr arg)))
 	      ((comment) (set! comment (cadr arg)))
 	      ((attrs) (set! attrs (cdr arg)))
 	      ((for) (set! for (cdr arg)))
-	      ((default) (set! default (cadr arg)))
+	      ((default) (set! default (cdr arg)))
 	      ((values) (set! values (cdr arg)))
 	      (else (parse-error context "invalid attribute arg" arg)))
 	    (loop (cdr arg-list)))))
 
-    ; If the default is a list it is an rtx expression,
-    ; convert it to ((rtx-expression)) so that it is recognized by
-    ; /attr-val-is-rtx?.
-    (if (pair? default) ;; pair? -> cheap non-null-list?
-	(set! default (list default)))
-
-    ; Must have type now.
+    ;; Must have type now.
     (if (eq? type-class 'not-set)
 	(parse-error context "type not specified") arg-list)
-    ; Establish proper defaults now that we know the type.
-    (case (class-name type-class)
-      ((<boolean-attribute>)
+
+    ;; For scalar attributes, fix up the default.
+    (if (and default (memq type '(boolean string integer enum)))
+	(begin
+	  (if (!= (length default) 1)
+	      (parse-error context "invalid default" default))
+	  ;; Don't change rtx values.
+	  (if (not (pair? (car default)))
+	      (set! default (car default)))))
+
+    ;; Establish proper defaults now that we know the type.
+    ;; FIXME: Clean up with /attr-parse.
+    (case type
+      ((boolean)
        (if (eq? default #f)
-	   (set! default #f)) ; really a nop, but for consistency
+	   (set! default #f)) ;; really a nop, but for consistency
        (if (eq? values #f)
 	   (set! values '(#f #t))))
-      ((bitset-attribute>) ;; FIXME
+      ((bitset) ;; FIXME
        (if (eq? default #f)
-	   (parse-error context "bitset-attribute default not specified"
+	   (parse-error context "bitset attribute default not specified"
 			arg-list))
        (if (eq? values #f)
-	   (parse-error context "bitset-attribute values not specified"
+	   (parse-error context "bitset attribute values not specified"
 			arg-list)))
-      ((integer-attribute>) ;; FIXME
+      ((integer) ;; FIXME
        (if (eq? default #f)
 	   (set! default 0))
        (if (eq? values #f)
-	   (set! values #f))) ; really a nop, but for consistency
-      ((enum-attribute>) ;; FIXME
-       (if (eq? default #f)
-	   (parse-error context "enum-attribute default not specified"
-			arg-list))
+	   (set! values #f))) ;; really a nop, but for consistency
+      ((enum) ;; FIXME
+;; There are some existing cases where no default is specified,
+;; expecting that the first value is the default.
+;;     (if (eq? default #f)
+;;	   (parse-error context "enum attribute default not specified"
+;;			arg-list))
        (if (eq? values #f)
-	   (parse-error context "bitset-attribute values not specified"
+	   (parse-error context "enum attribute values not specified"
+			arg-list)))
+      ((string)
+       (if (eq? default #f)
+	   (set! default ""))
+       (if (not (eq? values #f))
+	   (parse-error context "string attribute values specified"
 			arg-list)))
       )
 
-    ; Now that we've identified the elements, build the object.
+    ;; Now that we've identified the elements, build the object.
     (/attr-parse context type-class name comment attrs for default values))
 )
 
@@ -534,6 +575,7 @@
 
 ; Return value of ATTR in attribute alist ALIST.
 ; If not present, return the default value.
+; If ATTR is an unknown attribute, return #f.
 ; OWNER is the containing object or #f if there is none.
 
 (define (attr-value alist attr owner)
@@ -546,6 +588,8 @@
 )
 
 ; Return the value of ATTR in ATLIST.
+; If not present, return the default value.
+; If ATTR is an unknown attribute, return #f.
 ; OWNER is the containing object or #f if there is none.
 
 (define (atlist-attr-value atlist attr owner)
@@ -564,30 +608,34 @@
 )
 
 ; Return the default for attribute A.
-; If A isn't a non-boolean attribute, we assume it's a boolean one, and
-; return #f (??? for backward's compatibility, to be removed in time).
+;
+; If A is unknown return #f.
+; This means the caller can't distinguish booleans from unknowns,
+; but the caller is left to deal with that.
+;
 ; OWNER is the containing object or #f if there is none.
 
 (define (attr-lookup-default a owner)
   (let ((at (current-attr-lookup a)))
     (if at
 	(if (bool-attr? at)
-	    #f
+	    #f ;; FIXME: should fetch default from the attribute
 	    (let ((deflt (attr-default at)))
 	      (if deflt
 		  (if (/attr-val-is-rtx? deflt)
 		      (/attr-eval deflt owner)
 		      deflt)
-		  ; If no default was provided, use the first value.
+		  ;; If no default was provided, use the first value.
+		  ;; FIXME: This shouldn't happen.  /attr-parse should DTRT.
 		  (caar (attr-values at)))))
 	#f))
 )
 
 ; Return a boolean indicating if X is present in BITSET.
-; Bitset values are recorded as val1,val2,....
+; Bitset values are recorded as (val1 val2 ...).
 
 (define (bitset-attr-member? x bitset)
-  (->bool (memq x (bitset-attr->list bitset)))
+  (->bool (memq x bitset))
 )
 
 ; Routines for accessing attributes in objects.
@@ -643,6 +691,7 @@
 
 ; Return value of attribute ATTR in OBJ.
 ; If the attribute isn't present, the default is returned.
+; If ATTR is an unknown attribute, return #f.
 ; OBJ is any object that supports the get-atlist method.
 
 (define (obj-attr-value obj attr)
@@ -672,16 +721,11 @@
 
 ; Utilities.
 
-; Convert a bitset value "a,b,c" into a list (a b c).
-
-(define (bitset-attr->list x)
-  (map string->symbol (string-cut (->string x) #\,))
-)
-
 ; Generate a list representing a bit mask of the indices of 'values'
 ; within 'all-values'. Each element in the resulting list represents a byte.
 ; Both bits and bytes are indexed from left to right starting at 0
 ; with 8 bits in a byte.
+
 (define (charmask-bytes values all-values vec-length)
   (logit 3 "charmask-bytes for " values " " all-values "\n")
   (let ((result (make-vector vec-length 0))
@@ -702,18 +746,21 @@
 )
 
 ; Convert a bitset value into a bit string based on the
-; index of each member in values
-(define (bitset-attr->charmask value values)
+; index of each member in values.
+; VALUE is a list of symbols in the bitset.
+; VALUES is the values member of the attribute's definition.
+
+(define (/bitset-attr->charmask value values)
   (let* ((values-names (map car values))
 	 (values-values (map cadr values))
 	 (vec-length (+ 1 (quotient (apply max values-values) 8))))
     (string-append "{ " (number->string vec-length) ", \""
 		   (string-map (lambda (x)
 				 (string-append "\\x" (number->hex x)))
-			       (charmask-bytes (bitset-attr->list value)
-					       values vec-length))
+			       (charmask-bytes value values vec-length))
 		   "\" }"))
 )
+
 ; Return the enum of ATTR-NAME for type TYPE.
 ; TYPE is one of 'ifld, 'hw, 'operand, 'insn.
 
@@ -846,6 +893,7 @@
 ; The result is the attribute alist.
 
 (define (attr-parse context attrs)
+  (logit 4 (list 'attr-parse context attrs) "\n")
   (if (not (list? attrs))
       (parse-error context "improper attribute list" attrs))
   (let ((alist nil))
@@ -877,13 +925,21 @@
   (make <attr-list> prefix (attr-parse context attrs))
 )
 
-; Return the source form of an atlist's values.
-; Externally attributes are ((name1 value1) (name2 value2) ...).
-; Internally they are ((name1 . value1) (name2 . value2) ...).
+;; Return the source form of an atlist's values.
+;; Externally scalar attributes (boolean, integer, enum and string) are
+;; ((name1 value1) (name2 value2) ...).
+;; Internally they are ((name1 . value1) (name2 . value2) ...).
+;; Externally bitset attributes are (name value1 value2 ...).
+;; Internally they are the same, (name value1 value2 ...).
+;; If the value is an rtx expression, externally it is (name (expr)),
+;; and internally it is the same, (name (expr)).
 
 (define (atlist-source-form atlist)
   (map (lambda (attr)
-	 (list (car attr) (cdr attr)))
+	 (let ((value (cdr attr)))
+	   (if (pair? value)
+	       (cons (car attr) value)
+	       (list (car attr) value))))
        (atlist-attrs atlist))
 )
 
@@ -1031,20 +1087,24 @@
    (send self 'gen-value-for-defn-raw value))
 )
 
+;; NOTE: VALUE is a list of symbols in the bitset.
+
 (method-make!
  <bitset-attribute> 'gen-value-for-defn-raw
  (lambda (self value)
    (if (string=? (string-downcase (gen-sym self)) "isa")
-       (bitset-attr->charmask value (elm-get self 'values))
+       (/bitset-attr->charmask value (elm-get self 'values))
        (string-drop1
 	(string-upcase
 	 (string-map (lambda (x)
 		       (string-append "|(1<<"
 				      (gen-sym self)
 				      "_" (gen-c-symbol x) ")"))
-		     (bitset-attr->list value)))))
+		     value))))
  )
 )
+
+;; NOTE: VALUE is a list of symbols in the bitset.
 
 (method-make!
  <bitset-attribute> 'gen-value-for-defn
@@ -1052,7 +1112,7 @@
    (string-append
     "{ "
     (if (string=? (string-downcase (gen-sym self)) "isa")
-	(bitset-attr->charmask value (elm-get self 'values))
+	(/bitset-attr->charmask value (elm-get self 'values))
 	(string-append
 	 "{ "
 	 (string-drop1
@@ -1061,7 +1121,7 @@
 			 (string-append "|(1<<"
 					(gen-sym self)
 					"_" (gen-c-symbol x) ")"))
-		       (bitset-attr->list value))))
+		       value)))
 	 ", 0 }"))
     " }")
  )

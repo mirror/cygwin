@@ -155,9 +155,8 @@
  (lambda (self)
    (or (elm-get self 'isas-cache)
        (let* ((isas (obj-attr-value self 'ISA))
-	      (isa-objs (if (eq? isas 'all) (current-isa-list)
-			    (map current-isa-lookup
-				 (bitset-attr->list isas)))))
+	      (isa-objs (if (equal? isas '(all)) (current-isa-list)
+			    (map current-isa-lookup isas))))
 	 (elm-set! self 'isas-cache isa-objs)
 	 isa-objs)))
 )
@@ -1221,27 +1220,27 @@ Modify a hardware element, name/value pair list version.
     ; objects after the fact (e.g. model parameters to instructions), but
     ; that's further down the road.
     (set! h-memory (define-full-hardware 'h-memory "memory"
-		     `((ISA ,all))
+		     `((ISA ,@all))
 		     ; Ensure memory not flagged as a scalar.
 		     'h-memory '(memory UQI (1)) nil nil nil
 		     nil nil nil))
     (set! h-sint (define-full-hardware 'h-sint "signed integer"
-		   `((ISA ,all))
+		   `((ISA ,@all))
 		   'h-sint '(immediate (INT 32)) nil nil nil
 		   nil nil nil))
     (set! h-uint (define-full-hardware 'h-uint "unsigned integer"
-		   `((ISA ,all))
+		   `((ISA ,@all))
 		   'h-uint '(immediate (UINT 32)) nil nil nil
 		   nil nil nil))
     (set! h-addr (define-full-hardware 'h-addr "address"
-		   `((ISA ,all))
+		   `((ISA ,@all))
 		   'h-addr '(address) nil nil '((print "print_address"))
 		   nil nil nil))
     ; Instruction addresses.
     ; These are different because the simulator may want to do something
     ; special with them, and some architectures treat them differently.
     (set! h-iaddr (define-full-hardware 'h-iaddr "instruction address"
-		    `((ISA ,all))
+		    `((ISA ,@all))
 		    'h-iaddr '(iaddress) nil nil '((print "print_address"))
 		    nil nil nil)))
 

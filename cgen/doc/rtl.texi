@@ -309,9 +309,9 @@ There are several predefined attributes for entry types that need them
 attributes are documented in each relevant section.
 
 In C applications an enum is created that defines all the attributes.
-Applications that wish to be architecture independent need the attribute
-to have the same value across all architectures.  This is achieved by
-giving the attribute the INDEX attribute
+Applications that wish to have some architecture independent-ness
+need the attribute to have the same value across all architectures.
+This is achieved by giving the attribute the INDEX attribute
 @footnote{Yes, attributes can have attributes.},
 which specifies the enum value must be fixed across all architectures.
 @c FIXME: Give an example here.
@@ -333,6 +333,8 @@ Boolean attributes are defined with:
   (name attribute-name)
   (comment "attribute comment")
   (attrs attribute-attributes)
+  (values #f #t)
+  (default #f)
 )
 @end example
 
@@ -343,14 +345,16 @@ Boolean attributes are specified in either of two forms:
 The first form is the canonical form.  The latter two
 are shorthand versions.
 @code{NAME} means "true" and @code{!NAME} means "false".
-@samp{expr} is an expression that evaluates to 0 for false and non-zero
-for true @footnote{The details of @code{expr} is still undecided.}.
+@samp{expr} is either @code{#f} or @code{#t}.
 
 @code{user-list} is a space separated list of entry types that will use
 the attribute.  Possible values are: @samp{attr}, @samp{enum},
 @samp{cpu}, @samp{mach}, @samp{model}, @samp{ifield}, @samp{hardware},
 @samp{operand}, @samp{insn} and @samp{macro-insn}.  If omitted all are
 considered users of the attribute.
+
+The @code{values} and @code{default} fields if provided must have the
+indicated values.  Usually these fields are elided.
 
 @subsection Integer Attributes
 @cindex Attributes, integer
@@ -364,16 +368,13 @@ Integer attributes are defined with:
   (name attribute-name)
   (comment "attribute comment")
   (attrs attribute-attributes)
-  (default expr)
+  (default integer-value)
 )
 @end example
 
 If omitted, the default is 0.
 
-(*Note: The details of @code{expr} is still undecided.
-For now it must be an integer.)
-
-Integer attributes are specified with @code{(NAME expr)}.
+Integer attributes are specified with @code{(NAME value)}.
 
 @subsection Enumerated Attributes
 @cindex Attributes, enumerated
@@ -390,16 +391,13 @@ Enumerated attributes are defined with
   (comment "attribute comment")
   (attrs attribute-attributes)
   (values enum-value1 enum-value2 ...)
-  (default expr)
+  (default default-enum-value)
 )
 @end example
 
-If omitted, the default is the first specified value.
+If omitted, the default is the first entry in @code{values}.
 
-(*Note: The details of @code{expr} is still undecided.
-For now it must be the name of one of the specified values.)
-
-Enum attributes are specified with @code{(NAME expr)}.
+Enum attributes are specified with @code{(NAME enum-value)}.
 
 @subsection Bitset Attributes
 @cindex Attributes, bitset
@@ -422,20 +420,25 @@ Bitset attributes are defined with:
   (comment "attribute comment")
   (attrs attribute-attributes)
   (values enum-value1 enum-value2 ...)
-  (default default-name)
+  (default default-value1 default-value2 ...)
 )
 @end example
 
-@samp{default-name} must be the name of one of the specified values.  If
-omitted, it is the first value.
+The default values must be from the specified values.
+The default must be provided, it may not be omitted.
 
-Bitset attributes are specified with @code{(NAME val1,val2,...)}.  There
-must be no spaces in ``@code{val1,val2,...}'' and each value must be a
-valid Scheme symbol.
+Bitset attributes are specified with @code{(NAME val1 val2 ...)}.
 
-(*Note: It's not clear whether allowing arbitrary expressions will be
-useful here, but doing so is not precluded.  For now each value must be
-the name of one of the specified values.)
+For backward compatibility they may also be specified with
+@code{(NAME val1,val2,...)} or @code{(NAME "val1,val2,...")},
+there must be no spaces in ``@code{val1,val2,...}''
+and each value must be a valid Scheme symbol.
+Use of @code{(NAME val1,val2,...)} is deprecated, and
+support for it will go away at some point.
+
+@c NOTE: It's not clear whether allowing arbitrary expressions will be
+@c useful here, but doing so is not precluded.  For now each value must be
+@c the name of one of the specified values.
 
 @node Architecture variants
 @section Architecture variants

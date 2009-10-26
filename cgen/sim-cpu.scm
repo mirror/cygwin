@@ -71,7 +71,7 @@
 	    (or (not (with-multiple-isa?))
 		(>= (count-common
 		     (current-keep-isa-name-list)
-		     (bitset-attr->list (obj-attr-value hw 'ISA)))
+		     (obj-attr-value hw 'ISA))
 		    1)))
 	  (current-hw-list))
     )

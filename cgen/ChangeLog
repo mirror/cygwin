@@ -4,6 +4,10 @@
 	* attr.scm (/attr-val-is-rtx?): New function.
 	(attr-value): Call it.
 	(atlist-attr-value-no-default, attr-lookup-default): Ditto.
+	(/attr-parse): Use /attr-val-is-rtx? to detect rtx values.
+	Disallow rtx values for bitset attributes.
+	(/attr-read): Record rtx in default value as ((rtx-expr)).
+	(/attr-eval): Update.
 
 2009-10-24  Doug Evans  <dje@sebabeach.org>
 

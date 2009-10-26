@@ -332,31 +332,42 @@
     (elm-xset! result 'comment (parse-comment context comment))
     (elm-xset! result 'attrs (atlist-parse context attrs ""))
     (elm-xset! result 'for for)
+
     ; Set the default.
     (case (class-name type-class)
       ((<boolean-attribute>)
        (if (and (not (memq default '(#f #t)))
-		(not (rtx? default)))
+		(not (/attr-val-is-rtx? default)))
 	   (parse-error context "invalid default" default))
        (elm-xset! result 'default default))
       ((<string-attribute>)
        (let ((default (or default "")))
 	 (if (and (not (string? default))
-		  (not (rtx? default)))
+		  (not (/attr-val-is-rtx? default)))
 	     (parse-error context "invalid default" default))
 	 (elm-xset! result 'default default)))
       ((<integer-attribute>)
        (let ((default (if default default (if (null? values) 0 (car values)))))
 	 (if (and (not (integer? default))
-		  (not (rtx? default)))
+		  (not (/attr-val-is-rtx? default)))
 	     (parse-error context "invalid default" default))
 	 (elm-xset! result 'default default)))
-      ((<bitset-attribute> <enum-attribute>)
+      ((<enum-attribute>)
        (let ((default (if default default (caar parsed-values))))
 	 (if (and (not (assq default parsed-values))
-		  (not (rtx? default)))
+		  (not (/attr-val-is-rtx? default)))
+	     (parse-error context "invalid default" default))
+	 (elm-xset! result 'default default)))
+      ((<bitset-attribute>)
+       (let ((default (if default default (caar parsed-values))))
+	 ;; NOTE: We don't allow an rtx for bitset attributes,
+	 ;; the rtl language currently doesn't support them.
+	 (if (/attr-val-is-rtx? default)
+	     (parse-error context "invalid default, rtx not supported for bitset" default))
+	 (if (not (assq default parsed-values))
 	     (parse-error context "invalid default" default))
 	 (elm-xset! result 'default default))))
+
     (elm-xset! result 'values parsed-values)
 
     result)
@@ -404,6 +415,12 @@
 	      ((values) (set! values (cdr arg)))
 	      (else (parse-error context "invalid attribute arg" arg)))
 	    (loop (cdr arg-list)))))
+
+    ; If the default is a list it is an rtx expression,
+    ; convert it to ((rtx-expression)) so that it is recognized by
+    ; /attr-val-is-rtx?.
+    (if (pair? default) ;; pair? -> cheap non-null-list?
+	(set! default (list default)))
 
     ; Must have type now.
     (if (eq? type-class 'not-set)
@@ -507,7 +524,8 @@
 
 (define (/attr-eval atval owner)
   (let* ((estate (estate-make-for-eval #f owner))
-	 (expr (rtx-simplify #f owner (rtx-canonicalize #f 'DFLT atval nil) nil))
+	 (atval-expr (car atval))
+	 (expr (rtx-simplify #f owner (rtx-canonicalize #f 'DFLT atval-expr nil) nil))
 	 (value (rtx-eval-with-estate expr DFLT estate)))
     (cond ((symbol? value) value)
 	  ((number? value) value)

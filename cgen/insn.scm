@@ -401,7 +401,7 @@
   (let* ((name (parse-name context name))
 	 (context (context-append-name context name))
 	 (atlist-obj (atlist-parse context attrs "cgen_insn"))
-	 (isas (bitset-attr->list (atlist-attr-value atlist-obj 'ISA #f))))
+	 (isas (atlist-attr-value atlist-obj 'ISA #f)))
 
     (if (keep-atlist? atlist-obj #f)
 

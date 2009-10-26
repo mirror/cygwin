@@ -98,7 +98,7 @@
 	   (map isa-base-insn-bitsize
 		(map current-isa-lookup
 		     (collect (lambda (ifld) 
-				(bitset-attr->list (atlist-attr-value (obj-atlist ifld) 'ISA #f)))
+				(atlist-attr-value (obj-atlist ifld) 'ISA #f))
 			      fld-list))))))
     (if (= 1 (length isa-base-bitsizes))
 	(min (car isa-base-bitsizes) (compute-insn-length fld-list))

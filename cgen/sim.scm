@@ -1928,7 +1928,7 @@ struct scache {
      (insn-read context
 		'(name x-begin)
 		'(comment "pbb begin handler")
-		`(attrs VIRTUAL PBB (ISA ,all))
+		`(attrs VIRTUAL PBB (ISA ,@all))
 		'(syntax "--begin--")
 		'(semantics (c-code VOID "\
   {
@@ -1954,7 +1954,7 @@ struct scache {
      (insn-read context
 		'(name x-chain)
 		'(comment "pbb chain handler")
-		`(attrs VIRTUAL PBB (ISA ,all))
+		`(attrs VIRTUAL PBB (ISA ,@all))
 		'(syntax "--chain--")
 		'(semantics (c-code VOID "\
   {
@@ -1973,7 +1973,7 @@ struct scache {
      (insn-read context
 		'(name x-cti-chain)
 		'(comment "pbb cti-chain handler")
-		`(attrs VIRTUAL PBB (ISA ,all))
+		`(attrs VIRTUAL PBB (ISA ,@all))
 		'(syntax "--cti-chain--")
 		'(semantics (c-code VOID "\
   {
@@ -1998,7 +1998,7 @@ struct scache {
      (insn-read context
 		'(name x-before)
 		'(comment "pbb begin handler")
-		`(attrs VIRTUAL PBB (ISA ,all))
+		`(attrs VIRTUAL PBB (ISA ,@all))
 		'(syntax "--before--")
 		'(semantics (c-code VOID "\
   {
@@ -2014,7 +2014,7 @@ struct scache {
      (insn-read context
 		'(name x-after)
 		'(comment "pbb after handler")
-		`(attrs VIRTUAL PBB (ISA ,all))
+		`(attrs VIRTUAL PBB (ISA ,@all))
 		'(syntax "--after--")
 		'(semantics (c-code VOID "\
   {
@@ -2030,7 +2030,7 @@ struct scache {
      (insn-read context
 		'(name x-invalid)
 		'(comment "invalid insn handler")
-		`(attrs VIRTUAL (ISA ,all))
+		`(attrs VIRTUAL (ISA ,@all))
 		'(syntax "--invalid--")
 		(list 'semantics (list 'c-code 'VOID (string-append "\
   {

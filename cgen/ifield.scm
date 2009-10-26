@@ -445,7 +445,7 @@
   (let* ((name (parse-name context name))
 	 (context (context-append-name context name))
 	 (atlist (atlist-parse context attrs "cgen_ifld"))
-	 (isas (bitset-attr->list (atlist-attr-value atlist 'ISA #f))))
+	 (isas (atlist-attr-value atlist 'ISA #f)))
 
     ; No longer ensure only one isa specified.
     ;(if (!= (length isas) 1)
@@ -903,7 +903,7 @@ Define an instruction multi-field, all arguments specified.
   (let* ((name (parse-name context name))
 	 (context (context-append-name context name))
 	 (atlist (atlist-parse context attrs "cgen_ifld"))
-	 (isas (bitset-attr->list (atlist-attr-value atlist 'ISA #f))))
+	 (isas (atlist-attr-value atlist 'ISA #f)))
 
     ; No longer ensure only one isa specified.
     ; (if (!= (length isas) 1)

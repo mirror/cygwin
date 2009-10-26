@@ -819,7 +819,7 @@
 ; all machs.
 
 (define (mach-supports? mach obj)
-  (let ((machs (bitset-attr->list (obj-attr-value obj 'MACH)))
+  (let ((machs (obj-attr-value obj 'MACH))
 	(name (obj:name mach)))
     (or (memq name machs)
 	(memq 'base machs)))
@@ -852,6 +852,7 @@
       (if (= (length isas) 1)
 	  '(for)
 	  '(for ifield operand insn hardware))
+      (cons 'default (list (caar isa-enums)))
       (cons 'values isa-enums))
     )
 
@@ -861,7 +862,7 @@
 ; Return the bitset attr value for all isas.
 
 (define (all-isas-attr-value)
-  (stringize (current-arch-isa-name-list) ",")
+  (current-arch-isa-name-list)
 )
 
 ; Return an ISA attribute of all isas.
@@ -874,13 +875,13 @@
 ; Return list of ISA names specified by attribute object ATLIST.
 
 (define (attr-isa-list atlist)
-  (bitset-attr->list (atlist-attr-value atlist 'ISA #f))
+  (atlist-attr-value atlist 'ISA #f)
 )
 
 ; Return list of ISA names specified by OBJ.
 
 (define (obj-isa-list obj)
-  (bitset-attr->list (obj-attr-value obj 'ISA))
+  (obj-attr-value obj 'ISA)
 )
 
 ; Return #t if <isa> ISA is supported by OBJ.

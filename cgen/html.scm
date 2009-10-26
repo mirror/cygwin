@@ -456,7 +456,7 @@ See the input .cpu file(s) for copyright information.
    "machines: "
    (string-map (lambda (mach)
 		 (string-append " " (symbol->string mach)))
-	       (bitset-attr->list (obj-attr-value reg 'MACH)))
+	       (obj-attr-value reg 'MACH))
    "\n"
    "</li>\n"
    "<li>\n"
@@ -575,7 +575,7 @@ See the input .cpu file(s) for copyright information.
    "machines: "
    (string-map (lambda (mach)
 		 (string-append " " (symbol->string mach)))
-	       (bitset-attr->list (obj-attr-value insn 'MACH)))
+	       (obj-attr-value insn 'MACH))
    "\n"
    "</li>\n"
    "<br>\n"

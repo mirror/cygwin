@@ -367,17 +367,15 @@
 ;; for normal functions.
 (define target:groups '(normal vliw))
 
-;; True if INSN belongs to GROUP, where GROUP is a membmer of TARGET:GROUPS.
+;; True if INSN belongs to GROUP, where GROUP is a member of TARGET:GROUPS.
 (define (target:belongs-to-group? insn group)
   (case (obj-attr-value (md-insn:cgen-insn insn) 'SLOT)
     ((NONE)
-     (if (obj-attr-value (md-insn:cgen-insn insn) 'SLOTS)
-	 (case (obj-attr-value (md-insn:cgen-insn insn) 'SLOTS)
-	   ((CORE) #t)
-	   ((C3) (equal? group 'normal))
-	   (else (equal? group 'vliw))
-	   )
-	 (equal? group 'normal)))
+     (let ((slots (obj-attr-value (md-insn:cgen-insn insn) 'SLOTS)))
+       (cond ((not slots) (equal? group 'normal))
+	     ((memq 'CORE slots) #t)
+	     ((memq 'C3 slots) (equal? group 'normal))
+	     (else (equal? group 'vliw)))))
     ((C3) (equal? group 'normal))
     ((V1 V3) (equal? group 'vliw))))
 
@@ -394,7 +392,7 @@
   (if (exists? (lambda (isa)
 		 (or (equal? isa 'mep)
 		     (equal? (string-take 8 (st isa)) "ext_core")))
-	       (bitset-attr->list (obj-attr-value insn 'ISA)))
+	       (obj-attr-value insn 'ISA))
       "core"
       "cop"))
 
@@ -726,8 +724,7 @@
 (define (md-insn:isas insn)
   (map convert-isa
        (find (lambda (isa) (member isa intrinsics-isas))
-	     (bitset-attr->list
-	      (obj-attr-value (md-insn:cgen-insn insn) 'ISA)))))
+	     (obj-attr-value (md-insn:cgen-insn insn) 'ISA))))
 
 ;; The full list of instruction groups.  As well target-specific groups,
 ;; this includes "known-code", meaning that the instruction uses a specific

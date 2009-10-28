@@ -1,3 +1,8 @@
+2009-10-28  Doug Evans  <dje@sebabeach.org>
+
+	* cos.scm (object-assign!): New function.
+	* mode.scm (/mode-set-word-params!): Call it.
+
 2009-10-25  Doug Evans  <dje@sebabeach.org>
 
 	Record bitset attributes internally as a list.

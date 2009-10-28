@@ -83,11 +83,7 @@
 (define (/mode-set-word-params! dst src)
   (assert (mode? dst))
   (assert (mode? src))
-  (elm-xset! dst 'bits (elm-xget src 'bits))
-  (elm-xset! dst 'bytes (elm-xget src 'bytes))
-  (elm-xset! dst 'non-mode-c-type (elm-xget src 'non-mode-c-type))
-  (elm-xset! dst 'printf-type (elm-xget src 'printf-type))
-  (elm-xset! dst 'sem-mode (elm-xget src 'sem-mode))
+  (object-assign! dst src)
   *UNSPECIFIED*
 )
 

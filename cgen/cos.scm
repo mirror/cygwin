@@ -661,6 +661,24 @@
   (/object-copy obj)
 )
 
+; Assign object SRC to object DST.
+; They must have the same class.
+
+(define (object-assign! dst src)
+  (/object-check dst "object-assign!")
+  (/object-check src "object-assign!")
+  (if (not (eq? (/object-class-name dst) (/object-class-name src)))
+      (/object-error "object-assign" (list dst src) "not same class"))
+
+  (let ((n (vector-length dst)))
+    (let loop ((i 0))
+      (if (< i n)
+	  (begin
+	    (vector-set! dst i (vector-ref src i))
+	    (loop (+ i 1))))))
+  /object-unspecified
+)
+
 ; Utility to define a standard `make!' method.
 ; A standard make! method is one in which all it does is initialize
 ; fields from args.

@@ -1182,15 +1182,15 @@
   (let ((result
 	 (if (pair? expr) ;; pair? -> cheap non-null-list?
 
-	     (begin
-	       (if (not (symbol? (car expr)))
+	     (let ((rtx-name (car expr)))
+	       (if (not (symbol? rtx-name))
 		   (/rtx-canon-error cstate "invalid rtx function name"
 				     expr parent-expr op-num))
-	       (let ((rtx-obj (rtx-lookup (car expr))))
+	       (let ((rtx-obj (rtx-lookup rtx-name)))
 		 (if rtx-obj
-		     (/rtx-canon-expr rtx-obj mode (car expr) (cdr expr)
+		     (/rtx-canon-expr rtx-obj mode rtx-name (cdr expr)
 				      parent-expr op-num cstate env depth)
-		     (let ((rtx-obj (/rtx-macro-lookup (car expr))))
+		     (let ((rtx-obj (/rtx-macro-lookup rtx-name)))
 		       (if rtx-obj
 			   (/rtx-canon (/rtx-macro-expand expr rtx-evaluator)
 				       expected mode parent-expr op-num cstate env (+ depth 1))

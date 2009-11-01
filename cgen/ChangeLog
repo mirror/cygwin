@@ -1,5 +1,7 @@
 2009-11-01  Doug Evans  <dje@sebabeach.org>
 
+	* gen-all: New file.
+
 	* rtl-traverse.scm (/rtx-canon): Issue better error message for
 	invalid rtx function names.
 

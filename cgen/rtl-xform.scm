@@ -465,7 +465,7 @@
 ; - empty options list
 ; - ifield/operand/local/const wrappers
 ;
-; NOTE: While having to trim the result of rtx-simplify may seem ironical,
+; NOTE: While having to trim the result of rtx-simplify may seem ironic,
 ; it isn't.  You need to keep separate the notions of simplifying "1+1" to "2"
 ; and trimming the clutter from "(const () BI 0)" yielding "0".
 

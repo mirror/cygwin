@@ -874,7 +874,7 @@
 ; eg> mask-superset? #b1100 #b1000 #b1010 #b1010 -> #f
 ; eg> mask-superset? #b1100 #b1000 #b1110 #b1100 -> #f
 ; eg> mask-superset? #b1100 #b1000 #b1100 #b1000 -> #f
-; 
+
 (define (mask-superset? m1 v1 m2 v2)
   (let ((result
 	 (and (= (cg-logand m1 m2) m1)
@@ -887,9 +887,6 @@
 		      "\n"))
     result)
 )
-
-
-
 
 ; Return a boolean indicating if INSN is a cti [control transfer insn].
 ; This includes SKIP-CTI insns even though they don't terminate a basic block.

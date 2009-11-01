@@ -1182,16 +1182,20 @@
   (let ((result
 	 (if (pair? expr) ;; pair? -> cheap non-null-list?
 
-	     (let ((rtx-obj (rtx-lookup (car expr))))
-	       (if rtx-obj
-		   (/rtx-canon-expr rtx-obj mode (car expr) (cdr expr)
-				    parent-expr op-num cstate env depth)
-		   (let ((rtx-obj (/rtx-macro-lookup (car expr))))
-		     (if rtx-obj
-			 (/rtx-canon (/rtx-macro-expand expr rtx-evaluator)
-				     expected mode parent-expr op-num cstate env (+ depth 1))
-			 (/rtx-canon-error cstate "unknown rtx function"
-					   expr parent-expr op-num)))))
+	     (begin
+	       (if (not (symbol? (car expr)))
+		   (/rtx-canon-error cstate "invalid rtx function name"
+				     expr parent-expr op-num))
+	       (let ((rtx-obj (rtx-lookup (car expr))))
+		 (if rtx-obj
+		     (/rtx-canon-expr rtx-obj mode (car expr) (cdr expr)
+				      parent-expr op-num cstate env depth)
+		     (let ((rtx-obj (/rtx-macro-lookup (car expr))))
+		       (if rtx-obj
+			   (/rtx-canon (/rtx-macro-expand expr rtx-evaluator)
+				       expected mode parent-expr op-num cstate env (+ depth 1))
+			   (/rtx-canon-error cstate "unknown rtx function"
+					     expr parent-expr op-num))))))
 
 	     ;; EXPR is not a list.
 	     ;; See if it's an operand shortcut.

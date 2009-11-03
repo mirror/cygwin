@@ -368,10 +368,11 @@
 
 (define (define-full-insn-enum name comment attrs prefix fld vals)
   (let* ((context (make-current-context "define-full-insn-enum"))
-	 (atlist (atlist-parse context attrs "insn-enum"))
-	 (fld-obj (current-ifld-lookup fld)))
+	 (atlist-obj (atlist-parse context attrs "insn-enum"))
+	 (isa-name-list (atlist-attr-value atlist-obj 'ISA #f))
+	 (fld-obj (current-ifld-lookup fld isa-name-list)))
 
-    (if (keep-isa-atlist? atlist #f)
+    (if (keep-isa-atlist? atlist-obj #f)
 	(begin
 	  (if (not fld-obj)
 	      (parse-error context "unknown insn field" fld))
@@ -379,7 +380,7 @@
 	  (let ((e (make <insn-enum>
 		     (parse-name context name)
 		     (parse-comment context comment)
-		     atlist
+		     atlist-obj
 		     (/enum-parse-prefix context prefix)
 		     fld-obj
 		     (parse-enum-vals context prefix vals))))

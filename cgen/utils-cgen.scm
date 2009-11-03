@@ -578,11 +578,10 @@
 ; Ideally most, if not all, of the guts of the generated sanitization is here.
 
 ; Utility to simplify expression in .cpu file.
-; Usage: (sanitize keyword entry-type entry-name1 [entry-name2 ...])
+; Usage: (sanitize isa-name-list keyword entry-type entry-name1 [entry-name2 ...])
 ; Enum attribute `(sanitize keyword)' is added to the entry.
-; It's written this way so Hobbit can handle it.
 
-(define (sanitize keyword entry-type . entry-names)
+(define (sanitize isa-name-list keyword entry-type . entry-names)
   (for-each (lambda (entry-name)
 	      (let ((entry #f))
 		(case entry-type
@@ -592,11 +591,11 @@
 		  ((cpu) (set! entry (current-cpu-lookup entry-name)))
 		  ((mach) (set! entry (current-mach-lookup entry-name)))
 		  ((model) (set! entry (current-model-lookup entry-name)))
-		  ((ifield) (set! entry (current-ifld-lookup entry-name)))
+		  ((ifield) (set! entry (current-ifld-lookup entry-name isa-name-list)))
 		  ((hardware) (set! entry (current-hw-lookup entry-name)))
-		  ((operand) (set! entry (current-op-lookup entry-name)))
-		  ((insn) (set! entry (current-insn-lookup entry-name)))
-		  ((macro-insn) (set! entry (current-minsn-lookup entry-name)))
+		  ((operand) (set! entry (current-op-lookup entry-name isa-name-list)))
+		  ((insn) (set! entry (current-insn-lookup entry-name isa-name-list)))
+		  ((macro-insn) (set! entry (current-minsn-lookup entry-name isa-name-list)))
 		  (else (parse-error (make-prefix-context "sanitize")
 				     "unknown entry type" entry-type)))
 

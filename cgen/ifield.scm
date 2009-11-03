@@ -468,7 +468,7 @@
 	      (flength (parse-number context flength '(0 . 127)))
 	      (lsb0? (current-arch-insn-lsb0?))
 	      (mode-obj (parse-mode-name context mode))
-	      (follows-obj (/ifld-parse-follows context follows))
+	      (follows-obj (/ifld-parse-follows context follows isas))
 	      )
 
 	  ; Calculate the <bitrange> object.
@@ -620,9 +620,9 @@
 
 ; Parse a `follows' spec.
 
-(define (/ifld-parse-follows context follows)
+(define (/ifld-parse-follows context follows isas)
   (if follows
-      (let ((follows-obj (current-op-lookup follows)))
+      (let ((follows-obj (current-op-lookup follows isas)))
 	(if (not follows-obj)
 	    (parse-error context "unknown operand to follow" follows))
 	follows-obj)

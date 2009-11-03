@@ -20,7 +20,8 @@
 (define (gas-test-analyze!)
   (opcodes-analyze!)
   (map (lambda (insn)
-	 (elm-xset! insn 'tmp (syntax-break-out (insn-syntax insn))))
+	 (elm-xset! insn 'tmp (syntax-break-out (insn-syntax insn)
+						(obj-isa-list insn))))
        (non-multi-insns (current-insn-list)))
   *UNSPECIFIED*
 )

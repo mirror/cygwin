@@ -125,9 +125,11 @@
 			 (let ((expr (cadr encode))
 			       (value (if (symbol? (caar encode)) (caar encode) (cadr (caar encode))))
 			       (pc (if (symbol? (cadar encode)) (cadar encode) (cadr (cadar encode)))))
-			   (rtl-c DFLT expr
+			   (rtl-c DFLT
+				  (obj-isa-list self)
 				  (list (list value (obj:name (ifld-decode-mode self)) "value")
-					(list pc 'IAI "pc"))))
+					(list pc 'IAI "pc"))
+				  expr))
 			 ";\n")
 	  "")
       (if need-extra?
@@ -208,9 +210,11 @@
 			 (let ((expr (cadr decode))
 			       (value (if (symbol? (caar decode)) (caar decode) (cadr (caar decode))))
 			       (pc (if (symbol? (cadar decode)) (cadar decode) (cadr (cadar decode)))))
-			   (rtl-c DFLT expr
+			   (rtl-c DFLT
+				  (obj-isa-list self)
 				  (list (list value (obj:name (ifld-decode-mode self)) "value")
-					(list pc 'IAI "pc"))))
+					(list pc 'IAI "pc"))
+				  expr))
 			 ";\n")
 	  "")
       (if need-extra?
@@ -235,13 +239,15 @@
 			 (let ((expr (cadr encode))
 			       (value (caar encode))
 			       (pc (cadar encode)))
-			   (rtl-c DFLT expr
+			   (rtl-c DFLT
+				  (obj-isa-list self)
 				  (list (list value (obj:name (ifld-decode-mode self)) varname)
-					(list pc 'IAI "pc"))))
+					(list pc 'IAI "pc"))
+				  expr))
 			 ";\n")
 	  "")
       (let ((expr (elm-get self 'insert)))
-	(rtl-c VOID expr nil))
+	(rtl-c VOID (obj-isa-list self) nil expr))
       (string-list-map (lambda (subfld)
 			 (string-list
 			  "  "
@@ -279,15 +285,17 @@
 			  ))
 		       (elm-get self 'subfields))
       (let ((expr (elm-get self 'extract)))
-	(rtl-c VOID expr nil))
+	(rtl-c VOID (obj-isa-list self) nil expr))
       (if need-extra?
 	  (string-append "        " varname " = "
 			 (let ((expr (cadr decode))
 			       (value (caar decode))
 			       (pc (cadar decode)))
-			   (rtl-c DFLT expr
+			   (rtl-c DFLT
+				  (obj-isa-list self)
 				  (list (list value (obj:name (ifld-decode-mode self)) varname)
-					(list pc 'IAI "pc"))))
+					(list pc 'IAI "pc"))
+				  expr))
 			 ";\n")
 	  "")
       "      }\n"

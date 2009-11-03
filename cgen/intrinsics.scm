@@ -956,7 +956,8 @@
 	 ;; each cgen operand is replaced by an md-operand.
 	 (syntax (map (lambda (x)
 			(if (operand? x) (make-operand x) x))
-		      (syntax-break-out (insn-syntax insn))))
+		      (syntax-break-out (insn-syntax insn)
+					(obj-isa-list insn))))
 
 	 ;; All relevant outputs.
 	 (outputs (find (lambda (op)

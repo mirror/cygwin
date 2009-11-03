@@ -609,7 +609,7 @@ static void
     (let ((decode-code (gen-decoder insn-list initial-bitnums
 				    decode-bitsize
 				    "    " lsb0?
-				    (current-insn-lookup 'x-invalid)
+				    (current-insn-lookup 'x-invalid #f)
 				    #t)))
 
       (string-write

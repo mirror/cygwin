@@ -1,5 +1,93 @@
 2009-11-02  Doug Evans  <dje@sebabeach.org>
 
+	Specify isa(s) when doing ifield, operand, insn lookups.
+	ACU = all callers updated.
+	* attr.scm (/attr-eval): Call rtx-value instead of rtx-eval-with-estate.
+	* enum.scm (define-full-insn-enum): Pass isa-name-list to
+	current-ifld-lookup.
+	* html.scm (get-insn-properties): Pass isa-name-list to
+	current-op-lookup.
+	* ifield.scm (/ifld-parse-follows): New arg isas, ACU.
+	* insn.scm (/parse-insn-format-symbol): New arg isa-name-list, ACU.
+	(/parse-insn-format-list, /parse-insn-iformat-iflds): Ditto.
+	(/parse-insn-format, syntax-break-out): Ditto.
+	* mach.scm (obj-filter-by-isa): New function.
+	(current-ifld-lookup): New optional arg maybe-isa-name-list.
+	(/ifld-already-defined?, /op-already-defined?): Simplify.
+	(current-op-lookup): New optional arg maybe-isa-name-list.
+	(current-insn-lookup): New arg isa-name-list, ACU.
+	(/insn-already-defined?, /minsn-already-defined?): Simplify.
+	(current-minsn-lookup): New arg isa-name-list, ACU.
+	* minsn.scm (/minsn-compute-iflds): Pass isa-name-list to
+	current-op-lookup.
+	* opc-itab.scm (compute-syntax): New arg isa-name-list, ACU.
+	(gen-syntax-entry): Ditto.
+	* operand.scm (/operand-parse): Pass isa-name-list to
+	current-ifld-lookup.
+	(/derived-parse-encoding): New arg isa-name-list, ACU.
+	(/derived-parse-ifield-assertion): Ditto.
+	(/derived-operand-parse): Pass isa-name-list to current-op-lookup.
+	(/anyof-parse-choice): Ditto.
+	(anyof-satisfies-assertions?): Pass context to rtx-solve.
+	(/anyof-merge-syntax): New arg container, ACU.
+	(operand-builtin!): Add pc to all isas.
+	* rtl-c.scm (estate-make-for-rtl-c): Delete arg extra-vars-alist, ACU.
+	(estate-make-for-rtl-c++, rtl-c-expr-parsed): Ditto.
+	(rtl-c-parsed, rtl-c++-parsed): Ditto.
+	(rtl-c): New arg isa-name-list, ACU.
+	(rtl-c-expr, rtl-c++): Ditto.
+	(closure): New arg isa-name-list, ACU.
+	* rtl-traverse.scm (/make-cstate): New arg isa-name-list, ACU.
+	(/cstate-isas): New function.
+	(/rtx-canon-symbol-list): New function.
+	(/rtx-canon-env-stack): Renamed from /rtx-canon-env, ACU.
+	updated.
+	(/rtx-make-canon-table): Rename ENV to ENVSTACK, new entry SYMBOLLIST.
+	(/rtx-canon-rtx-operand): Pass isa list to current-op-lookup.
+	(/rtx-canon-rtx-ref, /rtx-canon): Ditto.
+	(rtx-canonicalize): New arg isa-name-list, ACU.
+	(rtx-canonicalize-stmt): Delete.
+	(tstate-make): New arg isas, ACU.
+	(tstate-isas, tstate--set-isas!): New functions.
+	(tstate-env-stack): Renamed from tstate-env, ACU.
+	(tstate-set-env-stack!): Renamed from tstate-set-env!, ACU.
+	(tstate-make-closure): Renamed from tstate-new-env, new arg
+	isa-name-list, ACU.
+	(/rtx-traverse-env): Delete.
+	(/rtx-make-traverser-table): Rename ENV to ENVSTACK, new entry
+	SUMBOLLIST.
+	(/rtx-traverse): Include conditional flag in dump output.
+	Update isa,envstack for closures.  Pass isa list to current-op-lookup.
+	(<eval-state>): New member isas.  Rename env to env-stack.
+	(<eval-state> vmake!): Handle #:isas.  #:env renamed to #:env-stack.
+	(<eval-state>): New getter/setter for isas.  Rename env getter/setter
+	to env-stack.
+	(estate-make-for-eval): Provide #:isas.
+	(estate-make-closure): Renamed from estate-new-env.  New arg
+	isa-name-list, ACU.
+	* rtl-xform.scm (/rtx-simplify-expr-fn): Handle closures.
+	(/rtx-trim-args): ENV renamed to ENVSTACK.  Ad ITERATION, SYMBOLLIST.
+	(/rtx-trim-for-doc): Handle closures.
+	* rtl.scm (/rtx-valid-types): Rename ENV to ENVSTACK.  Add ITERATION,
+	SYMBOLLIST.
+	(rtx-env-var-list): Delete.
+	(rtx-env-make): Handle already-compiled environments.
+	(rtx-var-alist-to-env): New function.
+	(rtx-var-alist-to-closure-env-stack, rtx-make-env-stack): New functions.
+	(rtx-env-stack-dump): Renamed from rtx-env-dump, ACU.
+	(rtx-operand-obj): New arg isa-name-list, ACU.
+	(rtx-closure-isas, rtx-closure-env-stack, rtx-closure-expr): New
+	functions.
+	* rtx-funcs.scm (closure): New arg isa-name-list, reorder args, ACU.
+	* sem-frags.scm (<sfrag>): Delete member compiled-semantics.
+	(/frag-compute-desired-frags): Minor simplification.
+	(/frag-pick-best): Ditto.
+	* sid-cpu.scm (gen-semantic-code): Require canonical rtl.
+	(/gen-sfrag-code): Update.
+	* sim-cpu.scm (gen-semantic-code): Require canonical rtl.
+	* utils-cgen.scm (sanitize): New arg isa-name-list, ACU.
+	* utils.scm (non-null-intersection?): New function.
+
 	* gen-all (do_src): Manually run cgen-all for sid.
 
 2009-11-01  Doug Evans  <dje@sebabeach.org>

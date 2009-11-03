@@ -196,7 +196,7 @@
 
 (define (/frag-hash-stmt stmt locals size)
   (set! /frag-hash-value-tmp 0)
-  (rtx-traverse-with-locals #f #f stmt /frag-hash-compute! locals #f) ; FIXME: (/fastcall-make /frag-hash-compute!))
+  (rtx-traverse-with-locals #f #f stmt /frag-hash-compute! locals #f)
   (modulo /frag-hash-value-tmp size)
 )
 
@@ -241,7 +241,7 @@
 (define (/frag-stmt-cost stmt locals)
   (set! /frag-speed-cost-tmp 0)
   (set! /frag-size-cost-tmp 0)
-  (rtx-traverse-with-locals #f #f stmt /frag-cost-compute! locals #f) ; FIXME: (/fastcall-make /frag-cost-compute!))
+  (rtx-traverse-with-locals #f #f stmt /frag-cost-compute! locals #f)
   (cons /frag-speed-cost-tmp /frag-size-cost-tmp)
 )
 
@@ -433,11 +433,8 @@
 		; statements.
 		stmt-numbers
 
-		; Raw rtl source of fragment.
+		; rtl source of fragment.
 		semantics
-
-		; Compiled source.
-		compiled-semantics
 
 		; Boolean indicating if this frag is for parallel exec support.
 		parallel?
@@ -454,7 +451,7 @@
 )
 
 (define-getters <sfrag> sfrag
-  (users user-nums sfmt stmt-numbers semantics compiled-semantics
+  (users user-nums sfmt stmt-numbers semantics
 	 parallel? header? trailer?)
 )
 
@@ -686,6 +683,17 @@
 		  (for-each
 		   (lambda (users)
 		     (let* ((first-owner (cdar users))
+			    (context (make-obj-context first-owner "While building sfrags"))
+			    (rtl (apply
+				  rtx-make
+				  (cons 'sequence
+					(cons 'VOID
+					      (cons nil
+						    (map (lambda (stmt-num)
+							   (-stmt-expr
+							    (vector-ref stmt-table
+									stmt-num)))
+							 stmt-list))))))
 			    (sfrag
 			     (make <sfrag>
 			       (symbol-append (obj:name first-owner)
@@ -698,17 +706,7 @@
 			       (map car users)
 			       (insn-sfmt first-owner)
 			       stmt-list
-			       (apply
-				rtx-make
-				(cons 'sequence
-				      (cons 'VOID
-					    (cons nil
-						  (map (lambda (stmt-num)
-							 (-stmt-expr
-							  (vector-ref stmt-table
-								      stmt-num)))
-						       stmt-list)))))
-			       #f ; compiled-semantics
+			       rtl
 			       #f ; parallel?
 			       (eq? kind 'header)
 			       (eq? kind 'trailer)
@@ -856,7 +854,17 @@
 			    (+ expr-num 1)
 			    (cdr expr-middle-stmts))
 		      ; Yep.
-		      (let ((owner (vector-ref owner-table expr-num)))
+		      (let* ((owner (vector-ref owner-table expr-num))
+			     (context (make-obj-context owner "While building sfrags"))
+			     (rtl (apply
+				   rtx-make
+				   (cons 'sequence
+					 (cons 'VOID
+					       (cons nil
+						     (map (lambda (stmt-num)
+							    (-stmt-expr
+							     (vector-ref stmt-table stmt-num)))
+							  (car expr-middle-stmts))))))))
 			(vector-set! (vector-ref expr-sfrags expr-num)
 				     1 next-middle-frag-num)
 			(loop (cons (make <sfrag>
@@ -868,16 +876,7 @@
 				      (list expr-num)
 				      (insn-sfmt owner)
 				      (car expr-middle-stmts)
-				      (apply
-				       rtx-make
-				       (cons 'sequence
-					     (cons 'VOID
-						   (cons nil
-							 (map (lambda (stmt-num)
-								(-stmt-expr
-								 (vector-ref stmt-table stmt-num)))
-							      (car expr-middle-stmts))))))
-				      #f ; compiled-semantics
+				      rtl
 				      #f ; parallel?
 				      #f ; header?
 				      #f ; trailer?
@@ -1105,10 +1104,9 @@
 				      '(VIRTUAL) "")
 			nil ; users
 			nil ; user ordinals
-			(insn-sfmt (current-insn-lookup 'x-before))
+			(insn-sfmt (current-insn-lookup 'x-before #f))
 			#f ; stmt-numbers
 			(rtx-make 'nop)
-			#f ; compiled-semantics
 			#f ; parallel?
 			#t ; header?
 			#f ; trailer?
@@ -1123,10 +1121,9 @@
 				      '(VIRTUAL) "")
 			nil ; users
 			nil ; user ordinals
-			(insn-sfmt (current-insn-lookup 'x-before))
+			(insn-sfmt (current-insn-lookup 'x-before #f))
 			#f ; stmt-numbers
 			(rtx-make 'nop)
-			#f ; compiled-semantics
 			#f ; parallel?
 			#f ; header?
 			#t ; trailer?

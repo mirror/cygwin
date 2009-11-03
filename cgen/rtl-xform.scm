@@ -285,6 +285,11 @@
 	   known-val ; (rtx-make 'const 'INT known-val)
 	   #f)))
 
+    ((closure)
+     (let ((simplified-expr (/rtx-traverse (rtx-closure-expr expr)
+					   'RTX expr 2 tstate appstuff)))
+       simplified-expr))
+
     ; Leave EXPR unchanged and continue.
     (else #f))
 )
@@ -315,6 +320,7 @@
   (/rtx-traverse expr #f #f 0
 		 (tstate-make context owner
 			      /rtx-simplify-expr-fn
+			      #f ;; ok since EXPR is fully canonical
 			      (rtx-env-empty-stack)
 			      #f known 0)
 		 #f)
@@ -368,7 +374,7 @@
 ;	  (/rtx-traverse simplified-expr #f #f 0
 ;			 (tstate-make context owner
 ;				      /solve-expr-fn
-;				      (rtx-env-empty-stack)
+;				      #f (rtx-env-empty-stack)
 ;				      #f known 0)
 ;			 #f))
 	 )
@@ -438,7 +444,7 @@
 	      ((LOCALS)
 	       #f) ; leave arg untouched
 
-	      ((ENV)
+	      ((ITERATION SYMBOLLIST ENVSTACK)
 	       #f) ; leave arg untouched for now
 
 	      ((ATTRS)
@@ -471,6 +477,7 @@
 
 (define (/rtx-trim-for-doc rtx)
   (if (pair? rtx) ; ??? cheap rtx?
+
       (let ((name (car rtx))
 	    (options (cadr rtx))
 	    (mode (caddr rtx))
@@ -512,6 +519,19 @@
 		     (cons name (reverse result))
 		     (cons name (cons mode (reverse result))))
 		 (cons name (cons options (cons mode (reverse result)))))))
+
+	  ((closure)
+	   ;; Remove outer closures, they are artificially added, and are
+	   ;; basically noise to the human trying to understand the semantics.
+	   ;; ??? Since we currently can't distinguish outer closures,
+	   ;; just remove them all.
+	   (let ((trimmed-expr (/rtx-trim-for-doc (rtx-closure-expr rtx))))
+	     (if (and (null? options) (null? (rtx-closure-env-stack rtx)))
+		 trimmed-expr
+		 (rtx-make 'closure options mode
+			   (rtx-closure-isas rtx)
+			   (rtx-closure-env-stack rtx)
+			   trimmed-expr))))
 
 	  (else
 	   (let ((trimmed-args (/rtx-trim-args name rest)))

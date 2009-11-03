@@ -7,15 +7,16 @@
 ; ---------------------
 ; The main way to generate C code from an RTL expression is:
 ;
-; (rtl-c mode '(func mode ...) nil)
+; (rtl-c-parsed mode isa-name-list nil '(func mode ...))
 ;
 ; E.g.
-; (rtl-c SI '(add () SI (const () SI 1) (const () SI 2)) nil)
+; (rtl-c-parsed SI (all) nil '(add () SI (const () SI 1) (const () SI 2)))
 ; -->
 ; "ADDSI (1, 2)"
 ;
 ; The expression is in source form and must be already canonicalized (with
-; rtx-canonicalize).
+; rtx-canonicalize).  There is also rtl-c for the occasions where the rtl
+; isn't already canonicalized.
 ;
 ; The `set' rtx needs to be handled a little carefully.
 ; Both the dest and src are processed first, and then code to perform the
@@ -274,21 +275,15 @@
 )
 
 ;; Build an estate for use in generating C.
-;; EXTRA-VARS-ALIST is an association list of
-;; (symbol <mode>-or-mode-name value) elements to be used during value lookup.
 ;; OVERRIDES is a #:keyword/value list of parameters to apply last.
-;;
-;; ??? Move EXTRA-VARS-ALIST into OVERRIDES (caller would have to call
-;; rtx-env-init-stack1)?
 
-(define (estate-make-for-rtl-c extra-vars-alist overrides)
+(define (estate-make-for-rtl-c overrides)
   (apply vmake
 	 (append!
 	  (list
 	   <rtl-c-eval-state>
 	   #:expr-fn (lambda (rtx-obj expr mode estate)
 		       (rtl-c-generator rtx-obj))
-	   #:env (rtx-env-init-stack1 extra-vars-alist)
 	   #:rtl-cover-fns? /rtl-c-rtl-cover-fns?)
 	  overrides))
 )
@@ -302,35 +297,33 @@
 )
 
 ; Translate parsed RTL expression X to a string of C code.
-; X must have already been fed through rtx-canonicalize.
+; EXPR must have already been fed through rtx-canonicalize.
 ; MODE is the desired mode of the value or DFLT for "natural mode".
 ; MODE is a <mode> object.
-; EXTRA-VARS-ALIST is an association list of extra
-; (symbol <mode>-or-mode-name value) elements to be used during value lookup.
 ; OVERRIDES is a #:keyword/value list of arguments to build the eval state
 ; with.
 
-(define (rtl-c-parsed mode x extra-vars-alist . overrides)
+(define (rtl-c-parsed mode expr . overrides)
   ;; ??? If we're passed insn-compiled-semantics the output of xops is
   ;; confusing.  Fix by subclassing <operand> -> <xoperand>, and
   ;; have <xoperand> provide original source expr.
-  (let ((estate (estate-make-for-rtl-c extra-vars-alist
-				       (cons #:outer-expr
-					     (cons x overrides)))))
-    (rtl-c-with-estate estate mode x))
+  (let ((estate (estate-make-for-rtl-c (cons #:outer-expr
+					     (cons expr overrides)))))
+    (rtl-c-with-estate estate mode expr))
 )
 
-; Same as rtl-c-parsed but X is unparsed.
+; Same as rtl-c-parsed but EXPR is unparsed.
+; ISA-NAME-LIST is the list of ISA(s) in which to evaluate EXPR.
+; EXTRA-VARS-ALIST is an association list of extra (symbol <mode> value)
+; elements to be used during value lookup.
 ; MODE is a <mode> object.
 
-(define (rtl-c mode x extra-vars-alist . overrides)
-  ;; This doesn't pass the canonicalized expr for #outer-expr on purpose,
-  ;; to keep it closer to what the user wrote.
-  (let ((estate (estate-make-for-rtl-c extra-vars-alist
-				       (cons #:outer-expr
-					     (cons x overrides)))))
-    (rtl-c-with-estate estate mode (rtx-canonicalize #f (obj:name mode) x
-						     extra-vars-alist)))
+(define (rtl-c mode isa-name-list extra-vars-alist expr . overrides)
+  (let* ((canonical-rtl (rtx-canonicalize #f (obj:name mode)
+					  isa-name-list extra-vars-alist expr))
+	 (estate (estate-make-for-rtl-c (cons #:outer-expr
+					      (cons canonical-rtl overrides)))))
+    (rtl-c-with-estate estate mode canonical-rtl))
 )
 
 ; Same as rtl-c-with-estate except return a <c-expr> object.
@@ -343,71 +336,60 @@
 ; Same as rtl-c-parsed except return a <c-expr> object.
 ; MODE is a <mode> object.
 
-(define (rtl-c-expr-parsed mode x extra-vars-alist . overrides)
+(define (rtl-c-expr-parsed mode expr . overrides)
   ;; ??? If we're passed insn-compiled-semantics the output of xops is
   ;; confusing.  Fix by subclassing <operand> -> <xoperand>, and
   ;; have <xoperand> provide original source expr.
-  (let ((estate (estate-make-for-rtl-c extra-vars-alist
-				       (cons #:outer-expr
-					     (cons x overrides)))))
-    (rtl-c-expr-with-estate estate mode x))
+  (let ((estate (estate-make-for-rtl-c (cons #:outer-expr
+					     (cons expr overrides)))))
+    (rtl-c-expr-with-estate estate mode expr))
 )
 
-; Same as rtl-c-expr-parsed but X is unparsed.
+; Same as rtl-c-expr-parsed but EXPR is unparsed.
 ; MODE is a <mode> object.
 
-(define (rtl-c-expr mode x extra-vars-alist . overrides)
-  ;; This doesn't pass the canonicalized expr for #outer-expr on purpose,
-  ;; to keep it closer to what the user wrote.
-  (let ((estate (estate-make-for-rtl-c extra-vars-alist
-				       (cons #:outer-expr
-					     (cons x overrides)))))
-    (rtl-c-expr-with-estate estate mode (rtx-canonicalize #f (obj:name mode) x
-							  extra-vars-alist)))
+(define (rtl-c-expr mode isa-name-list extra-vars-alist expr . overrides)
+  (let* ((canonical-rtl (rtx-canonicalize #f (obj:name mode)
+					  isa-name-list extra-vars-alist expr))
+	 (estate (estate-make-for-rtl-c (cons #:outer-expr
+					      (cons canonical-rtl overrides)))))
+    (rtl-c-expr-with-estate estate mode canonical-rtl))
 )
 
 ; C++ versions of rtl-c routines.
 
 ; Build an estate for use in generating C++.
-; EXTRA-VARS-ALIST is an association list of (symbol <mode> value)
-; elements to be used during value lookup.
 ; OVERRIDES is a #:keyword/value list of parameters to apply last.
 
-(define (estate-make-for-rtl-c++ extra-vars-alist overrides)
-  (estate-make-for-rtl-c extra-vars-alist
-			 (cons #:output-language (cons "c++" overrides)))
+(define (estate-make-for-rtl-c++ overrides)
+  (estate-make-for-rtl-c (cons #:output-language (cons "c++" overrides)))
 )
 
 ; Translate parsed RTL expression X to a string of C++ code.
-; X must have already been fed through rtx-canonicalize.
+; EXPR must have already been fed through rtx-canonicalize.
 ; MODE is the desired mode of the value or DFLT for "natural mode".
 ; MODE is a <mode> object.
-; EXTRA-VARS-ALIST is an association list of extra (symbol <mode> value)
-; elements to be used during value lookup.
 ; OVERRIDES is a #:keyword/value list of arguments to build the eval state
 ; with.
 
-(define (rtl-c++-parsed mode x extra-vars-alist . overrides)
+(define (rtl-c++-parsed mode expr . overrides)
   ;; ??? If we're passed insn-compiled-semantics the output of xops is
   ;; confusing.  Fix by subclassing <operand> -> <xoperand>, and
   ;; have <xoperand> provide original source expr.
-  (let ((estate (estate-make-for-rtl-c++ extra-vars-alist
-					 (cons #:outer-expr
-					       (cons x overrides)))))
-    (rtl-c-with-estate estate mode x))
+  (let ((estate (estate-make-for-rtl-c++ (cons #:outer-expr
+					       (cons expr overrides)))))
+    (rtl-c-with-estate estate mode expr))
 )
 
-; Same as rtl-c++-parsed but X is unparsed.
+; Same as rtl-c++-parsed but EXPR is unparsed.
 ; MODE is a <mode> object.
 
-(define (rtl-c++ mode x extra-vars-alist . overrides)
-  ;; This doesn't pass the canonicalized expr for #outer-expr on purpose,
-  ;; to keep it closer to what the user wrote.
-  (let ((estate (estate-make-for-rtl-c++ extra-vars-alist
-					 (cons #:outer-expr
-					       (cons x overrides)))))
-    (rtl-c-with-estate estate mode (rtx-canonicalize #f (obj:name mode) x
-						     extra-vars-alist)))
+(define (rtl-c++ mode isa-name-list extra-vars-alist expr . overrides)
+  (let* ((canonical-rtl (rtx-canonicalize #f (obj:name mode)
+					  isa-name-list extra-vars-alist expr))
+	 (estate (estate-make-for-rtl-c++ (cons #:outer-expr
+						(cons canonical-rtl overrides)))))
+    (rtl-c-with-estate estate mode canonical-rtl))
 )
 
 ; Top level routines for getting/setting values.
@@ -481,11 +463,11 @@
 		     (obj:name mode))))))
 
 	  ;; FIXME: Can we ever get a symbol here?
-	  ((or (and (symbol? src) (rtx-temp-lookup (estate-env estate) src))
+	  ((or (and (symbol? src) (rtx-temp-lookup (estate-env-stack estate) src))
 	       (rtx-temp? src))
 	   (begin
 	     (if (symbol? src)
-		 (set! src (rtx-temp-lookup (estate-env estate) src)))
+		 (set! src (rtx-temp-lookup (estate-env-stack estate) src)))
 	     (cond ((mode:eq? 'DFLT mode)
 		    (send src 'cxmake-get estate (rtx-temp-mode src) #f #f))
 		   ((rtx-mode-compatible? mode (rtx-temp-mode src))
@@ -1307,8 +1289,8 @@
   (let* ((limit-var (rtx-make-iteration-limit-var iter-var))
 	 (env (rtx-env-make-iteration-locals iter-var))
 	 (estate (estate-push-env estate env))
-	 (temp-iter (rtx-temp-lookup (estate-env estate) iter-var))
-	 (temp-limit (rtx-temp-lookup (estate-env estate) limit-var))
+	 (temp-iter (rtx-temp-lookup (estate-env-stack estate) iter-var))
+	 (temp-limit (rtx-temp-lookup (estate-env-stack estate) limit-var))
 	 (c-iter-var (rtx-temp-value temp-iter))
 	 (c-limit-var (rtx-temp-value temp-limit)))
     (cx:make VOID
@@ -1430,7 +1412,7 @@
   (cond ((rtx-temp? object-or-name)
 	 object-or-name)
 	((symbol? object-or-name)
-	 (let ((object (rtx-temp-lookup (estate-env *estate*) object-or-name)))
+	 (let ((object (rtx-temp-lookup (estate-env-stack *estate*) object-or-name)))
 	   (if (not object)
 	       (estate-error *estate* "undefined local" object-or-name))
 	   object))
@@ -1873,9 +1855,10 @@
 	 (cons *estate* (cons iter-var (cons nr-times (cons expr exprs)))))
 )
 
-(define-fn closure (*estate* options mode expr env)
-  ; ??? estate-push-env?
-  (rtl-c-with-estate (estate-new-env *estate* env) (mode:lookup mode) expr)
+(define-fn closure (*estate* options mode isa-name-list env-stack expr)
+  (rtl-c-with-estate (estate-make-closure *estate* isa-name-list
+					  (rtx-make-env-stack env-stack))
+		     (mode:lookup mode) expr)
 )
 
 ;; The result is the rtl->c generator table.

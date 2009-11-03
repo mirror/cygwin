@@ -341,6 +341,20 @@
   (object-assq isa-name (current-isa-list))
 )
 
+;; Given a list of objects OBJ-LIST, return those objects that are from the
+;; ISA(s) in ISA-NAME-LIST.
+;; ISA-NAME-LIST may be (all) or #f (which also means (all)).
+
+(define (obj-filter-by-isa obj-list isa-name-list)
+  (if (or (eq? isa-name-list #f)
+	  (memq 'all isa-name-list))
+      obj-list
+      (find (lambda (obj)
+	      (let ((obj-isas (obj-attr-value obj 'ISA)))
+		(non-null-intersection? obj-isas isa-name-list)))
+	    obj-list))
+)
+
 ; Cpu families.
 
 (define (current-cpu-list) (arch-cpu-list CURRENT-ARCH))
@@ -431,26 +445,28 @@
 )
 
 ;; Look up ifield X in the current architecture.
+;; Returns the <ifield> object or #f if not found.
+;; If there is an ambiguity (i.e. the ifield is in multiple ISAs and
+;; MAYBE-ISA-NAME-LIST doesn't disambiguate the choice) an error is signalled.
 ;;
 ;; If X is an <ifield> object, just return it.
 ;; This is to handle ???
 ;; Otherwise X is the name of the ifield to look up.
-;;
-;; ??? This doesn't work if there are multiple operands with the same name
-;; for different isas.
+;; If MAYBE-ISA-NAME-LIST is provided, the car is a list of ISAs to look in.
+;; If the specified isa list is #f, look in all ISAs.
 
-(define (current-ifld-lookup x)
+(define (current-ifld-lookup x . maybe-isa-name-list)
   (if (ifield? x)
       x
       (let ((f-list (/ident-object-table-lookup (car (arch-ifld-table CURRENT-ARCH))
 						x)))
 	(if f-list
-	    (if (= (length f-list) 1)
-		(car f-list)
-		;; FIXME: For now just return the first one,
-		;; same behaviour as before.
-		;; Here "first one" means "first defined".
-		(/get-lowest-ordinal f-list))
+	    (let* ((isas (if (not (null? maybe-isa-name-list)) (car maybe-isa-name-list) #f))
+		   (filtered-f-list (obj-filter-by-isa f-list isas)))
+	      (case (length filtered-f-list)
+		((0) (error "Ifield not in specified ISA:" x))
+		((1) (car filtered-f-list))
+		(else (error "Ambiguous ifield lookup:" x))))
 	    #f)))
 )
 
@@ -467,7 +483,7 @@
 	(let ((result #f)
 	      (f-isas (obj-isa-list f)))
 	  (for-each (lambda (ff)
-		      (if (not (null? (intersection f-isas (obj-isa-list ff))))
+		      (if (non-null-intersection? f-isas (obj-isa-list ff))
 			  (set! result #t)))
 		    iflds)
 	  result)
@@ -492,18 +508,24 @@
   *UNSPECIFIED*
 )
 
-; ??? This doesn't work if there are multiple operands with the same name
-; for different isas.
+;; Look up operand NAME in the current architecture.
+;; Returns the <operand> object or #f if not found.
+;; If there is an ambiguity (i.e. the operand is in multiple ISAs and
+;; MAYBE-ISA-NAME-LIST doesn't disambiguate the choice) an error is signalled.
+;;
+;; If MAYBE-ISA-NAME-LIST is provided, the car is a list of ISAs to look in.
+;; If the specified isa list is #f, look in all ISAs.
 
-(define (current-op-lookup name)
+(define (current-op-lookup name . maybe-isa-name-list)
   (let ((op-list (/ident-object-table-lookup (car (arch-op-table CURRENT-ARCH))
 					     name)))
     (if op-list
-	(if (= (length op-list) 1)
-	    (car op-list)
-	    ;; FIXME: For now just return the first one, same behaviour as before.
-	    ;; Here "first one" means "first defined".
-	    (/get-lowest-ordinal op-list))
+	(let* ((isas (if (not (null? maybe-isa-name-list)) (car maybe-isa-name-list) #f))
+	       (filtered-o-list (obj-filter-by-isa op-list isas)))
+	  (case (length filtered-o-list)
+	    ((0) (error "Operand not in specified ISA:" name))
+	    ((1) (car filtered-o-list))
+	    (else (error "Ambiguous operand lookup:" name))))
 	#f))
 )
 
@@ -520,7 +542,7 @@
 	(let ((result #f)
 	      (op-isas (obj-isa-list op)))
 	  (for-each (lambda (o)
-		      (if (not (null? (intersection op-isas (obj-isa-list o))))
+		      (if (non-null-intersection? op-isas (obj-isa-list o))
 			  (set! result #t)))
 		    ops)
 	  result)
@@ -554,19 +576,21 @@
   *UNSPECIFIED*
 )
 
-; ??? This doesn't work if there are multiple insns with the same name
-; for different isas.
+;; Look up insn NAME in the current architecture.
+;; Returns the <insn> object or #f if not found.
+;; If there is an ambiguity (i.e. the insn is in multiple ISAs and
+;; ISA-NAME-LIST doesn't disambiguate the choice) an error is signalled.
+;; If the specified isa list is #f, look in all ISAs.
 
-(define (current-insn-lookup name)
-  (let ((i (/ident-object-table-lookup (car (arch-insn-table CURRENT-ARCH))
-				       name)))
-    (if i
-	(begin
-	  (if (= (length i) 1)
-	      (car i)
-	      ;; FIXME: For now just flag an error.
-	      ;; Later add an isa-list arg to distinguish.
-	      (error "multiple insns with name:" name)))
+(define (current-insn-lookup name isa-name-list)
+  (let ((i-list (/ident-object-table-lookup (car (arch-insn-table CURRENT-ARCH))
+					    name)))
+    (if i-list
+	(let ((filtered-i-list (obj-filter-by-isa i-list isa-name-list)))
+	  (case (length filtered-i-list)
+	    ((0) (error "Insn not in specified ISA:" name))
+	    ((1) (car filtered-i-list))
+	    (else (error "Ambiguous insn lookup:" name))))
 	#f))
 )
 
@@ -583,7 +607,7 @@
 	(let ((result #f)
 	      (insn-isas (obj-isa-list insn)))
 	  (for-each (lambda (i)
-		      (if (not (null? (intersection insn-isas (obj-isa-list i))))
+		      (if (non-null-intersection? insn-isas (obj-isa-list i))
 			  (set! result #t)))
 		    insns)
 	  result)
@@ -608,19 +632,21 @@
   *UNSPECIFIED*
 )
 
-; ??? This doesn't work if there are multiple minsns with the same name
-; for different isas.
+;; Look up minsn NAME in the current architecture.
+;; Returns the <macro-insn> object or #f if not found.
+;; If there is an ambiguity (i.e. the minsn is in multiple ISAs and
+;; ISA-NAME-LIST doesn't disambiguate the choice) an error is signalled.
+;; If the specified isa list is #f, look in all ISAs.
 
-(define (current-minsn-lookup name)
-  (let ((m (/ident-object-table-lookup (car (arch-minsn-table CURRENT-ARCH))
-				       name)))
-    (if m
-	(begin
-	  (if (= (length m) 1)
-	      (car m)
-	      ;; FIXME: For now just flag an error.
-	      ;; Later add an isa-list arg to distinguish.
-	      (error "multiple macro-insns with name:" name)))
+(define (current-minsn-lookup name isa-name-list)
+  (let ((m-list (/ident-object-table-lookup (car (arch-minsn-table CURRENT-ARCH))
+					    name)))
+    (if m-list
+	(let ((filtered-m-list (obj-filter-by-isa m-list isa-name-list)))
+	  (case (length filtered-m-list)
+	    ((0) (error "Macro-insn not in specified ISA:" name))
+	    ((1) (car filtered-m-list))
+	    (else (error "Ambiguous macro-insn lookup:" name))))
 	#f))
 )
 
@@ -637,7 +663,7 @@
 	(let ((result #f)
 	      (m-isas (obj-isa-list m)))
 	  (for-each (lambda (mm)
-		      (if (not (null? (intersection m-isas (obj-isa-list mm))))
+		      (if (non-null-intersection? m-isas (obj-isa-list mm))
 			  (set! result #t)))
 		    minsns)
 	  result)
@@ -841,10 +867,6 @@
 					   nil))))
 			 isas)
 		    '((max)))))
-    ; Using a bitset attribute here implies something could be used by two
-    ; separate isas.  This seems highly unlikely but we don't [as yet]
-    ; preclude it.  The other thing to consider is whether the cpu table
-    ; would ever want to be opened for multiple isas.
     (define-attr '(type bitset) '(name ISA)
       '(comment "instruction set selection")
       ; If there's only one isa, don't (yet) pollute the tables with a value
@@ -1880,7 +1902,8 @@
 			     (make-obj-context insn
 					       (string-append "canonicalizing semantics of "
 							      (obj:str-name insn)))
-			     'VOID (insn-semantics insn) nil)))
+			     'VOID (obj-isa-list insn) nil
+			     (insn-semantics insn))))
 		       (insn-set-canonical-semantics! insn canon-sem)))
 		    (else
 		     (logit 2 "Skipping instruction " (obj:name insn) ", no semantics ...\n"))))

@@ -561,13 +561,18 @@
 ; Expand attribute value ATVAL, which is an rtx expression.
 ; OWNER is the containing object or #f if there is none.
 ; OWNER is needed if an attribute is defined in terms of other attributes.
-; If it's #f obviously ATVAL can't be defined in terms of others.
+; OWNER is also needed to get the ISA(s) in which to evaluate the expression.
+; If it's #f obviously ATVAL can't be defined in terms of others,
+; or refer to operands that require an ISA to disambiguate.
 
 (define (/attr-eval atval owner)
-  (let* ((estate (estate-make-for-eval #f owner))
-	 (atval-expr (car atval))
-	 (expr (rtx-simplify #f owner (rtx-canonicalize #f 'DFLT atval-expr nil) nil))
-	 (value (rtx-eval-with-estate expr DFLT estate)))
+  (let* ((atval-expr (car atval))
+	 (expr (rtx-simplify #f owner
+			     (rtx-canonicalize #f 'DFLT
+					       (and owner (obj-isa-list owner))
+					       nil atval-expr)
+			     nil))
+	 (value (rtx-value expr owner)))
     (cond ((symbol? value) value)
 	  ((number? value) value)
 	  (error "/attr-eval: internal error, unsupported result:" value)))

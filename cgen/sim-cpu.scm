@@ -534,7 +534,8 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 	    (isa-setup-semantics (current-isa)))
        (string-append
 	"  "
-	(rtl-c VOID (isa-setup-semantics (current-isa)) nil
+	(rtl-c VOID (obj-isa-list insn) nil
+	       (isa-setup-semantics (current-isa))
 	       #:for-insn? #t
 	       #:rtl-cover-fns? #t
 	       #:owner insn)
@@ -543,24 +544,23 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 
    ; Indicate generating code for INSN.
    ; Use the compiled form if available.
-   ; The case when they're not available is for virtual insns. (??? Still true?)
+   ; The case when they're not available is for virtual insns. xxx Still true?
    (cond ((insn-compiled-semantics insn)
 	  => (lambda (sem)
-	       (rtl-c-parsed VOID sem nil
+	       (rtl-c-parsed VOID sem
 			     #:for-insn? #t
 			     #:rtl-cover-fns? #t
 			     #:owner insn)))
 	 ((insn-canonical-semantics insn)
 	  => (lambda (sem)
-	       (rtl-c-parsed VOID sem nil
+	       (rtl-c-parsed VOID sem
 			     #:for-insn? #t
 			     #:rtl-cover-fns? #t
 			     #:owner insn)))
 	 (else
-	  (rtl-c VOID (insn-semantics insn) nil
-		 #:for-insn? #t
-		 #:rtl-cover-fns? #t
-		 #:owner insn))))
+	  (context-error (make-obj-context insn #f)
+			 "While generating semantic code"
+			 "semantics of insn are not canonicalized"))))
 )
 
 ; Return definition of C function to perform INSN.
@@ -1272,7 +1272,7 @@ xfull-extract-* | xfast-extract-*)
 cat <<EOF
 {
 "
-   (rtl-c VOID insn-extract nil #:rtl-cover-fns? #t)
+   (rtl-c VOID #f nil insn-extract #:rtl-cover-fns? #t)
 "}
 EOF
 
@@ -1283,7 +1283,7 @@ xfull-exec-* | xfast-exec-*)
 cat <<EOF
 {
 "
-   (rtl-c VOID insn-execute nil #:rtl-cover-fns? #t)
+   (rtl-c VOID #f nil insn-execute #:rtl-cover-fns? #t)
 "}
 EOF
 

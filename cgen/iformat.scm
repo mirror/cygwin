@@ -390,12 +390,12 @@
 ; Attributes derivable from the semantics are also computed.
 ; This is all done at the same time to minimize the number of times the
 ; semantic code is traversed.
-; The semantics of INSN must already be compiled and stored in
-; compiled-semantics.
+; The semantics of INSN must already be canonicalized and stored in
+; canonical-semantics.
 ;
-; The result is (descriptor attrs).
-; `descriptor' is #f for insns with an empty field list
-; (this happens for virtual insns).
+; The result is (descriptor compiled-semantics attrs).
+; `descriptor' and `compiled-semantics' are #f for insns with an empty
+; field list.  This happens for virtual insns.
 ; `attrs' is an <attr-list> object of attributes derived from the semantics.
 ;
 ; ??? We never traverse the semantics of virtual insns.

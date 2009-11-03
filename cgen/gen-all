@@ -86,6 +86,10 @@ then
 		exit 1
 	    fi
 	    make -j3
+	    # SID doesn't support --enable-cgen-maint, sigh.
+	    (cd sid/component/cgen-cpu && make cgen-all)
+	    if [ $? != 0 ] ; then exit 1 ; fi 
+	    make -j3 all-sid
 	fi
     )
     if [ $? != 0 ] ; then exit 1 ; fi 

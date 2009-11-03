@@ -1,3 +1,7 @@
+2009-11-02  Doug Evans  <dje@sebabeach.org>
+
+	* gen-all (do_src): Manually run cgen-all for sid.
+
 2009-11-01  Doug Evans  <dje@sebabeach.org>
 
 	* gen-all: New file.

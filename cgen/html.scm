@@ -693,7 +693,8 @@ See the input .cpu file(s) for copyright information.
 	(lambda (rtx-obj expr parent-expr op-pos tstate appstuff)
 	  (case (car expr)
 
-	    ((operand) (if (memory? (op:type (current-op-lookup (rtx-arg1 expr))))
+	    ((operand) (if (memory? (op:type (current-op-lookup (rtx-arg1 expr)
+								(obj-isa-list insn))))
 			   ; Don't change to '(MEM), since we use append!.
 			   (append! sem-attrs (list 'MEM)))
 		       (if (mode-float? (mode:lookup (rtx-mode expr)))

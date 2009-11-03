@@ -331,7 +331,8 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
    "#define CGEN_ACTUAL_MAX_SYNTAX_ELEMENTS "
    ; The +2 account for the leading "MNEM" and trailing 0.
    (number->string (+ 2 (apply max (map (lambda (insn) 
-					  (length (syntax-break-out (insn-syntax insn))))
+					  (length (syntax-break-out (insn-syntax insn)
+								    (obj-isa-list insn))))
 					(current-insn-list)))))
    "\n"
    "\n"

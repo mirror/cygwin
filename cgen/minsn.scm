@@ -180,7 +180,8 @@
 	 ; parsed the associated element in ifld-names is deleted.  At the
 	 ; end ifld-names must be empty.  delq! can't delete the first
 	 ; element in a list, so we insert a fencepost.
-	 (ifld-names (cons #f (map obj:name ifld-ops))))
+	 (ifld-names (cons #f (map obj:name ifld-ops)))
+	 (isa-name-list (obj-isa-list real-insn)))
     ;(logit 3 "Computing ifld list, operand field names: " ifld-names "\n")
     ; For each macro-insn ifield expression, look it up in the real insn's
     ; ifield list.  If an operand without a prespecified value, leave
@@ -188,7 +189,7 @@
     ; the ifield entry.
     (for-each (lambda (f)
 		(let* ((op-name (if (pair? f) (car f) f))
-		       (op-obj (current-op-lookup op-name))
+		       (op-obj (current-op-lookup op-name isa-name-list))
 		       ; If `op-name' is an operand, use its ifield.
 		       ; Otherwise `op-name' must be an ifield name.
 		       (f-name (if op-obj
@@ -219,7 +220,7 @@
       (parse-error context "not an alias macro-insn" minsn))
 
   (let* ((expn (car (minsn-expansions minsn)))
-	 (alias-of (current-insn-lookup (cadr expn))))
+	 (alias-of (current-insn-lookup (cadr expn) (obj-isa-list minsn))))
 
     (if (not alias-of)
 	(parse-error context "unknown real insn in expansion" minsn))

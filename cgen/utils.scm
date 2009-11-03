@@ -663,6 +663,18 @@
 (define (intersection a b) 
   (foldl (lambda (l e) (if (memq e a) (cons e l) l)) '() b))
 
+; Return #t if the intersection of A and B is non-null.
+
+(define (non-null-intersection? a b)
+  (let loop ((todo a))
+    (cond ((null? todo)
+	   #f)
+	  ((memq (car todo) b)
+	   #t)
+	  (else
+	   (loop (cdr todo)))))
+)
+
 ; Return union of two lists.
 
 (define (union a b) 

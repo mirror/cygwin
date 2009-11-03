@@ -122,7 +122,8 @@
 ; Values < 128 are characters that must be matched.
 ; Values >= 128 are 128 + the index into the operand table.
 
-(define (compute-syntax strip-mnemonic? strip-mnem-operands? syntax op-macro)
+(define (compute-syntax strip-mnemonic? strip-mnem-operands? syntax op-macro
+			isa-name-list)
   (let ((context (make-prefix-context "syntax computation"))
 	(syntax (if strip-mnemonic?
 		    (strip-mnemonic strip-mnem-operands? syntax)
@@ -165,7 +166,7 @@
 		   (if (= n 0)
 		       (parse-error context "empty or invalid operand name" syntax))
 		   (let ((operand (string->symbol (substring syn 1 (1+ n)))))
-		     (if (not (current-op-lookup operand))
+		     (if (not (current-op-lookup operand isa-name-list))
 			 (parse-error context "undefined operand " operand syntax)))
 		   (loop (string-drop (1+ n) syn)
 			 (string-append result op-macro " ("
@@ -183,14 +184,15 @@
 ; Return C code to define the syntax string for SYNTAX
 ; MNEM is the C value to use to represent the instruction's mnemonic.
 ; OP is the C macro to use to compute an operand's syntax value.
+; ISA-NAME-LIST is the list of ISA names in which the owning insn lives.
 
-(define (gen-syntax-entry mnem op syntax)
+(define (gen-syntax-entry mnem op syntax isa-name-list)
   (string-append
    "{ { "
    mnem ", "
    ; `mnem' is used to represent the mnemonic, so we always want to strip it
    ; from the syntax string, regardless of the setting of `strip-mnemonic?'.
-   (compute-syntax #t #f syntax op)
+   (compute-syntax #t #f syntax op isa-name-list)
    " } }")
 )
 
@@ -341,7 +343,9 @@
     "/* " (insn-syntax insn) " */\n"
     "  {\n"
     "    " (gen-insn-handlers insn) ",\n"
-    "    " (gen-syntax-entry "MNEM" "OP" (insn-syntax insn)) ",\n"
+    "    "
+    (gen-syntax-entry "MNEM" "OP" (insn-syntax insn) (obj-isa-list insn))
+    ",\n"
     ; ??? 'twould save space to put a pointer here and record format separately
     "    " (gen-ifmt-entry insn) ", "
     ;"0x" (number->string (insn-value insn) 16) ",\n"
@@ -506,7 +510,9 @@ static unsigned int dis_hash_insn (const char *, CGEN_INSN_INT);
     "-1, " ; macro-insns are not currently enumerated, no current need to
     "\"" (obj:str-name minsn) "\", "
     "\"" (minsn-mnemonic minsn) "\",\n"
-    "    " (gen-syntax-entry "MNEM" "OP" (minsn-syntax minsn)) ",\n"
+    "    "
+    (gen-syntax-entry "MNEM" "OP" (minsn-syntax minsn) (obj-isa-list minsn))
+    ",\n"
     "    (PTR) & macro_" (gen-sym minsn) "_expansions[0],\n"
     "    "
     (gen-obj-attr-defn 'minsn minsn all-attrs num-non-bools gen-insn-attr-mask)
@@ -527,7 +533,9 @@ static unsigned int dis_hash_insn (const char *, CGEN_INSN_INT);
     "-1, " ; macro-insns are not currently enumerated, no current need to
     "\"" (obj:str-name minsn) "\", "
     "\"" (minsn-mnemonic minsn) "\",\n"
-    "    " (gen-syntax-entry "MNEM" "OP" (minsn-syntax minsn)) ",\n"
+    "    "
+    (gen-syntax-entry "MNEM" "OP" (minsn-syntax minsn) (obj-isa-list minsn))
+    ",\n"
     "    (PTR) & macro_" (gen-sym minsn) "_expansions[0],\n"
     "    "
     (gen-obj-attr-defn 'minsn minsn all-attrs num-non-bools gen-insn-attr-mask)

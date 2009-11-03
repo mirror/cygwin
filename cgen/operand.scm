@@ -561,7 +561,12 @@
   ;; Pick out name first to augment the error context.
   (let* ((name (parse-name context name))
 	 (context (context-append-name context name))
-	 (atlist-obj (atlist-parse context attrs "cgen_operand")))
+	 (atlist-obj (atlist-parse context attrs "cgen_operand"))
+	 (isa-name-list (atlist-attr-value atlist-obj 'ISA #f)))
+
+    ;; Verify all specified ISAs are valid.
+    (if (not (all-true? (map current-isa-lookup isa-name-list)))
+	(parse-error context "unknown isa in isa list" isa-name-list))
 
     (if (keep-atlist? atlist-obj #f)
 
@@ -569,7 +574,7 @@
 	      (mode-obj (parse-mode-name context mode))
 	      (ifld-val (if (integer? ifld)
 			    ifld
-			    (current-ifld-lookup ifld))))
+			    (current-ifld-lookup ifld isa-name-list))))
 
 	  (if (not mode-obj)
 	      (parse-error context "unknown mode" mode))
@@ -816,7 +821,7 @@
 ; The result is a <derived-ifield> object.
 ; The {owner} member still needs to be set!
 
-(define (/derived-parse-encoding context operand-name encoding)
+(define (/derived-parse-encoding context isa-name-list operand-name encoding)
   (if (or (null? encoding)
 	  (not (list? encoding)))
       (parse-error context "encoding not a list" encoding))
@@ -825,7 +830,7 @@
 
   ; ??? Calling /parse-insn-format is a quick hack.
   ; It's an internal routine of some other file.
-  (let ((iflds (/parse-insn-format context #f #f encoding)))
+  (let ((iflds (/parse-insn-format context #f isa-name-list encoding)))
     (make <derived-ifield>
 	  operand-name
 	  'derived-ifield ; (string-append "<derived-ifield> for " operand-name)
@@ -840,10 +845,10 @@
 ;; asserting something about the ifield values of the containing insn.
 ;; The result is #f if the assertion is (), or the canonical rtl.
 
-(define (/derived-parse-ifield-assertion context ifield-assertion)
+(define (/derived-parse-ifield-assertion context isa-name-list ifield-assertion)
   (if (null? ifield-assertion)
       #f
-      (rtx-canonicalize context 'INT ifield-assertion nil))
+      (rtx-canonicalize context 'INT isa-name-list nil ifield-assertion))
 )
 
 ; Parse a derived operand definition.
@@ -864,12 +869,18 @@
   ;; Pick out name first to augment the error context.
   (let* ((name (parse-name context name))
 	 (context (context-append-name context name))
-	 (atlist-obj (atlist-parse context attrs "cgen_operand")))
+	 (atlist-obj (atlist-parse context attrs "cgen_operand"))
+	 (isa-name-list (atlist-attr-value atlist-obj 'ISA #f)))
+
+    ;; Verify all specified ISAs are valid.
+    (if (not (all-true? (map current-isa-lookup isa-name-list)))
+	(parse-error context "unknown isa in isa list" isa-name-list))
 
     (if (keep-atlist? atlist-obj #f)
 
-	(let ((mode-obj (parse-mode-name context mode))
-	      (parsed-encoding (/derived-parse-encoding context name encoding)))
+	(let* ((mode-obj (parse-mode-name context mode))
+	       (parsed-encoding (/derived-parse-encoding context isa-name-list
+							 name encoding)))
 
 	  (if (not mode-obj)
 	      (parse-error context "unknown mode" mode))
@@ -883,7 +894,7 @@
 		       (map (lambda (a)
 			      (if (not (symbol? a))
 				  (parse-error context "arg not a symbol" a))
-			      (let ((op (current-op-lookup a)))
+			      (let ((op (current-op-lookup a isa-name-list)))
 				(if (not op)
 				    (parse-error context "not an operand" a))
 				op))
@@ -891,20 +902,27 @@
 		       syntax
 		       base-ifield ; FIXME: validate
 		       parsed-encoding
-		       (/derived-parse-ifield-assertion context ifield-assertion)
+		       (/derived-parse-ifield-assertion context isa-name-list
+							ifield-assertion)
 		       (if (null? getter)
 			   #f
-			   (/operand-parse-getter context
-						  (list args
-							(rtx-canonicalize context mode getter nil))
-						  (length args)))
+			   (/operand-parse-getter
+			    context
+			    (list args
+				  (rtx-canonicalize context mode
+						    isa-name-list nil
+						    getter))
+			    (length args)))
 		       (if (null? setter)
 			   #f
-			   (/operand-parse-setter context
-						  (list (append args '(newval))
-							(rtx-canonicalize context 'VOID setter
-									  (list (list 'newval mode #f))))
-						  (length args)))
+			   (/operand-parse-setter
+			    context
+			    (list (append args '(newval))
+				  (rtx-canonicalize context 'VOID
+						    isa-name-list
+						    (list (list 'newval mode #f))
+						    setter))
+			    (length args)))
 		       )))
 	    (elm-set! result 'hw-name (obj:name (hardware-for-mode mode-obj)))
 	    ;(elm-set! result 'hw-name (obj:name parsed-encoding))
@@ -996,10 +1014,10 @@
 ; Parse an "anyof" choice, which is a derived-operand name.
 ; The result is {choice} unchanged.
 
-(define (/anyof-parse-choice context choice)
+(define (/anyof-parse-choice context choice isa-name-list)
   (if (not (symbol? choice))
       (parse-error context "anyof choice not a symbol" choice))
-  (let ((op (current-op-lookup choice)))
+  (let ((op (current-op-lookup choice isa-name-list)))
     (if (not (derived-operand? op))
 	(parse-error context "anyof choice not a derived-operand" choice))
     op)
@@ -1025,7 +1043,8 @@
 
     (if (keep-atlist? atlist-obj #f)
 
-	(let ((mode-obj (parse-mode-name context mode)))
+	(let ((mode-obj (parse-mode-name context mode))
+	      (isa-name-list (atlist-attr-value atlist-obj 'ISA #f)))
 	  (if (not mode-obj)
 	      (parse-error context "unknown mode" mode))
 
@@ -1036,7 +1055,7 @@
 		mode
 		base-ifield
 		(map (lambda (c)
-		       (/anyof-parse-choice context c))
+		       (/anyof-parse-choice context c isa-name-list))
 		     choices)))
 
 	(begin
@@ -1133,7 +1152,7 @@
   (assert (derived-operand? anyof-instance))
   (let ((assertion (derived-ifield-assertion anyof-instance)))
     (if assertion
-	(rtx-solve #f ; FIXME: context
+	(rtx-solve (make-obj-context anyof-instance #f)
 		   anyof-instance ; owner
 		   assertion
 		   known-values)
@@ -1155,8 +1174,11 @@
   (elm-get anyof-instance 'name)
 )
 
-(define (/anyof-merge-syntax syntax value-names values)
-  (let ((syntax-elements (syntax-break-out syntax)))
+; CONTAINER is the <anyof-operand> containing SYNTAX.
+
+(define (/anyof-merge-syntax syntax value-names values container)
+  (let* ((isa-name-list (obj-isa-list container))
+	 (syntax-elements (syntax-break-out syntax isa-name-list)))
     (syntax-make (map (lambda (e)
 			(if (anyof-operand? e)
 			    (let* ((name (obj:name e))
@@ -1333,7 +1355,8 @@
 		(op:mode choice)
 		(derived-args choice)
 		(/anyof-merge-syntax (derived-syntax choice)
-				     arg-names new-args)
+				     arg-names new-args
+				     container)
 		(derived-base-ifield choice)
 		encoding
 		(/anyof-merge-ifield-assertion (derived-ifield-assertion choice)
@@ -1616,6 +1639,7 @@ Define an anyof operand, name/value pair list version.
   ; Also (defined elsewhere): PCREL-ADDR ABS-ADDR.
 
   (set! pc (make <pc>))
+  (obj-cons-attr! pc (all-isas-attr))
   (current-op-add! pc)
 
   *UNSPECIFIED*

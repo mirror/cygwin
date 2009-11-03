@@ -17,12 +17,13 @@
 ;; This carries the immutable elements only!
 ;; OUTER-EXPR is the EXPR argument to rtx-canonicalize.
 
-(define (/make-cstate context outer-expr)
-  (vector context outer-expr)
+(define (/make-cstate context isa-name-list outer-expr)
+  (vector context isa-name-list outer-expr)
 )
 
 (define (/cstate-context cstate) (vector-ref cstate 0))
-(define (/cstate-outer-expr cstate) (vector-ref cstate 1))
+(define (/cstate-isas cstate) (vector-ref cstate 1))
+(define (/cstate-outer-expr cstate) (vector-ref cstate 2))
 
 ;; Flag an error while canonicalizing rtl.
 
@@ -475,7 +476,15 @@
     (cons val (cons new-env env)))
 )
 
-(define (/rtx-canon-env val mode parent-expr op-num cstate env depth)
+(define (/rtx-canon-symbol-list val mode parent-expr op-num cstate env depth)
+  (if (or (not (list? val))
+	  (not (all-true? (map symbol? val))))
+      (/rtx-canon-error cstate "bad symbol list"
+			val parent-expr op-num))
+  #f
+)
+
+(define (/rtx-canon-env-stack val mode parent-expr op-num cstate env depth)
   ;; VAL is an environment stack.
   (if (not (list? val))
       (/rtx-canon-error cstate "environment not a list"
@@ -558,7 +567,8 @@
 	  (cons 'CASERTX /rtx-canon-casertx)
 	  (cons 'LOCALS /rtx-canon-locals)
 	  (cons 'ITERATION /rtx-canon-iteration)
-	  (cons 'ENV /rtx-canon-env)
+	  (cons 'SYMBOLLIST /rtx-canon-symbol-list)
+	  (cons 'ENVSTACK /rtx-canon-env-stack)
 	  (cons 'ATTRS /rtx-canon-attrs)
 	  (cons 'SYMBOL /rtx-canon-symbol)
 	  (cons 'STRING /rtx-canon-string)
@@ -805,7 +815,7 @@
 
   (let ((expr-mode-name (cadr args))
 	(op-name (caddr args)))
-    (let ((op-obj (current-op-lookup op-name)))
+    (let ((op-obj (current-op-lookup op-name (/cstate-isas cstate))))
 
       (if op-obj
 
@@ -876,7 +886,7 @@
   (let ((expr-mode-name (cadr args))
 	(ref-name (caddr args)))
     ;; FIXME: Will current-op-lookup find named operands?
-    (let ((op-obj (current-op-lookup env ref-name)))
+    (let ((op-obj (current-op-lookup ref-name (/cstate-isas cstate))))
 
       (if op-obj
 
@@ -1147,7 +1157,7 @@
 	  (display requested-mode-name)
 	  (newline)
 	  (display (spaces (* 4 depth)))
-	  (rtx-env-dump env)
+	  (rtx-env-stack-dump env)
 	  (force-output)))
 
     (let* ((canoner (vector-ref /rtx-operand-canoners (rtx-num rtx-obj)))
@@ -1175,7 +1185,7 @@
 	(display (rtx-dump expr))
 	(newline)
 	(display (spaces (* 4 depth)))
-	(rtx-env-dump env)
+	(rtx-env-stack-dump env)
 	(force-output)
 	))
 
@@ -1202,7 +1212,7 @@
 	     (if (memq expected '(RTX SETRTX))
 
 		 (cond ((symbol? expr)
-			(cond ((current-op-lookup expr)
+			(cond ((current-op-lookup expr (/cstate-isas cstate))
 			       => (lambda (op)
 				    ;; NOTE: We can't simply call
 				    ;; op:mode-name here, we need the real
@@ -1254,36 +1264,37 @@
 ;;   - ifield-name -> (ifield ifield-name)
 ;; Plus an absent option list is replaced with ().
 ;; Plus DFLT mode is converted to a useful mode.
+;; Plus the specified isa-name-list is recorded in the RTL.
 ;;
 ;; The result is EXPR in canonical form.
 ;;
 ;; CONTEXT is a <context> object or #f if there is none.
 ;; It is used in error messages.
 ;;
+;; ISA-NAME-LIST is a list of ISAs in which to evaluate the expression,
+;; e.g. to do operand lookups.
+;; The ISAs must be compatible, e.g. operand lookups must be unambiguous.
+;;
 ;; MODE-NAME is the requested mode of the result, or DFLT.
 ;;
 ;; EXTRA-VARS-ALIST is an association list of extra (symbol <mode> value)
 ;; elements to be used during value lookup.
-;; VALUE can be #f which means "unknown".
-;;
-;; ??? If EXTRA-VARS-ALIST is non-null, it might be nice to return a closure.
-;; It might simplify subsequent uses of the canonicalized code.
+;; VALUE can be #f which means the value is assumed to be known, but is
+;; currently unrepresentable.  This is used, for example, when representing
+;; ifield setters: we don't know the new value, but it will be known when the
+;; rtx is evaluated (??? Sigh, this is a bit of a cheat, closures have no
+;; such thing, but it's useful here because we don't necessarily know what
+;; the value will be in the application side of things).
 
-(define (rtx-canonicalize context mode-name expr extra-vars-alist)
+(define (rtx-canonicalize context mode-name isa-name-list extra-vars-alist expr)
   (let ((result
 	 (/rtx-canon expr 'RTX mode-name #f 0
-		     (/make-cstate context expr)
+		     (/make-cstate context isa-name-list expr)
 		     (rtx-env-init-stack1 extra-vars-alist) 0)))
     (rtx-verify-no-dflt-modes context result)
-    result)
-)
-
-;; Utility for a common case.
-;; Canonicalize rtl expression STMT which has a VOID result,
-;; and no external environment.
-
-(define (rtx-canonicalize-stmt context stmt)
-  (rtx-canonicalize context 'VOID stmt nil)
+    (rtx-make 'closure mode-name isa-name-list
+	      (rtx-var-alist-to-closure-env-stack extra-vars-alist)
+	      result))
 )
 
 ;; RTL expression traversal support.
@@ -1325,6 +1336,8 @@
 ; computing the insn format) EXPR-FN processes the expression itself, and
 ; when evaluating EXPR it's the result of EXPR-FN that computes the value.
 ;
+; ISAS is a list of ISA name(s) in which to evaluate the expression.
+;
 ; ENV is the current environment.  This is a stack of sequence locals.
 ;
 ; COND? is a boolean indicating if the current expression is on a conditional
@@ -1349,24 +1362,26 @@
 ;
 ; DEPTH is the current traversal depth.
 
-(define (tstate-make context owner expr-fn env cond? known depth)
-  (vector context owner expr-fn env cond? known depth)
+(define (tstate-make context owner expr-fn isas env cond? known depth)
+  (vector context owner expr-fn isas env cond? known depth)
 )
 
-(define (tstate-context state)             (vector-ref state 0))
-(define (tstate-set-context! state newval) (vector-set! state 0 newval))
-(define (tstate-owner state)               (vector-ref state 1))
-(define (tstate-set-owner! state newval)   (vector-set! state 1 newval))
-(define (tstate-expr-fn state)             (vector-ref state 2))
-(define (tstate-set-expr-fn! state newval) (vector-set! state 2 newval))
-(define (tstate-env state)                 (vector-ref state 3))
-(define (tstate-set-env! state newval)     (vector-set! state 3 newval))
-(define (tstate-cond? state)               (vector-ref state 4))
-(define (tstate-set-cond?! state newval)   (vector-set! state 4 newval))
-(define (tstate-known state)               (vector-ref state 5))
-(define (tstate-set-known! state newval)   (vector-set! state 5 newval))
-(define (tstate-depth state)               (vector-ref state 6))
-(define (tstate-set-depth! state newval)   (vector-set! state 6 newval))
+(define (tstate-context state)               (vector-ref state 0))
+(define (tstate-set-context! state newval)   (vector-set! state 0 newval))
+(define (tstate-owner state)                 (vector-ref state 1))
+(define (tstate-set-owner! state newval)     (vector-set! state 1 newval))
+(define (tstate-expr-fn state)               (vector-ref state 2))
+(define (tstate-set-expr-fn! state newval)   (vector-set! state 2 newval))
+(define (tstate-isas state)                  (vector-ref state 3))
+(define (tstate-set-isas! state newval)      (vector-set! state 3 newval))
+(define (tstate-env-stack state)             (vector-ref state 4))
+(define (tstate-set-env-stack! state newval) (vector-set! state 4 newval))
+(define (tstate-cond? state)                 (vector-ref state 5))
+(define (tstate-set-cond?! state newval)     (vector-set! state 5 newval))
+(define (tstate-known state)                 (vector-ref state 6))
+(define (tstate-set-known! state newval)     (vector-set! state 6 newval))
+(define (tstate-depth state)                 (vector-ref state 7))
+(define (tstate-set-depth! state newval)     (vector-set! state 7 newval))
 
 ; Create a copy of STATE.
 
@@ -1375,11 +1390,13 @@
   (list->vector (vector->list state))
 )
 
-; Create a copy of STATE with a new environment ENV.
+;; Create a copy of STATE with environment stack ENV-STACK added,
+;; and the ISA(s) set to ISA-NAME-LIST.
 
-(define (tstate-new-env state env)
+(define (tstate-make-closure state isa-name-list env-stack)
   (let ((result (tstate-copy state)))
-    (tstate-set-env! result env)
+    (tstate-set-isas! result isa-name-list)
+    (tstate-set-env-stack! result (append env-stack (tstate-env-stack result)))
     result)
 )
 
@@ -1390,7 +1407,7 @@
 
 (define (tstate-push-env state env)
   (let ((result (tstate-copy state)))
-    (tstate-set-env! result (cons env (tstate-env result)))
+    (tstate-set-env-stack! result (cons env (tstate-env-stack result)))
     result)
 )
 
@@ -1531,11 +1548,6 @@
     (cons val (tstate-push-env tstate env)))
 )
 
-(define (/rtx-traverse-env val expr op-num tstate appstuff)
-  ;; VAL is an environment stack.
-  (cons val (tstate-new-env tstate val))
-)
-
 (define (/rtx-traverse-attrs val expr op-num tstate appstuff)
 ;  (cons val ; (atlist-source-form (atlist-parse (make-prefix-context "with-attr") val ""))
 ;	tstate)
@@ -1578,7 +1590,9 @@
 	  (cons 'CASERTX /rtx-traverse-casertx)
 	  (cons 'LOCALS /rtx-traverse-locals)
 	  (cons 'ITERATION /rtx-traverse-iteration)
-	  (cons 'ENV /rtx-traverse-env)
+	  ;; NOTE: Closure isas and env are handled in /rtx-traverse.
+	  (cons 'SYMBOLLIST /rtx-traverse-normal-operand)
+	  (cons 'ENVSTACK /rtx-traverse-normal-operand)
 	  (cons 'ATTRS /rtx-traverse-attrs)
 	  (cons 'SYMBOL /rtx-traverse-normal-operand)
 	  (cons 'STRING /rtx-traverse-normal-operand)
@@ -1605,7 +1619,7 @@
 	(display "Traversing operands of: ")
 	(display (rtx-dump expr))
 	(newline)
-	(rtx-env-dump (tstate-env tstate))
+	(rtx-env-stack-dump (tstate-env-stack tstate))
 	(force-output)))
 
   (let loop ((operands (cdr expr))
@@ -1733,12 +1747,6 @@
 ; TSTATE is the current traversal state.
 ;
 ; APPSTUFF is for application specific use.
-;
-; All macros are expanded here.  User code never sees them.
-; All operand shortcuts are also expand here.  User code never sees them.
-; These are:
-; - operands, ifields, and numbers appearing where an rtx is expected are
-;   converted to use `operand', `ifield', or `const'.
 
 (define (/rtx-traverse expr expected parent-expr op-pos tstate appstuff)
   (if /rtx-traverse-debug?
@@ -1751,6 +1759,10 @@
 	(display "-expected:       ")
 	(display expected)
 	(newline)
+	(display (spaces (* 4 (tstate-depth tstate))))
+	(display "-conditional:    ")
+	(display (tstate-cond? tstate))
+	(newline)
 	(force-output)
 	))
 
@@ -1758,12 +1770,21 @@
 
   (if (pair? expr) ; pair? -> cheap non-null-list?
 
-      (let ((rtx-obj (rtx-lookup (car expr))))
+      (let* ((rtx-name (car expr))
+	     (rtx-obj (rtx-lookup rtx-name))
+	     ;; If this is a closure, update tstate.
+	     ;; ??? This is a bit of a wart.  All other rtxes handle their
+	     ;; special args/needs via rtx-arg-types.  Left as is to simmer.
+	     (tstate (if (eq? rtx-name 'closure)
+			 (tstate-make-closure tstate
+					      (rtx-closure-isas expr)
+					      (rtx-make-env-stack (rtx-closure-env-stack expr)))
+			 tstate)))
 	(tstate-incr-depth! tstate)
 	(let ((result
 	       (if rtx-obj
 		   (/rtx-traverse-expr rtx-obj expr parent-expr op-pos tstate appstuff)
-		   (let ((rtx-obj (/rtx-macro-lookup (car expr))))
+		   (let ((rtx-obj (/rtx-macro-lookup rtx-name)))
 		     (if rtx-obj
 			 (/rtx-traverse (/rtx-macro-expand expr rtx-evaluator)
 					expected parent-expr op-pos tstate appstuff)
@@ -1773,17 +1794,18 @@
 
       ; EXPR is not a list.
       ; See if it's an operand shortcut.
+      ; FIXME: Can we get here any more? [now that EXPR is already canonical]
       (if (memq expected '(RTX SETRTX))
 
 	  (cond ((symbol? expr)
-		 (cond ((current-op-lookup expr)
+		 (cond ((current-op-lookup expr (tstate-isas tstate))
 			=> (lambda (op)
 			     (/rtx-traverse
 			      ;; NOTE: Can't call op:mode-name here, we need
 			      ;; the real mode, not (potentially) DFLT.
 			      (rtx-make-operand (obj:name (op:mode op)) expr)
 			      expected parent-expr op-pos tstate appstuff)))
-		       ((rtx-temp-lookup (tstate-env tstate) expr)
+		       ((rtx-temp-lookup (tstate-env-stack tstate) expr)
 			=> (lambda (tmp)
 			     (/rtx-traverse
 			      (rtx-make-local (rtx-temp-mode tmp) expr)
@@ -1812,7 +1834,7 @@
 )
 
 ; User visible procedures to traverse an rtl expression.
-; EXPR must be fully canonical (i.e. compiled).
+; EXPR must be fully canonical.
 ; These calls /rtx-traverse to do most of the work.
 ; See tstate-make for explanations of OWNER, EXPR-FN.
 ; CONTEXT is a <context> object or #f if there is none.
@@ -1821,7 +1843,9 @@
 
 (define (rtx-traverse context owner expr expr-fn appstuff)
   (/rtx-traverse expr #f #f 0
-		 (tstate-make context owner expr-fn (rtx-env-empty-stack)
+		 (tstate-make context owner expr-fn
+			      #f ;; ok since EXPR is fully canonical
+			      (rtx-env-empty-stack)
 			      #f nil 0)
 		 appstuff)
 )
@@ -1829,6 +1853,7 @@
 (define (rtx-traverse-with-locals context owner expr expr-fn locals appstuff)
   (/rtx-traverse expr #f #f 0
 		 (tstate-make context owner expr-fn
+			      #f ;; ok since EXPR is fully canonical
 			      (rtx-env-push (rtx-env-empty-stack)
 					    (rtx-env-make-locals locals))
 			      #f nil 0)
@@ -1909,8 +1934,16 @@
 		; In time things should be simplified.
 		(expr-fn . #f)
 
-		; Current environment.  This is a stack of sequence locals.
-		(env . ())
+		; List of ISA name(s) in which to evaluate the expression.
+		; This is used for example during operand lookups.
+		; All specified ISAs must be compatible,
+		; e.g. operand lookups must be unambiguous.
+		; A value of #f means "all ISAs".
+		(isas . #f)
+
+		; Current environment.  This is a stack of sequence locals,
+		; e.g. made with rtx-env-init-stack1.
+		(env-stack . ())
 
 		; Current evaluation depth.  This is used, for example, to
 		; control indentation in generated output.
@@ -1946,8 +1979,10 @@
 	      (elm-set! self 'outer-expr (cadr args)))
 	     ((#:expr-fn)
 	      (elm-set! self 'expr-fn (cadr args)))
-	     ((#:env)
-	      (elm-set! self 'env (cadr args)))
+	     ((#:env-stack)
+	      (elm-set! self 'env-stack (cadr args)))
+	     ((#:isas)
+	      (elm-set! self 'isas (cadr args)))
 	     ((#:depth)
 	      (elm-set! self 'depth (cadr args)))
 	     ((#:modifiers)
@@ -1962,10 +1997,10 @@
 ; Accessors.
 
 (define-getters <eval-state> estate
-  (context owner outer-expr expr-fn env depth modifiers)
+  (context owner outer-expr expr-fn isas env-stack depth modifiers)
 )
 (define-setters <eval-state> estate
-  (env depth modifiers)
+  (isas env-stack depth modifiers)
 )
 
 ; Build an estate for use in producing a value from rtl.
@@ -1977,7 +2012,8 @@
 	 #:context context
 	 #:owner owner
 	 #:expr-fn (lambda (rtx-obj expr mode estate)
-		     (rtx-evaluator rtx-obj)))
+		     (rtx-evaluator rtx-obj))
+	 #:isas (and owner (obj-isa-list owner)))
 )
 
 ; Create a copy of ESTATE.
@@ -1986,11 +2022,13 @@
   (object-copy-top estate)
 )
 
-; Create a copy of ESTATE with a new environment ENV.
+;; Create a copy of ESTATE with environment stack ENV-STACK added,
+;; and the ISA(s) set to ISA-NAME-LIST.
 
-(define (estate-new-env estate env)
+(define (estate-make-closure estate isa-name-list env-stack)
   (let ((result (estate-copy estate)))
-    (estate-set-env! result env)
+    (estate-set-isas! result isa-name-list)
+    (estate-set-env-stack! result (append env-stack (estate-env-stack result)))
     result)
 )
 
@@ -2001,7 +2039,7 @@
 
 (define (estate-push-env estate env)
   (let ((result (estate-copy estate)))
-    (estate-set-env! result (cons env (estate-env result)))
+    (estate-set-env-stack! result (cons env (estate-env-stack result)))
     result)
 )
 
@@ -2026,7 +2064,7 @@
 (define (tstate->estate t)
   (vmake <eval-state>
 	 #:context (tstate-context t)
-	 #:env (tstate-env t))
+	 #:env-stack (tstate-env-stack t))
 )
 
 ; Issue an error given an estate.
@@ -2070,7 +2108,7 @@
 	(newline)
 	(display (rtx-dump expr))
 	(newline)
-	(rtx-env-dump (estate-env estate))
+	(rtx-env-stack-dump (estate-env-stack estate))
 	))
 
   (if (pair? expr) ; pair? -> cheap non-null-list?
@@ -2099,8 +2137,9 @@
 
 ; Evaluate rtx expression EXPR and return the computed value.
 ; EXPR must already be in canonical form (the result of rtx-canonicalize).
-; OWNER is the owner of the value, used for attribute computation,
-; or #f if there isn't one.
+; OWNER is the owner of the value, used for attribute computation
+; and to get the ISA name list.
+; OWNER is #f if there isn't one.
 ; FIXME: context?
 
 (define (rtx-value expr owner)

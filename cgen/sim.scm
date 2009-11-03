@@ -527,10 +527,12 @@
 	       (expr (cadr getter)))
 	   (gen-get-macro (gen-sym self)
 			  (if (hw-scalar? self) "" "index")
-			  (rtl-c mode expr
+			  (rtl-c mode
+				 #f ;; h/w is not ISA-specific
 				 (if (hw-scalar? self)
 				     nil
 				     (list (list (car args) 'UINT "index")))
+				 expr
 				 #:rtl-cover-fns? #t)))
 	 (send self 'gen-sym-get-macro
 	       (obj:name self) (obj:comment self)))))
@@ -549,12 +551,13 @@
 			       ""
 			       "index")
 			   "x"
-			   (rtl-c VOID ; not `mode', sets have mode VOID
-				  expr
+			   (rtl-c VOID ;; not `mode', sets have mode VOID
+				  #f ;; h/w is not ISA-specific
 				  (if (hw-scalar? self)
 				      (list (list (car args) (hw-mode self) "(x)"))
 				      (list (list (car args) 'UINT "(index)")
 					    (list (cadr args) (hw-mode self) "(x)")))
+				  expr
 				  #:rtl-cover-fns? #t #:macro? #t)))
 	 (send self 'gen-sym-set-macro
 	       (obj:name self) (obj:comment self)))))
@@ -954,7 +957,7 @@
 ; Generate C code for SEL.
 
 (define (/gen-hw-selector sel)
-  (rtl-c 'INT sel nil)
+  (rtl-c INT #f nil sel)
 )
 
 ; Instruction operand support code.
@@ -1003,7 +1006,7 @@
  <pc> 'cxmake-skip
  (lambda (self estate yes?)
    (send (op:type self) 'cxmake-skip estate
-	 (rtl-c INT yes? nil #:rtl-cover-fns? #t)))
+	 (rtl-c INT (obj-isa-list self) nil yes? #:rtl-cover-fns? #t)))
 )
 
 ; For parallel write post-processing, we don't want to defer setting the pc.
@@ -1028,7 +1031,7 @@
 ; For operands, the word `read' is only used in this context.
 
 (define (op:read op sfmt)
-  (let ((estate (estate-make-for-rtl-c nil nil)))
+  (let ((estate (estate-make-for-rtl-c nil)))
     (send op 'gen-read estate sfmt /par-operand-macro))
 )
 
@@ -1039,7 +1042,7 @@
 ; For operands, the word `write' is only used in this context.
 
 (define (op:write op sfmt)
-  (let ((estate (estate-make-for-rtl-c nil nil)))
+  (let ((estate (estate-make-for-rtl-c nil)))
     (send op 'gen-write estate sfmt /par-operand-macro))
 )
 
@@ -1111,10 +1114,12 @@
 	   ((op:getter self)
 	    (let ((args (car (op:getter self)))
 		  (expr (cadr (op:getter self))))
-	      (rtl-c-expr mode expr
+	      (rtl-c-expr mode
+			  (obj-isa-list self)
 			  (if (= (length args) 0)
 			      nil
 			      (list (list (car args) 'UINT index)))
+			  expr
 			  #:rtl-cover-fns? #t)))
 	   (else
 	    (send (op:type self) 'cxmake-get estate mode index selector)))))
@@ -1198,11 +1203,13 @@
    (if (op:setter op)
        (let ((args (car (op:setter op)))
 	     (expr (cadr (op:setter op))))
-	 (rtl-c 'VOID expr
+	 (rtl-c VOID
+		(obj-isa-list op)
 		(if (= (length args) 0)
 		    (list (list 'newval mode "opval"))
 		    (list (list (car args) 'UINT index)
 			  (list 'newval mode "opval")))
+		expr
 		#:rtl-cover-fns? #t))
        ;else
        (send (op:type op) 'gen-set-quiet estate mode index selector
@@ -1338,7 +1345,7 @@
 ; smart enough to know there is no need.
 
 (define (op:record-profile op sfmt out?)
-  (let ((estate (estate-make-for-rtl-c nil nil)))
+  (let ((estate (estate-make-for-rtl-c nil)))
     (send op 'gen-record-profile sfmt out? estate))
 )
 
@@ -2089,7 +2096,7 @@ struct scache {
 	(set! /sim-insns-analyzed? #t)))
 
   ; Do our own error checking.
-  (assert (current-insn-lookup 'x-invalid))
+  (assert (current-insn-lookup 'x-invalid #f))
 
   *UNSPECIFIED*
 )

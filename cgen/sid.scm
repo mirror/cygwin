@@ -876,7 +876,7 @@
 ; Generate C code for SEL.
 
 (define (/gen-hw-selector sel)
-  (rtl-c++ 'INT sel nil)
+  (rtl-c++ INT #f nil sel)
 )
 
 ; Instruction operand support code.
@@ -925,7 +925,7 @@
  <pc> 'cxmake-skip
  (lambda (self estate yes?)
    (send (op:type self) 'cxmake-skip estate
-	 (rtl-c++ INT yes? nil #:rtl-cover-fns? #t)))
+	 (rtl-c++ INT (obj-isa-list self) nil yes? #:rtl-cover-fns? #t)))
 )
 
 ; Default gen-read method.
@@ -997,9 +997,11 @@
 			 (getter
 			  (let ((args (car getter))
 				(expr (cadr getter)))
-			    (rtl-c-expr mode expr
+			    (rtl-c-expr mode
+					(obj-isa-list self)
 					(if (= (length args) 0) nil
 					    (list (list (car args) 'UINT index)))
+					expr
 					#:rtl-cover-fns? #t
 					#:output-language (estate-output-language estate))))
 			 (else
@@ -1078,11 +1080,13 @@
    (if (op:setter op)
        (let ((args (car (op:setter op)))
 	     (expr (cadr (op:setter op))))
-	 (rtl-c 'VOID expr
+	 (rtl-c 'VOID
+		(obj-isa-list op)
 		(if (= (length args) 0)
 		    (list (list 'newval mode "opval"))
 		    (list (list (car args) 'UINT index)
 			  (list 'newval mode "opval")))
+		expr
 		#:rtl-cover-fns? #t
 		#:output-language (estate-output-language estate)))
        ;else
@@ -1805,7 +1809,10 @@
     pbb_br_status = BRANCH_UNTAKEN;
     UINT cond_code = abuf->cond;
     BI exec_p = "
-    (rtl-c++ DFLT (cadr (isa-condition isa)) '((cond-code UINT "cond_code"))
+    (rtl-c++ DFLT
+	     (list (obj:name isa))
+	     '((cond-code UINT "cond_code"))
+	     (cadr (isa-condition isa))
 	     #:rtl-cover-fns? #t)
     ";
     if (! exec_p)
@@ -2007,7 +2014,7 @@
 	))
 
   ; Do our own error checking.
-  (assert (current-insn-lookup 'x-invalid))
+  (assert (current-insn-lookup 'x-invalid #f))
 
   *UNSPECIFIED*
 )

@@ -310,7 +310,7 @@
 		     (obj:comment insn)
 		     (obj-atlist insn)
 		     (/anyof-merge-syntax (insn-syntax insn)
-					  value-names new-values)
+					  value-names new-values insn)
 		     ifields
 		     (insn-ifield-assertion insn) ; FIXME
 		     (anyof-merge-semantics (insn-semantics insn)
@@ -401,14 +401,20 @@
   (let* ((name (parse-name context name))
 	 (context (context-append-name context name))
 	 (atlist-obj (atlist-parse context attrs "cgen_insn"))
-	 (isas (atlist-attr-value atlist-obj 'ISA #f)))
+	 (isa-name-list (atlist-attr-value atlist-obj 'ISA #f)))
+
+    ;; Verify all specified ISAs are valid.
+    (if (not (all-true? (map current-isa-lookup isa-name-list)))
+	(parse-error context "unknown isa in isa list" isa-name-list))
 
     (if (keep-atlist? atlist-obj #f)
 
 	(let ((ifield-assertion (if (and ifield-assertion
 					 (not (null? ifield-assertion)))
-				    (rtx-canonicalize context 'DFLT ;; BI?
-						      ifield-assertion nil)
+				    (rtx-canonicalize context
+						      'DFLT ;; BI?
+						      isa-name-list nil
+						      ifield-assertion)
 				    #f))
 	      (semantics (if (not (null? semantics))
 			     semantics
@@ -417,11 +423,7 @@
 		       (context-append context " format")
 		       (and (not (atlist-has-attr? atlist-obj 'VIRTUAL))
 			    (reader-verify-iformat? CURRENT-READER))
-		       ;; Just pick the first, the base len
-		       ;; for each should be the same.
-		       ;; If not this is caught by
-		       ;; compute-insn-base-mask-length.
-		       (current-isa-lookup (car isas))
+		       isa-name-list
 		       fmt))
 	      (comment (parse-comment context comment))
 	      ; If there are no semantics, mark this as an alias.
@@ -542,9 +544,9 @@
 
 ; Subroutine of /parse-insn-format to parse a symbol ifield spec.
 
-(define (/parse-insn-format-symbol context sym)
+(define (/parse-insn-format-symbol context isa-name-list sym)
   ;(debug-repl-env sym)
-  (let ((op (current-op-lookup sym)))
+  (let ((op (current-op-lookup sym isa-name-list)))
     (if op
 	(cond ((derived-operand? op)
 	       ; There is a one-to-one relationship b/w derived operands and
@@ -600,8 +602,8 @@
 ; ??? There is room for growth in the specification syntax here.
 ; Possibilities are (ifield-name|operand-name [options] [value]).
 
-(define (/parse-insn-format-list context spec)
-  (let ((ifld (current-ifld-lookup (car spec))))
+(define (/parse-insn-format-list context isa-name-list spec)
+  (let ((ifld (current-ifld-lookup (car spec) isa-name-list)))
     (if ifld
 	(/parse-insn-format-ifield-spec context ifld spec)
 	(parse-error context "unknown ifield" spec)))
@@ -609,8 +611,9 @@
 
 ; Subroutine of /parse-insn-format to simplify it.
 ; Parse the provided iformat spec and return the list of ifields.
+; ISA-NAME-lIST is the ISA attribute of the containing insn.
 
-(define (/parse-insn-iformat-iflds context fld-list)
+(define (/parse-insn-iformat-iflds context isa-name-list fld-list)
   (if (null? fld-list)
       nil ; field list unspecified
       (case (car fld-list)
@@ -619,12 +622,12 @@
 				 (string->symbol fld)
 				 fld)))
 		      (cond ((symbol? f)
-			     (/parse-insn-format-symbol context f))
+			     (/parse-insn-format-symbol context isa-name-list f))
 			    ((and (list? f)
 				  ; ??? This use to allow <ifield> objects
 				  ; in the `car' position.  Checked for below.
 				  (symbol? (car f)))
-			     (/parse-insn-format-list context f))
+			     (/parse-insn-format-list context isa-name-list f))
 			    (else
 			     (if (and (list? f)
 				      (ifield? (car f)))
@@ -637,7 +640,7 @@
 		   (parse-error context
 				"bad `=' format spec, should be `(= insn-name)'"
 				fld-list))
-	       (let ((insn (current-insn-lookup (cadr fld-list))))
+	       (let ((insn (current-insn-lookup (cadr fld-list) isa-name-list)))
 		 (if (not insn)
 		     (parse-error context "unknown insn" (cadr fld-list)))
 		 (insn-iflds insn))))
@@ -648,9 +651,8 @@
 
 ; Given an insn format field from a .cpu file, replace it with a list of
 ; ifield objects with the values assigned.
-; ISA is an <isa> object or #f.
-; If VERIFY? is non-#f, perform various checks on the format
-; (ISA must be an <isa> object).
+; ISA-NAME-LIST is the ISA attribute of the containing insn.
+; If VERIFY? is non-#f, perform various checks on the format.
 ;
 ; An insn format field is a list of ifields that make up the instruction.
 ; All bits must be specified, including reserved bits
@@ -679,8 +681,9 @@
 ; It's called for each instruction, and is one of the more expensive routines
 ; in insn parsing.
 
-(define (/parse-insn-format context verify? isa ifld-list)
-  (let* ((parsed-ifld-list (/parse-insn-iformat-iflds context ifld-list)))
+(define (/parse-insn-format context verify? isa-name-list ifld-list)
+  (let* ((parsed-ifld-list
+	  (/parse-insn-iformat-iflds context isa-name-list ifld-list)))
 
     ;; NOTE: We could sort the fields here, but it introduces differences
     ;; in the generated opcodes files.  Later it might be a good thing to do
@@ -693,14 +696,17 @@
 
     (if verify?
 
-	(let ((base-len (isa-base-insn-bitsize isa))
-	      (pretty-print-iflds (lambda (iflds)
-				    (if (null? iflds)
-					" none provided"
-					(string-map (lambda (f)
-						      (string-append " "
-								     (ifld-pretty-print f)))
-						    iflds)))))
+	;; Just pick the first ISA, the base len for each should be the same.
+	;; If not this is caught by compute-insn-base-mask-length.
+	(let* ((isa (current-isa-lookup (car isa-name-list)))
+	       (base-len (isa-base-insn-bitsize isa))
+	       (pretty-print-iflds (lambda (iflds)
+				     (if (null? iflds)
+					 " none provided"
+					 (string-map (lambda (f)
+						       (string-append " "
+								      (ifld-pretty-print f)))
+						     iflds)))))
 
 	  ;; Perform some error checking.
 	  ;; Look for overlapping ifields and missing bits.
@@ -989,7 +995,7 @@
 ; Create a list of syntax strings broken up into a list of characters and
 ; operand objects.
 
-(define (syntax-break-out syntax)
+(define (syntax-break-out syntax isa-name-list)
   (let ((result nil))
     ; ??? The style of the following could be more Scheme-like.  Later.
     (let loop ()
@@ -1011,13 +1017,15 @@
 		  (let ((n (string-index syntax #\})))
 		    (set! result (cons (current-op-lookup
 					(string->symbol
-					 (substring syntax 2 n)))
+					 (substring syntax 2 n))
+					isa-name-list)
 				       result))
 		    (set! syntax (string-drop (+ 1 n) syntax)))
 		  (let ((n (id-len (string-drop1 syntax))))
 		    (set! result (cons (current-op-lookup
 					(string->symbol
-					 (substring syntax 1 (+ 1 n))))
+					 (substring syntax 1 (+ 1 n)))
+					isa-name-list)
 				       result))
 		    (set! syntax (string-drop (+ 1 n) syntax)))))
 	     ; Handle everything else.

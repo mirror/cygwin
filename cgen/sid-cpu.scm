@@ -111,7 +111,6 @@ namespace @arch@ {
 	(name (obj:name hw))
 	(getter (hw-getter hw))
 	(setter (hw-setter hw))
-	(isas (obj-attr-value hw 'ISA))
 	(type (gen-type hw)))
     (let ((get-code (if getter
 			(let ((mode (hw-mode hw))
@@ -119,10 +118,12 @@ namespace @arch@ {
 			      (expr (cadr getter)))
 			  (string-append
 			   "return "
-			   (rtl-c++ mode expr
+			   (rtl-c++ mode
+				    #f ;; h/w is not ISA-specific
 				    (if scalar?
 					nil
 					(list (list (car args) 'UINT "regno")))
+				    expr
 				    #:rtl-cover-fns? #t)
 			   ";"))
 			(string-append
@@ -135,11 +136,12 @@ namespace @arch@ {
 			      (expr (cadr setter)))
 			  (rtl-c++
 			   VOID ; not `mode', sets have mode VOID
-			   expr
+			   #f ;; h/w is not ISA-specific
 			   (if scalar?
 			       (list (list (car args) (hw-mode hw) "newval"))
 			       (list (list (car args) 'UINT "regno")
 				     (list (cadr args) (hw-mode hw) "newval")))
+			   expr
 			   #:rtl-cover-fns? #t))
 			(string-append
 			 "this->hardware."
@@ -704,26 +706,22 @@ using namespace cgen;
 ; Return C code to perform the semantics of INSN.
 
 (define (gen-semantic-code insn)
-  ; Indicate generating code for INSN.
-  ; Use the canonical form if available.
-  ; The case when they're not available is for virtual insns. (??? Still true?)
   (cond ((insn-compiled-semantics insn)
 	 => (lambda (sem)
-	      (rtl-c++-parsed VOID sem nil
+	      (rtl-c++-parsed VOID sem
 			      #:for-insn? #t
 			      #:rtl-cover-fns? #t
 			      #:owner insn)))
 	((insn-canonical-semantics insn)
 	 => (lambda (sem)
-	      (rtl-c++-parsed VOID sem nil
+	      (rtl-c++-parsed VOID sem
 			      #:for-insn? #t
 			      #:rtl-cover-fns? #t
 			      #:owner insn)))
 	(else
-	 (rtl-c++ VOID (insn-semantics insn) nil
-		  #:for-insn? #t
-		  #:rtl-cover-fns? #t
-		  #:owner insn)))
+	 (context-error (make-obj-context insn #f)
+			"While generating semantic code"
+			"semantics of insn are not canonicalized")))
 )
 
 ; Return definition of C function to perform INSN.
@@ -894,7 +892,8 @@ using namespace @prefix@; // FIXME: namespace organization still wip\n"))
 	      (isa-setup-semantics (current-isa)))
 	 (string-append
 	  "      "
-	  (rtl-c++ VOID (isa-setup-semantics (current-isa)) nil
+	  (rtl-c++ VOID (obj-isa-list insn) nil
+		   (isa-setup-semantics (current-isa))
 		   #:for-insn? #t
 		   #:rtl-cover-fns? #t
 		   #:owner insn))
@@ -1115,27 +1114,20 @@ struct @prefix@_pbb_label {
 ; Each element is (symbol <mode> "c-var-name").
 
 (define (/gen-sfrag-code frag locals)
-  ; Indicate generating code for FRAG.
-  ; Use the compiled form if available.
-  ; The case when they're not available is for virtual insns.
-  (let ((sem (sfrag-compiled-semantics frag))
+  (let ((sem (sfrag-semantics frag))
 	; If the frag has one owner, use it.  Otherwise indicate the owner is
 	; unknown.  In cases where the owner is needed by the semantics, the
 	; frag should have only one owner.  In practice this means that frags
 	; with the ref,current-insn rtx cannot be used by multiple insns.
 	(owner (if (= (length (sfrag-users frag)) 1)
 		   (car (sfrag-users frag))
-		   #f))
-	)
-    (if sem
-	(rtl-c++-parsed VOID sem locals
-			#:for-insn? #t
-			#:rtl-cover-fns? #t
-			#:owner owner)
-	(rtl-c++ VOID (sfrag-semantics frag) locals
-		 #:for-insn? #t
-		 #:rtl-cover-fns? #t
-		 #:owner owner)))
+		   #f)))
+    ;; NOTE: (sfrag-users frag) is nil for the x-header and x-trailer frags.
+    ;; They are just nops.
+    (rtl-c++ VOID (and owner (obj-isa-list owner)) locals sem
+	     #:for-insn? #t
+	     #:rtl-cover-fns? #t
+	     #:owner owner))
 )
 
 ; Generate a switch case to perform FRAG.
@@ -1189,7 +1181,8 @@ struct @prefix@_pbb_label {
 	      (isa-setup-semantics (current-isa)))
 	 (string-append
 	  "      "
-	  (rtl-c++ VOID (isa-setup-semantics (current-isa)) nil
+	  (rtl-c++ VOID (list (obj:name (current-isa))) nil
+		   (isa-setup-semantics (current-isa))
 		   #:rtl-cover-fns? #t
 		   #:owner #f))
 	 "")

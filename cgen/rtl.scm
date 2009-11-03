@@ -66,7 +66,8 @@
 		; CASERTX - a case expression ((symbol .. symbol) rtx ... rtx)
 		; LOCALS - the locals list of a sequence
 		; ITERATION - the iteration 
-		; ENV - environment stack
+		; SYMBOLLIST - used for ISA name lists
+		; ENVSTACK - environment stack
 		; ATTRS - attribute list
 		; SYMBOL - arg must be a symbol
 		; STRING - arg must be a string
@@ -165,7 +166,8 @@
    '(OPTIONS)
     /rtx-valid-mode-types
     '(RTX SETRTX TESTRTX CONDRTX CASERTX)
-    '(LOCALS ENV ATTRS SYMBOL STRING NUMBER SYMORNUM OBJECT)
+    '(LOCALS ITERATION SYMBOLLIST ENVSTACK ATTRS)
+    '(SYMBOL STRING NUMBER SYMORNUM OBJECT)
     )
 )
 
@@ -436,7 +438,7 @@
 (define (rtx-lvalue-mode-name estate x)
   (assert (rtx? x))
   (case (car x)
-;    ((operand) (obj:name (op:mode (current-op-lookup (cadr x)))))
+;    ((operand) (obj:name (op:mode (current-op-lookup (cadr x) (obj-isa-list (estate-owner estate))))))
     ((xop) (obj:name (send (rtx-xop-obj x) 'get-mode)))
 ;    ((opspec)
 ;     (if (eq? (rtx-opspec-mode x) 'VOID)
@@ -445,7 +447,7 @@
 ;    ((reg mem) (cadr x))
     ((local) ;; (local options mode name)
      (let* ((name (cadddr x))
-	    (temp (rtx-temp-lookup (estate-env estate) name)))
+	    (temp (rtx-temp-lookup (estate-env-stack estate) name)))
        (if (not temp)
 	   (estate-error estate "unknown local" name))
        (obj:name (rtx-temp-mode temp))))
@@ -530,7 +532,6 @@
 
 (define (rtx-env-stack-empty? env-stack) (null? env-stack))
 (define (rtx-env-stack-head env-stack) (car env-stack))
-(define (rtx-env-var-list env) env)
 (define (rtx-env-empty-stack) nil)
 (define (rtx-env-init-stack1 vars-alist)
   (if (null? vars-alist)
@@ -539,18 +540,23 @@
 )
 (define (rtx-env-empty? env) (null? env))
 
-; Create an initial environment.
-; VAR-LIST is a list of (name <mode>-or-mode-name value) elements.
+;; Create an environment from VAR-ALIST,
+;; an alist of (name <mode>-or-mode-name value) elements,
+;; or, in the case of /rtx-closure-make, a list of (name . <rtx-temp>).
 
-(define (rtx-env-make var-list)
-  ; Convert VAR-LIST to an associative list of <rtx-temp> objects.
-  (map (lambda (var-spec)
-	 (cons (car var-spec)
-	       (make <rtx-temp>
-		 (car var-spec)
-		 (mode-maybe-lookup (cadr var-spec))
-		 (caddr var-spec))))
-       var-list)
+(define (rtx-env-make var-alist)
+  ;; Check for an already-compiled environment, for /rtx-closure-make's sake.
+  (if (and (pair? var-alist)
+	   (rtx-temp? (cdar var-alist)))
+      var-alist
+      ;; Convert VAR-ALIST to an associative list of <rtx-temp> objects.
+      (map (lambda (var-spec)
+	     (cons (car var-spec)
+		   (make <rtx-temp>
+		     (car var-spec)
+		     (mode-maybe-lookup (cadr var-spec))
+		     (caddr var-spec))))
+	   var-alist))
 )
 
 ; Create an initial environment with local variables.
@@ -581,6 +587,28 @@
 			     (list 'INT (rtx-make-iteration-limit-var iter-var))))
 )
 
+;; Convert an alist of (name <mode>-object-or-name value) to
+;; an environment.
+
+(define (rtx-var-alist-to-env var-alist) var-alist)
+
+;; Convert an alist of (name <mode>-object-or-name value) to
+;; an environment stack.
+
+(define (rtx-var-alist-to-closure-env-stack var-alist)
+  ;; Preserve emptiness so (null? env-stack) works.
+  (if (null? var-alist)
+      nil
+      (list var-alist))
+)
+
+;; Convert the source form of an env-stack, e.g. as used in a closure,
+;; to the internal form, which is (name <rtx-temp>-object).
+
+(define (rtx-make-env-stack closure-env-stack)
+  (map rtx-env-make closure-env-stack)
+)
+
 ; Push environment ENV onto the front of environment stack ENV-STACK,
 ; returning a new object.  ENV-STACK is not modified.
 
@@ -588,12 +616,11 @@
   (cons env env-stack)
 )
 
-; Lookup variable NAME in environment ENV.
+; Lookup variable NAME in environment stack ENV-STACK.
 ; The result is the <rtx-temp> object.
-; ??? Should environments only have rtx-temps?
 
-(define (rtx-temp-lookup env name)
-  (let loop ((stack (rtx-env-var-list env)))
+(define (rtx-temp-lookup env-stack name)
+  (let loop ((stack env-stack))
     (if (null? stack)
 	#f
 	(let ((temp (assq-ref (car stack) name)))
@@ -602,14 +629,17 @@
 	      (loop (cdr stack))))))
 )
 
-; Create a "closure" of EXPR using the current temp stack.
+; Create a "closure" of EXPR using the current ISA list and temp stack.
+; MODE is the mode name.
 
 (define (/rtx-closure-make estate mode expr)
-  (rtx-make 'closure mode expr (estate-env estate))
+  ;; NOTE: This records the "compiled" environment stack in the closure.
+  (rtx-make 'closure mode (estate-isas estate) (estate-env-stack estate)
+	    expr)
 )
 
-(define (rtx-env-dump env)
-  (let ((stack env))
+(define (rtx-env-stack-dump env-stack)
+  (let ((stack env-stack))
     (if (rtx-env-stack-empty? stack)
 	(display "rtx-env stack (empty):\n")
 	(let loop ((stack stack) (level 0))
@@ -709,7 +739,7 @@
 (define (rtx-ifield-obj rtx)
   (let ((ifield (rtx-arg1 rtx)))
     (if (symbol? ifield)
-	(current-ifield-lookup ifield)
+	(current-ifld-lookup ifield)
 	ifield))
 )
 
@@ -726,19 +756,22 @@
 	(obj:name operand)))
 )
 
-;; Given an operand rtx, construct the <operand> object.
+;; Given an operand rtx, return the <operand> object.
 ;; RTX must be canonical rtl.
+;; ISA-NAME-LIST is the list of ISAs to look the operand up in.
+;;
+;; NOTE: op:mode-name can be DFLT, which means use the mode of the type.
+;; It is up to the caller to deal with it.
 
-(define (rtx-operand-obj rtx)
-  (let ((op (current-op-lookup (rtx-arg1 rtx)))
-	(mode (rtx-mode rtx)))
+(define (rtx-operand-obj rtx isa-name-list)
+  (let ((op (current-op-lookup (rtx-arg1 rtx) isa-name-list))
+	(mode-name (rtx-mode rtx)))
     (assert op)
-    (assert (not (eq? mode 'DFLT)))
-    ;; NOTE: op:mode-name can be DFLT, which means use the mode of the type.
-    ;; But we can't propagate DFLT here, in canonical rtl DFLT is not allowed.
-    (if (mode:eq? (op:mode-name op) mode)
-	op
-	(op:new-mode op mode)))
+    (assert (not (eq? mode-name 'DFLT)))
+    ;; Ensure requested mode is supported by the hardware.
+    ;; rtx-canonicalize should have verified this already (I think).
+    (assert (hw-mode-ok? (op:type op) mode-name (op:index op)))
+    op)
 )
 
 (define (rtx-make-local mode-name local-name)
@@ -802,7 +835,7 @@
 (define (rtx-sequence-exprs rtx) (cddddr rtx))
 
 ; Same as rtx-sequence-locals except return in assq'able form.
-; ??? Sometimes I should it should have been (sequence ((name MODE)) ...)
+; ??? Sometimes I think it should have been (sequence ((name MODE)) ...)
 ; instead of (sequence ((MODE name)) ...) from the beginning, sigh.
 
 (define (rtx-sequence-assq-locals rtx)
@@ -811,6 +844,10 @@
 	   (list (cadr local) (car local)))
 	 locals))
 )
+
+(define (rtx-closure-isas rtx) (list-ref rtx 3))
+(define (rtx-closure-env-stack rtx) (list-ref rtx 4))
+(define (rtx-closure-expr rtx) (list-ref rtx 5))
 
 ; Return a semi-pretty string describing RTX.
 ; This is used by hw to include the index in the element's name.
@@ -986,19 +1023,15 @@
 ; HW-NAME/MODE-NAME/SELECTOR/INDEX-ARG.
 ;
 ; HW-NAME is the name of the hardware element.
+; MODE-NAME is the name of the mode.
 ; INDEX-ARG is an rtx or number of the index.
 ; In the case of scalar hardware elements, pass 0 for INDEX-ARG.
-; MODE-NAME is the name of the mode.
 ; In the case of a vector of registers, INDEX-ARG is the vector index.
-; In the case of a scalar register, the value is ignored, but pass 0 (??? #f?).
 ; SELECTOR is an rtx or number and is passed to HW-NAME to allow selection of a
 ; particular variant of the hardware.  It's kind of like an INDEX, but along
 ; an atypical axis.  An example is memory ASI's on Sparc.  Pass
 ; hw-selector-default if there is no selector.
 ; ESTATE is the current rtx evaluation state.
-;
-; e.g. (hw estate WI h-gr #f (const INT 14))
-; selects register 14 of the h-gr set of registers.
 ;
 ; *** The index is passed unevaluated because for parallel execution support
 ; *** a variable is created with a name based on the hardware element and
@@ -1043,13 +1076,6 @@
 		 (cond ((number? index-arg)
 			(make <hw-index> 'anonymous 'constant UINT index-arg))
 		       ((rtx? index-arg)
-			; For the simulator the following could be done which
-			; would save having to create a closure.
-			; ??? Old code, left in for now.
-			; (rtx-get estate DFLT
-			;          (rtx-eval (estate-context estate)
-			;                    (estate-econfig estate)
-			;                    index-arg rtx-evaluator))
 			; Make sure constant indices are recorded as such.
 			(if (rtx-constant? index-arg)
 			    (make <hw-index> 'anonymous 'constant UINT

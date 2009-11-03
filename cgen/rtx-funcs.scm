@@ -1125,7 +1125,6 @@
 
 ; This has to be a syntax node to handle locals properly: they're not defined
 ; yet and thus pre-evaluating the expressions doesn't work.
-; ??? This should create a closure.
 
 (drsn (sequence &options &mode locals expr . exprs)
      #f
@@ -1145,11 +1144,13 @@
 )
 
 ; Internal rtx to create a closure.
-; Internal, so it does not appear in rtl.texi.
+; Internal, so it does not appear in rtl.texi (at least not yet).
+; ??? Maybe closures shouldn't be separate from sequences,
+; but I'm less convinced these days.
 
-(drsn (closure &options &mode expr env)
+(drsn (closure &options &mode isa-name-list env-stack expr)
      #f
-      (OPTIONS VOIDORNUMMODE RTX ENV) (NA NA MATCHEXPR NA)
+      (OPTIONS VOIDORNUMMODE SYMBOLLIST ENVSTACK RTX) (NA NA NA NA MATCHEXPR)
       MISC
       #f
 )

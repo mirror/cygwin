@@ -736,8 +736,10 @@
 ; isa.
 
 (define (keep-isa? isa-list)
+  ;; If unspecified, the default is the first one in the list.
   (if (null? isa-list)
       (set! isa-list (list (car (current-arch-isa-name-list)))))
+
   (let* ((keep (reader-keep-isa CURRENT-READER))
 	 (keep? (map (lambda (i)
 		       (or (memq i keep)

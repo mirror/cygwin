@@ -20,7 +20,8 @@
 (define (sim-test-analyze!)
   (opcodes-analyze!)
   (map (lambda
-	   (insn) (elm-xset! insn 'tmp (syntax-break-out (insn-syntax insn))))
+	   (insn) (elm-xset! insn 'tmp (syntax-break-out (insn-syntax insn)
+							 (obj-isa-list insn))))
        (current-insn-list))
   *UNSPECIFIED*
 )

@@ -75,8 +75,10 @@
 ; Adds COND-CTI/UNCOND-CTI to SEM-ATTRS if the operand is a set of the pc.
 
 (define (/build-operand! op-expr tstate ref-type op-list sem-attrs)
-  (let* ((op (rtx-operand-obj op-expr))
+  (let* ((orig-op (rtx-operand-obj op-expr (obj-isa-list (tstate-owner tstate))))
 	 (mode (rtx-mode op-expr))
+	 ;; We need a copy as we'll be modifying it.
+	 (op (op:new-mode orig-op mode))
 	 ;; The first #f is a placeholder for the object.
 	 (try (list '-op- #f mode (rtx-arg1 op-expr) #f))
 	 (existing-op (/rtx-find-op try op-list)))
@@ -208,7 +210,8 @@
 		   "only `(index-of operand)' is currently supported"
 		   expr))
 
-  (let ((op (rtx-operand-obj (rtx-index-of-value expr))))
+  (let ((op (rtx-operand-obj (rtx-index-of-value expr)
+			     (obj-isa-list (tstate-owner tstate)))))
     (let ((indx (op:index op)))
       (if (not (eq? (hw-index:type indx) 'ifield))
 	  (parse-error (tstate-context tstate)
@@ -278,8 +281,7 @@
 (define (csem-outputs csem) (vector-ref csem 2))
 (define (csem-attrs csem) (vector-ref csem 3))
 
-; Traverse each element in SEM-CODE, converting them to canonical form,
-; and computing the input and output operands.
+; Traverse SEM-CODE, computing the input and output operands.
 ; The result is an object of four elements (built with csem-make).
 ; The first is a list of the canonical form of each element in SEM-CODE:
 ; operand and ifield elements specified without `operand' or `ifield' have it
@@ -298,6 +300,7 @@
 ;
 ; CONTEXT is a <context> object or #f if there is none.
 ; INSN is the <insn> object.
+; SEM-CODE must be canonicalized rtl.
 ;
 ; ??? Specifying operand ordinals in the source would simplify this and speed
 ; it up.  On the other hand that makes the source form more complex.  Maybe the

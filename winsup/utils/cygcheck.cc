@@ -63,7 +63,7 @@ void dump_dodgy_apps (int verbose);
 /* Forward declaration */
 static void usage (FILE *, int);
 
-static const char version[] = "$Revision: 1.121 $";
+static const char version[] = "$Revision: 1.122 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -2270,6 +2270,7 @@ nuke (char *ev)
 
 extern "C" {
 unsigned long (*cygwin_internal) (int, ...);
+WCHAR cygwin_dll_path[32768];
 };
 
 static void
@@ -2279,6 +2280,7 @@ load_cygwin (int& argc, char **&argv)
 
   if (!(h = LoadLibrary ("cygwin1.dll")))
     return;
+  GetModuleFileNameW (h, cygwin_dll_path, 32768);
   if ((cygwin_internal = (DWORD (*) (int, ...)) GetProcAddress (h, "cygwin_internal")))
     {
       char **av = (char **) cygwin_internal (CW_ARGV);

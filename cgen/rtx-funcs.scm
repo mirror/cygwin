@@ -47,7 +47,7 @@
 
 (drn (enum &options &mode enum-name)
      #f
-     (OPTIONS ANYINTMODE SYMBOL) (NA NA NA) ;; FIXME: s/SYMBOL/ENUM-NAME/ ?
+     (OPTIONS ANYINTMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/ENUM-NAME/ ?
      ARG
      ; When computing a value, return the enum's value.
      (enum-lookup-val enum-name)
@@ -61,7 +61,7 @@
 
 (dron (ifield &options &mode ifld-name)
       #f
-      (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; FIXME: s/SYMBOL/IFIELD-NAME/ ?
+      (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/IFIELD-NAME/ ?
       ARG
       (let ((f (current-ifld-lookup ifld-name)))
 	(make <operand> (obj-location f)
@@ -80,7 +80,7 @@
 
 (dron (operand &options &mode op-name)
       #f
-      (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; FIXME: s/SYMBOL/OPERAND-NAME/ ?
+      (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/OPERAND-NAME/ ?
       ARG
       (current-op-lookup op-name)
 )
@@ -127,7 +127,7 @@
 
 (dron (xop &options &mode object)
       #f
-      (OPTIONS ANYNUMMODE OBJECT) (NA NA NA) ;; FIXME: s/OBJECT/OPERAND/ ?
+      (OPTIONS ANYNUMMODE OBJECT) (NA NA NA) ;; ??? s/OBJECT/OPERAND/ ?
       ARG
       object
 )
@@ -153,7 +153,7 @@
 
 (dron (local &options &mode local-name)
       #f
-      (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; FIXME: s/SYMBOL/LOCAL-NAME/ ?
+      (OPTIONS ANYNUMMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/LOCAL-NAME/ ?
       ARG
       (rtx-temp-lookup (tstate-env *tstate*) local-name)
 )
@@ -186,7 +186,7 @@
 
 (drsn (ref &options &mode name)
       BI
-      (OPTIONS BIMODE SYMBOL) (NA NA NA) ;; FIXME: s/SYMBOL/OPERAND-NAME/ ?
+      (OPTIONS BIMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/OPERAND-NAME/ ?
       ARG
       #f
 )
@@ -248,7 +248,7 @@
 ; INDX-SEL is an optional index and possible selector.
 (dron (reg &options &mode hw-elm . indx-sel)
       #f
-      (OPTIONS ANYNUMMODE SYMBOL . RTX) (NA NA NA . INT) ;; FIXME: s/SYMBOL/HW-NAME/ ?
+      (OPTIONS ANYNUMMODE SYMBOL . RTX) (NA NA NA . INT) ;; ??? s/SYMBOL/HW-NAME/ ?
       ARG
       (let ((indx (if (pair? indx-sel) (car indx-sel) 0))
 	    (selector (if (and (pair? indx-sel) (pair? (cdr indx-sel)))
@@ -262,7 +262,7 @@
 
 (dron (raw-reg &options &mode hw-elm . indx-sel)
       #f
-      (OPTIONS ANYNUMMODE SYMBOL . RTX) (NA NA NA . INT) ;; FIXME: s/SYMBOL/HW-NAME/ ?
+      (OPTIONS ANYNUMMODE SYMBOL . RTX) (NA NA NA . INT) ;; ??? s/SYMBOL/HW-NAME/ ?
       ARG
       (let ((indx (if (pair? indx-sel) (car indx-sel) 0))
 	    (selector (if (and (pair? indx-sel) (pair? (cdr indx-sel)))

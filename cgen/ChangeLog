@@ -1,5 +1,7 @@
 2009-11-05  Doug Evans  <dje@sebabeach.org>
 
+	* testsuite/name-comments-1.test: Update call to current-insn-lookup.
+
 	* utils.scm (reduce): Delete.
 
 	* rtl-traverse.scm (/rtx-canon-rtx-enum): Tweak local name.

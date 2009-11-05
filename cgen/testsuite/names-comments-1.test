@@ -20,7 +20,7 @@ cat > ${cpu_file} <<EOF
 
 ;; Verify the correct insn got created.
 ;; ??? Also need to verify the comment's contents.
-(internal-verify "lists in names" (current-insn-lookup 'add3))
+(internal-verify "lists in names" (current-insn-lookup 'add3 #f))
 EOF
 
 run_cgen ${cpu_file}

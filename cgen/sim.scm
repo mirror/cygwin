@@ -525,15 +525,15 @@
      (if getter
 	 (let ((args (car getter))
 	       (expr (cadr getter)))
-	   (gen-get-macro (gen-sym self)
-			  (if (hw-scalar? self) "" "index")
-			  (rtl-c mode
-				 #f ;; h/w is not ISA-specific
-				 (if (hw-scalar? self)
-				     nil
-				     (list (list (car args) 'UINT "index")))
-				 expr
-				 #:rtl-cover-fns? #t)))
+	   (gen-get-macro2 (gen-sym self)
+			   (if (hw-scalar? self) "" "index")
+			   (rtl-c mode
+				  #f ;; h/w is not ISA-specific
+				  (if (hw-scalar? self)
+				      nil
+				      (list (list (car args) 'UINT "index")))
+				  expr
+				  #:rtl-cover-fns? #t #:macro? #t)))
 	 (send self 'gen-sym-get-macro
 	       (obj:name self) (obj:comment self)))))
 )
@@ -547,9 +547,7 @@
 	 (let ((args (car setter))
 	       (expr (cadr setter)))
 	   (gen-set-macro2 (gen-sym self)
-			   (if (hw-scalar? self)
-			       ""
-			       "index")
+			   (if (hw-scalar? self) "" "index")
 			   "x"
 			   (rtl-c VOID ;; not `mode', sets have mode VOID
 				  #f ;; h/w is not ISA-specific

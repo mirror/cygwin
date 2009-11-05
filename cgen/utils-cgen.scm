@@ -915,14 +915,28 @@
   (string-append "bfd_mach_" (gen-c-symbol (mach-bfd-name mach)))
 )
 
-; Return definition of C macro to get the value of SYM.
+;; Return definition of C macro to get the value of SYM.
+;; INDEX-ARGS, EXPR must not have any newlines.
 
 (define (gen-get-macro sym index-args expr)
   (string-append
    "#define GET_" (string-upcase sym) "(" index-args ") " expr "\n")
 )
 
-; Return definition of C macro to set the value of SYM.
+;; Return definition of C macro to get the value of SYM, version 2.
+;; EXPR is a C expression *without* proper \newline handling,
+;; we prepend \ to each line.
+;; INDEX-ARGS, EXPR must not have any newlines.
+
+(define (gen-get-macro2 sym index-args expr)
+  (string-append
+   "#define GET_" (string-upcase sym) "(" index-args ") "
+   (backslash "\n" expr)
+   "\n")
+)
+
+;; Return definition of C macro to set the value of SYM.
+;; INDEX-ARGS, EXPR, LVALUE must not have any newlines.
 
 (define (gen-set-macro sym index-args lvalue)
   (string-append
@@ -932,9 +946,10 @@
    "x) (" lvalue " = (x))\n")
 )
 
-; Return definition of C macro to set the value of SYM, version 2.
-; EXPR is one or more C statements *without* proper \newline handling,
-; we prepend \ to each line.
+;; Return definition of C macro to set the value of SYM, version 2.
+;; EXPR is one or more C statements *without* proper \newline handling,
+;; we prepend \ to each line.
+;; INDEX-ARGS, NEWVAL-ARG must not have any newlines.
 
 (define (gen-set-macro2 sym index-args newval-arg expr)
   (string-append

@@ -853,7 +853,7 @@
 (method-make!
  <hw-index> 'get-write-index
  (lambda (self hw sfmt op access-macro)
-   (if (memq (hw-index:type self) '(scalar constant str-expr ifield))
+   (if (memq (hw-index:type self) '(scalar constant enum str-expr ifield))
        self
        (let ((index-mode (send hw 'get-index-mode)))
 	 (if index-mode
@@ -887,6 +887,9 @@
 		      (string-append "((" (mode:c-type mode) ") "
 				     (number->string value)
 				     ")")))
+      ((enum) (let ((sym (hw-index-enum-name index))
+		    (obj (hw-index-enum-obj index)))
+		(gen-enum-sym obj sym)))
       ((str-expr) value)
       ((rtx) (rtl-c-with-estate estate mode value))
       ((ifield) (if (= (ifld-length value) 0)
@@ -909,6 +912,9 @@
       ((constant) (string-append "((" (mode:c-type mode) ") "
 				 (number->string value)
 				 ")"))
+      ((enum) (let ((sym (hw-index-enum-name index))
+		    (obj (hw-index-enum-obj index)))
+		(gen-enum-sym obj sym)))
       ((str-expr) value)
       ((rtx) (rtl-c-with-estate estate mode value))
       ((ifield) (if (= (ifld-length value) 0)

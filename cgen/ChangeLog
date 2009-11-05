@@ -1,5 +1,8 @@
 2009-11-05  Doug Evans  <dje@sebabeach.org>
 
+	* utils-cgen.scm (gen-set-macro2): New function.
+	* sim.scm (<hw-register> gen-get-macro): Call it.
+
 	* co-for-gen-all: New file.
 
 	* testsuite/name-comments-1.test: Update call to current-insn-lookup.

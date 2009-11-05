@@ -1280,26 +1280,6 @@
   #f ; ??? wip
 )
 
-; Given X, a number or symbol, reduce it to a constant if possible.
-; Numbers always reduce to themselves.
-; Symbols are reduced to a number if they're defined as such,
-; or to an enum constant if one exists; otherwise X is returned unchanged.
-; Requires: symbol-bound? enum-lookup-val
-
-(define (reduce x)
-  (if (number? x)
-      x
-      ; A symbol bound to a number?
-      (if (and (symbol? x) (symbol-bound? #f x) (number? (eval1 x)))
-	  (eval1 x)
-	  ; An enum value that has a known numeric value?
-	  (let ((e (enum-lookup-val x)))
-	    (if (number? (car e))
-		(car e)
-		; Otherwise return X unchanged.
-		x))))
-)
-
 ; If OBJ has a dump method call it, otherwise return OBJ untouched.
 
 (define (dump obj)

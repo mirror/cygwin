@@ -679,7 +679,7 @@
 (define (rtx-constant-value rtx)
   (case (rtx-name rtx)
     ((const) (rtx-const-value rtx))
-    ((enum) (enum-lookup-val (rtx-enum-value rtx)))
+    ((enum) (car (enum-lookup-val (rtx-enum-value rtx))))
     (else (error "rtx-constant-value: not const or enum" rtx)))
 )
 
@@ -1077,11 +1077,15 @@
 			(make <hw-index> 'anonymous 'constant UINT index-arg))
 		       ((rtx? index-arg)
 			; Make sure constant indices are recorded as such.
-			(if (rtx-constant? index-arg)
-			    (make <hw-index> 'anonymous 'constant UINT
-				  (rtx-constant-value index-arg))
-			    (make <hw-index> 'anonymous 'rtx (mode:lookup index-mode)
-				  (/rtx-closure-make estate index-mode index-arg))))
+			(case (rtx-name index-arg)
+			  ((const)
+			   (make <hw-index> 'anonymous 'constant UINT
+				 (rtx-constant-value index-arg)))
+			  ((enum)
+			   (make-enum-hw-index 'anonymous (rtx-enum-value index-arg)))
+			  (else
+			   (make <hw-index> 'anonymous 'rtx (mode:lookup index-mode)
+				 (/rtx-closure-make estate index-mode index-arg)))))
 		       (else (parse-error (estate-context estate)
 					  "invalid index" index-arg))))
 

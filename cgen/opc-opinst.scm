@@ -27,6 +27,11 @@
 			 ((eq? (hw-index:type index) 'constant)
 			  (string-append "0, "
 					 (number->string (hw-index:value index))))
+			 ((eq? (hw-index:type index) 'enum)
+			  (let ((sym (hw-index-enum-name index))
+				(obj (hw-index-enum-obj index)))
+			    (string-append "0, "
+					   (gen-enum-sym obj sym))))
 			 (else "0, 0"))
 		   ", " (if (op:cond? op) "COND_REF" "0")
 		   " },\n"))

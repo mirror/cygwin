@@ -49,8 +49,9 @@
      #f
      (OPTIONS ANYINTMODE SYMBOL) (NA NA NA) ;; ??? s/SYMBOL/ENUM-NAME/ ?
      ARG
-     ; When computing a value, return the enum's value.
-     (enum-lookup-val enum-name)
+     ;; When computing a value, return the enum's value.
+     ;; Canonicalization should have already caught bad values.
+     (car (enum-lookup-val enum-name))
 )
 
 ; Instruction fields

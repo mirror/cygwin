@@ -243,36 +243,6 @@
      (string-append "\"" pname "\"")))
 )
 
-; PC support.
-; This is a subclass of <operand>, used to give the simulator a place to
-; hang a couple of methods.
-; At the moment we only support one pc, a reasonable place to stop for now.
-
-(define <pc> (class-make '<pc> '(<operand>) nil nil))
-
-(method-make!
- <pc> 'make!
- (lambda (self)
-   (send-next self '<pc> 'make!
-	      (builtin-location) 'pc "program counter"
-	      (atlist-parse (make-prefix-context "make! of pc")
-			    '(SEM-ONLY) "cgen_operand")
-	      'h-pc
-	      'DFLT
-	      (make <hw-index> 'anonymous
-		    'ifield 'UINT (current-ifld-lookup 'f-nil))
-	      nil ; handlers
-	      #f #f) ; getter setter
-   self)
-)
-
-; Return a boolean indicating if operand op is the pc.
-; This must not call op:type.  op:type will try to resolve a hardware
-; element that may be multiply specified, and this is used in contexts
-; where that's not possible.
-
-(define (pc? op) (class-instance? <pc> op))
-
 ; Mode support.
 
 ; Create a copy of operand OP in mode NEW-MODE-NAME.
@@ -351,17 +321,21 @@
 ; TYPE is a symbol that indicates what VALUE is.
 ; scalar: the hardware object is a scalar, no index is required
 ;         [MODE and VALUE are #f to denote "undefined" in this case]
-; constant: a (non-negative) integer
+; constant: a (non-negative) integer (FIXME: rename to const)
+; enum: an enum value stored as (enum-name . (enum-lookup-val enum-name)),
+;       i.e. (name value . enum-obj)
 ; str-expr: a C expression as a string
 ; rtx: an rtx to be expanded
-; ifield: an ifield object
-; operand: an operand object
+; ifield: an <ifield> object
+; derived-ifield: a <derived-ifield> object ???
+; operand: an <operand> object
 ; ??? A useful simplification may be to always record the value as an rtx
 ; [which may require extensions to rtl so is deferred].
 ; ??? We could use runtime type identification, but doing things this way
 ; adds more structure.
 ;
-; MODE is the mode of VALUE.  If DFLT, mode must be obtained from VALUE.
+; MODE is the mode of VALUE, as a <mode> object.
+; If DFLT, mode must be obtained from VALUE.
 ; DFLT is only allowable for rtx and operand types.
 
 (define <hw-index> (class-make '<hw-index> nil '(name type mode value) nil))
@@ -413,6 +387,46 @@
    (if (eq? (hw-index:type self) 'ifield)
        (send (hw-index:value self) 'field-length)
        0))
+)
+
+;; Return #t if index is a constant.
+
+(define (hw-index-constant? hw-index)
+  (memq (hw-index:type hw-index) '(constant enum))
+)
+
+;; Given that (hw-index-constant? hw-index) is true, return the value.
+
+(define (hw-index-constant-value hw-index)
+  (case (hw-index:type hw-index)
+    ((constant) (hw-index:value hw-index))
+    ((enum) (hw-index-enum-value hw-index))
+    (else (error "invalid constant hw-index" hw-index)))
+)
+
+;; Make an enum <hw-index> given the enum's name.
+
+(define (make-enum-hw-index name enum-name)
+  (make <hw-index> name 'enum UINT
+	(cons enum-name (enum-lookup-val enum-name)))
+)
+
+;; Given an enum <hw-index>, return the enum's name.
+
+(define (hw-index-enum-name hw-index)
+  (car (hw-index:value hw-index))
+)
+
+;; Given an enum <hw-index>, return the enum's value.
+
+(define (hw-index-enum-value hw-index)
+  (cadr (hw-index:value hw-index))
+)
+
+;; Given an enum <hw-index>, return the enum's object.
+
+(define (hw-index-enum-obj hw-index)
+  (cddr (hw-index:value hw-index))
 )
 
 ; There only ever needs to be one of these objects, so create one.
@@ -555,7 +569,7 @@
 ; ??? This only takes insn fields as the index.  May need another proc (or an
 ; enhancement of this one) that takes other kinds of indices.
 
-(define (/operand-parse context name comment attrs hw mode ifld handlers getter setter)
+(define (/operand-parse context name comment attrs hw mode index handlers getter setter)
   (logit 2 "Processing operand " name " ...\n")
 
   ;; Pick out name first to augment the error context.
@@ -572,50 +586,64 @@
 
 	(let ((hw-objs (current-hw-sem-lookup hw))
 	      (mode-obj (parse-mode-name context mode))
-	      (ifld-val (if (integer? ifld)
-			    ifld
-			    (current-ifld-lookup ifld isa-name-list))))
+	      (index-val (cond ((integer? index)
+				index)
+			       ((and (symbol? index) (enum-lookup-val index))
+				=> (lambda (x) x))
+			       ((and (symbol? index) (current-ifld-lookup index isa-name-list))
+				=> (lambda (x) x))
+			       (else
+				(if (symbol? index)
+				    (parse-error context "unknown enum or ifield" index)
+				    (parse-error context "invalid operand index" index))))))
 
 	  (if (not mode-obj)
 	      (parse-error context "unknown mode" mode))
-	  (if (not ifld-val)
-	      (parse-error context "unknown insn field" ifld))
-	  ; Disallow some obviously invalid numeric indices.
-	  (if (and (integer? ifld-val)
-		   (< ifld-val 0))
-	      (parse-error context "invalid integer index" ifld-val))
-	  ; Don't validate HW until we know whether this operand will be kept
-	  ; or not.  If not, HW may have been discarded too.
+	  ;; Disallow some obviously invalid numeric indices.
+	  (if (and (number? index-val)
+		   (or (not (integer? index-val))
+		       (< index-val 0)))
+	      (parse-error context "invalid integer index" index))
+	  ;; If an enum is used, it must be non-negative.
+	  (if (and (pair? index-val)
+		   (< (car index-val) 0))
+	      (parse-error context "negative enum value" index))
+	  ;; NOTE: Don't validate HW until we know whether this operand
+	  ;; will be kept or not.  If not, HW may have been discarded too.
 	  (if (null? hw-objs)
 	      (parse-error context "unknown hardware element" hw))
 
-	  ; At this point IFLD-VAL is either an integer or an <ifield> object.
-	  ; Since we can't look up the hardware element at this time
-	  ; [well, actually we should be able to with a bit of work],
-	  ; we determine scalarness from the index.
-	  (let* ((scalar? (or (integer? ifld-val) (ifld-nil? ifld-val)))
-		 (hw-index
-		  (if (integer? ifld-val)
-		      (make <hw-index> (symbol-append 'i- name)
-			    ; FIXME: constant -> const
-			    'constant 'UINT ifld-val)
-		      (if scalar?
-			  (hw-index-scalar)
-			  (make <hw-index> (symbol-append 'i- name)
-				'ifield 'UINT ifld-val)))))
+	  ;; At this point INDEX-VAL is either an integer, (value . enum-obj),
+	  ;; or an <ifield> object.
+	  ;; Since we can't look up the hardware element at this time
+	  ;; [well, actually we should be able to with a bit of work],
+	  ;; we determine scalarness from an index of f-nil.
+	  (let ((hw-index
+		  (cond ((integer? index-val)
+			 (make <hw-index> (symbol-append 'i- name)
+			       ;; FIXME: constant -> const
+			       'constant UINT index-val))
+			((pair? index-val) ;; enum?
+			 (make <hw-index> (symbol-append 'i- name)
+			       'enum UINT (cons index index-val)))
+			((ifld-nil? index-val)
+			 (hw-index-scalar))
+			(else
+			 (make <hw-index> (symbol-append 'i- name)
+			       'ifield UINT index-val)))))
 	    (make <operand>
 	      (context-location context)
 	      name
 	      (parse-comment context comment)
-	      ; Copy FLD's attributes so one needn't duplicate attrs like
-	      ; PCREL-ADDR, etc.  An operand inherits the attributes of
-	      ; its field.  They are overridable of course, which is why we use
-	      ; `atlist-append' here.
-	      (if (integer? ifld-val)
-		  atlist-obj
-		  (atlist-append atlist-obj (obj-atlist ifld-val)))
-	      hw   ; note that this is the hw's name, not an object
-	      mode ; ditto, this is a name, not an object
+	      ;; Copy FLD's attributes so one needn't duplicate attrs like
+	      ;; PCREL-ADDR, etc.  An operand inherits the attributes of
+	      ;; its field.  They are overridable of course, which is why we use
+	      ;; `atlist-append' here.
+	      (if (ifield? index-val)
+		  (atlist-append atlist-obj (obj-atlist index-val))
+		  atlist-obj)
+	      hw ;; note that this is the hw's name, not an object
+	      mode ;; ditto, this is a name, not an object
 	      hw-index
 	      (parse-handlers context '(parse print) handlers)
 	      (/operand-parse-getter context getter (if scalar? 0 1))
@@ -1581,6 +1609,37 @@
 ;(define $1 (make <syntax-operand> 1))
 ;(define $2 (make <syntax-operand> 2))
 ;(define $3 (make <syntax-operand> 3))
+
+;; PC support.
+;; This is a subclass of <operand>, used to give the simulator a place to
+;; hang a couple of methods.
+;; At the moment we only support one pc, a reasonable place to stop for now.
+
+(define <pc> (class-make '<pc> '(<operand>) nil nil))
+
+(method-make!
+ <pc> 'make!
+ (lambda (self)
+   (send-next self '<pc> 'make!
+	      (builtin-location) 'pc "program counter"
+	      (atlist-parse (make-prefix-context "make! of pc")
+			    '(SEM-ONLY) "cgen_operand")
+	      'h-pc
+	      'DFLT
+	      ;;(hw-index-scalar) ;; FIXME: change to this
+	      (make <hw-index> 'anonymous
+		    'ifield 'UINT (current-ifld-lookup 'f-nil))
+	      nil ;; handlers
+	      #f #f) ;; getter setter
+   self)
+)
+
+; Return a boolean indicating if operand op is the pc.
+; This must not call op:type.  op:type will try to resolve a hardware
+; element that may be multiply specified, and this is used in contexts
+; where that's not possible.
+
+(define (pc? op) (class-instance? <pc> op))
 
 ; Called before/after loading the .cpu file to initialize/finalize.
 

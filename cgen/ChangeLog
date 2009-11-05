@@ -1,3 +1,25 @@
+2009-11-05  Doug Evans  <dje@sebabeach.org>
+
+	* utils.scm (reduce): Delete.
+
+	* rtl-traverse.scm (/rtx-canon-rtx-enum): Tweak local name.
+
+	* enum.scm (gen-enum-sym): Make consistent with gen-enum-decl
+	regarding PREFIX attribute handling.
+
+	* operand.scm (<hw-index>): Add enum to possible types, all uses
+	updated.
+	(hw-index-constant?, hw-index-constant-value): New functions.
+	(make-enum-hw-index, hw-index-enum-name, hw-index-enum-value,
+	hw-index-enum-obj): New functions.
+	(/operand-parse): Handle enum indices.
+	* intrinsics.scm (md-operand:fixed-register): Use hw-index-constant?,
+	hw-index-constant-value.
+	* rtl.scm (rtx-constant-value): Fix handling of enums.
+	* rtx-funcs.scm (enum): Ditto.
+	* sid.scm (<hardware-base> cxmake-get): Only ifield indices are
+	currently supported here.
+
 2009-11-02  Doug Evans  <dje@sebabeach.org>
 
 	Specify isa(s) when doing ifield, operand, insn lookups.

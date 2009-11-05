@@ -768,9 +768,9 @@
   (let ((mode-name (cadr args))
 	(enum-name (caddr args)))
     (let ((mode-obj (mode:lookup mode-name))
-	  (enum-obj (enum-lookup-val enum-name)))
+	  (enum-val-and-obj (enum-lookup-val enum-name)))
 
-      (if (not enum-obj)
+      (if (not enum-val-and-obj)
 	  (/rtx-canon-error cstate "unknown enum value"
 			    enum-name parent-expr #f))
 

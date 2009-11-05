@@ -145,7 +145,7 @@
  (lambda (self n)
    (case (hw-index:type self)
      ((ifield operand) (send (hw-index:value self) 'test-data n))
-     ((constant) (make-list n (hw-index:value self)))
+     ((constant enum) (make-list n (hw-index-constant-value self)))
      ((scalar) (make-list n nil))
      ((str-expr rtx) (make-list n nil)) ;; ???
      (else (error "invalid hw-index type" (hw-index:type self)))))

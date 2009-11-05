@@ -4,11 +4,12 @@
 ; See file COPYING.CGEN for details.
 
 ; Enums having attribute PREFIX have their symbols prepended with
-; the enum class' name.
-; Member PREFIX is always prepended to the symbol names.
+; the enum class' name + "_" in generated code.  FIXME: deprecated
+;
+; Member PREFIX is prepended to the symbol names when the object is defined.
 ;
 ; Enum values are looked up with `enum-lookup-val'.  The value to search for
-; has PREFIX prepended.
+; must already have PREFIX prepended.
 ;
 ; Enums always have mode INT.
 
@@ -231,7 +232,7 @@
 
 ; Return C code to declare enum SYM with values VALS.
 ; COMMENT is inserted in "/* Enum declaration for <...>.  */".
-; PREFIX is added to each element of VALS.
+; PREFIX is added to each element of VALS (uppercased).
 ; All enum symbols are uppercase.
 ; If the list of vals is sequential beginning at 0, don't output them.
 ; This simplifies the output and is necessary for sanitized values where
@@ -332,10 +333,15 @@
 		  (elm-get self 'vals)))
 )
 
-; Return the C symbol of an enum value named VAL.
+;; Return the C symbol of an enum value named VAL.
+;; ENUM-OBJ is the <enum> object containing VAL.
 
 (define (gen-enum-sym enum-obj val)
-  (string-upcase (gen-c-symbol (string-append (enum-prefix enum-obj) val)))
+  (string-upcase
+   (string-append (if (has-attr? enum-obj 'PREFIX)
+		      (string-append (elm-xget enum-obj 'name) "_")
+		      "")
+		  (gen-c-symbol val)))
 )
 
 ; Instruction code enums.

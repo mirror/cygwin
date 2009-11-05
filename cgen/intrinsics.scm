@@ -560,9 +560,8 @@
 (define (md-operand:fixed-register op)
   (and (not (md-operand:pc? op))
        (md-operand:register? op)
-       (let ((constant (if (equal? 'constant
-				   (hw-index:type (md-operand:index op)))
-			   (hw-index:value (md-operand:index op))
+       (let ((constant (if (hw-index-constant? (md-operand:index op))
+			   (hw-index-constant-value (md-operand:index op))
 			   (md-operand:ifield-value op))))
 	 (and constant
 	      (+ constant (target:base-reg (md-operand:hw op)))))))

@@ -1,3 +1,10 @@
+2009-11-06  Kevin Buettner  <kevinb@redhat.com>
+
+	From Michael Snyder (circa 2004):
+	* lib/gdbserv-output.c (gdbserv_output_string_as_bytes): 
+	Pull strlen out of loop for optimization.
+	(gdbserv_output_string): Ditto.
+
 2008-07-03  Kevin Buettner  <kevinb@redhat.com>
 
 	* HOWTO, HOWTO.old: Preserve old HOWTO document as HOWTO.old.  It

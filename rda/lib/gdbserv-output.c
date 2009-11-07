@@ -57,7 +57,9 @@ void
 gdbserv_output_string_as_bytes (struct gdbserv *gdbserv, const char *packet)
 {
   int i;
-  for (i = 0; i < strlen (packet); i++)
+  int len = strlen (packet);
+
+  for (i = 0; i < len; i++)
     {
       gdbserv_output_byte (gdbserv, packet[i]);
     }
@@ -67,7 +69,9 @@ void
 gdbserv_output_string (struct gdbserv *gdbserv, const char *packet)
 {
   int i;
-  for (i = 0; i < strlen (packet); i++)
+  int len = strlen (packet);
+
+  for (i = 0; i < len; i++)
     gdbserv_output_char (gdbserv, packet[i]);
 }
 

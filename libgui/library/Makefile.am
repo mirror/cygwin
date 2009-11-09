@@ -11,8 +11,6 @@ postghost.tcl prefs.tcl print.tcl sendpr.tcl topbind.tcl toolbar.tcl \
 ulset.tcl wframe.tcl wingrab.tcl ventry.tcl combobox.tcl \
 pane.tcl panedwindow.tcl
 
-PACKAGES = combobox.tcl
-
 ## This directory is also referenced in paths.c, which see.
 guidir = $(datadir)/redhat/gui
 gui_DATA = tclIndex pkgIndex.tcl $(TCL) $(PACKAGES)

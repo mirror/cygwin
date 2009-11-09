@@ -1,3 +1,12 @@
+2009-11-09  Keith Seitz  <keiths@redhat.com>
+
+	* Makefile.in: Regenerate with autotools 1.11.
+	* aclocal.m4: Regenerate.
+	* configure: Regenerate.
+	* plugins/Makefile.in: Regenerate.
+	* plugins/aclocal.m4: Regenerate.
+	* plugins/configure: Regenerate.
+
 2009-10-08  Keith Seitz  <keiths@redhat.com>
 
 	* library/srctextwin.ith (ExecutableLineLimit): Define.

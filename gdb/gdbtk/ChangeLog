@@ -1,5 +1,10 @@
 2009-11-09  Keith Seitz  <keiths@redhat.com>
 
+	* README: Update information about using external
+	Tcl, Tk, and Itcl.
+
+2009-11-09  Keith Seitz  <keiths@redhat.com>
+
 	* Makefile.in: Regenerate with autotools 1.11.
 	* aclocal.m4: Regenerate.
 	* configure: Regenerate.

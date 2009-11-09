@@ -1,5 +1,16 @@
 2009-11-09  Keith Seitz  <keiths@redhat.com>
 
+	* library/srctextwin.itb (lookup_line): Update parameters
+	to gdb_set_bp.
+	* generic/gdbtk-bp.c: Remove extern declarations for symbols
+	in breakpoint.c.
+	(gdb_set_bp_addr): Remove.
+	(Gdbtk_Breakpoint_Init): Remove Tcl command "gdb_set_bp_addr".
+	(gdb_set_bp): Remove file and line arguments; add "addr" argument.
+	Rewrite to use "public" APIs from gdb.
+
+2009-11-09  Keith Seitz  <keiths@redhat.com>
+
 	* README: Update information about using external
 	Tcl, Tk, and Itcl.
 

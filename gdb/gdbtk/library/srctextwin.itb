@@ -1756,10 +1756,10 @@ itcl::body SrcTextWin::lookup_line {win y} {
 
   switch $type {
     asm {
-      set set_cmd [list gdb_set_bp_addr $addr]
+      set set_cmd [list gdb_set_bp "*$addr"]
     }
     src {
-      set set_cmd [list gdb_set_bp $current(filename) $addr]
+      set set_cmd [list gdb_set_bp "$current(filename):$addr"]
     }
   }
 

@@ -394,9 +394,11 @@
 )
 
 ; Subroutine of /rtx-trim-for-doc to simplify it.
-; Trim all the arguments of rtx NAME.
+; Trim the arguments of rtx NAME.
+; ARGS has already had options,mode removed.
 
 (define (/rtx-trim-args name args)
+  (logit 4 "Trimming args of " name ": " args "\n")
   (let* ((rtx-obj (rtx-lookup name))
 	 (arg-types (rtx-arg-types rtx-obj)))
 
@@ -470,6 +472,7 @@
 ; Examples of things to remove:
 ; - empty options list
 ; - ifield/operand/local/const wrappers
+; - modes of operations that don't need them to convey meaning
 ;
 ; NOTE: While having to trim the result of rtx-simplify may seem ironic,
 ; it isn't.  You need to keep separate the notions of simplifying "1+1" to "2"
@@ -490,7 +493,13 @@
 	       (car rest)
 	       rtx))
 
-	  ((set)
+	  ((set set-quiet)
+	   (let ((trimmed-args (/rtx-trim-args name rest)))
+	     (if (null? options)
+		 (cons name trimmed-args)
+		 (cons name (cons options (cons mode trimmed-args))))))
+
+	  ((eq ne lt le gt ge ltu leu gtu geu index-of)
 	   (let ((trimmed-args (/rtx-trim-args name rest)))
 	     (if (null? options)
 		 (cons name trimmed-args)
@@ -519,6 +528,9 @@
 		     (cons name (reverse result))
 		     (cons name (cons mode (reverse result))))
 		 (cons name (cons options (cons mode (reverse result)))))))
+
+	  ((nop)
+	   (list 'nop))
 
 	  ((closure)
 	   ;; Remove outer closures, they are artificially added, and are

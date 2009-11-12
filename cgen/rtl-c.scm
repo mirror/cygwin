@@ -1198,13 +1198,15 @@
     (set! /par-temp-list nil)
 
     (let* ((set-dest-exprs
-	    (map (lambda (expr)
-		   (rtx-traverse (estate-context estate)
-				 (estate-owner estate)
-				 expr
-				 /par-replace-set-dest-expr-fn
-				 #f))
-		 exprs))
+	    ;; Use map-in-order because we need temp creation and usage to
+	    ;; follow the same order.
+	    (map-in-order (lambda (expr)
+			    (rtx-traverse (estate-context estate)
+					  (estate-owner estate)
+					  expr
+					  /par-replace-set-dest-expr-fn
+					  #f))
+			  exprs))
 	   (set-dests (string-map (lambda (expr)
 				    (rtl-c-with-estate estate VOID expr))
 				  set-dest-exprs))
@@ -1214,13 +1216,15 @@
       (set! /par-temp-list temps)
 
       (let* ((set-src-exprs
-	      (map (lambda (expr)
-		     (rtx-traverse (estate-context estate)
-				   (estate-owner estate)
-				   expr
-				   /par-replace-set-src-expr-fn
-				   #f))
-		   exprs))
+	      ;; Use map-in-order because we need temp creation and usage to
+	      ;; follow the same order.
+	      (map-in-order (lambda (expr)
+			      (rtx-traverse (estate-context estate)
+					    (estate-owner estate)
+					    expr
+					    /par-replace-set-src-expr-fn
+					    #f))
+			    exprs))
 	     (set-srcs (string-map (lambda (expr)
 				     (rtl-c-with-estate estate VOID expr))
 				    set-src-exprs)))

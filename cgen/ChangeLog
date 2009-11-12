@@ -1,6 +1,7 @@
 2009-11-12  Doug Evans  <dje@sebabeach.org>
 
 	* rtl-c.scm (s-parallel): Use map-in-order instead of map.
+
 	* rtl-xform.scm (/rtx-trim-for-doc): Handle set-quiet, nop,
 	eq, ne, lt, le, gt, ge, ltu, leu, gtu, geu, index-of.
 

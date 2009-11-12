@@ -1,3 +1,15 @@
+2009-11-11  Kevin Buettner  <kevinb@redhat.com>
+
+	Update configury:
+	acinclude.m4: Include toplevel libtool related files.  Don't
+	include gettext-sister.m4.
+	configure.in (ZW_GNU_GETTEXT_SISTER_DIR): Delete.
+	aclocal.m4, configure, Makefile.in: Regenerate.
+	samples/Makefile.am (INCLUDES): Rename to AM_CPPFLAGS.
+	lib/Makefile.in, qe/Makefile.in, samples/Makefile.in: Regenerate.
+	unix/acinclude.m4: Include toplevel libtool related files.
+	unix/aclocal.m4, unix/configure, unix/Makefile.in: Regenerate.
+
 2009-11-06  Kevin Buettner  <kevinb@redhat.com>
 
 	From Michael Snyder (circa 2004):

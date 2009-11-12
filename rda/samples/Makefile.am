@@ -8,7 +8,7 @@ AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 
 noinst_PROGRAMS = sample async poll thread
 
-INCLUDES = -I$(srcdir) -I$(srcdir)/../include
+AM_CPPFLAGS = -I$(srcdir) -I$(srcdir)/../include
 
 sample_SOURCES = main.c demo-target.c
 sample_DEPLIBS = ../lib/librda.la 

@@ -831,6 +831,7 @@ See the input .cpu file(s) for copyright information.
   ; First simplify the semantics, e.g. do constant folding.
   ; For insns built up from macros, often this will remove a lot of clutter.
   (for-each (lambda (insn)
+	      (logit 2 "Simplifying the rtl for insn " (obj:name insn) " ...\n")
 	      (insn-set-tmp! insn (rtx-simplify-insn #f insn)))
 	    (current-insn-list))
 

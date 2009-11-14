@@ -1,3 +1,8 @@
+2009-11-14  Doug Evans  <dje@sebabeach.org>
+
+	* cpu/xc16x.cpu: Delete, use copy in ../cpu.
+	* cpu/xc16x.opc: Ditto.
+
 2009-11-12  Doug Evans  <dje@sebabeach.org>
 
 	* rtl-c.scm (s-parallel): Use map-in-order instead of map.

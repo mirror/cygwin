@@ -1198,8 +1198,16 @@
 				     expr parent-expr op-num))
 	       (let ((rtx-obj (rtx-lookup rtx-name)))
 		 (if rtx-obj
-		     (/rtx-canon-expr rtx-obj mode rtx-name (cdr expr)
-				      parent-expr op-num cstate env depth)
+		     (let ((canon-expr
+			    (/rtx-canon-expr rtx-obj mode rtx-name (cdr expr)
+					     parent-expr op-num cstate env depth)))
+		       (if (eq? mode 'VOID)
+			   (let ((expr-mode (or (rtx-result-mode rtx-obj)
+						(rtx-mode canon-expr))))
+			     (if (not (eq? expr-mode 'VOID))
+				 (/rtx-canon-error cstate "non-VOID-mode expression"
+						   expr parent-expr op-num))))
+		       canon-expr)
 		     (let ((rtx-obj (/rtx-macro-lookup rtx-name)))
 		       (if rtx-obj
 			   (/rtx-canon (/rtx-macro-expand expr rtx-evaluator)
@@ -1211,33 +1219,37 @@
 	     ;; See if it's an operand shortcut.
 	     (if (memq expected '(RTX SETRTX))
 
-		 (cond ((symbol? expr)
-			(cond ((current-op-lookup expr (/cstate-isas cstate))
-			       => (lambda (op)
-				    ;; NOTE: We can't simply call
-				    ;; op:mode-name here, we need the real
-				    ;; mode, not (potentially) DFLT.
-				    ;; See /rtx-pick-op-mode.
-				    (rtx-make-operand (/rtx-pick-op-mode cstate mode 'DFLT op parent-expr)
-						      expr)))
-			      ((rtx-temp-lookup env expr)
-			       => (lambda (tmp)
-				    (rtx-make-local (obj:name (rtx-temp-mode tmp)) expr)))
-			      ((current-ifld-lookup expr)
-			       => (lambda (f)
-				    (rtx-make-ifield (obj:name (ifld-mode f)) expr)))
-			      ((enum-lookup-val expr)
-			       ;; ??? If enums could have modes other than INT,
-			       ;; we'd want to propagate that mode here.
-			       (rtx-make-enum 'INT expr))
-			      (else
-			       (/rtx-canon-error cstate "unknown operand"
-						 expr parent-expr op-num))))
-		       ((integer? expr)
-			(rtx-make-const 'INT expr))
-		       (else
-			(/rtx-canon-error cstate "unexpected operand"
-					  expr parent-expr op-num)))
+		 (begin
+		   (if (eq? mode 'VOID)
+		       (/rtx-canon-error cstate "non-VOID-mode expression"
+					 expr parent-expr op-num))
+		   (cond ((symbol? expr)
+			  (cond ((current-op-lookup expr (/cstate-isas cstate))
+				 => (lambda (op)
+				      ;; NOTE: We can't simply call
+				      ;; op:mode-name here, we need the real
+				      ;; mode, not (potentially) DFLT.
+				      ;; See /rtx-pick-op-mode.
+				      (rtx-make-operand (/rtx-pick-op-mode cstate mode 'DFLT op parent-expr)
+							expr)))
+				((rtx-temp-lookup env expr)
+				 => (lambda (tmp)
+				      (rtx-make-local (obj:name (rtx-temp-mode tmp)) expr)))
+				((current-ifld-lookup expr)
+				 => (lambda (f)
+				      (rtx-make-ifield (obj:name (ifld-mode f)) expr)))
+				((enum-lookup-val expr)
+				 ;; ??? If enums could have modes other than INT,
+				 ;; we'd want to propagate that mode here.
+				 (rtx-make-enum 'INT expr))
+				(else
+				 (/rtx-canon-error cstate "unknown operand"
+						   expr parent-expr op-num))))
+			 ((integer? expr)
+			  (rtx-make-const 'INT expr))
+			 (else
+			  (/rtx-canon-error cstate "unexpected operand"
+					    expr parent-expr op-num))))
 
 		 ;; Not expecting RTX or SETRTX.
 		 (/rtx-canon-error cstate "unexpected operand"

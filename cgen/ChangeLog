@@ -1,5 +1,8 @@
 2009-11-14  Doug Evans  <dje@sebabeach.org>
 
+	* rtl-traverse.scm (/rtx-canon): Flag an error for non-void
+	expressions used in a void context.
+
 	* gen-all: Explicitly build binutils, gas, ld, gdb, sid.
 
 	* cpu/xc16x.cpu: Delete, use copy in ../cpu.

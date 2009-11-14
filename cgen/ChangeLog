@@ -1,5 +1,7 @@
 2009-11-14  Doug Evans  <dje@sebabeach.org>
 
+	* gen-all: Explicitly build binutils, gas, ld, gdb, sid.
+
 	* cpu/xc16x.cpu: Delete, use copy in ../cpu.
 	* cpu/xc16x.opc: Ditto.
 

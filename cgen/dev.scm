@@ -4,35 +4,25 @@
 ; See file COPYING.CGEN for details.
 
 ; This file is loaded in during an interactive guile session to
-; develop and debug CGEN.  The user visible procs are:
-;
-; (use-c)
-; (load-opc)
-; (load-sim)
-; (load-sid)
-; (load-testsuite)
-; (cload #:arch path-to-cpu-file #:machs "mach-list" #:isas "isa-list"
-;        #:options "options" #:trace "trace-options")
-
+; develop and debug CGEN.
+
 ; First load guile.scm to coerce guile into something we've been using.
 ; Guile is always in flux.
 (load "guile.scm")
 
-(define srcdir ".")
-(set! %load-path (cons srcdir %load-path))
-
-; Utility to enable/disable compiled-in C code.
-
-(define (use-c) (set! CHECK-LOADED? #t))
-(define (no-c) (set! CHECK-LOADED? #f))
+(load "dev-utils.scm")
 
 ; Also defined in read.scm, but we need it earlier.
 (define APPLICATION 'UNKNOWN)
+
+(define dev-verbose-level 2)
 
 ; Supply the path name and suffic for the .cpu file and delete the analyzer
 ; arg from cpu-load to lessen the typing.
 
 (define (cload . args)
+  (set! verbose-level dev-verbose-level)
+
   (let ((cpu-file #f)
 	(keep-mach "all")
 	(keep-isa "all")
@@ -117,86 +107,9 @@
 (if (not (defined? 'CHECK-LOADED?))
     (define CHECK-LOADED? #f))
 
-(define (load-doc)
-  (load "read")
-  (load "desc")
-  (load "desc-cpu")
-  (load "html")
-  ; ??? Necessary for the following case, dunno why.
-  ; bash$ guile -l dev.scm
-  ; guile> (load-doc)
-  ; guile> (cload #:arch "./cpu/m32r.cpu")
-  (set! verbose-level 2)
-  (set! APPLICATION 'DOC)
-)
-
-(define (load-opc)
-  (load "read")
-  (load "desc")
-  (load "desc-cpu")
-  (load "opcodes")
-  (load "opc-asmdis")
-  (load "opc-ibld")
-  (load "opc-itab")
-  (load "opc-opinst")
-  (set! verbose-level 2)
-  (set! APPLICATION 'OPCODES)
-)
-
-(define (load-gtest)
-  (load-opc)
-  (load "gas-test")
-  (set! verbose-level 2)
-  (set! APPLICATION 'GAS-TEST)
-)
-
-(define (load-sid)
-  (load "read")
-  (load "utils-sim")
-  (load "sid")
-  (load "sid-cpu")
-  (load "sid-model")
-  (load "sid-decode")
-  (set! verbose-level 2)
-  (set! APPLICATION 'SID-SIMULATOR)
-)
-
-(define (load-sim)
-  (load "read")
-  (load "desc")
-  (load "desc-cpu")
-  (load "utils-sim")
-  (load "sim")
-  (load "sim-arch")
-  (load "sim-cpu")
-  (load "sim-model")
-  (load "sim-decode")
-  (set! verbose-level 2)
-  (set! APPLICATION 'SIMULATOR)
-)
-
-(define (load-stest)
-  (load-opc)
-  (load "sim-test")
-  (set! verbose-level 2)
-  (set! APPLICATION 'SIM-TEST)
-)
-
-(define (load-testsuite)
-  (load "read")
-  (load "desc")
-  (load "desc-cpu")
-  (load "testsuite.scm")
-  (set! verbose-level 2)
-  (set! APPLICATION 'TESTSUITE)
-)
-
 (display "
-First enable compiled in C code if desired.
 
-(use-c)
-
-Then choose the application via one of:
+First choose the application via one of:
 
 (load-doc)
 (load-opc)
@@ -212,7 +125,8 @@ Then choose the application via one of:
 
 Then load the .cpu file with:
 
-(cload #:arch \"path-to-cpu-file\" #:machs \"keep-mach\" #:isas \"keep-isa\" #:options \"options\" #:trace \"trace-options\")
+(cload #:arch \"path-to-cpu-file\" #:machs \"keep-mach\" #:isas \"keep-isa\"
+       #:options \"options\" #:trace \"trace-options\" #:diag \"diagnostic-options\")
 
 Only the #:arch parameter is mandatory, the rest are optional.
 
@@ -254,6 +168,12 @@ trace-options: (comma-separated list of options)
 commands - trace cgen command invocation
 pmacros - trace pmacro expansion
 all - trace everything
+\n")
+
+(display "\
+diagnostic-options: (comma-separated list of options)
+iformat - do more diagnostics on instruction formats
+all - do all diagnostics
 \n")
 
 ; If ~/.cgenrc exists, load it.

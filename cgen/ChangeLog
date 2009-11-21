@@ -1,5 +1,7 @@
 2009-11-21  Doug Evans  <dje@sebabeach.org>
 
+	* operand.scm (op-nub): Delete.
+
 	* dev-utils.scm: New file.
 	* dev.scm (srcdir, load-doc, load-opc, load-gtest, load-sid,
 	load-sim, load-stest, load-testsuite): Moved to dev-utils.scm.

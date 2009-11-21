@@ -1,5 +1,9 @@
 2009-11-21  Doug Evans  <dje@sebabeach.org>
 
+	* sim.scm (/operand-number-elaboration-written?): New variable.
+	(/op-gen-written-update op): New function.
+	(/op-gen-set-trace, /op-gen-set-trace-parallel): Call it.
+
 	* read.scm (/cmd-define-rtl-version): Only log rtl version if changed.
 
 	* operand.scm (op-nub): Delete.

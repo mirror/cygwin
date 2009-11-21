@@ -113,105 +113,41 @@
 ; This is mostly for descriptive purposes.
 (define APPLICATION 'UNKNOWN)
 
-; Things are organized so that files can be compiled with Hobbit for
-; experimentation.  Thus we need one file that loads all the other files.
-; This is that file, though it would make sense to move the code in this
-; file to another.
+;; Load the base cgen files.
 
-; If a routine to initialize compiled-in code is defined, run it.
-(if (defined? 'cgen-init-c) (cgen-init-c))
-
-; If this is set to #f, the file is always loaded.
-; Don't override any current setting, e.g. from dev.scm.
-(if (not (defined? 'CHECK-LOADED?))
-    (define CHECK-LOADED? #t))
-
-; Unlink file if we're reloaded (say in an interactive session).
-; Dynamic loading is enabled by setting LIBCPU.SO to the pathname of the .so.
-(if (and (defined? 'libcpu.so) (dynamic-object? libcpu.so))
-    (dynamic-unlink libcpu.so))
-(define libcpu.so #f)
-(if (and (defined? 'LIBCPU.SO)
-	 (file-exists? LIBCPU.SO))
-    (set! libcpu.so (dynamic-link LIBCPU.SO))
-)
-
-; List of loaded files.
-
-(if (not (defined? '/loaded-file-list))
-    (define /loaded-file-list '()))
-
-; Return non-zero if FILE was loaded last time through.
-
-(define (/loaded-file? file)
-  (->bool (memq (string->symbol file) /loaded-file-list))
-)
-
-; Record FILE as compiled in.
-
-(define (/loaded-file-record! file)
-  (let ((file (string->symbol file)))
-    (if (not (memq file /loaded-file-list))
-	(set! /loaded-file-list (cons file /loaded-file-list))))
-)
-
-; Load FILE if SYM is not compiled in.
-
-(define (maybe-load file init-func sym)
-  ; Return non-#f if FUNC is present in DYNOBJ.
-  (define (dynamic-func? func dynobj)
-    (catch #t
-	   (lambda () (dynamic-func func dynobj))
-	   (lambda args #f))
-    )
-
-  (let ((init-func (string-append "init_" (if init-func init-func file))))
-    (cond ((and libcpu.so
-		(dynamic-func? init-func libcpu.so))
-	   (dynamic-call init-func libcpu.so)
-	   (display (string-append "Skipping " file ", dynamically loaded.\n")))
-	  ((or (not CHECK-LOADED?)
-	       (not (defined? sym))
-	       (/loaded-file? file))
-	   (/loaded-file-record! file)
-	   (load file))
-	  (else
-	   (display (string-append "Skipping " file ", already loaded.\n")))))
-)
-
-(maybe-load "pmacros" #f 'define-pmacro)
-(maybe-load "cos" #f 'make)
-(maybe-load "slib/logical" #f 'logical:logand)
-(maybe-load "slib/sort" #f 'sort)
+(load "pmacros")
+(load "cos")
+(load "slib/logical")
+(load "slib/sort")
 ; Used to pretty-print debugging messages.
-(maybe-load "slib/pp" #f 'pretty-print)
+(load "slib/pp")
 ; Used by pretty-print.
-(maybe-load "slib/random" #f 'random)
-(maybe-load "slib/genwrite" #f 'generic-write)
-(maybe-load "utils" #f 'logit)
-(maybe-load "utils-cgen" "utils_cgen" 'obj:name)
-(maybe-load "attr" #f '<attribute>)
-(maybe-load "enum" #f '<enum>)
-(maybe-load "mach" #f '<mach>)
-(maybe-load "model" #f '<model>)
-(maybe-load "types" #f '<scalar>)
-(maybe-load "mode" #f '<mode>)
-(maybe-load "ifield" #f '<ifield>)
-(maybe-load "iformat" #f '<iformat>)
-(maybe-load "hardware" #f '<hardware-base>)
-(maybe-load "operand" #f '<operand>)
-(maybe-load "insn" #f '<insn>)
-(maybe-load "minsn" #f '<macro-insn>)
-(maybe-load "decode" #f 'decode-build-table)
-(maybe-load "rtl" "rtl" '<rtx-func>)
-(maybe-load "rtl-traverse" "rtl_traverse" 'rtx-traverse)
-(maybe-load "rtl-xform" "rtx_simplify" 'rtx-simplify)
-(maybe-load "rtx-funcs" "rtx_funcs" 'def-rtx-funcs)
-(maybe-load "rtl-c" "rtl_c" '<c-expr>)
-(maybe-load "semantics" #f 'semantic-compile)
-(maybe-load "sem-frags" "sem_frags" 'gen-threaded-engine)
-(maybe-load "utils-gen" "utils_gen" 'attr-gen-decl)
-(maybe-load "pgmr-tools" "pgmr_tools" 'pgmr-pretty-print-insn-format)
+(load "slib/random")
+(load "slib/genwrite")
+(load "utils")
+(load "utils-cgen")
+(load "attr")
+(load "enum")
+(load "mach")
+(load "model")
+(load "types")
+(load "mode")
+(load "ifield")
+(load "iformat")
+(load "hardware")
+(load "operand")
+(load "insn")
+(load "minsn")
+(load "decode")
+(load "rtl")
+(load "rtl-traverse")
+(load "rtl-xform")
+(load "rtx-funcs")
+(load "rtl-c")
+(load "semantics")
+(load "sem-frags")
+(load "utils-gen")
+(load "pgmr-tools")
 
 ; Reader state data.
 ; All state regarding the reading of a .cpu file is kept in an object of

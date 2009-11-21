@@ -1,3 +1,12 @@
+2009-11-21  Doug Evans  <dje@sebabeach.org>
+
+	* dev-utils.scm: New file.
+	* dev.scm (srcdir, load-doc, load-opc, load-gtest, load-sid,
+	load-sim, load-stest, load-testsuite): Moved to dev-utils.scm.
+	* read.scm (CHECK-LOADED?, libcpu.so, /loaded-file-list, /loaded-file?,
+	/loaded-file-record!, maybe-load): Delete.
+	Load cgen files directly instead of via maybe-load.
+
 2009-11-14  Doug Evans  <dje@sebabeach.org>
 
 	* rtl-traverse.scm (/rtx-canon): Flag an error for non-void

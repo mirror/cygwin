@@ -1565,12 +1565,6 @@
 
 (define (op:length operand) (send operand 'field-length))
 
-; Return the nub of a list of operands, base on their names.
-
-(define (op-nub op-list)
-  (nub op-list obj:name)
-)
-
 ; Return a sorted list of operand lists.
 ; Each element in the inner list is an operand with the same name, but for
 ; whatever reason were defined separately.
@@ -1624,7 +1618,7 @@
 	      (builtin-location) 'pc "program counter"
 	      (atlist-parse (make-prefix-context "make! of pc")
 			    '(SEM-ONLY) "cgen_operand")
-	      'h-pc
+	      'h-pc ;; FIXME: keep name h-pc hardwired?
 	      'DFLT
 	      ;;(hw-index-scalar) ;; FIXME: change to this
 	      (make <hw-index> 'anonymous

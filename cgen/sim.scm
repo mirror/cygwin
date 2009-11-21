@@ -1198,6 +1198,33 @@
        " = " (cx:c newval) ";\n"))
 )
 
+(define /operand-number-elaboration-written? #f)
+
+;; Return code to update `written'.
+
+(define (/op-gen-written-update op)
+  (if (op:cond? op)
+      ;; FIXME: we don't yet handle a large number of operands
+      (if (< (op:num op) 32)
+	  (string-append "    written |= (1 << "
+			 (number->string (op:num op))
+			 ");\n")
+	  (begin
+	    ;; FIXME: This creates broken simulators if with-parallel-write?.
+	    (message (if (with-parallel-write?) "Error: " "Warning: ")
+		     (obj:name op)
+		     " operand number " (op:num op)
+		     " is too large (>= 32)\n")
+	    (if (not /operand-number-elaboration-written?)
+		(begin
+		  (message "This is a current internal cgen limitation.\n")
+		  (if (not (with-parallel-write?))
+		      (message "The only effect is a loss in profiling capability.\n"))
+		  (set! /operand-number-elaboration-written? #t)))
+	    ""))
+      "")
+)
+
 (define (/op-gen-set-trace op estate mode index selector newval)
   (string-append
    "  {\n"
@@ -1218,11 +1245,7 @@
        ;else
        (send (op:type op) 'gen-set-quiet estate mode index selector
 	     (cx:make-with-atlist mode "opval" (cx:atlist newval))))
-   (if (op:cond? op)
-       (string-append "    written |= (1 << "
-		      (number->string (op:num op))
-		      ");\n")
-       "")
+   (/op-gen-written-update op)
 ; TRACE_RESULT_<MODE> (cpu, abuf, hwnum, opnum, value);
 ; For each insn record array of operand numbers [or indices into
 ; operand instance table].
@@ -1249,11 +1272,7 @@
 	    "")
 	"    " /par-operand-macro " (" (gen-sym op) ")"
 	" = opval;\n"))
-   (if (op:cond? op)
-       (string-append "    written |= (1 << "
-		      (number->string (op:num op))
-		      ");\n")
-       "")
+   (/op-gen-written-update op)
 ; TRACE_RESULT_<MODE> (cpu, abuf, hwnum, opnum, value);
 ; For each insn record array of operand numbers [or indices into
 ; operand instance table].

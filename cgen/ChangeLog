@@ -1,5 +1,7 @@
 2009-11-21  Doug Evans  <dje@sebabeach.org>
 
+	* read.scm (/cmd-define-rtl-version): Only log rtl version if changed.
+
 	* operand.scm (op-nub): Delete.
 
 	* dev-utils.scm: New file.

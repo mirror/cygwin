@@ -105,7 +105,8 @@
   (let ((new-version (list major minor)))
     (if (not (member new-version /supported-rtl-versions))
 	(parse-error #f "Unsupported/invalid rtl version" new-version))
-    (logit 1 "Setting RTL version to " major "." minor " ...\n")
+    (if (not (equal? new-version /CGEN-RTL-VERSION))
+	(logit 1 "Setting RTL version to " major "." minor " ...\n"))
     (set! /CGEN-RTL-VERSION new-version))
 )
 

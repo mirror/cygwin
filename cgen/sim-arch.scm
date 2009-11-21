@@ -48,7 +48,6 @@
 				     (/gen-cpu-header cpu "eng")
 				     "#include \"cgen-engine.h\"\n"
 				     (/gen-cpu-header cpu "cpu")
-				     ; FIXME: Shorten "decode" to "dec".
 				     (/gen-cpu-header cpu "decode")
 				     "#endif\n\n")))
 		    (current-cpu-list))

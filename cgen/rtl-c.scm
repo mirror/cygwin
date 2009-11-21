@@ -1244,47 +1244,54 @@
 		 ))))
 )
 
-; Return a <c-expr> node for a `sequence'.
-; MODE is the mode name.
+;; Return a <c-expr> node for a `sequence'.
+;; MODE is the mode name.
 
 (define (s-sequence estate mode env . exprs)
-  (let* ((env (rtx-env-make-locals env)) ; compile env
+  (let* ((env (rtx-env-make-locals env)) ;; compile env
 	 (estate (estate-push-env estate env)))
+
     (if (or (mode:eq? 'DFLT mode) ;; FIXME: DFLT can't appear anymore
 	    (mode:eq? 'VOID mode))
+
 	(cx:make VOID
 		 (string-append 
-		  ; ??? do {} while (0); doesn't get "optimized out"
-		  ; internally by gcc, meaning two labels and a loop are
-		  ; created for it to have to process.  We can generate pretty
-		  ; big files and can cause gcc to require *lots* of memory.
-		  ; So let's try just {} ...
+		  ;; ??? do {} while (0); doesn't get "optimized out"
+		  ;; internally by gcc, meaning two labels and a loop are
+		  ;; created for it to have to process.  We can generate pretty
+		  ;; big files and can cause gcc to require *lots* of memory.
+		  ;; So let's try just {} ...
 		  "{\n"
 		  (gen-temp-defs estate env)
 		  (string-map (lambda (e)
 				(rtl-c-with-estate estate VOID e))
 			      exprs)
 		  "}\n"))
-	(cx:make mode
-		 (string-append
-		  ; Don't use GCC extension unless necessary.
-		  (if (rtx-env-empty? env) "(" "({ ")
-		  (gen-temp-defs estate env)
-		  (string-drop 2
-			       (string-map
-				(lambda (e)
-				  (string-append
-				   (if (rtx-env-empty? env) ", " "; ")
-				   ; Strip off gratuitous ";\n" at end of expressions that
-				   ; misguessed themselves to be in statement context.
-				   ; See s-c-call, s-c-call-raw above.
-				   (let ((substmt (rtl-c-with-estate estate DFLT e)))
-				     (if (and (rtx-env-empty? env)
-					      (string=? (string-take -2 substmt) ";\n"))
-					 (string-drop -2 substmt)
-					 substmt))))
-				exprs))
-		  (if (rtx-env-empty? env) ")" "; })")))))
+
+	(let (
+	      ;; Don't use GCC extension unless necessary.
+	      (use-stmt-expr? (or (not (rtx-env-empty? env))
+				  (> (length exprs) 1)))
+	      )
+	  (cx:make mode
+		   (string-append
+		    (if use-stmt-expr? "({ " "(")
+		    (gen-temp-defs estate env)
+		    (string-drop 2
+				 (string-map
+				  (lambda (e)
+				    (string-append
+				     (if use-stmt-expr? "; " ", ")
+				     ;; Strip off gratuitous ";\n" at end of expressions that
+				     ;; misguessed themselves to be in statement context.
+				     ;; See s-c-call, s-c-call-raw above.
+				     (let ((substmt (rtl-c-with-estate estate DFLT e)))
+				       (if (and (not use-stmt-expr?)
+						(string=? (string-take -2 substmt) ";\n"))
+					   (string-drop -2 substmt)
+					   substmt))))
+				  exprs))
+		    (if use-stmt-expr? "; })" ")"))))))
 )
 
 ; Return a <c-expr> node for a `do-count'.

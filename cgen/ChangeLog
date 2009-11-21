@@ -1,5 +1,8 @@
 2009-11-21  Doug Evans  <dje@sebabeach.org>
 
+	* rtl-c.scm (s-sequence): Use gcc's statement expressions for
+	non-VOID-mode expressions with multiple statements.
+
 	* sim.scm (/operand-number-elaboration-written?): New variable.
 	(/op-gen-written-update op): New function.
 	(/op-gen-set-trace, /op-gen-set-trace-parallel): Call it.

@@ -719,8 +719,8 @@
 				"\n")
 			    indent "    if (("
 			    (if (adata-integral-insn? CURRENT-ARCH) "entire_insn" "base_insn")
-			    " & 0x" (number->hex (insn-base-mask insn))
-			    ") == 0x" (number->hex (insn-value insn)) ")\n" 
+			    " & " (gen-c-hex-constant (insn-base-mask insn) "CGEN_INSN_LGUINT")
+			    ") == " (gen-c-hex-constant (insn-value insn) "CGEN_INSN_LGUINT") ")\n"
 			    (/gen-bracketed-set-itype-and-extract (string-append indent "      ")
 								  (gen-cpu-insn-enum (current-cpu) insn)
 								  fmt-name fn?)

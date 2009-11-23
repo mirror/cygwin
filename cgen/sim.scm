@@ -1002,8 +1002,17 @@
    (let ((mode (if (mode:eq? 'DFLT mode)
 		   (send self 'get-mode)
 		   mode)))
-     ; The enclosing function must set `pc' to the correct value.
-     (cx:make mode "pc")))
+
+     (logit 4 "<pc> cxmake-get self=" (obj:name self) " mode=" (obj:name mode) "\n")
+
+     (if (obj-has-attr? self 'RAW)
+	 (let ((hw (op:type self))
+	       ;; For consistency with <operand> process index,selector similarly.
+	       (index (if index index (op:index self)))
+	       (selector (if selector selector (op:selector self))))
+	   (send hw 'cxmake-get-raw estate mode index selector))
+	 ;; The enclosing function must set `pc' to the correct value.
+	 (cx:make mode "pc"))))
 )
 
 (method-make!
@@ -1104,29 +1113,34 @@
 		   mode))
 	 (index (if index index (op:index self)))
 	 (selector (if selector selector (op:selector self))))
-     ; If the instruction could be parallely executed with others and we're
-     ; doing read pre-processing, the operand has already been fetched, we
-     ; just have to grab the cached value.
-     ; ??? reg-raw: support wip
-     (cond ((obj-has-attr? self 'RAW)
-	    (send (op:type self) 'cxmake-get-raw estate mode index selector))
-	   ((with-parallel-read?)
-	    (cx:make-with-atlist mode
-				 (string-append /par-operand-macro
-						" (" (gen-sym self) ")")
-				 nil)) ; FIXME: want CACHED attr if present
-	   ((op:getter self)
-	    (let ((args (car (op:getter self)))
-		  (expr (cadr (op:getter self))))
-	      (rtl-c-expr mode
-			  (obj-isa-list self)
-			  (if (= (length args) 0)
-			      nil
-			      (list (list (car args) 'UINT index)))
-			  expr
-			  #:rtl-cover-fns? #t)))
-	   (else
-	    (send (op:type self) 'cxmake-get estate mode index selector)))))
+     ;; If the instruction could be parallely executed with others and we're
+     ;; doing read pre-processing, the operand has already been fetched, we
+     ;; just have to grab the cached value.
+     (let ((result
+	    (cond ((obj-has-attr? self 'RAW)
+		   (send (op:type self) 'cxmake-get-raw estate mode index selector))
+		  ((with-parallel-read?)
+		   (cx:make-with-atlist mode
+					(string-append /par-operand-macro
+						       " (" (gen-sym self) ")")
+					nil)) ;; FIXME: want CACHED attr if present
+		  ((op:getter self)
+		   (let ((args (car (op:getter self)))
+			 (expr (cadr (op:getter self))))
+		     (rtl-c-expr mode
+				 (obj-isa-list self)
+				 (if (= (length args) 0)
+				     nil
+				     (list (list (car args) 'UINT index)))
+				 expr
+				 #:rtl-cover-fns? #t)))
+		  (else
+		   (send (op:type self) 'cxmake-get estate mode index selector)))))
+
+       (logit 4 "<operand> cxmake-get self=" (obj:name self) " mode=" (obj:name mode)
+	      " index=" (obj:name index) " selector=" selector "\n")
+
+       result)))
 )
 
 ; Utilities to implement gen-set-quiet/gen-set-trace.

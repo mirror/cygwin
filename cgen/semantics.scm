@@ -110,8 +110,10 @@
 )
 
 ; Subroutine of semantic-compile:process-expr!, to simplify it.
+; REF-TYPE is one of 'use, 'set, 'set-quiet.
+; Adds COND-CTI/UNCOND-CTI to SEM-ATTRS if the operand is a set of the pc.
 
-(define (/build-reg-operand! expr tstate op-list)
+(define (/build-reg-operand! expr tstate ref-type op-list sem-attrs)
   (let* ((hw-name (rtx-reg-name expr))
 	 (hw (current-hw-sem-lookup-1 hw-name)))
 
@@ -122,6 +124,12 @@
 	       ; #f is a place-holder for the object (filled in later)
 	       (try (list 'reg #f mode hw-name indx-sel))
 	       (existing-op (/rtx-find-op try op-list)))
+
+	  ;; FIXME: keep name h-pc hardwired?
+	  (if (and (eq? 'h-pc hw-name)
+		   (memq ref-type '(set set-quiet)))
+	      (append! sem-attrs
+		       (list (if (tstate-cond? tstate) 'COND-CTI 'UNCOND-CTI))))
 
 	  ; If already present, return the object, otherwise add it.
 	  (if existing-op
@@ -356,10 +364,11 @@
 			   (else (parse-error (tstate-context tstate)
 					      "invalid register number"
 					      regno)))
-		     (/build-reg-operand! expr tstate
+		     (/build-reg-operand! expr tstate ref-type
 					  (if (eq? ref-type 'use)
 					      in-ops
-					      out-ops))))
+					      out-ops)
+					  sem-attrs)))
 
 	    ; Memory.
 	    ((mem) (let ((ref-type (/rtx-ref-type parent-expr op-pos)))
@@ -494,6 +503,7 @@
 ;
 ; CONTEXT is a <context> object or #f if there is none.
 ; INSN is the <insn> object.
+; SEM-CODE must be canonicalized rtl.
 
 (define (semantic-attrs context insn sem-code)
   (assert (rtx? sem-code))
@@ -515,11 +525,24 @@
 				      '(set set-quiet)))
 			   (append! sem-attrs
 				    (if (tstate-cond? tstate)
-					; Don't change these to '(FOO), since
-					; we use append!.
+					;; Don't change these to '(FOO), since
+					;; we use append!.
 					(list 'COND-CTI)
 					(list 'UNCOND-CTI)))))
+
+	    ;; FIXME: keep name h-pc hardwired?
+	    ((reg) (if (and (eq? 'h-pc (rtx-reg-name expr))
+			    (memq (/rtx-ref-type parent-expr op-pos)
+				  '(set set-quiet)))
+		       (append! sem-attrs
+				(if (tstate-cond? tstate)
+				    ;; Don't change these to '(FOO), since
+				    ;; we use append!.
+				    (list 'COND-CTI)
+				    (list 'UNCOND-CTI)))))
+
 	    ((skip) (append! sem-attrs (list 'SKIP-CTI)) #f)
+
 	    ((delay) (append! sem-attrs (list 'DELAY-SLOT)) #f)
 
 	    ; If this is a syntax expression, the operands won't have been

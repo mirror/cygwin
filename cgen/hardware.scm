@@ -981,6 +981,8 @@
 
 (method-make! <hw-pc> 'pc? (lambda (self) #t))
 
+(define (hw-pc? hw) (send hw 'pc?))
+
 ; Memory.
 
 (define <hw-memory> (class-make '<hw-memory> '(<hardware-base>) nil nil))

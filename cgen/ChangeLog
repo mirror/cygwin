@@ -1,3 +1,24 @@
+2009-11-23  Doug Evans  <dje@sebabeach.org>
+
+	* hardware.scm (hw-pc?): New function.
+	* ifield.scm (ifld-signed?): New function.
+	* iformat.scm (ifmt-analyze): Call insn-cti-attr? instead of insn-cti?.
+	* insn.scm (insn-cti-attr?): Renamed from insn-ctl?.
+	(insn-cti?): New function.
+	* rtl.scm (/hw): Create <pc> object for pcs.
+	* semantics.scm (/build-reg-operand!): New args ref-type, sem-attrs.
+	All callers updated.  Watch for sets to the pc.
+	(semantic-attrs): Watch for sets to the pc.
+	* sid.scm (<pc> cxmake-get): Handle raw-reg.
+	* sim.scm (<pc> cxmake-get): Handle raw-reg.
+	(<operand> cxmake-get): Add debugging printf.
+	* utils-gen.scm (/gen-ifld-extract-base): Emit calls to
+	EXTRACT_[LM]SB0_LG[SU]INT for values > 32 bits.
+	(/gen-extract-word): Ditto.
+
+	* utils.scm (gen-c-hex-constant): New function.
+	* utils-sim.scm (/gen-decode-insn-entry): Call it.
+
 2009-11-22  Doug Evans  <dje@sebabeach.org>
 
 	* insn.scm (/parse-insn-format): Watch for duplicate ifields.

@@ -902,12 +902,27 @@
     result)
 )
 
-; Return a boolean indicating if INSN is a cti [control transfer insn].
-; This includes SKIP-CTI insns even though they don't terminate a basic block.
-; ??? SKIP-CTI insns are wip, waiting for more examples of how they're used.
+;; Return a boolean indicating if INSN is a cti [control transfer insn]
+;; according the its attributes.
+;;
+;; N.B. This only looks at the insn's atlist, which only contains what was
+;; specified in the .cpu file.  .cpu files are not required to manually mark
+;; CTI insns.  Basically this exists as an escape hatch in case semantic-attrs
+;; gets it wrong.
+
+(define (insn-cti-attr? insn)
+  (atlist-cti? (obj-atlist insn))
+)
+
+;; Return a boolean indicating if INSN is a cti [control transfer insn].
+;; This includes SKIP-CTI insns even though they don't terminate a basic block.
+;; ??? SKIP-CTI insns are wip, waiting for more examples of how they're used.
+;;
+;; N.B. This requires the <sformat> of INSN.
 
 (define (insn-cti? insn)
-  (atlist-cti? (obj-atlist insn))
+  (or (insn-cti-attr? insn)
+      (sfmt-cti? (insn-sfmt insn)))
 )
 
 ; Return a boolean indicating if INSN can be executed in parallel.

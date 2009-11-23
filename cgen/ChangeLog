@@ -1,5 +1,13 @@
 2009-11-22  Doug Evans  <dje@sebabeach.org>
 
+	* insn.scm (/parse-insn-format): Watch for duplicate ifields.
+	* read.scm (parse-error-continuable): New function.
+	(define /continuable-error-found?): New variable.
+	(/init-reader!): Initialize it.
+	(/finish-reader!): New function.
+	(cpu-load): Call it.
+	* utils-cgen.scm (obj-list-nub): New function.
+
 	* mach.scm (<derived-arch-data>): New member large-insn-word?.
 	(/adata-set-derived!): Set it.
 	(adata-large-insn-word?): New function.

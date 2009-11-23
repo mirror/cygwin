@@ -881,6 +881,7 @@
      " } }"
      ))
 )
+
 ; Return a boolean indicating if ATLIST indicates a CTI insn.
 
 (define (atlist-cti? atlist)
@@ -962,9 +963,15 @@
    ";} while (0)\n")
 )
 
-; Misc. object utilities.
+;; Misc. object utilities.
 
-; Sort a list of objects with get-name methods alphabetically.
+;; Return the nub of a list of objects.
+
+(define (obj-list-nub obj-list)
+  (nub obj-list obj:name)
+)
+
+;; Sort a list of objects with get-name methods alphabetically.
 
 (define (alpha-sort-obj-list l)
   (sort l

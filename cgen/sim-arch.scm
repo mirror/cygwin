@@ -41,16 +41,16 @@
 (define (/gen-cpuall-includes)
   (string-list
    "/* Include files for each cpu family.  */\n\n"
-   (string-list-map (lambda (cpu)
-		      (let* ((cpu-name (gen-sym cpu))
-			     (CPU-NAME (string-upcase cpu-name)))
-			(string-list "#ifdef WANT_CPU_" CPU-NAME "\n"
-				     (/gen-cpu-header cpu "eng")
-				     "#include \"cgen-engine.h\"\n"
-				     (/gen-cpu-header cpu "cpu")
-				     (/gen-cpu-header cpu "decode")
-				     "#endif\n\n")))
-		    (current-cpu-list))
+   (string-list-map
+    (lambda (cpu)
+      (let* ((cpu-name (gen-sym cpu))
+	     (CPU-NAME (string-upcase cpu-name)))
+	(string-list "#ifdef WANT_CPU_" CPU-NAME "\n"
+		     (/gen-cpu-header cpu "eng")
+		     (/gen-cpu-header cpu "cpu")
+		     (/gen-cpu-header cpu "decode")
+		     "#endif\n\n")))
+    (current-cpu-list))
    )
 )
 

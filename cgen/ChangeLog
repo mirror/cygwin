@@ -1,5 +1,19 @@
 2009-11-22  Doug Evans  <dje@sebabeach.org>
 
+	* mach.scm (<derived-arch-data>): New member large-insn-word?.
+	(/adata-set-derived!): Set it.
+	(adata-large-insn-word?): New function.
+	* sim-arch.scm (/gen-cpuall-includes): Don't #include cgen-engine.h
+	here.
+	* sim-cpu.scm (cgen-cpu.h): #include it here.
+	(/gen-cpu-defines): Define CGEN_INSN_WORD.
+	(/gen-no-scache-semantic-fn): Use CGEN_INSN_WORD instead of
+	CGEN_INSN_INT.
+	* sim-decode.scm (/gen-idesc-decls): Ditto.
+	(/gen-extract-case, /gen-decode-fn): Ditto.
+	* sim-model.scm (/gen-model-insn-fn): Ditto.
+	* sim.scm (gen-argbuf-type): Ditto.
+
 	* rtl-c.scm (/use-gcc-stmt-expr?): New function.
 	(s-sequence): Call it.
 

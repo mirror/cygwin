@@ -146,7 +146,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
        ""
        (string-list
 	"  IADDR UNUSED pc = GET_H_PC ();\n"
-	"  CGEN_INSN_INT insn = abuf->insn;\n"
+	"  CGEN_INSN_WORD insn = abuf->insn;\n"
 	(gen-define-ifmt-ifields (insn-ifmt insn) "  " #f #t)
 	(gen-sfmt-op-argbuf-defns (insn-sfmt insn))
 	(gen-extract-ifmt-ifields (insn-ifmt insn) "  " #f #t)

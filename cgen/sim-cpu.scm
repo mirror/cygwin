@@ -846,7 +846,6 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
    ;; We need to include it here (or thereabouts) because cgen-engine.h
    ;; needs CGEN_INSN_WORD and parts of the remainder of this file need
    ;; cgen-engine.h.
-   "/* cgen-engine.h needs CGEN_INSN_WORD that we just defined.  */\n"
    "#include \"cgen-engine.h\"\n\n"
    /gen-hardware-types
    /gen-cpu-reg-access-decls

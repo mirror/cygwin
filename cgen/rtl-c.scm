@@ -1244,6 +1244,26 @@
 		 ))))
 )
 
+;; Subroutine of s-sequence to simplify it.
+;; Return a boolean indicating if GCC's "statement expression" extension
+;; is necessary to implement (sequence MODE ENV EXPR-LIST).
+;; Only use GCC "statement expression" extension if necessary.
+;;
+;; Avoid using statement expressions for
+;; (sequence non-VOID-mode (error "mumble") expr).
+;; Some targets, e.g. cris, use this.
+
+(define (/use-gcc-stmt-expr? mode env expr-list)
+  (if (not (rtx-env-empty? env))
+      #t
+      (case (length expr-list)
+	((1) #f)
+	((2) (if (eq? (rtx-name (car expr-list)) 'error)
+		 #f
+		 #t))
+	(else #t)))
+)
+
 ;; Return a <c-expr> node for a `sequence'.
 ;; MODE is the mode name.
 
@@ -1268,11 +1288,7 @@
 			      exprs)
 		  "}\n"))
 
-	(let (
-	      ;; Don't use GCC extension unless necessary.
-	      (use-stmt-expr? (or (not (rtx-env-empty? env))
-				  (> (length exprs) 1)))
-	      )
+	(let ((use-stmt-expr? (/use-gcc-stmt-expr? mode env exprs)))
 	  (cx:make mode
 		   (string-append
 		    (if use-stmt-expr? "({ " "(")

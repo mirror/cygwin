@@ -1,3 +1,8 @@
+2009-11-22  Doug Evans  <dje@sebabeach.org>
+
+	* rtl-c.scm (/use-gcc-stmt-expr?): New function.
+	(s-sequence): Call it.
+
 2009-11-21  Doug Evans  <dje@sebabeach.org>
 
 	* rtl-c.scm (s-sequence): Use gcc's statement expressions for

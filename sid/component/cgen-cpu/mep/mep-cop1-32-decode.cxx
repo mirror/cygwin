@@ -2965,7 +2965,7 @@ mepcop1_32_extract_sfmt_cpmovi_b_C3 (mepcop1_32_scache* abuf, mep_ext1_cpu* curr
     INT f_ivc2_8s4;
     UINT f_ivc2_5u21;
 
-    f_ivc2_8s4 = EXTRACT_MSB0_INT (insn, 32, 4, 8);
+    f_ivc2_8s4 = EXTRACT_MSB0_SINT (insn, 32, 4, 8);
     f_ivc2_5u21 = EXTRACT_MSB0_UINT (insn, 32, 21, 5);
 
   /* Record the fields for the semantic handler.  */

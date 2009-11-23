@@ -582,8 +582,8 @@ public:
 /* Treating the TOTAL least significant bits of VAL as a field, and
    numbering its leftmost bit zero, return the LENGTH-bit subfield
    whose leftmost bit is START.
-   The '*INT' version sign-extends; the '*UINT' version doesn't.  */
-#define EXTRACT_MSB0_INT(val, total, start, length) \
+   The '*SINT' version sign-extends; the '*UINT' version doesn't.  */
+#define EXTRACT_MSB0_SINT(val, total, start, length) \
 (((INT) (val) << ((sizeof (INT) * 8) - (total) + (start))) \
  >> ((sizeof (INT) * 8) - (length)))
 #define EXTRACT_MSB0_UINT(val, total, start, length) \
@@ -593,13 +593,27 @@ public:
 /* Treating the TOTAL least significant bits of VAL as a field, and
    numbering its rightmost bit zero, return the LENGTH-bit subfield
    whose leftmost bit is START.
-   The '*INT' version sign-extends; the '*UINT' version doesn't.  */
-#define EXTRACT_LSB0_INT(val, total, start, length) \
+   The '*SINT' version sign-extends; the '*UINT' version doesn't.  */
+#define EXTRACT_LSB0_SINT(val, total, start, length) \
 (((INT) (val) << ((sizeof (INT) * 8) - (start) - 1)) \
  >> ((sizeof (INT) * 8) - (length)))
 #define EXTRACT_LSB0_UINT(val, total, start, length) \
 (((UINT) (val) << ((sizeof (UINT) * 8) - (start) - 1)) \
  >> ((sizeof (UINT) * 8) - (length)))
+
+#define EXTRACT_MSB0_LGSINT(val, total, start, length) \
+(((CGEN_INSN_LGSINT) (val) << ((sizeof (CGEN_INSN_LGSINT) * 8) - (total) + (start))) \
+ >> ((sizeof (CGEN_INSN_LGSINT) * 8) - (length)))
+#define EXTRACT_MSB0_LGUINT(val, total, start, length) \
+(((CGEN_INSN_UINT) (val) << ((sizeof (CGEN_INSN_LGUINT) * 8) - (total) + (start))) \
+ >> ((sizeof (CGEN_INSN_LGUINT) * 8) - (length)))
+
+#define EXTRACT_LSB0_LGSINT(val, total, start, length) \
+(((CGEN_INSN_LGSINT) (val) << ((sizeof (CGEN_INSN_LGSINT) * 8) - (start) - 1)) \
+ >> ((sizeof (CGEN_INSN_LGSINT) * 8) - (length)))
+#define EXTRACT_LSB0_LGUINT(val, total, start, length) \
+(((CGEN_INSN_LGUINT) (val) << ((sizeof (CGEN_INSN_LGUINT) * 8) - (start) - 1)) \
+ >> ((sizeof (CGEN_INSN_LGUINT) * 8) - (length)))
 
 } // namespace cgen
 

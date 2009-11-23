@@ -3194,7 +3194,7 @@ sh3e_extract_sfmt_bf_compact (sh3e_scache* abuf, sh3e_cpu* current_cpu, PCADDR p
 #define FLD(f) abuf->fields.sfmt_bf_compact.f
     SI f_disp8;
 
-    f_disp8 = ((((EXTRACT_MSB0_INT (insn, 16, 8, 8)) << (1))) + (((pc) + (4))));
+    f_disp8 = ((((EXTRACT_MSB0_SINT (insn, 16, 8, 8)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_disp8) = f_disp8;
@@ -3218,7 +3218,7 @@ sh3e_extract_sfmt_bfs_compact (sh3e_scache* abuf, sh3e_cpu* current_cpu, PCADDR 
 #define FLD(f) abuf->fields.sfmt_bf_compact.f
     SI f_disp8;
 
-    f_disp8 = ((((EXTRACT_MSB0_INT (insn, 16, 8, 8)) << (1))) + (((pc) + (4))));
+    f_disp8 = ((((EXTRACT_MSB0_SINT (insn, 16, 8, 8)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_disp8) = f_disp8;
@@ -3242,7 +3242,7 @@ sh3e_extract_sfmt_bra_compact (sh3e_scache* abuf, sh3e_cpu* current_cpu, PCADDR 
 #define FLD(f) abuf->fields.sfmt_bra_compact.f
     SI f_disp12;
 
-    f_disp12 = ((((EXTRACT_MSB0_INT (insn, 16, 4, 12)) << (1))) + (((pc) + (4))));
+    f_disp12 = ((((EXTRACT_MSB0_SINT (insn, 16, 4, 12)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_disp12) = f_disp12;
@@ -3292,7 +3292,7 @@ sh3e_extract_sfmt_bsr_compact (sh3e_scache* abuf, sh3e_cpu* current_cpu, PCADDR 
 #define FLD(f) abuf->fields.sfmt_bra_compact.f
     SI f_disp12;
 
-    f_disp12 = ((((EXTRACT_MSB0_INT (insn, 16, 4, 12)) << (1))) + (((pc) + (4))));
+    f_disp12 = ((((EXTRACT_MSB0_SINT (insn, 16, 4, 12)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_disp12) = f_disp12;

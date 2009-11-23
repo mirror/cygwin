@@ -1,3 +1,19 @@
+2009-11-23  Doug Evans  <dje@sebabeach.org>
+
+	* sh2-decode.cxx: Regenerate.
+	* sh2a-fpu-decode.cxx: Regenerate.
+	* sh2a-nofpu-decode.cxx: Regenerate.
+	* sh2e-decode.cxx: Regenerate.
+	* sh3-decode.cxx: Regenerate.
+	* sh3e-decode.cxx: Regenerate.
+	* sh4-decode.cxx: Regenerate.
+	* sh4-nofpu-decode.cxx: Regenerate.
+	* sh4a-decode.cxx: Regenerate.
+	* sh4a-nofpu-decode.cxx: Regenerate.
+	* sh4al-decode.cxx: Regenerate.
+	* sh5-compact-decode.cxx: Regenerate.
+	* sh5-media-decode.cxx: Regenerate.
+
 2009-10-23  Doug Evans  <dje@sebabeach.org>
 
 	* sh-desc.h: Regenerate.
@@ -13,6 +29,7 @@
 	* sh4a-nofpu-decode.cxx: Regenerate.
 	* sh4al-decode.cxx: Regenerate.
 	* sh5-compact-decode.cxx: Regenerate.
+	* sh5-media-decode.cxx: Regenerate.
 
 2007-08-13  Frank Ch. Eigler  <fche@redhat.com>
 

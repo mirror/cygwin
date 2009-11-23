@@ -1709,7 +1709,7 @@ mepcore1_extract_sfmt_prefd (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rn) = f_rn;
@@ -1784,7 +1784,7 @@ mepcore1_extract_sfmt_sbcp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PC
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_12s20 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_12s20 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_12s20) = f_12s20;
@@ -1819,7 +1819,7 @@ mepcore1_extract_sfmt_lbcp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PC
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_12s20 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_12s20 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_12s20) = f_12s20;
@@ -1854,7 +1854,7 @@ mepcore1_extract_sfmt_shcp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PC
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_12s20 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_12s20 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_12s20) = f_12s20;
@@ -1889,7 +1889,7 @@ mepcore1_extract_sfmt_lhcp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PC
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_12s20 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_12s20 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_12s20) = f_12s20;
@@ -1924,7 +1924,7 @@ mepcore1_extract_sfmt_lbucpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -1960,7 +1960,7 @@ mepcore1_extract_sfmt_lhucpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -1996,7 +1996,7 @@ mepcore1_extract_sfmt_lbucpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu,
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -2034,7 +2034,7 @@ mepcore1_extract_sfmt_lhucpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu,
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -2072,7 +2072,7 @@ mepcore1_extract_sfmt_lbucpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu,
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -2110,7 +2110,7 @@ mepcore1_extract_sfmt_lhucpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu,
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -2770,7 +2770,7 @@ mepcore1_extract_sfmt_sb16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PC
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rm) = f_rm;
@@ -2807,7 +2807,7 @@ mepcore1_extract_sfmt_sh16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PC
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rm) = f_rm;
@@ -2844,7 +2844,7 @@ mepcore1_extract_sfmt_sw16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PC
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rm) = f_rm;
@@ -2881,7 +2881,7 @@ mepcore1_extract_sfmt_lb16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PC
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rm) = f_rm;
@@ -2918,7 +2918,7 @@ mepcore1_extract_sfmt_lh16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PC
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rm) = f_rm;
@@ -2955,7 +2955,7 @@ mepcore1_extract_sfmt_lw16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PC
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rm) = f_rm;
@@ -2992,7 +2992,7 @@ mepcore1_extract_sfmt_lbu16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rm) = f_rm;
@@ -3029,7 +3029,7 @@ mepcore1_extract_sfmt_lhu16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rm) = f_rm;
@@ -3227,7 +3227,7 @@ mepcore1_extract_sfmt_movi8 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
     INT f_8s8;
 
     f_rn = EXTRACT_MSB0_UINT (insn, 16, 4, 4);
-    f_8s8 = EXTRACT_MSB0_INT (insn, 16, 8, 8);
+    f_8s8 = EXTRACT_MSB0_SINT (insn, 16, 8, 8);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_8s8) = f_8s8;
@@ -3258,7 +3258,7 @@ mepcore1_extract_sfmt_movi16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
     INT f_16s16;
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_16s16) = f_16s16;
@@ -3394,7 +3394,7 @@ mepcore1_extract_sfmt_add (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCA
     INT f_6s8;
 
     f_rn = EXTRACT_MSB0_UINT (insn, 16, 4, 4);
-    f_6s8 = EXTRACT_MSB0_INT (insn, 16, 8, 6);
+    f_6s8 = EXTRACT_MSB0_SINT (insn, 16, 8, 6);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rn) = f_rn;
@@ -3594,7 +3594,7 @@ mepcore1_extract_sfmt_add3x (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rm) = f_rm;
@@ -3631,7 +3631,7 @@ mepcore1_extract_sfmt_slt3x (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rm) = f_rm;
@@ -3837,7 +3837,7 @@ mepcore1_extract_sfmt_bra (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCA
 #define FLD(f) abuf->fields.sfmt_bsr12.f
     SI f_12s4a2;
 
-    f_12s4a2 = ((((EXTRACT_MSB0_INT (insn, 16, 4, 11)) << (1))) + (pc));
+    f_12s4a2 = ((((EXTRACT_MSB0_SINT (insn, 16, 4, 11)) << (1))) + (pc));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_12s4a2) = f_12s4a2;
@@ -3866,7 +3866,7 @@ mepcore1_extract_sfmt_beqz (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PC
     SI f_8s8a2;
 
     f_rn = EXTRACT_MSB0_UINT (insn, 16, 4, 4);
-    f_8s8a2 = ((((EXTRACT_MSB0_INT (insn, 16, 8, 7)) << (1))) + (pc));
+    f_8s8a2 = ((((EXTRACT_MSB0_SINT (insn, 16, 8, 7)) << (1))) + (pc));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_8s8a2) = f_8s8a2;
@@ -3901,7 +3901,7 @@ mepcore1_extract_sfmt_beqi (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PC
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_4u8 = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_17s16a2 = ((((EXTRACT_MSB0_INT (insn, 32, 16, 16)) << (1))) + (pc));
+    f_17s16a2 = ((((EXTRACT_MSB0_SINT (insn, 32, 16, 16)) << (1))) + (pc));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_17s16a2) = f_17s16a2;
@@ -3938,7 +3938,7 @@ mepcore1_extract_sfmt_beq (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCA
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_17s16a2 = ((((EXTRACT_MSB0_INT (insn, 32, 16, 16)) << (1))) + (pc));
+    f_17s16a2 = ((((EXTRACT_MSB0_SINT (insn, 32, 16, 16)) << (1))) + (pc));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_17s16a2) = f_17s16a2;
@@ -3973,7 +3973,7 @@ mepcore1_extract_sfmt_bsr12 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 #define FLD(f) abuf->fields.sfmt_bsr12.f
     SI f_12s4a2;
 
-    f_12s4a2 = ((((EXTRACT_MSB0_INT (insn, 16, 4, 11)) << (1))) + (pc));
+    f_12s4a2 = ((((EXTRACT_MSB0_SINT (insn, 16, 4, 11)) << (1))) + (pc));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_12s4a2) = f_12s4a2;
@@ -4004,7 +4004,7 @@ mepcore1_extract_sfmt_bsr24 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
     INT f_24s5a2n;
 
     f_24s5a2n_lo = EXTRACT_MSB0_UINT (insn, 32, 5, 7);
-    f_24s5a2n_hi = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_24s5a2n_hi = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
   f_24s5a2n = ((((((f_24s5a2n_hi) << (8))) | (((f_24s5a2n_lo) << (1))))) + (pc));
 
   /* Record the fields for the semantic handler.  */
@@ -4149,7 +4149,7 @@ mepcore1_extract_sfmt_repeat (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
     SI f_17s16a2;
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
-    f_17s16a2 = ((((EXTRACT_MSB0_INT (insn, 32, 16, 16)) << (1))) + (pc));
+    f_17s16a2 = ((((EXTRACT_MSB0_SINT (insn, 32, 16, 16)) << (1))) + (pc));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_17s16a2) = f_17s16a2;
@@ -4183,7 +4183,7 @@ mepcore1_extract_sfmt_erepeat (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu,
 #define FLD(f) abuf->fields.sfmt_repeat.f
     SI f_17s16a2;
 
-    f_17s16a2 = ((((EXTRACT_MSB0_INT (insn, 32, 16, 16)) << (1))) + (pc));
+    f_17s16a2 = ((((EXTRACT_MSB0_SINT (insn, 32, 16, 16)) << (1))) + (pc));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_17s16a2) = f_17s16a2;
@@ -5334,7 +5334,7 @@ mepcore1_extract_sfmt_swcp16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_crn) = f_crn;
@@ -5369,7 +5369,7 @@ mepcore1_extract_sfmt_lwcp16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rm) = f_rm;
@@ -5404,7 +5404,7 @@ mepcore1_extract_sfmt_smcp16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_crn) = f_crn;
@@ -5439,7 +5439,7 @@ mepcore1_extract_sfmt_lmcp16 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_16s16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+    f_16s16 = EXTRACT_MSB0_SINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rm) = f_rm;
@@ -5474,7 +5474,7 @@ mepcore1_extract_sfmt_sbcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -5510,7 +5510,7 @@ mepcore1_extract_sfmt_shcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -5546,7 +5546,7 @@ mepcore1_extract_sfmt_swcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -5582,7 +5582,7 @@ mepcore1_extract_sfmt_lwcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -5618,7 +5618,7 @@ mepcore1_extract_sfmt_smcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -5654,7 +5654,7 @@ mepcore1_extract_sfmt_lmcpa (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -5690,7 +5690,7 @@ mepcore1_extract_sfmt_sbcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -5728,7 +5728,7 @@ mepcore1_extract_sfmt_shcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -5766,7 +5766,7 @@ mepcore1_extract_sfmt_swcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -5804,7 +5804,7 @@ mepcore1_extract_sfmt_lwcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -5842,7 +5842,7 @@ mepcore1_extract_sfmt_smcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -5880,7 +5880,7 @@ mepcore1_extract_sfmt_lmcpm0 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -5918,7 +5918,7 @@ mepcore1_extract_sfmt_sbcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -5956,7 +5956,7 @@ mepcore1_extract_sfmt_shcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -5994,7 +5994,7 @@ mepcore1_extract_sfmt_swcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -6032,7 +6032,7 @@ mepcore1_extract_sfmt_lwcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -6070,7 +6070,7 @@ mepcore1_extract_sfmt_smcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -6108,7 +6108,7 @@ mepcore1_extract_sfmt_lmcpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, 
 
     f_crn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_cdisp10 = (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_INT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_INT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_INT (insn, 32, 22, 10)))) & (1023)));
+    f_cdisp10 = (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (512))) ? (((((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023))) - (1024))) : (((((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) & (512))) ? ((((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10))) - (1024))) : ((((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) & (128))) ? (((EXTRACT_MSB0_SINT (insn, 32, 22, 10)) ^ (768))) : (EXTRACT_MSB0_SINT (insn, 32, 22, 10)))) & (1023)));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_cdisp10) = f_cdisp10;
@@ -6144,7 +6144,7 @@ mepcore1_extract_sfmt_bcpeq (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
     SI f_17s16a2;
 
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_17s16a2 = ((((EXTRACT_MSB0_INT (insn, 32, 16, 16)) << (1))) + (pc));
+    f_17s16a2 = ((((EXTRACT_MSB0_SINT (insn, 32, 16, 16)) << (1))) + (pc));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rm) = f_rm;

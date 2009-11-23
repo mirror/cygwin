@@ -2570,7 +2570,7 @@ mepcop1_16_extract_sfmt_cpmovi_b_P0S_P1 (mepcop1_16_scache* abuf, mep_ext1_cpu* 
     INT f_ivc2_8s20;
 
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
-    f_ivc2_8s20 = EXTRACT_MSB0_INT (insn, 32, 20, 8);
+    f_ivc2_8s20 = EXTRACT_MSB0_SINT (insn, 32, 20, 8);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_ivc2_8s20) = f_ivc2_8s20;

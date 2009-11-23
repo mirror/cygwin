@@ -2017,7 +2017,7 @@ thumb_extract_sfmt_beq (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 #define FLD(f) abuf->fields.sfmt_beq.f
     SI f_soffset8;
 
-    f_soffset8 = ((((EXTRACT_LSB0_INT (insn, 16, 7, 8)) << (1))) + (((pc) + (4))));
+    f_soffset8 = ((((EXTRACT_LSB0_SINT (insn, 16, 7, 8)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_soffset8) = f_soffset8;
@@ -2037,7 +2037,7 @@ thumb_extract_sfmt_bcs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 #define FLD(f) abuf->fields.sfmt_beq.f
     SI f_soffset8;
 
-    f_soffset8 = ((((EXTRACT_LSB0_INT (insn, 16, 7, 8)) << (1))) + (((pc) + (4))));
+    f_soffset8 = ((((EXTRACT_LSB0_SINT (insn, 16, 7, 8)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_soffset8) = f_soffset8;
@@ -2057,7 +2057,7 @@ thumb_extract_sfmt_bmi (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 #define FLD(f) abuf->fields.sfmt_beq.f
     SI f_soffset8;
 
-    f_soffset8 = ((((EXTRACT_LSB0_INT (insn, 16, 7, 8)) << (1))) + (((pc) + (4))));
+    f_soffset8 = ((((EXTRACT_LSB0_SINT (insn, 16, 7, 8)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_soffset8) = f_soffset8;
@@ -2077,7 +2077,7 @@ thumb_extract_sfmt_bvs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 #define FLD(f) abuf->fields.sfmt_beq.f
     SI f_soffset8;
 
-    f_soffset8 = ((((EXTRACT_LSB0_INT (insn, 16, 7, 8)) << (1))) + (((pc) + (4))));
+    f_soffset8 = ((((EXTRACT_LSB0_SINT (insn, 16, 7, 8)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_soffset8) = f_soffset8;
@@ -2097,7 +2097,7 @@ thumb_extract_sfmt_bhi (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 #define FLD(f) abuf->fields.sfmt_beq.f
     SI f_soffset8;
 
-    f_soffset8 = ((((EXTRACT_LSB0_INT (insn, 16, 7, 8)) << (1))) + (((pc) + (4))));
+    f_soffset8 = ((((EXTRACT_LSB0_SINT (insn, 16, 7, 8)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_soffset8) = f_soffset8;
@@ -2117,7 +2117,7 @@ thumb_extract_sfmt_bge (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 #define FLD(f) abuf->fields.sfmt_beq.f
     SI f_soffset8;
 
-    f_soffset8 = ((((EXTRACT_LSB0_INT (insn, 16, 7, 8)) << (1))) + (((pc) + (4))));
+    f_soffset8 = ((((EXTRACT_LSB0_SINT (insn, 16, 7, 8)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_soffset8) = f_soffset8;
@@ -2137,7 +2137,7 @@ thumb_extract_sfmt_bgt (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 #define FLD(f) abuf->fields.sfmt_beq.f
     SI f_soffset8;
 
-    f_soffset8 = ((((EXTRACT_LSB0_INT (insn, 16, 7, 8)) << (1))) + (((pc) + (4))));
+    f_soffset8 = ((((EXTRACT_LSB0_SINT (insn, 16, 7, 8)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_soffset8) = f_soffset8;
@@ -2178,7 +2178,7 @@ thumb_extract_sfmt_b (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thu
 #define FLD(f) abuf->fields.sfmt_b.f
     SI f_offset11;
 
-    f_offset11 = ((((EXTRACT_LSB0_INT (insn, 16, 10, 11)) << (1))) + (((pc) + (4))));
+    f_offset11 = ((((EXTRACT_LSB0_SINT (insn, 16, 10, 11)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_offset11) = f_offset11;
@@ -2198,7 +2198,7 @@ thumb_extract_sfmt_bl_hi (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc,
 #define FLD(f) abuf->fields.sfmt_bl_hi.f
     INT f_lbwl_hi;
 
-    f_lbwl_hi = EXTRACT_LSB0_INT (insn, 16, 10, 11);
+    f_lbwl_hi = EXTRACT_LSB0_SINT (insn, 16, 10, 11);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_lbwl_hi) = f_lbwl_hi;

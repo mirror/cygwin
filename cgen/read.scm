@@ -277,9 +277,9 @@
 			":")))
 )
 
-;;; Subroutine of parse-error, parse-warning to simplify them.
-;;; Flag an error or a warning.
-;;; EMITTER is a function of one argument, the message to print.
+;; Subroutine of parse-error, parse-warning to simplify them.
+;; Flag an error or a warning.
+;; EMITTER is a function of one argument, the message to print.
 
 (define (/parse-diagnostic emitter context message expr maybe-help-text)
   (if (not context)
@@ -305,12 +305,13 @@
 	  ""))))
 )
 
-;;; Signal a parse error while reading a .cpu file.
-;;; If CONTEXT is #f, use a default context of the current reader location
-;;; and an empty prefix.
-;;; If MAYBE-HELP-TEXT is specified, elide the last trailing \n.
-;;; Multiple lines of help text need embedded newlines, and should be no longer
-;;; than 79 characters.
+;; Signal a parse error while reading a .cpu file.
+;; Processing stops immediately.
+;; If CONTEXT is #f, use a default context of the current reader location
+;; and an empty prefix.
+;; If MAYBE-HELP-TEXT is specified, elide the last trailing \n.
+;; Multiple lines of help text need embedded newlines, and should be no longer
+;; than 79 characters.
 
 (define (parse-error context errmsg expr . maybe-help-text)
   (/parse-diagnostic error
@@ -320,12 +321,23 @@
 		     (if (null? maybe-help-text) "" (car maybe-help-text)))
 )
 
-;;; Signal a parse warning while reading a .cpu file.
-;;; If CONTEXT is #f, use a default context of the current reader location
-;;; and an empty prefix.
-;;; If MAYBE-HELP-TEXT is specified, elide the last trailing \n.
-;;; Multiple lines of help text need embedded newlines, and should be no longer
-;;; than 79 characters.
+;; Same as parse-error, but continue processing.
+
+(define (parse-error-continuable context errmsg expr . maybe-help-text)
+  (set! /continuable-error-found? #t)
+  (/parse-diagnostic (lambda (text) (message "Error: " text "\n"))
+		     context
+		     errmsg
+		     expr
+		     (if (null? maybe-help-text) #f (car maybe-help-text)))
+)
+
+;; Signal a parse warning while reading a .cpu file.
+;; If CONTEXT is #f, use a default context of the current reader location
+;; and an empty prefix.
+;; If MAYBE-HELP-TEXT is specified, elide the last trailing \n.
+;; Multiple lines of help text need embedded newlines, and should be no longer
+;; than 79 characters.
 
 (define (parse-warning context errmsg expr . maybe-help-text)
   (/parse-diagnostic (lambda (text) (message "Warning: " text "\n"))
@@ -838,6 +850,9 @@
 
 ; .cpu file loader support
 
+;; #t if an error was found (but processing continued)
+(define /continuable-error-found? #f)
+
 ;; Initialize a new <reader> object.
 ;; This doesn't add cgen-specific commands, leaving each element (ifield,
 ;; hardware, etc.) to add their own.
@@ -847,6 +862,8 @@
   (set! CURRENT-READER (new <reader>))
 
   (set! /CGEN-RTL-VERSION /default-rtl-version)
+
+  (set! /continuable-error-found? #f)
 
   (reader-add-command! 'define-rtl-version
 		       "Specify the RTL version being used.\n"
@@ -868,6 +885,14 @@ Define a preprocessor-style macro.
 "
 		       nil '(name arg1 . arg-rest) define-pmacro)
 
+  *UNSPECIFIED*
+)
+
+;; Called at the end of .cpu file loading.
+
+(define (/finish-reader! file)
+  (if /continuable-error-found?
+      (error (string-append "Error loading " file)))
   *UNSPECIFIED*
 )
 
@@ -1035,8 +1060,9 @@ Define a preprocessor-style macro.
   (logit 1 "diags:   " diagnostic-options "\n")
   (set! arch-path (dirname file))
   (reader-read-file! file)
-  (logit 2 "Processing cpu description " file " ...\n")
   (/finish-parse-cpu!)
+  (/finish-reader! file)
+  (logit 1 "Processing cpu description " file " ...\n")
   (app-finisher!)
   (/global-error-checks)
   (analyzer!)

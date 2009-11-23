@@ -49,6 +49,8 @@
 #include "lwp-ctrl.h"
 #include "diagnostics.h"
 
+#include <syscall.h>
+
 /* This is unix ptrace gdbserv target that uses the RDA library to implement
    a remote gdbserver on a unix ptrace host.  It controls the process
    to be debugged on the linux host, allowing GDB to pull the strings

@@ -672,7 +672,7 @@ mt_extract_sfmt_addi (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_w
 
     f_sr1 = EXTRACT_LSB0_UINT (insn, 32, 23, 4);
     f_dr = EXTRACT_LSB0_UINT (insn, 32, 19, 4);
-    f_imm16s = ((EXTRACT_LSB0_INT (insn, 32, 15, 16)) + (0));
+    f_imm16s = ((EXTRACT_LSB0_SINT (insn, 32, 15, 16)) + (0));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_sr1) = f_sr1;
@@ -772,7 +772,7 @@ mt_extract_sfmt_brlt (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_w
 
     f_sr1 = EXTRACT_LSB0_UINT (insn, 32, 23, 4);
     f_sr2 = EXTRACT_LSB0_UINT (insn, 32, 19, 4);
-    f_imm16s = ((EXTRACT_LSB0_INT (insn, 32, 15, 16)) + (0));
+    f_imm16s = ((EXTRACT_LSB0_SINT (insn, 32, 15, 16)) + (0));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_sr1) = f_sr1;
@@ -797,7 +797,7 @@ mt_extract_sfmt_jmp (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_wo
 #define FLD(f) abuf->fields.sfmt_brlt.f
     HI f_imm16s;
 
-    f_imm16s = ((EXTRACT_LSB0_INT (insn, 32, 15, 16)) + (0));
+    f_imm16s = ((EXTRACT_LSB0_SINT (insn, 32, 15, 16)) + (0));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_imm16s) = f_imm16s;
@@ -845,7 +845,7 @@ mt_extract_sfmt_dbnz (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_w
     HI f_imm16s;
 
     f_sr1 = EXTRACT_LSB0_UINT (insn, 32, 23, 4);
-    f_imm16s = ((EXTRACT_LSB0_INT (insn, 32, 15, 16)) + (0));
+    f_imm16s = ((EXTRACT_LSB0_SINT (insn, 32, 15, 16)) + (0));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_sr1) = f_sr1;
@@ -914,7 +914,7 @@ mt_extract_sfmt_ldw (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_wo
 
     f_sr1 = EXTRACT_LSB0_UINT (insn, 32, 23, 4);
     f_dr = EXTRACT_LSB0_UINT (insn, 32, 19, 4);
-    f_imm16s = ((EXTRACT_LSB0_INT (insn, 32, 15, 16)) + (0));
+    f_imm16s = ((EXTRACT_LSB0_SINT (insn, 32, 15, 16)) + (0));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_sr1) = f_sr1;
@@ -943,7 +943,7 @@ mt_extract_sfmt_stw (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_wo
 
     f_sr1 = EXTRACT_LSB0_UINT (insn, 32, 23, 4);
     f_sr2 = EXTRACT_LSB0_UINT (insn, 32, 19, 4);
-    f_imm16s = ((EXTRACT_LSB0_INT (insn, 32, 15, 16)) + (0));
+    f_imm16s = ((EXTRACT_LSB0_SINT (insn, 32, 15, 16)) + (0));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_sr1) = f_sr1;

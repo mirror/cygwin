@@ -1675,7 +1675,7 @@ arm_extract_sfmt_b (arm_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, arm_ins
 #define FLD(f) abuf->fields.sfmt_b.f
     SI f_offset24;
 
-    f_offset24 = ((((EXTRACT_LSB0_INT (insn, 32, 23, 24)) << (2))) + (((pc) + (8))));
+    f_offset24 = ((((EXTRACT_LSB0_SINT (insn, 32, 23, 24)) << (2))) + (((pc) + (8))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_offset24) = f_offset24;
@@ -1695,7 +1695,7 @@ arm_extract_sfmt_bl (arm_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, arm_in
 #define FLD(f) abuf->fields.sfmt_b.f
     SI f_offset24;
 
-    f_offset24 = ((((EXTRACT_LSB0_INT (insn, 32, 23, 24)) << (2))) + (((pc) + (8))));
+    f_offset24 = ((((EXTRACT_LSB0_SINT (insn, 32, 23, 24)) << (2))) + (((pc) + (8))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_offset24) = f_offset24;

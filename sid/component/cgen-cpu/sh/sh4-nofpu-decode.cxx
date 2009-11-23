@@ -2978,7 +2978,7 @@ sh4_nofpu_extract_sfmt_bf_compact (sh4_nofpu_scache* abuf, sh4_nofpu_cpu* curren
 #define FLD(f) abuf->fields.sfmt_bf_compact.f
     SI f_disp8;
 
-    f_disp8 = ((((EXTRACT_MSB0_INT (insn, 16, 8, 8)) << (1))) + (((pc) + (4))));
+    f_disp8 = ((((EXTRACT_MSB0_SINT (insn, 16, 8, 8)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_disp8) = f_disp8;
@@ -3002,7 +3002,7 @@ sh4_nofpu_extract_sfmt_bfs_compact (sh4_nofpu_scache* abuf, sh4_nofpu_cpu* curre
 #define FLD(f) abuf->fields.sfmt_bf_compact.f
     SI f_disp8;
 
-    f_disp8 = ((((EXTRACT_MSB0_INT (insn, 16, 8, 8)) << (1))) + (((pc) + (4))));
+    f_disp8 = ((((EXTRACT_MSB0_SINT (insn, 16, 8, 8)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_disp8) = f_disp8;
@@ -3026,7 +3026,7 @@ sh4_nofpu_extract_sfmt_bra_compact (sh4_nofpu_scache* abuf, sh4_nofpu_cpu* curre
 #define FLD(f) abuf->fields.sfmt_bra_compact.f
     SI f_disp12;
 
-    f_disp12 = ((((EXTRACT_MSB0_INT (insn, 16, 4, 12)) << (1))) + (((pc) + (4))));
+    f_disp12 = ((((EXTRACT_MSB0_SINT (insn, 16, 4, 12)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_disp12) = f_disp12;
@@ -3076,7 +3076,7 @@ sh4_nofpu_extract_sfmt_bsr_compact (sh4_nofpu_scache* abuf, sh4_nofpu_cpu* curre
 #define FLD(f) abuf->fields.sfmt_bra_compact.f
     SI f_disp12;
 
-    f_disp12 = ((((EXTRACT_MSB0_INT (insn, 16, 4, 12)) << (1))) + (((pc) + (4))));
+    f_disp12 = ((((EXTRACT_MSB0_SINT (insn, 16, 4, 12)) << (1))) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (i_disp12) = f_disp12;
@@ -3913,7 +3913,7 @@ sh4_nofpu_extract_sfmt_movi20_compact (sh4_nofpu_scache* abuf, sh4_nofpu_cpu* cu
     INT f_imm20;
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
-    f_imm20_hi = EXTRACT_MSB0_INT (insn, 32, 8, 4);
+    f_imm20_hi = EXTRACT_MSB0_SINT (insn, 32, 8, 4);
     f_imm20_lo = EXTRACT_MSB0_UINT (insn, 32, 16, 16);
   f_imm20 = ((((f_imm20_hi) << (16))) | (f_imm20_lo));
 
@@ -4594,7 +4594,7 @@ sh4_nofpu_extract_sfmt_movl12_compact (sh4_nofpu_scache* abuf, sh4_nofpu_cpu* cu
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_imm12x4 = ((EXTRACT_MSB0_INT (insn, 32, 20, 12)) << (2));
+    f_imm12x4 = ((EXTRACT_MSB0_SINT (insn, 32, 20, 12)) << (2));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_imm12x4) = f_imm12x4;
@@ -4629,7 +4629,7 @@ sh4_nofpu_extract_sfmt_movl13_compact (sh4_nofpu_scache* abuf, sh4_nofpu_cpu* cu
 
     f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
     f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
-    f_imm12x4 = ((EXTRACT_MSB0_INT (insn, 32, 20, 12)) << (2));
+    f_imm12x4 = ((EXTRACT_MSB0_SINT (insn, 32, 20, 12)) << (2));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_imm12x4) = f_imm12x4;

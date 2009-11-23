@@ -1695,7 +1695,7 @@ sh5_media_extract_sfmt_addi (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp10 = EXTRACT_MSB0_INT (insn, 32, 12, 10);
+    f_disp10 = EXTRACT_MSB0_SINT (insn, 32, 12, 10);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -1798,7 +1798,7 @@ sh5_media_extract_sfmt_beqi (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
     UINT f_tra;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_imm6 = EXTRACT_MSB0_INT (insn, 32, 16, 6);
+    f_imm6 = EXTRACT_MSB0_SINT (insn, 32, 16, 6);
     f_likely = EXTRACT_MSB0_UINT (insn, 32, 22, 1);
     f_tra = EXTRACT_MSB0_UINT (insn, 32, 25, 3);
 
@@ -2303,7 +2303,7 @@ sh5_media_extract_sfmt_fldd (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp10x8 = ((EXTRACT_MSB0_INT (insn, 32, 12, 10)) << (3));
+    f_disp10x8 = ((EXTRACT_MSB0_SINT (insn, 32, 12, 10)) << (3));
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -2338,7 +2338,7 @@ sh5_media_extract_sfmt_fldp (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp10x8 = ((EXTRACT_MSB0_INT (insn, 32, 12, 10)) << (3));
+    f_disp10x8 = ((EXTRACT_MSB0_SINT (insn, 32, 12, 10)) << (3));
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -2374,7 +2374,7 @@ sh5_media_extract_sfmt_flds (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp10x4 = ((EXTRACT_MSB0_INT (insn, 32, 12, 10)) << (2));
+    f_disp10x4 = ((EXTRACT_MSB0_SINT (insn, 32, 12, 10)) << (2));
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -2717,7 +2717,7 @@ sh5_media_extract_sfmt_fstd (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp10x8 = ((EXTRACT_MSB0_INT (insn, 32, 12, 10)) << (3));
+    f_disp10x8 = ((EXTRACT_MSB0_SINT (insn, 32, 12, 10)) << (3));
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -2752,7 +2752,7 @@ sh5_media_extract_sfmt_fsts (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp10x4 = ((EXTRACT_MSB0_INT (insn, 32, 12, 10)) << (2));
+    f_disp10x4 = ((EXTRACT_MSB0_SINT (insn, 32, 12, 10)) << (2));
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -2898,7 +2898,7 @@ sh5_media_extract_sfmt_getcfg (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCA
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp6 = EXTRACT_MSB0_INT (insn, 32, 16, 6);
+    f_disp6 = EXTRACT_MSB0_SINT (insn, 32, 16, 6);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -2994,7 +2994,7 @@ sh5_media_extract_sfmt_ldb (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp10 = EXTRACT_MSB0_INT (insn, 32, 12, 10);
+    f_disp10 = EXTRACT_MSB0_SINT (insn, 32, 12, 10);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3029,7 +3029,7 @@ sh5_media_extract_sfmt_ldl (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp10x4 = ((EXTRACT_MSB0_INT (insn, 32, 12, 10)) << (2));
+    f_disp10x4 = ((EXTRACT_MSB0_SINT (insn, 32, 12, 10)) << (2));
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3064,7 +3064,7 @@ sh5_media_extract_sfmt_ldq (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp10x8 = ((EXTRACT_MSB0_INT (insn, 32, 12, 10)) << (3));
+    f_disp10x8 = ((EXTRACT_MSB0_SINT (insn, 32, 12, 10)) << (3));
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3099,7 +3099,7 @@ sh5_media_extract_sfmt_lduw (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp10x2 = ((EXTRACT_MSB0_INT (insn, 32, 12, 10)) << (1));
+    f_disp10x2 = ((EXTRACT_MSB0_SINT (insn, 32, 12, 10)) << (1));
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3134,7 +3134,7 @@ sh5_media_extract_sfmt_ldhil (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCAD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp6 = EXTRACT_MSB0_INT (insn, 32, 16, 6);
+    f_disp6 = EXTRACT_MSB0_SINT (insn, 32, 16, 6);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3169,7 +3169,7 @@ sh5_media_extract_sfmt_ldhiq (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCAD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp6 = EXTRACT_MSB0_INT (insn, 32, 16, 6);
+    f_disp6 = EXTRACT_MSB0_SINT (insn, 32, 16, 6);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3204,7 +3204,7 @@ sh5_media_extract_sfmt_ldlol (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCAD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp6 = EXTRACT_MSB0_INT (insn, 32, 16, 6);
+    f_disp6 = EXTRACT_MSB0_SINT (insn, 32, 16, 6);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3239,7 +3239,7 @@ sh5_media_extract_sfmt_ldloq (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCAD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp6 = EXTRACT_MSB0_INT (insn, 32, 16, 6);
+    f_disp6 = EXTRACT_MSB0_SINT (insn, 32, 16, 6);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3525,7 +3525,7 @@ sh5_media_extract_sfmt_movi (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
     INT f_imm16;
     UINT f_dest;
 
-    f_imm16 = EXTRACT_MSB0_INT (insn, 32, 6, 16);
+    f_imm16 = EXTRACT_MSB0_SINT (insn, 32, 6, 16);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3574,7 +3574,7 @@ sh5_media_extract_sfmt_ori (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_imm10 = EXTRACT_MSB0_INT (insn, 32, 12, 10);
+    f_imm10 = EXTRACT_MSB0_SINT (insn, 32, 12, 10);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3608,7 +3608,7 @@ sh5_media_extract_sfmt_pta (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR
     UINT f_likely;
     UINT f_tra;
 
-    f_disp16 = ((((EXTRACT_MSB0_INT (insn, 32, 6, 16)) << (2))) + (pc));
+    f_disp16 = ((((EXTRACT_MSB0_SINT (insn, 32, 6, 16)) << (2))) + (pc));
     f_likely = EXTRACT_MSB0_UINT (insn, 32, 22, 1);
     f_tra = EXTRACT_MSB0_UINT (insn, 32, 25, 3);
 
@@ -3713,7 +3713,7 @@ sh5_media_extract_sfmt_putcfg (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCA
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp6 = EXTRACT_MSB0_INT (insn, 32, 16, 6);
+    f_disp6 = EXTRACT_MSB0_SINT (insn, 32, 16, 6);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3844,7 +3844,7 @@ sh5_media_extract_sfmt_stb (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp10 = EXTRACT_MSB0_INT (insn, 32, 12, 10);
+    f_disp10 = EXTRACT_MSB0_SINT (insn, 32, 12, 10);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3879,7 +3879,7 @@ sh5_media_extract_sfmt_stl (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp10x4 = ((EXTRACT_MSB0_INT (insn, 32, 12, 10)) << (2));
+    f_disp10x4 = ((EXTRACT_MSB0_SINT (insn, 32, 12, 10)) << (2));
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3914,7 +3914,7 @@ sh5_media_extract_sfmt_stq (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp10x8 = ((EXTRACT_MSB0_INT (insn, 32, 12, 10)) << (3));
+    f_disp10x8 = ((EXTRACT_MSB0_SINT (insn, 32, 12, 10)) << (3));
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3949,7 +3949,7 @@ sh5_media_extract_sfmt_stw (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp10x2 = ((EXTRACT_MSB0_INT (insn, 32, 12, 10)) << (1));
+    f_disp10x2 = ((EXTRACT_MSB0_SINT (insn, 32, 12, 10)) << (1));
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -3984,7 +3984,7 @@ sh5_media_extract_sfmt_sthil (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCAD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp6 = EXTRACT_MSB0_INT (insn, 32, 16, 6);
+    f_disp6 = EXTRACT_MSB0_SINT (insn, 32, 16, 6);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -4019,7 +4019,7 @@ sh5_media_extract_sfmt_sthiq (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCAD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp6 = EXTRACT_MSB0_INT (insn, 32, 16, 6);
+    f_disp6 = EXTRACT_MSB0_SINT (insn, 32, 16, 6);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -4054,7 +4054,7 @@ sh5_media_extract_sfmt_stlol (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCAD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp6 = EXTRACT_MSB0_INT (insn, 32, 16, 6);
+    f_disp6 = EXTRACT_MSB0_SINT (insn, 32, 16, 6);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -4089,7 +4089,7 @@ sh5_media_extract_sfmt_stloq (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCAD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_disp6 = EXTRACT_MSB0_INT (insn, 32, 16, 6);
+    f_disp6 = EXTRACT_MSB0_SINT (insn, 32, 16, 6);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */
@@ -4331,7 +4331,7 @@ sh5_media_extract_sfmt_xori (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
     UINT f_dest;
 
     f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
-    f_imm6 = EXTRACT_MSB0_INT (insn, 32, 16, 6);
+    f_imm6 = EXTRACT_MSB0_SINT (insn, 32, 16, 6);
     f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
 
   /* Record the fields for the semantic handler.  */

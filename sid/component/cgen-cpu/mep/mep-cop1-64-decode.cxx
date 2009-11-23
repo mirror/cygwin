@@ -4493,7 +4493,7 @@ mepcop1_64_extract_sfmt_cpmovi_b_P0S_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* 
     INT f_ivc2_8s20;
 
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
-    f_ivc2_8s20 = EXTRACT_MSB0_INT (insn, 32, 20, 8);
+    f_ivc2_8s20 = EXTRACT_MSB0_SINT (insn, 32, 20, 8);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_ivc2_8s20) = f_ivc2_8s20;
@@ -4809,7 +4809,7 @@ mepcop1_64_extract_sfmt_cpfmulia1s0u_b_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu
     UINT f_ivc2_5u13;
     UINT f_ivc2_5u18;
 
-    f_ivc2_8s0 = EXTRACT_MSB0_INT (insn, 32, 0, 8);
+    f_ivc2_8s0 = EXTRACT_MSB0_SINT (insn, 32, 0, 8);
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
     f_ivc2_5u18 = EXTRACT_MSB0_UINT (insn, 32, 18, 5);
 
@@ -4842,7 +4842,7 @@ mepcop1_64_extract_sfmt_cpfmuliua1s0_h_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu
     UINT f_ivc2_5u13;
     UINT f_ivc2_5u18;
 
-    f_ivc2_8s0 = EXTRACT_MSB0_INT (insn, 32, 0, 8);
+    f_ivc2_8s0 = EXTRACT_MSB0_SINT (insn, 32, 0, 8);
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
     f_ivc2_5u18 = EXTRACT_MSB0_UINT (insn, 32, 18, 5);
 
@@ -4875,7 +4875,7 @@ mepcop1_64_extract_sfmt_cpfmulila1s0_h_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu
     UINT f_ivc2_5u13;
     UINT f_ivc2_5u18;
 
-    f_ivc2_8s0 = EXTRACT_MSB0_INT (insn, 32, 0, 8);
+    f_ivc2_8s0 = EXTRACT_MSB0_SINT (insn, 32, 0, 8);
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
     f_ivc2_5u18 = EXTRACT_MSB0_UINT (insn, 32, 18, 5);
 
@@ -4908,7 +4908,7 @@ mepcop1_64_extract_sfmt_cpfmadia1s0u_b_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu
     UINT f_ivc2_5u13;
     UINT f_ivc2_5u18;
 
-    f_ivc2_8s0 = EXTRACT_MSB0_INT (insn, 32, 0, 8);
+    f_ivc2_8s0 = EXTRACT_MSB0_SINT (insn, 32, 0, 8);
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
     f_ivc2_5u18 = EXTRACT_MSB0_UINT (insn, 32, 18, 5);
 
@@ -4941,7 +4941,7 @@ mepcop1_64_extract_sfmt_cpfmadiua1s0_h_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu
     UINT f_ivc2_5u13;
     UINT f_ivc2_5u18;
 
-    f_ivc2_8s0 = EXTRACT_MSB0_INT (insn, 32, 0, 8);
+    f_ivc2_8s0 = EXTRACT_MSB0_SINT (insn, 32, 0, 8);
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
     f_ivc2_5u18 = EXTRACT_MSB0_UINT (insn, 32, 18, 5);
 
@@ -4974,7 +4974,7 @@ mepcop1_64_extract_sfmt_cpfmadila1s0_h_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu
     UINT f_ivc2_5u13;
     UINT f_ivc2_5u18;
 
-    f_ivc2_8s0 = EXTRACT_MSB0_INT (insn, 32, 0, 8);
+    f_ivc2_8s0 = EXTRACT_MSB0_SINT (insn, 32, 0, 8);
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
     f_ivc2_5u18 = EXTRACT_MSB0_UINT (insn, 32, 18, 5);
 
@@ -5008,7 +5008,7 @@ mepcop1_64_extract_sfmt_cpfmulia1u_b_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* 
     UINT f_ivc2_5u18;
     UINT f_ivc2_3u25;
 
-    f_ivc2_8s0 = EXTRACT_MSB0_INT (insn, 32, 0, 8);
+    f_ivc2_8s0 = EXTRACT_MSB0_SINT (insn, 32, 0, 8);
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
     f_ivc2_5u18 = EXTRACT_MSB0_UINT (insn, 32, 18, 5);
     f_ivc2_3u25 = EXTRACT_MSB0_UINT (insn, 32, 25, 3);
@@ -5045,7 +5045,7 @@ mepcop1_64_extract_sfmt_cpfmuliua1_h_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* 
     UINT f_ivc2_5u18;
     UINT f_ivc2_3u25;
 
-    f_ivc2_8s0 = EXTRACT_MSB0_INT (insn, 32, 0, 8);
+    f_ivc2_8s0 = EXTRACT_MSB0_SINT (insn, 32, 0, 8);
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
     f_ivc2_5u18 = EXTRACT_MSB0_UINT (insn, 32, 18, 5);
     f_ivc2_3u25 = EXTRACT_MSB0_UINT (insn, 32, 25, 3);
@@ -5082,7 +5082,7 @@ mepcop1_64_extract_sfmt_cpfmulila1_h_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* 
     UINT f_ivc2_5u18;
     UINT f_ivc2_3u25;
 
-    f_ivc2_8s0 = EXTRACT_MSB0_INT (insn, 32, 0, 8);
+    f_ivc2_8s0 = EXTRACT_MSB0_SINT (insn, 32, 0, 8);
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
     f_ivc2_5u18 = EXTRACT_MSB0_UINT (insn, 32, 18, 5);
     f_ivc2_3u25 = EXTRACT_MSB0_UINT (insn, 32, 25, 3);
@@ -5119,7 +5119,7 @@ mepcop1_64_extract_sfmt_cpfmadia1u_b_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* 
     UINT f_ivc2_5u18;
     UINT f_ivc2_3u25;
 
-    f_ivc2_8s0 = EXTRACT_MSB0_INT (insn, 32, 0, 8);
+    f_ivc2_8s0 = EXTRACT_MSB0_SINT (insn, 32, 0, 8);
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
     f_ivc2_5u18 = EXTRACT_MSB0_UINT (insn, 32, 18, 5);
     f_ivc2_3u25 = EXTRACT_MSB0_UINT (insn, 32, 25, 3);
@@ -5156,7 +5156,7 @@ mepcop1_64_extract_sfmt_cpfmadiua1_h_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* 
     UINT f_ivc2_5u18;
     UINT f_ivc2_3u25;
 
-    f_ivc2_8s0 = EXTRACT_MSB0_INT (insn, 32, 0, 8);
+    f_ivc2_8s0 = EXTRACT_MSB0_SINT (insn, 32, 0, 8);
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
     f_ivc2_5u18 = EXTRACT_MSB0_UINT (insn, 32, 18, 5);
     f_ivc2_3u25 = EXTRACT_MSB0_UINT (insn, 32, 25, 3);
@@ -5193,7 +5193,7 @@ mepcop1_64_extract_sfmt_cpfmadila1_h_P1 (mepcop1_64_scache* abuf, mep_ext1_cpu* 
     UINT f_ivc2_5u18;
     UINT f_ivc2_3u25;
 
-    f_ivc2_8s0 = EXTRACT_MSB0_INT (insn, 32, 0, 8);
+    f_ivc2_8s0 = EXTRACT_MSB0_SINT (insn, 32, 0, 8);
     f_ivc2_5u13 = EXTRACT_MSB0_UINT (insn, 32, 13, 5);
     f_ivc2_5u18 = EXTRACT_MSB0_UINT (insn, 32, 18, 5);
     f_ivc2_3u25 = EXTRACT_MSB0_UINT (insn, 32, 25, 3);

@@ -3065,7 +3065,7 @@ xstormy16_extract_sfmt_movgrgrii (xstormy16_scache* abuf, xstormy16_cpu* current
     f_op2m = EXTRACT_MSB0_UINT (insn, 32, 7, 1);
     f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rdm = EXTRACT_MSB0_UINT (insn, 32, 13, 3);
-    f_imm12 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_imm12 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rs) = f_Rs;
@@ -3098,7 +3098,7 @@ xstormy16_extract_sfmt_movgrgriipostinc (xstormy16_scache* abuf, xstormy16_cpu* 
     f_op2m = EXTRACT_MSB0_UINT (insn, 32, 7, 1);
     f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rdm = EXTRACT_MSB0_UINT (insn, 32, 13, 3);
-    f_imm12 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_imm12 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rs) = f_Rs;
@@ -3131,7 +3131,7 @@ xstormy16_extract_sfmt_movgrgriipredec (xstormy16_scache* abuf, xstormy16_cpu* c
     f_op2m = EXTRACT_MSB0_UINT (insn, 32, 7, 1);
     f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rdm = EXTRACT_MSB0_UINT (insn, 32, 13, 3);
-    f_imm12 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_imm12 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rs) = f_Rs;
@@ -3164,7 +3164,7 @@ xstormy16_extract_sfmt_movgriigr (xstormy16_scache* abuf, xstormy16_cpu* current
     f_op2m = EXTRACT_MSB0_UINT (insn, 32, 7, 1);
     f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rdm = EXTRACT_MSB0_UINT (insn, 32, 13, 3);
-    f_imm12 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_imm12 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rdm) = f_Rdm;
@@ -3197,7 +3197,7 @@ xstormy16_extract_sfmt_movgriipostincgr (xstormy16_scache* abuf, xstormy16_cpu* 
     f_op2m = EXTRACT_MSB0_UINT (insn, 32, 7, 1);
     f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rdm = EXTRACT_MSB0_UINT (insn, 32, 13, 3);
-    f_imm12 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_imm12 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rdm) = f_Rdm;
@@ -3230,7 +3230,7 @@ xstormy16_extract_sfmt_movgriipredecgr (xstormy16_scache* abuf, xstormy16_cpu* c
     f_op2m = EXTRACT_MSB0_UINT (insn, 32, 7, 1);
     f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rdm = EXTRACT_MSB0_UINT (insn, 32, 13, 3);
-    f_imm12 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_imm12 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rdm) = f_Rdm;
@@ -3556,7 +3556,7 @@ xstormy16_extract_sfmt_movfgrgrii (xstormy16_scache* abuf, xstormy16_cpu* curren
     f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rdm = EXTRACT_MSB0_UINT (insn, 32, 13, 3);
     f_Rb = EXTRACT_MSB0_UINT (insn, 32, 17, 3);
-    f_imm12 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_imm12 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rb) = f_Rb;
@@ -3593,7 +3593,7 @@ xstormy16_extract_sfmt_movfgrgriipostinc (xstormy16_scache* abuf, xstormy16_cpu*
     f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rdm = EXTRACT_MSB0_UINT (insn, 32, 13, 3);
     f_Rb = EXTRACT_MSB0_UINT (insn, 32, 17, 3);
-    f_imm12 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_imm12 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rb) = f_Rb;
@@ -3630,7 +3630,7 @@ xstormy16_extract_sfmt_movfgrgriipredec (xstormy16_scache* abuf, xstormy16_cpu* 
     f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rdm = EXTRACT_MSB0_UINT (insn, 32, 13, 3);
     f_Rb = EXTRACT_MSB0_UINT (insn, 32, 17, 3);
-    f_imm12 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_imm12 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rb) = f_Rb;
@@ -3667,7 +3667,7 @@ xstormy16_extract_sfmt_movfgriigr (xstormy16_scache* abuf, xstormy16_cpu* curren
     f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rdm = EXTRACT_MSB0_UINT (insn, 32, 13, 3);
     f_Rb = EXTRACT_MSB0_UINT (insn, 32, 17, 3);
-    f_imm12 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_imm12 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rb) = f_Rb;
@@ -3704,7 +3704,7 @@ xstormy16_extract_sfmt_movfgriipostincgr (xstormy16_scache* abuf, xstormy16_cpu*
     f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rdm = EXTRACT_MSB0_UINT (insn, 32, 13, 3);
     f_Rb = EXTRACT_MSB0_UINT (insn, 32, 17, 3);
-    f_imm12 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_imm12 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rb) = f_Rb;
@@ -3741,7 +3741,7 @@ xstormy16_extract_sfmt_movfgriipredecgr (xstormy16_scache* abuf, xstormy16_cpu* 
     f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rdm = EXTRACT_MSB0_UINT (insn, 32, 13, 3);
     f_Rb = EXTRACT_MSB0_UINT (insn, 32, 17, 3);
-    f_imm12 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+    f_imm12 = EXTRACT_MSB0_SINT (insn, 32, 20, 12);
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rb) = f_Rb;
@@ -4231,7 +4231,7 @@ xstormy16_extract_sfmt_bccgrgr (xstormy16_scache* abuf, xstormy16_cpu* current_c
     f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rd = EXTRACT_MSB0_UINT (insn, 32, 12, 4);
     f_op5 = EXTRACT_MSB0_UINT (insn, 32, 16, 4);
-    f_rel12 = ((EXTRACT_MSB0_INT (insn, 32, 20, 12)) + (((pc) + (4))));
+    f_rel12 = ((EXTRACT_MSB0_SINT (insn, 32, 20, 12)) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rd) = f_Rd;
@@ -4264,7 +4264,7 @@ xstormy16_extract_sfmt_bccgrimm8 (xstormy16_scache* abuf, xstormy16_cpu* current
     f_Rm = EXTRACT_MSB0_UINT (insn, 32, 4, 3);
     f_imm8 = EXTRACT_MSB0_UINT (insn, 32, 8, 8);
     f_op5 = EXTRACT_MSB0_UINT (insn, 32, 16, 4);
-    f_rel12 = ((EXTRACT_MSB0_INT (insn, 32, 20, 12)) + (((pc) + (4))));
+    f_rel12 = ((EXTRACT_MSB0_SINT (insn, 32, 20, 12)) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rm) = f_Rm;
@@ -4294,7 +4294,7 @@ xstormy16_extract_sfmt_bccimm16 (xstormy16_scache* abuf, xstormy16_cpu* current_
     UINT f_imm16;
 
     f_op2 = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
-    f_rel8_4 = ((EXTRACT_MSB0_INT (insn, 32, 8, 8)) + (((pc) + (4))));
+    f_rel8_4 = ((EXTRACT_MSB0_SINT (insn, 32, 8, 8)) + (((pc) + (4))));
     f_imm16 = EXTRACT_MSB0_UINT (insn, 32, 16, 16);
 
   /* Record the fields for the semantic handler.  */
@@ -4324,7 +4324,7 @@ xstormy16_extract_sfmt_bngrimm4 (xstormy16_scache* abuf, xstormy16_cpu* current_
 
     f_imm4 = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rd = EXTRACT_MSB0_UINT (insn, 32, 12, 4);
-    f_rel12 = ((EXTRACT_MSB0_INT (insn, 32, 20, 12)) + (((pc) + (4))));
+    f_rel12 = ((EXTRACT_MSB0_SINT (insn, 32, 20, 12)) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rd) = f_Rd;
@@ -4353,7 +4353,7 @@ xstormy16_extract_sfmt_bngrgr (xstormy16_scache* abuf, xstormy16_cpu* current_cp
 
     f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
     f_Rd = EXTRACT_MSB0_UINT (insn, 32, 12, 4);
-    f_rel12 = ((EXTRACT_MSB0_INT (insn, 32, 20, 12)) + (((pc) + (4))));
+    f_rel12 = ((EXTRACT_MSB0_SINT (insn, 32, 20, 12)) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_Rd) = f_Rd;
@@ -4382,7 +4382,7 @@ xstormy16_extract_sfmt_bnlmemimm (xstormy16_scache* abuf, xstormy16_cpu* current
 
     f_lmem8 = EXTRACT_MSB0_UINT (insn, 32, 8, 8);
     f_imm3b = EXTRACT_MSB0_UINT (insn, 32, 17, 3);
-    f_rel12 = ((EXTRACT_MSB0_INT (insn, 32, 20, 12)) + (((pc) + (4))));
+    f_rel12 = ((EXTRACT_MSB0_SINT (insn, 32, 20, 12)) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_imm3b) = f_imm3b;
@@ -4411,7 +4411,7 @@ xstormy16_extract_sfmt_bnhmemimm (xstormy16_scache* abuf, xstormy16_cpu* current
 
     f_hmem8 = ((EXTRACT_MSB0_UINT (insn, 32, 8, 8)) + (32512));
     f_imm3b = EXTRACT_MSB0_UINT (insn, 32, 17, 3);
-    f_rel12 = ((EXTRACT_MSB0_INT (insn, 32, 20, 12)) + (((pc) + (4))));
+    f_rel12 = ((EXTRACT_MSB0_SINT (insn, 32, 20, 12)) + (((pc) + (4))));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_hmem8) = f_hmem8;
@@ -4438,7 +4438,7 @@ xstormy16_extract_sfmt_bcc (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, 
     SI f_rel8_2;
 
     f_op2 = EXTRACT_MSB0_UINT (insn, 16, 4, 4);
-    f_rel8_2 = ((EXTRACT_MSB0_INT (insn, 16, 8, 8)) + (((pc) + (2))));
+    f_rel8_2 = ((EXTRACT_MSB0_SINT (insn, 16, 8, 8)) + (((pc) + (2))));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_op2) = f_op2;
@@ -4482,7 +4482,7 @@ xstormy16_extract_sfmt_br (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, P
 #define FLD(f) abuf->fields.sfmt_br.f
     SI f_rel12a;
 
-    f_rel12a = ((((EXTRACT_MSB0_INT (insn, 16, 4, 11)) << (1))) + (((pc) + (2))));
+    f_rel12a = ((((EXTRACT_MSB0_SINT (insn, 16, 4, 11)) << (1))) + (((pc) + (2))));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rel12a) = f_rel12a;
@@ -4574,7 +4574,7 @@ xstormy16_extract_sfmt_callrimm (xstormy16_scache* abuf, xstormy16_cpu* current_
 #define FLD(f) abuf->fields.sfmt_br.f
     SI f_rel12a;
 
-    f_rel12a = ((((EXTRACT_MSB0_INT (insn, 16, 4, 11)) << (1))) + (((pc) + (2))));
+    f_rel12a = ((((EXTRACT_MSB0_SINT (insn, 16, 4, 11)) << (1))) + (((pc) + (2))));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rel12a) = f_rel12a;

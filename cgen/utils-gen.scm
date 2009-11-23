@@ -86,8 +86,9 @@
   (let ((extraction
 	 (string-append "EXTRACT_"
 			(if (current-arch-insn-lsb0?) "LSB0_" "MSB0_")
+			(if (> total-length 32) "LG" "")
 			(case (mode:class (ifld-mode f))
-			  ((INT) "INT")
+			  ((INT) "SINT")
 			  ((UINT) "UINT")
 			  (else (error "unsupported mode class"
 				       (mode:class (ifld-mode f)))))
@@ -127,14 +128,16 @@
 	 (base (if (< start word-start) word-start start)))
     (string-append "("
 		   "EXTRACT_"
-		   (if lsb0? "LSB0" "MSB0")
+		   (if lsb0? "LSB0_" "MSB0_")
+		   (if (> word-length 32) "LG" "")
 		   (if (and (not unsigned?)
 			    ; Only want sign extension for word with sign bit.
 			    (bitrange-overlap? field-start 1
 					       word-start word-length
 					       lsb0?))
-		       "_INT ("
-		       "_UINT (")
+		       "SINT"
+		       "UINT")
+		   " ("
 		   ; What to extract from.
 		   word-name
 		   ", "

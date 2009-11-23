@@ -432,7 +432,7 @@
 		(out-ops (csem-outputs sem-ops))
 		(attrs (csem-attrs sem-ops))
 		(cti? (or (atlist-cti? (csem-attrs sem-ops))
-			  (insn-cti? insn))))
+			  (insn-cti-attr? insn))))
 
 	    (list (make <fmt-desc>
 		    cti? sorted-ifields in-ops out-ops

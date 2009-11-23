@@ -1063,7 +1063,9 @@
     (let* ((mode (if (eq? mode-name 'DFLT) (hw-mode hw) (mode:lookup mode-name)))
 	   (hw-name-with-mode (symbol-append hw-name '- (obj:name mode)))
 	   (index-mode (if (eq? hw-name 'h-memory) 'AI 'INT))
-	   (result (new <operand>))) ; ??? lookup-for-new?
+	   (result (if (hw-pc? hw)
+		       (new <pc>)
+		       (new <operand>)))) ; ??? lookup-for-new?
 
       (if (not mode)
 	  (parse-error (estate-context estate) "invalid mode" mode-name))
@@ -1102,7 +1104,9 @@
 
       ; The name of the operand must include the index so that multiple copies
       ; of a hardware object (e.g. h-gr[0], h-gr[14]) can be distinguished.
-      (let ((name (/rtx-hw-name hw hw-name-with-mode index-arg)))
+      (let ((name (if (hw-pc? hw)
+		      'pc
+		      (/rtx-hw-name hw hw-name-with-mode index-arg))))
 	(send result 'set-name! name)
 	(op:set-sem-name! result name))
 

@@ -923,8 +923,17 @@
    (let ((mode (if (mode:eq? 'DFLT mode)
 		   (send self 'get-mode)
 		   mode)))
-     ; The enclosing function must set `pc' to the correct value.
-     (cx:make mode "pc")))
+
+     (logit 4 "<pc> cxmake-get self=" (obj:name self) " mode=" (obj:name mode) "\n")
+
+     (if (obj-has-attr? self 'RAW)
+	 (let ((hw (op:type self))
+	       ;; For consistency with <operand> process index,selector similarly.
+	       (index (if index index (op:index self)))
+	       (selector (if selector selector (op:selector self))))
+	   (send hw 'cxmake-get-raw estate mode index selector))
+	 ;; The enclosing function must set `pc' to the correct value.
+	 (cx:make mode "pc"))))
 )
 
 (method-make!
@@ -1012,10 +1021,10 @@
 					#:output-language (estate-output-language estate))))
 			 (else
 			  (send hw 'cxmake-get estate mode index selector)))))
-     
+
      (logit 4 "<operand> cxmake-get self=" (obj:name self) " mode=" (obj:name mode)
 	    " index=" (obj:name index) " selector=" selector "\n")
-     
+
      (if delayval
 	 (cx:make mode (string-append "lookahead ("
 				      (number->string delayval)

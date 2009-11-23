@@ -170,6 +170,12 @@
 ;	   (not (has-attr? f 'RESERVED))))
 )
 
+; Return a boolean indicating if ifield F is signed.
+
+(define (ifld-signed? f)
+  (eq? (mode:class (ifld-mode f)) 'INT)
+)
+
 ; Return a boolean indicating if ifield F is an operand.
 ; FIXME: Should check for operand? or some such.
 

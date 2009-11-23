@@ -1108,6 +1108,20 @@
   (number->string num 16)
 )
 
+; Convert a number to a hex C constant,
+; taking care to handle large numbers.
+; If NUM won't fit in a portable int (32-bits), cast it to BIG-NUM-TYPE.
+
+(define (gen-c-hex-constant num big-num-type)
+  (cond ((< num (- (ash 1 31)))
+	 ;; Skip outputting -ve numbers in hex for now.
+	 (string-append "((" big-num-type ") " (number->string num) "LL)"))
+	((> num (- (ash 1 32) 1))
+	 (string-append "((" big-num-type ") 0x" (number->string num 16) "LL)"))
+	(else
+	 (string-append "0x" (number->string num 16))))
+)
+
 ; Given a list of numbers NUMS, generate text to pass them as arguments to a
 ; C function.  We assume they're not the first argument and thus have a
 ; leading comma.

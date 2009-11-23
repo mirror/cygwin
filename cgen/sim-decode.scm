@@ -92,9 +92,9 @@ static const struct insn_sem @prefix@_insn_sem_invalid = {
 (define (/gen-idesc-decls)
   (string-append "\
 extern const IDESC *@prefix@_decode (SIM_CPU *, IADDR,
-                                  CGEN_INSN_INT,"
+                                  CGEN_INSN_WORD,"
   (if (adata-integral-insn? CURRENT-ARCH)
-      " CGEN_INSN_INT,\n"
+      " CGEN_INSN_WORD,\n"
       "\n")
   "\
                                   ARGBUF *);
@@ -435,7 +435,7 @@ void
    "    const IDESC *idesc = &" IDESC-TABLE-VAR "[itype];\n"
    (if (> (length (sfmt-iflds sfmt)) 0)
        (string-append
-	"    CGEN_INSN_INT insn = "
+	"    CGEN_INSN_WORD insn = "
 	(if (adata-integral-insn? CURRENT-ARCH)
 	    "entire_insn;\n"
 	    "base_insn;\n"))
@@ -498,9 +498,9 @@ void
 
 const IDESC *
 @prefix@_decode (SIM_CPU *current_cpu, IADDR pc,
-              CGEN_INSN_INT base_insn,"
+              CGEN_INSN_WORD base_insn,"
        (if (adata-integral-insn? CURRENT-ARCH)
-	   " CGEN_INSN_INT entire_insn,\n"
+	   " CGEN_INSN_WORD entire_insn,\n"
 	   "\n")
        "\
               ARGBUF *abuf)
@@ -509,7 +509,7 @@ const IDESC *
   @PREFIX@_INSN_TYPE itype;
 
   {
-    CGEN_INSN_INT insn = base_insn;
+    CGEN_INSN_WORD insn = base_insn;
 \n"
 
        decode-code

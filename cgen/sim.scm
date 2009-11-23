@@ -1832,7 +1832,7 @@ struct argbuf {
   int written;
   union sem_fields fields;\n"
 	    "\
-  CGEN_INSN_INT insn;
+  CGEN_INSN_WORD insn;
   int written;\n")
        "")
    "};\n"

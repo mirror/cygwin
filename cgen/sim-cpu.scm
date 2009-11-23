@@ -23,7 +23,15 @@
 
 /* Maximum number of instructions that can be executed in parallel.  */
 #define MAX_PARALLEL_INSNS " (number->string (state-parallel-insns))
-   "\n\n"
+   "\n\
+
+/* The size of an \"int\" needed to hold an instruction word.
+   This is usually 32 bits, but some architectures needs 64 bits.  */
+typedef "
+   (if (adata-large-insn-word? CURRENT-ARCH)
+       "CGEN_INSN_LGUINT"
+       "CGEN_INSN_INT")
+   " CGEN_INSN_WORD;\n\n"
 ;   (gen-enum-decl '@cpu@_virtual
 ;		  "@cpu@ virtual insns"
 ;		  "@ARCH@_INSN_" ; not @CPU@ to match CGEN_INSN_TYPE in opc.h
@@ -636,8 +644,8 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
      "static SEM_STATUS\n"
      "SEM_FN_NAME (@prefix@," (gen-sym insn) ")"
      (if (and parallel? (not (with-generic-write?)))
-	 " (SIM_CPU *current_cpu, SEM_ARG sem_arg, PAREXEC *par_exec, CGEN_INSN_INT insn)\n"
-	 " (SIM_CPU *current_cpu, SEM_ARG sem_arg, CGEN_INSN_INT insn)\n")
+	 " (SIM_CPU *current_cpu, SEM_ARG sem_arg, PAREXEC *par_exec, CGEN_INSN_WORD insn)\n"
+	 " (SIM_CPU *current_cpu, SEM_ARG sem_arg, CGEN_INSN_WORD insn)\n")
      "{\n"
      (if (and parallel? (not (with-generic-write?)))
 	 (gen-define-parallel-operand-macro (insn-sfmt insn))
@@ -834,6 +842,12 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 
 "
    /gen-cpu-defines
+   ;; After CGEN_INSN_WORD is defined we can include cgen-engine.h.
+   ;; We need to include it here (or thereabouts) because cgen-engine.h
+   ;; needs CGEN_INSN_WORD and parts of the remainder of this file need
+   ;; cgen-engine.h.
+   "/* cgen-engine.h needs CGEN_INSN_WORD that we just defined.  */\n"
+   "#include \"cgen-engine.h\"\n\n"
    /gen-hardware-types
    /gen-cpu-reg-access-decls
    /gen-model-decls

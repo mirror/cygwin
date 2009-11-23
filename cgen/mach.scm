@@ -1774,21 +1774,28 @@
 	      '(
 		; whether all insns can be recorded in a host int
 		integral-insn?
+
+		; whether a large int is needed for insns
+		large-insn-word?
 		)
 	      nil)
 )
 
-; Called after the .cpu file has been read in to prime derived value
-; computation.
-; Often this data isn't needed so we only computed it if we have to.
+;; Called after the .cpu file has been read in to prime derived value
+;; computation.
+;; Often this data isn't needed so we only computed it if we have to.
+;; The computation can require a single selected ISA; if we don't require
+;; the data don't unnecessarily flag an error.
 
 (define (/adata-set-derived! arch)
-  ; Don't compute this data unless we need to.
+  ;; Don't compute this data unless we need to.
   (arch-set-derived!
    arch
    (make <derived-arch-data>
-     ; integral-insn?
+     ;; integral-insn?
      (delay (isa-integral-insn? (current-isa)))
+     ;; insn-word-bitsize
+     (> (apply max (map isa-base-insn-bitsize (current-isa-list))) 32)
      ))
 )
 
@@ -1796,6 +1803,10 @@
 
 (define (adata-integral-insn? arch)
   (force (elm-xget (arch-derived arch) 'integral-insn?))
+)
+
+(define (adata-large-insn-word? arch)
+  (elm-xget (arch-derived arch) 'large-insn-word?)
 )
 
 ; Instruction analysis control.

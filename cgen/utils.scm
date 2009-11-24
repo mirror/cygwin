@@ -1291,7 +1291,7 @@
 ;      (a b 4 c d 6))
 
 (define (list-expand l)
-  #f ; ??? wip
+  (error "wip")
 )
 
 ; If OBJ has a dump method call it, otherwise return OBJ untouched.

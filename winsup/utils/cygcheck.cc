@@ -63,7 +63,7 @@ void dump_dodgy_apps (int verbose);
 /* Forward declaration */
 static void usage (FILE *, int);
 
-static const char version[] = "$Revision: 1.122 $";
+static const char version[] = "$Revision: 1.123 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1492,7 +1492,7 @@ dump_sysinfo ()
  /* 0x0000002e */ "",
  /* 0x0000002f */ " Starter N",
  /* 0x00000030 */ " Professional",
- /* 0x00000031 */ " Proffesional N",
+ /* 0x00000031 */ " Professional N",
  /* 0x00000032 */ "",
  /* 0x00000033 */ "",
  /* 0x00000034 */ "",

@@ -2074,18 +2074,35 @@ thread_db_break_program (struct gdbserv *serv)
   /* We always send the signal to the main thread.  It's not correct
      to use process->pid; that's whatever thread last reported a
      status, and it may well have been exiting.
+     
+     We send either SIGSTOP or SIGINT depending upon user preference -
+     a GDB monitor command may be used to change the signal used.  SIGINT
+     has the advantage of allowing the user to continue in the usual
+     manner via GDB's continue command.  SIGSTOP may be preferred in some
+     settings because it cannot be blocked or ignored.  When SIGSTOP is
+     used, it is slightly more difficult to continue without sending
+     another SISSTOP.  */
 
-     We send SIGSTOP, rather than some other signal such as SIGINT,
-     because SIGSTOP cannot be blocked or ignored.  On Linux, using
-     a signal that can be blocked means that the process never gets
-     interrupted, since it's the kernel which does the blocking.  */
-  if (process->debug_backend)
-    fprintf (stderr, " -- send SIGSTOP to child %d\n", proc_handle.pid);
+  if (process->interrupt_with_SIGSTOP)
+    {
+      if (process->debug_backend)
+	fprintf (stderr, " -- send SIGSTOP to child %d\n", proc_handle.pid);
 
-  /* Tell the GDB user that SIGSTOP has been sent to the inferior.  */
-  print_sigstop_message (serv);
+      /* Tell the GDB user that SIGSTOP has been sent to the inferior.  */
+      print_sigstop_message (serv);
 
-  kill (proc_handle.pid, SIGSTOP);
+      kill (proc_handle.pid, SIGSTOP);
+    }
+  else
+    {
+      if (process->debug_backend)
+	fprintf (stderr, " -- send SIGINT to child %d\n", proc_handle.pid);
+
+      /* Tell the GDB user that SIGINT has been sent to the inferior.  */
+      print_sigint_message (serv);
+
+      kill (proc_handle.pid, SIGINT);
+    }
 }
 
 /* Function: check_child_state

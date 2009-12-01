@@ -3151,6 +3151,18 @@ linux_process_rcmd (struct gdbserv *serv, const char *cmd, int cmdsize)
       debug_lwp_pool = 0;
       gdbserv_output_string_as_bytes (serv, "All RDA diagnostics disabled.\n");
     }
+  else if (strcmp (cmd, "interrupt-with-SIGSTOP") == 0)
+    {
+      process->interrupt_with_SIGSTOP = 1;
+      gdbserv_output_string_as_bytes (serv,
+        "RDA will use SIGSTOP to perform user requested interrupts.\n");
+    }
+  else if (strcmp (cmd, "interrupt-with-SIGINT") == 0)
+    {
+      process->interrupt_with_SIGSTOP = 0;
+      gdbserv_output_string_as_bytes (serv,
+        "RDA will use SIGINT to perform user requested interrupts.\n");
+    }
   else
     gdbserv_output_string_as_bytes (serv,
       "Unrecognized monitor command.\n"
@@ -3162,7 +3174,9 @@ linux_process_rcmd (struct gdbserv *serv, const char *cmd, int cmdsize)
       "  monitor thread-db-noisy\n"
       "  monitor thread-db-quiet\n"
       "  monitor lwp-pool-noisy\n"
-      "  monitor lwp-pool-quiet\n");
+      "  monitor lwp-pool-quiet\n"
+      "  monitor interrupt-with-SIGSTOP\n"
+      "  monitor interrupt-with-SIGINT\n");
 }
 
 /* This function is called from gdbloop_poll when a new incoming

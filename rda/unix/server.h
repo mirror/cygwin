@@ -69,6 +69,7 @@ struct child_process {
   long signal_to_send;
   int  debug_backend;
   int  debug_informational;
+  int  interrupt_with_SIGSTOP;
   int  running;
   
 #if defined(_MIPSEL) || defined(_MIPSEB) || defined(AM33_2_0_LINUX_TARGET)

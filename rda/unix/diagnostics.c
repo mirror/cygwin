@@ -54,3 +54,21 @@ print_sigstop_message (struct gdbserv *serv)
     }
 }
 
+/* Print out a helpful message regarding SIGINT to the GDB console using
+   an "O" packet.  This message will be printed at most once per session.  */
+void
+print_sigint_message (struct gdbserv *serv)
+{
+  static int once = 0;
+
+  if (!once)
+    {
+      output_O_packet (serv, "\n"
+      "RDA has sent SIGINT to the inferior process.  If the process does not\n"
+      "stop in a timely fashion, it is possible that SIGINT is being blocked.\n"
+      "If that's the case, consider using SIGSTOP to interrupt the process\n"
+      "instead.  The monitor command \"monitor interrupt-with-SIGSTOP\" may\n"
+      "be used to turn on RDA's internal flag for effecting this behavior.\n");
+      once = 1;
+    }
+}

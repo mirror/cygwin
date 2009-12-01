@@ -1,3 +1,13 @@
+2009-11-30  Kevin Buettner  <kevinb@redhat.com>
+
+	* diagnostics.h, diagnostics.c (print_sigint_message): New function.
+	* linux-target.c (linux_process_rcmd): Add monitor commands
+	"interrupt-with-SIGSTOP and interrupt-with-SIGINT".
+	* server.h (struct child_process): Add new field
+	interrupt_with_SIGSTOP.
+	* thread-db.c (thread_db_break_program): Interrupt using either
+	SIGSTOP or SIGINT depending upon user's preference.
+
 2009-11-23  Kevin Buettner  <kevinb@redhat.com>
 
 	* ptrace-target.c (syscall.h): Include.

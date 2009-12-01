@@ -39,3 +39,8 @@ void output_O_packet (struct gdbserv *serv, char *message);
    an "O" packet.  This message will only be printed at most once per
    session.  */
 void print_sigstop_message (struct gdbserv *serv);
+
+/* Print out a helpful message regarding SIGINT to the GDB console using
+   an "O" packet.  This message will only be printed at most once per
+   session.  */
+void print_sigint_message (struct gdbserv *serv);

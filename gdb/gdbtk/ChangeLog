@@ -1,3 +1,8 @@
+2009-12-02  Paul Pluzhnikov  <ppluzhnikov@google.com>
+
+	* generic/gdbtk-hooks.c (gdbtk_memory_changed): Adjust.
+	(gdbtk_add_hooks): Adjust.
+	
 2009-11-09  Keith Seitz  <keiths@redhat.com>
 
 	* library/srctextwin.itb (lookup_line): Update parameters

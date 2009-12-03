@@ -27,9 +27,11 @@
 ; tree of "table-guts" elements, and then the application recurses on the
 ; result.  For example see sim-decode.scm.
 ;
+; The decoder exits when insns are unambiguously determined, even if there are
+; more opcode bits to examine, leaving it to the caller to validate any
+; remaining bits.
+;
 ; FIXME: Don't create more than 3 shifts (i.e. no more than 3 groups).
-; FIXME: Exits when insns are unambiguously determined, even if there are more
-; opcode bits to examine.
 
 ; Decoder data structures and accessors.
 ; The set of instruction is internally recorded as a tree of two data

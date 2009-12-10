@@ -1,3 +1,7 @@
+2009-12-10  Doug Evans  <dje@sebabeach.org>
+
+	* gen-all: Rewrite.  Build more ports.  Split out building of sid.
+
 2009-11-23  Doug Evans  <dje@sebabeach.org>
 
 	* hardware.scm (hw-pc?): New function.

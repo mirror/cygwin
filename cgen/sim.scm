@@ -1225,10 +1225,10 @@
 			 ");\n")
 	  (begin
 	    ;; FIXME: This creates broken simulators if with-parallel-write?.
-	    (message (if (with-parallel-write?) "Error: " "Warning: ")
-		     (obj:name op)
-		     " operand number " (op:num op)
-		     " is too large (>= 32)\n")
+;;	    (message (if (with-parallel-write?) "Error: " "Warning: ")
+;;		     (obj:name op)
+;;		     " operand number " (op:num op)
+;;		     " is too large (>= 32)\n")
 	    (if (not /operand-number-elaboration-written?)
 		(begin
 		  (message "This is a current internal cgen limitation.\n")

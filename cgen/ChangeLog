@@ -1,3 +1,8 @@
+2009-12-16  Doug Evans  <dje@sebabeach.org>
+
+	* sim.scm (/op-gen-written-update): Disable operand number is too
+	large warning, for now.
+
 2009-12-11  Nick Clifton  <nickc@redhat.com>
 
 	* cpu/fr30.opc: Fix shadowed variable warnings.

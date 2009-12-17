@@ -9,26 +9,39 @@
 set -e
 trap "echo ERROR: $(date)" 0
 
+MPC_DIR="/path/to/mpc"
+MPC_CONFIG="--with-mpc=${MPC_DIR}"
+export LD_LIBRARY_PATH="${MPC_DIR}/lib"
+
 echo "Starting gen-all: $(date)"
 
-cgen_cpus="arm cris fr30 frv ip2k iq2000 lm32 m32c m32r mep mt \
+all_cgen_cpus="arm cris fr30 frv ip2k iq2000 lm32 m32c m32r mep mt \
 openrisc sh64 xc16x xstormy16"
 
-sid_cpus="arm m32r mep mt sh xstormy16"
+all_sid_cpus="arm m32r mep mt sh xstormy16"
 
 do_config=no
 do_build=no
 do_binutils=no
+do_gcc=no
+do_newlib=no
 do_sim=no
 do_sid=no
 do_intrinsics=no
 do_diffs=no
+
+cgen_cpus="${all_cgen_cpus}"
+sid_cpus="${all_sid_cpus}"
+
 for a in "$@"
 do
     case $a in
+    cpus=*) cgen_cpus=${a/cpus=} sid_cpus=${cgen_cpus} ;;
     config) do_config=yes ;;
     build) do_build=yes ;;
     binutils) do_binutils=yes ;;
+    gcc) do_gcc=yes ;;
+    newlib) do_newlib=yes ;;
     sim) do_sim=yes ;;
     sid) do_sid=yes ;;
     intrinsics) do_intrinsics=yes ;;
@@ -37,6 +50,8 @@ do
 	do_config=yes
 	do_build=yes
 	do_binutils=yes
+	do_gcc=yes
+	do_newlib=yes
 	do_sim=yes
 	do_sid=yes
 	do_intrinsics=yes
@@ -46,15 +61,40 @@ do
     esac
 done
 
+for c in ${cgen_cpus}
+do
+    if echo " ${all_cgen_cpus} " | grep -q " ${c} "
+    then
+	: ok
+    else
+	echo "Invalid cgen cpu ${c}" >&2
+	exit 1
+    fi
+done
+if [ "${do_sid}" == "yes" ]
+then
+    for c in ${sid_cpus}
+    do
+	if echo " ${all_sid_cpus} " | grep -q " ${c} "
+	then
+	    : ok
+	else
+	    echo "Invalid sid cpu ${c}" >&2
+	    exit 1
+	fi
+    done
+fi
+
 mkdir -p tmp-all
 cd tmp-all
 build_dir=$(pwd)
 
-# Paths to src,gcc relative to ${build_dir}.
-src=../../../src
-gcc=../../../gcc
+# Paths to src,gcc,rel relative to ${build_dir}.
+src="../../../src"
+gcc="../../../gcc"
+reltop="../../.."
 
-build_all_target_sys="m32r-elf"
+build_all_target_sys="fr30-elf"
 build_sys=$(sh ${src}/config.guess)
 host_sys=${build_sys}
 
@@ -75,6 +115,7 @@ config_src () {
     then
 	echo "Configuring: $(date)"
 	../${src}/configure \
+	    --prefix=${prefix} \
 	    --build=${build_sys} \
 	    --host=${host_sys} \
 	    --target=${target_sys} \
@@ -85,9 +126,33 @@ config_src () {
     fi
 }
 
+config_gcc () {
+    target_sys=$1
+    prefix=$2
+
+    extra_config_args=""
+
+    if [ -f Makefile ]
+    then
+	true # already configured
+    elif [ "${do_config}" = "yes" ]
+    then
+	echo "Configuring: $(date)"
+	../${gcc}/configure \
+	    --prefix=${prefix} \
+	    --build=${build_sys} \
+	    --host=${host_sys} \
+	    --target=${target_sys} \
+	    --enable-languages=c \
+	    ${MPC_CONFIG} \
+	    ${extra_config_args}
+    fi
+}
+
 build_binutils () {
     target_sys=$1
     prefix=$2
+    PATH=${prefix}/bin:$PATH
 
     echo "Building ${target_sys} binutils, $(date)"
     mkdir -p tmp-src-${target_sys}
@@ -106,6 +171,69 @@ build_binutils () {
 		exit 1
 	    fi
 	    make -j3 all-binutils all-gas all-ld
+	    make -j1 install-binutils install-gas install-ld
+	    echo "Build done: $(date)"
+	fi
+    )
+    if [ $? != 0 ] ; then exit 1 ; fi 
+}
+
+build_gcc () {
+    target_sys=$1
+    prefix=$2
+    PATH=${prefix}/bin:$PATH
+
+    echo "Building ${target_sys} gcc, $(date)"
+    mkdir -p tmp-gcc-${target_sys}
+    (
+	set -e
+	cd tmp-gcc-${target_sys}
+
+	config_gcc ${target_sys} ${prefix}
+
+	if [ "${do_build}" = "yes" ]
+	then
+	    echo "Building: $(date)"
+	    if [ ! -f Makefile ]
+	    then
+		echo "Tree hasn't been configured."
+		exit 1
+	    fi
+	    make -j3 all-gcc
+	    make -j1 install-gcc
+	    # FIXME: The toplevel makefile doesn't find ${target}-gcc,
+	    # it sets CC_FOR_TARGET to ${target}-cc.
+	    rm -f ${prefix}/bin/${target_sys}-cc
+	    ln -s ${target_sys}-gcc ${prefix}/bin/${target_sys}-cc
+	    echo "Build done: $(date)"
+	fi
+    )
+    if [ $? != 0 ] ; then exit 1 ; fi 
+}
+
+build_newlib () {
+    target_sys=$1
+    prefix=$2
+    PATH=${prefix}/bin:$PATH
+
+    echo "Building ${target_sys} newlib, $(date)"
+    mkdir -p tmp-src-${target_sys}
+    (
+	set -e
+	cd tmp-src-${target_sys}
+
+	config_src ${target_sys} ${prefix}
+
+	if [ "${do_build}" = "yes" ]
+	then
+	    echo "Building: $(date)"
+	    if [ ! -f Makefile ]
+	    then
+		echo "Tree hasn't been configured."
+		exit 1
+	    fi
+	    make -j3 all-target-newlib all-target-libgloss
+	    make -j1 install-target-newlib install-target-libgloss
 	    echo "Build done: $(date)"
 	fi
     )
@@ -115,6 +243,7 @@ build_binutils () {
 build_sim () {
     target_sys=$1
     prefix=$2
+    PATH=${prefix}/bin:$PATH
 
     echo "Building ${cpu} sim, $(date)"
     mkdir -p tmp-src-${target_sys}
@@ -133,6 +262,7 @@ build_sim () {
 		exit 1
 	    fi
 	    make -j3 all-sim all-gdb
+	    make -j1 install-sim install-gdb
 	    echo "Build done: $(date)"
 	fi
     )
@@ -142,6 +272,7 @@ build_sim () {
 build_sid () {
     target_sys=$1
     prefix=$2
+    PATH=${prefix}/bin:$PATH
 
     echo "Building ${cpu} sid, $(date)"
     mkdir -p tmp-src-${target_sys}
@@ -165,8 +296,9 @@ build_sid () {
 		make -j3 configure-sid
 	    fi
 	    (cd sid/component/cgen-cpu && make cgen-all)
-	    if [ $? != 0 ] ; then exit 1 ; fi 
+	    if [ $? != 0 ] ; then exit 1 ; fi
 	    make -j3 all-sid
+	    make -j1 install-sid
 	    echo "Build done: $(date)"
 	fi
     )
@@ -188,8 +320,11 @@ build_diffs () {
 
 for cpu in ${cgen_cpus}
 do
+    # FIXME: arm-eabi is preferred over arm-elf
     target_sys=${cpu}-elf
-    prefix=${build_dir}/rel/${target_sys}
+    prefix=$(cd ${reltop} && pwd -P)/rel-${target_sys}
+    [ $? != 0 ] && { echo "Error setting prefix" >&2 ; exit 1 ; }
+    mkdir -p ${prefix}
 
     if [ "${do_binutils}" = "yes" ]
     then
@@ -200,12 +335,40 @@ do
     then
 	build_sim ${target_sys} ${prefix}
     fi
+
+    if [ "${do_gcc}" = "yes" ]
+    then
+	# GCC doesn't support some cpus that cgen supports.
+	case ${target_sys} in
+	ip2k-*) ;;
+	mt-*) ;;
+	openrisc-* | or32-*) ;;
+	xc16x-*) ;;
+	*) build_gcc ${target_sys} ${prefix} ;;
+	esac
+    fi
+
+    if [ "${do_newlib}" = "yes" ]
+    then
+	# Newlib doesn't support some cpus that cgen supports.
+	# We also can't build newlib if we don't have gcc.
+	case ${target_sys} in
+	ip2k-*) ;;
+	mt-*) ;;
+	openrisc-* | or32-*) ;;
+	xc16x-*) ;;
+	*) build_newlib ${target_sys} ${prefix} ;;
+	esac
+    fi
 done
 
 for cpu in ${sid_cpus}
 do
+    # FIXME: arm-eabi is preferred over arm-elf
     target_sys=${cpu}-elf
-    prefix=${build_dir}/rel/${target_sys}
+    prefix=$(cd ${reltop} && pwd -P)/rel-${target_sys}
+    [ $? != 0 ] && { echo "Error setting prefix" >&2 ; exit 1 ; }
+    mkdir -p ${prefix}
 
     if [ "${do_sid}" = "yes" ]
     then

@@ -1,3 +1,8 @@
+2009-12-17  Doug Evans  <dje@sebabeach.org>
+
+	* gen-all: Add support for building gcc/newlib.
+	Specify --prefix and install all built tools.
+
 2009-12-16  Doug Evans  <dje@sebabeach.org>
 
 	* sim.scm (/op-gen-written-update): Disable operand number is too

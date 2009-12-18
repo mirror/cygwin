@@ -1,5 +1,8 @@
 2009-12-17  Doug Evans  <dje@sebabeach.org>
 
+	* mep.opc: Apply patches from opcodes to compile with -Wshadow.
+	mep-asm.c now regenerates correctly again.
+	
 	* gen-all: Add support for building gcc/newlib.
 	Specify --prefix and install all built tools.
 

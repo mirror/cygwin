@@ -5,8 +5,11 @@ static int filelocal_bss;	/* In BSS section */
 #endif
 static const int filelocal_ro = 202;	/* In Read-Only Data section */
 
-foo ()
+void foo ()
 {
+
+  void bar ();
+  
   static int funclocal = 3;	/* In Data section */
   static int funclocal_bss;	/* In BSS section */
   static const int funclocal_ro = 203;	/* RO Data */
@@ -16,30 +19,37 @@ foo ()
   bar ();
 }
 
-bar ()
+void bar ()
 {
   static int funclocal = 4;	/* In data section */
   static int funclocal_bss;	/* In BSS section */
   funclocal_bss = 104;
 }
 
-init1 ()
+void init1 ()
 {
   filelocal_bss = 102;
 }
 
 /* On some systems, such as AIX, unreferenced variables are deleted
-   from the executable.  */
-usestatics1 ()
+   from the executable.  On other compilers, such as ARM RealView,
+   const variables without their address taken are deleted.  */
+void usestatics1 ()
 {
-  useit1 (filelocal);
-  useit1 (filelocal_bss);
-  useit1 (filelocal_ro);
+  void useit1 (const int *val);
+  
+  useit1 (&filelocal);
+  useit1 (&filelocal_bss);
+  useit1 (&filelocal_ro);
 }
 
-useit1 (val)
+#ifdef PROTOTYPES
+void useit1 (const int *val)
+#else
+void useit1 (val) const int *val;
+#endif
 {
     static int usedval;
 
-    usedval = val;
+    usedval = *val;
 }

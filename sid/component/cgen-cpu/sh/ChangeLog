@@ -1,3 +1,37 @@
+2010-01-02  Doug Evans  <dje@sebabeach.org>
+
+	* sh-desc.h, * sh2-cpu.h, * sh2-decode.cxx, * sh2-decode.h,
+	* sh2-defs.h, * sh2-model.cxx, * sh2-model.h, * sh2-sem.cxx,
+	* sh2-write.cxx, * sh2a-fpu-cpu.h, * sh2a-fpu-decode.cxx,
+	* sh2a-fpu-decode.h, * sh2a-fpu-defs.h, * sh2a-fpu-model.cxx,
+	* sh2a-fpu-model.h, * sh2a-fpu-sem.cxx, * sh2a-fpu-write.cxx,
+	* sh2a-nofpu-cpu.h, * sh2a-nofpu-decode.cxx, * sh2a-nofpu-decode.h,
+	* sh2a-nofpu-defs.h, * sh2a-nofpu-model.cxx, * sh2a-nofpu-model.h,
+	* sh2a-nofpu-sem.cxx, * sh2a-nofpu-write.cxx, * sh2e-cpu.h,
+	* sh2e-decode.cxx, * sh2e-decode.h, * sh2e-defs.h, * sh2e-model.cxx,
+	* sh2e-model.h, * sh2e-sem.cxx, * sh2e-write.cxx, * sh3-cpu.h,
+	* sh3-decode.cxx, * sh3-decode.h, * sh3-defs.h, * sh3-model.cxx,
+	* sh3-model.h, * sh3-sem.cxx, * sh3-write.cxx, * sh3e-cpu.h,
+	* sh3e-decode.cxx, * sh3e-decode.h, * sh3e-defs.h, * sh3e-model.cxx,
+	* sh3e-model.h, * sh3e-sem.cxx, * sh3e-write.cxx, * sh4-cpu.h,
+	* sh4-decode.cxx, * sh4-decode.h, * sh4-defs.h, * sh4-model.cxx,
+	* sh4-model.h, * sh4-nofpu-cpu.h, * sh4-nofpu-decode.cxx,
+	* sh4-nofpu-decode.h, * sh4-nofpu-defs.h, * sh4-nofpu-model.cxx,
+	* sh4-nofpu-model.h, * sh4-nofpu-sem.cxx, * sh4-nofpu-write.cxx,
+	* sh4-sem.cxx, * sh4-write.cxx, * sh4a-cpu.h, * sh4a-decode.cxx,
+	* sh4a-decode.h, * sh4a-defs.h, * sh4a-model.cxx, * sh4a-model.h,
+	* sh4a-nofpu-cpu.h, * sh4a-nofpu-decode.cxx, * sh4a-nofpu-decode.h,
+	* sh4a-nofpu-defs.h, * sh4a-nofpu-model.cxx, * sh4a-nofpu-model.h,
+	* sh4a-nofpu-sem.cxx, * sh4a-nofpu-write.cxx, * sh4a-sem.cxx,
+	* sh4a-write.cxx, * sh4al-cpu.h, * sh4al-decode.cxx, * sh4al-decode.h,
+	* sh4al-defs.h, * sh4al-model.cxx, * sh4al-model.h, * sh4al-sem.cxx,
+	* sh4al-write.cxx, * sh5-compact-decode.cxx, * sh5-compact-decode.h,
+	* sh5-compact-defs.h, * sh5-compact-model.cxx, * sh5-compact-model.h,
+	* sh5-compact-sem.cxx, * sh5-compact-write.cxx, * sh5-cpu.h,
+	* sh5-media-decode.cxx, * sh5-media-decode.h, * sh5-media-defs.h,
+	* sh5-media-model.cxx, * sh5-media-model.h, * sh5-media-sem.cxx,
+	* sh5-media-write.cxx: Regenerate.
+
 2009-11-23  Doug Evans  <dje@sebabeach.org>
 
 	* sh2-decode.cxx: Regenerate.

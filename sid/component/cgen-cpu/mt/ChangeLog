@@ -1,3 +1,8 @@
+2010-01-02  Doug Evans  <dje@sebabeach.org>
+
+	* mt-cpu.h, * mt-decode.cxx, * mt-decode.h, * mt-defs.h, * mt-desc.h,
+	* mt-sem.cxx, * mt-write.cxx: Regenerate.
+
 2009-11-23  Doug Evans  <dje@sebabeach.org>
 
 	* mt-decode.cxx: Regenerate.

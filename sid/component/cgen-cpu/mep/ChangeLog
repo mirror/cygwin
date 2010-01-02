@@ -1,3 +1,19 @@
+2010-01-02  Doug Evans  <dje@sebabeach.org>
+
+	* mep-cop1-16-decode.cxx, * mep-cop1-16-decode.h, * mep-cop1-16-defs.h,
+	* mep-cop1-16-model.cxx, * mep-cop1-16-model.h, * mep-cop1-16-sem.cxx,
+	* mep-cop1-32-decode.cxx, * mep-cop1-32-decode.h, * mep-cop1-32-defs.h,
+	* mep-cop1-32-model.cxx, * mep-cop1-32-model.h, * mep-cop1-32-sem.cxx,
+	* mep-cop1-48-decode.cxx, * mep-cop1-48-decode.h, * mep-cop1-48-defs.h,
+	* mep-cop1-48-model.cxx, * mep-cop1-48-model.h, * mep-cop1-48-sem.cxx,
+	* mep-cop1-64-decode.cxx, * mep-cop1-64-decode.h, * mep-cop1-64-defs.h,
+	* mep-cop1-64-model.cxx, * mep-cop1-64-model.h, * mep-cop1-64-sem.cxx,
+	* mep-core1-decode.cxx, * mep-core1-decode.h, * mep-core1-defs.h,
+	* mep-core1-model.cxx, * mep-core1-model.h, * mep-core1-sem.cxx,
+	* mep-cpu.h, * mep-decode.cxx, * mep-decode.h, * mep-defs.h,
+	* mep-desc.h, * mep-model.cxx, * mep-model.h,
+	* mep-sem.cxx: Regenerate.
+
 2009-11-23  Doug Evans  <dje@sebabeach.org>
 
 	* mep-cop1-16-decode.cxx: Regenerate.

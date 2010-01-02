@@ -1,3 +1,7 @@
+2010-01-02  Doug Evans  <dje@sebabeach.org>
+
+	* utils.scm (copyright-fsf, copyright-red-hat): Update copyright year.
+
 2009-12-17  Doug Evans  <dje@sebabeach.org>
 
 	* mep.opc: Apply patches from opcodes to compile with -Wshadow.

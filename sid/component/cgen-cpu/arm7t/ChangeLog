@@ -1,3 +1,9 @@
+2010-01-02  Doug Evans  <dje@sebabeach.org>
+
+	* arm-cpu.h, * arm-decode.cxx, * arm-decode.h, * arm-desc.h,
+	* arm-sem.cxx, * arm-semsw.cxx, * thumb-decode.cxx, * thumb-decode.h,
+	* thumb-sem.cxx, * thumb-semsw.cxx: Regenerate.
+
 2009-11-23  Doug Evans  <dje@sebabeach.org>
 
 	* arm-decode.cxx: Regenerate.

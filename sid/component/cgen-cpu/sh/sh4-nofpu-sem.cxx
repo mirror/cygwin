@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2009 Red Hat, Inc.
+Copyright (C) 2000-2010 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 

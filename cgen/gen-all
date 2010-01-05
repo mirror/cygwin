@@ -16,7 +16,7 @@ export LD_LIBRARY_PATH="${MPC_DIR}/lib"
 echo "Starting gen-all: $(date)"
 
 all_cgen_cpus="arm cris fr30 frv ip2k iq2000 lm32 m32c m32r mep mt \
-openrisc sh64 xc16x xstormy16"
+openrisc sh sh64 xc16x xstormy16"
 
 all_sid_cpus="arm m32r mep mt sh xstormy16"
 

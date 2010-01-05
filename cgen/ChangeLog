@@ -1,3 +1,7 @@
+2010-01-04  Doug Evans  <dje@sebabeach.org>
+
+	* gen-all (all_cgen_cpus): Add sh.
+
 2010-01-02  Doug Evans  <dje@sebabeach.org>
 
 	* utils.scm (copyright-fsf, copyright-red-hat): Update copyright year.

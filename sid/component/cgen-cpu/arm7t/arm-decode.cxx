@@ -3040,7 +3040,7 @@ arm_extract_sfmt_and_imm (arm_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, a
     f_set_cc_ = EXTRACT_LSB0_UINT (insn, 32, 20, 1);
     f_rn = EXTRACT_LSB0_UINT (insn, 32, 19, 4);
     f_rd = EXTRACT_LSB0_UINT (insn, 32, 15, 4);
-    f_imm12 = RORSI (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (255)), ((2) * (((unsigned int) (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (3840))) >> (8)))));
+    f_imm12 = RORSI (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (255)), ((2) * (((USI) (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (3840))) >> (8)))));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
@@ -3152,7 +3152,7 @@ arm_extract_sfmt_mov_imm (arm_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, a
 
     f_set_cc_ = EXTRACT_LSB0_UINT (insn, 32, 20, 1);
     f_rd = EXTRACT_LSB0_UINT (insn, 32, 15, 4);
-    f_imm12 = RORSI (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (255)), ((2) * (((unsigned int) (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (3840))) >> (8)))));
+    f_imm12 = RORSI (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (255)), ((2) * (((USI) (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (3840))) >> (8)))));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
@@ -3273,7 +3273,7 @@ arm_extract_sfmt_add_imm (arm_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, a
     f_set_cc_ = EXTRACT_LSB0_UINT (insn, 32, 20, 1);
     f_rn = EXTRACT_LSB0_UINT (insn, 32, 19, 4);
     f_rd = EXTRACT_LSB0_UINT (insn, 32, 15, 4);
-    f_imm12 = RORSI (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (255)), ((2) * (((unsigned int) (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (3840))) >> (8)))));
+    f_imm12 = RORSI (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (255)), ((2) * (((USI) (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (3840))) >> (8)))));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
@@ -3397,7 +3397,7 @@ arm_extract_sfmt_adc_imm (arm_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, a
     f_set_cc_ = EXTRACT_LSB0_UINT (insn, 32, 20, 1);
     f_rn = EXTRACT_LSB0_UINT (insn, 32, 19, 4);
     f_rd = EXTRACT_LSB0_UINT (insn, 32, 15, 4);
-    f_imm12 = RORSI (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (255)), ((2) * (((unsigned int) (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (3840))) >> (8)))));
+    f_imm12 = RORSI (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (255)), ((2) * (((USI) (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (3840))) >> (8)))));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
@@ -3620,7 +3620,7 @@ arm_extract_sfmt_cmp_imm (arm_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, a
     SI f_imm12;
 
     f_rn = EXTRACT_LSB0_UINT (insn, 32, 19, 4);
-    f_imm12 = RORSI (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (255)), ((2) * (((unsigned int) (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (3840))) >> (8)))));
+    f_imm12 = RORSI (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (255)), ((2) * (((USI) (((EXTRACT_LSB0_UINT (insn, 32, 11, 12)) & (3840))) >> (8)))));
 
   /* Record the fields for the semantic handler.  */
   FLD (f_imm12) = f_imm12;

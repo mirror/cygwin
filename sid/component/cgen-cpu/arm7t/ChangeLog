@@ -1,3 +1,7 @@
+2010-01-05  Doug Evans  <dje@sebabeach.org>
+
+	* arm-decode.cxx: Regenerate.
+
 2010-01-02  Doug Evans  <dje@sebabeach.org>
 
 	* arm-cpu.h, * arm-decode.cxx, * arm-decode.h, * arm-desc.h,

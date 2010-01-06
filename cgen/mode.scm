@@ -1,5 +1,5 @@
 ; Mode objects.
-; Copyright (C) 2000, 2009 Red Hat, Inc.
+; Copyright (C) 2000, 2009, 2010 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -18,13 +18,9 @@
 		; size in bytes
 		bytes
 
-		; NON-MODE-C-TYPE is the C type to use in situations where
-		; modes aren't available.  A somewhat dubious feature, but at
-		; the moment the opcodes tables use it.  It is either the C
-		; type as a string (e.g. "int") or #f for non-portable modes
-		; (??? could use other typedefs for #f, e.g. int64 for DI).
-		; Use of GCC can't be assumed though.
-		non-mode-c-type
+		; The C type to use or #f if there is no such C type.
+		; This is generally the name of the mode.
+		c-type
 
 		; PRINTF-TYPE is the %<letter> arg to printf-like functions,
 		; however we define our own extensions for non-portable modes.
@@ -72,7 +68,7 @@
 (define mode:class (elm-make-getter <mode> 'class))
 (define mode:bits (elm-make-getter <mode> 'bits))
 (define mode:bytes (elm-make-getter <mode> 'bytes))
-(define mode:non-mode-c-type (elm-make-getter <mode> 'non-mode-c-type))
+(define mode:c-type (elm-make-getter <mode> 'c-type))
 (define mode:printf-type (elm-make-getter <mode> 'printf-type))
 (define mode:sem-mode (elm-make-getter <mode> 'sem-mode))
 ; ptr-to is currently private so there is no accessor.
@@ -85,15 +81,6 @@
   (assert (mode? src))
   (object-assign! dst src)
   *UNSPECIFIED*
-)
-
-; Return string C type to use for values of mode M.
-
-(define (mode:c-type m)
-  (let ((ptr-to (elm-xget m 'ptr-to)))
-    (if ptr-to
-	(string-append (mode:c-type ptr-to) " *")
-	(obj:str-name m)))
 )
 
 ; CM is short for "concat mode".  It is a list of modes of the elements
@@ -250,7 +237,7 @@
 ; All arguments are in raw (non-evaluated) form.
 
 (define (/mode-parse context name comment attrs class bits bytes
-		     non-mode-c-type printf-type sem-mode ptr-to host?)
+		     c-type printf-type sem-mode ptr-to host?)
   (logit 2 "Processing mode " name " ...\n")
 
   ;; Pick out name first to augment the error context.
@@ -261,7 +248,7 @@
       name
       (parse-comment context comment)
       (atlist-parse context attrs "mode")
-      class bits bytes non-mode-c-type printf-type
+      class bits bytes c-type printf-type
       sem-mode ptr-to host?))
 )
 
@@ -271,11 +258,11 @@
 ; Define a mode object, all arguments specified.
 
 (define (define-full-mode name comment attrs class bits bytes
-	  non-mode-c-type printf-type sem-mode ptr-to host?)
+	  c-type printf-type sem-mode ptr-to host?)
   (let ((m (/mode-parse (make-current-context "define-full-mode")
 			name comment attrs
 			class bits bytes
-			non-mode-c-type printf-type sem-mode ptr-to host?)))
+			c-type printf-type sem-mode ptr-to host?)))
     ; Add it to the list of insn modes.
     (mode:add! name m)
     m)
@@ -559,47 +546,47 @@ Define a mode, all arguments specified.
     (dfm 'VOID "void" '() 'RANDOM 0 0 "void" "" #f #f #f) ; VOIDmode
 
     ; Special marker to indicate "use the default mode".
-    (dfm 'DFLT "default mode" '() 'RANDOM 0 0 "" "" #f #f #f)
+    (dfm 'DFLT "default mode" '() 'RANDOM 0 0 #f "" #f #f #f)
 
     ; Mode used in `symbol' rtxs.
-    (dfm 'SYM "symbol" '() 'RANDOM 0 0 "" "" #f #f #f)
+    (dfm 'SYM "symbol" '() 'RANDOM 0 0 #f "" #f #f #f)
 
     ; Mode used in `current-insn' rtxs.
-    (dfm 'INSN "insn" '() 'RANDOM 0 0 "" "" #f #f #f)
+    (dfm 'INSN "insn" '() 'RANDOM 0 0 #f "" #f #f #f)
 
     ; Mode used in `current-mach' rtxs.
-    (dfm 'MACH "mach" '() 'RANDOM 0 0 "" "" #f #f #f)
+    (dfm 'MACH "mach" '() 'RANDOM 0 0 #f "" #f #f #f)
 
     ; Not UINT on purpose.
-    (dfm 'BI "one bit (0,1 not 0,-1)" '() 'INT 1 1 "int" "'x'" #f #f #f)
+    (dfm 'BI "one bit (0,1 not 0,-1)" '() 'INT 1 1 "BI" "'x'" #f #f #f)
 
-    (dfm 'QI "8 bit byte" '() 'INT 8 1 "int" "'x'" #f #f #f)
-    (dfm 'HI "16 bit int" '() 'INT 16 2 "int" "'x'" #f #f #f)
-    (dfm 'SI "32 bit int" '() 'INT 32 4 "int" "'x'" #f #f #f)
-    (dfm 'DI "64 bit int" '(FN-SUPPORT) 'INT 64 8 "" "'D'" #f #f #f)
+    (dfm 'QI "8 bit byte" '() 'INT 8 1 "QI" "'x'" #f #f #f)
+    (dfm 'HI "16 bit int" '() 'INT 16 2 "HI" "'x'" #f #f #f)
+    (dfm 'SI "32 bit int" '() 'INT 32 4 "SI" "'x'" #f #f #f)
+    (dfm 'DI "64 bit int" '(FN-SUPPORT) 'INT 64 8 "DI" "'D'" #f #f #f)
 
     ; No unsigned versions on purpose for now.
-    (dfm 'TI "128 bit int" '(FN-SUPPORT) 'INT 128 16 "" "'T'" #f #f #f)
-    (dfm 'OI "256 bit int" '(FN-SUPPORT) 'INT 256 32 "" "'O'" #f #f #f)
+    (dfm 'TI "128 bit int" '(FN-SUPPORT) 'INT 128 16 "TI" "'T'" #f #f #f)
+    (dfm 'OI "256 bit int" '(FN-SUPPORT) 'INT 256 32 "OI" "'O'" #f #f #f)
 
     (dfm 'UQI "8 bit unsigned byte" '() 'UINT
-	 8 1 "unsigned int" "'x'" (mode:lookup 'QI) #f #f)
+	 8 1 "UQI" "'x'" (mode:lookup 'QI) #f #f)
     (dfm 'UHI "16 bit unsigned int" '() 'UINT
-	 16 2 "unsigned int" "'x'" (mode:lookup 'HI) #f #f)
+	 16 2 "UHI" "'x'" (mode:lookup 'HI) #f #f)
     (dfm 'USI "32 bit unsigned int" '() 'UINT
-	 32 4 "unsigned int" "'x'" (mode:lookup 'SI) #f #f)
+	 32 4 "USI" "'x'" (mode:lookup 'SI) #f #f)
     (dfm 'UDI "64 bit unsigned int" '(FN-SUPPORT) 'UINT
-	 64 8 "" "'D'" (mode:lookup 'DI) #f #f)
+	 64 8 "UDI" "'D'" (mode:lookup 'DI) #f #f)
 
     ; Floating point values.
     (dfm 'SF "32 bit float" '(FN-SUPPORT) 'FLOAT
-	 32 4 "" "'f'" #f #f #f)
+	 32 4 "SF" "'f'" #f #f #f)
     (dfm 'DF "64 bit float" '(FN-SUPPORT) 'FLOAT
-	 64 8 "" "'f'" #f #f #f)
+	 64 8 "DF" "'f'" #f #f #f)
     (dfm 'XF "80/96 bit float" '(FN-SUPPORT) 'FLOAT
-	 96 12 "" "'F'" #f #f #f)
+	 96 12 "XF" "'F'" #f #f #f)
     (dfm 'TF "128 bit float" '(FN-SUPPORT) 'FLOAT
-	 128 16 "" "'F'" #f #f #f)
+	 128 16 "TF" "'F'" #f #f #f)
 
     ; These are useful modes that represent host values.
     ; For INT/UINT the sizes indicate maximum portable values.
@@ -607,13 +594,15 @@ Define a mode, all arguments specified.
     ; and registers).
     ; FIXME: Can't be used to represent both host and target values.
     ; Either remove the distinction or add new modes with the distinction.
-    (dfm 'INT "portable int" '() 'INT 32 4 "int" "'x'"
+    ; FIXME: IWBN to specify #f for sem-mode, but that means we'd need
+    ; TRUNCINTQI,etc.
+    (dfm 'INT "portable int" '() 'INT 32 4 "INT" "'x'"
 	 (mode:lookup 'SI) #f #t)
-    (dfm 'UINT "portable unsigned int" '() 'UINT 32 4 "unsigned int" "'x'"
+    (dfm 'UINT "portable unsigned int" '() 'UINT 32 4 "UINT" "'x'"
 	 (mode:lookup 'SI) #f #t)
 
     ; ??? Experimental.
-    (dfm 'PTR "host pointer" '() 'RANDOM 0 0 "PTR" "'x'"
+    (dfm 'PTR "host pointer" '() 'RANDOM 0 0 "void*" "'x'"
 	 #f (mode:lookup 'VOID) #t)
     )
 

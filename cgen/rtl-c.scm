@@ -1,5 +1,5 @@
 ; RTL->C translation support.
-; Copyright (C) 2000, 2005, 2009 Red Hat, Inc.
+; Copyright (C) 2000, 2005, 2009, 2010 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -778,18 +778,23 @@
 				(cx:c val2) ")"))
 	(cx:make mode ; not sem-mode on purpose
 		 (string-append "("
-				; Ensure correct sign of shift.
+				;; Ensure correct sign of shift.
 				(cond ((equal? name "SRL")
-				       (string-append "("
-						      (if (eq? (mode:class mode) 'UINT)
-							  ""
-							  "unsigned ")
-						      (mode:non-mode-c-type mode)
-						      ") "))
+				       (string-append
+					"("
+					(cond ((mode-unsigned? mode) (mode:c-type mode))
+					      ((mode:eq? mode 'INT) (mode:c-type UINT))
+					      (else (mode:c-type (mode-find (mode:bits mode) 'UINT))))
+					") "))
 				      ((equal? name "SRA")
-				       (string-append "("
-						      (mode:non-mode-c-type mode)
-						      ") "))
+				       (string-append
+					"("
+					(cond ((mode-signed? mode) (mode:c-type mode))
+					      ((mode:eq? mode 'UINT) (mode:c-type INT))
+					      (else (mode:c-type (mode-find (mode:bits mode) 'INT))))
+					") "))
+				      ;; May wish to make this unsigned if not
+				      ;; already.  Later.
 				      (else ""))
 				"(" (cx:c val1) ") "
 				c-op

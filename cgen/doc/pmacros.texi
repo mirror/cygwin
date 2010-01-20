@@ -597,6 +597,10 @@ I.e. this is not supported:
 Note that @code{.splice} without any @code{.unsplice} expressions
 behaves identically to @code{.list}.
 
+Also note that the arguments to @code{.splice} and @code{.unsplice} are
+evaluted first.  Any macro invocations are first expanded, and then
+@code{.unsplice} is processed.
+
 @node Referencing a list element
 @subsection Referencing a list element
 @cindex .ref

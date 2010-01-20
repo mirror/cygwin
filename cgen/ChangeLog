@@ -1,5 +1,7 @@
 2010-01-19  Doug Evans  <dje@sebabeach.org>
 
+	* testsuite/pmacros-1.test: Add more .splice tests.
+
 	* read.scm (/cmd-include): Fix absolute path handling.
 
 2010-01-05  Doug Evans  <dje@sebabeach.org>

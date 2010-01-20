@@ -78,9 +78,21 @@ cat > ${cpu_file} <<EOF
 (print-match "zz")
 (print-expr (.substring xyzzy 2 4))
 
-(test-name ".splice")
+(test-name ".splice1")
 (print-match "(now is the time)")
 (print-expr (.splice now (.unsplice (is the time))))
+
+;; Arguments to .splice/.unsplice are evaluated.
+(test-name ".splice2")
+(print-match "(now is the time)")
+(define-pmacro splice2-piece now)
+(print-expr (.splice splice2-piece (.unsplice (is the time))))
+
+;; Arguments to .splice/.unsplice are evaluated.
+(test-name ".splice3")
+(print-match "(now is the time)")
+(define-pmacro splice3-piece the)
+(print-expr (.splice now (.unsplice (is splice3-piece time))))
 
 (test-name ".iota")
 (print-match "(0 1 2 3)")

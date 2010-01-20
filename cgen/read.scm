@@ -1,5 +1,5 @@
 ; Top level file for reading and recording .cpu file contents.
-; Copyright (C) 2000, 2001, 2006, 2009 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2006, 2009, 2010 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -982,12 +982,17 @@ Define a preprocessor-style macro.
   #f
 )
 
-; .cpu file include mechanism
+;; .cpu file include mechanism
+;; If FILE is not an absolute path, prepend ARCH-PATH.
 
 (define (/cmd-include file)
-  (logit 1 "Including file " (string-append arch-path "/" file) " ...\n")
-  (reader-read-file! (string-append arch-path "/" file))
-  (logit 2 "Resuming previous file ...\n")
+  (let ((full-path (if (eq? (string-ref file 0) #\/)
+		       file
+		       (string-append arch-path "/" file))))
+    (logit 1 "Including file " full-path " ...\n")
+    (reader-read-file! full-path)
+    (logit 2 "Resuming previous file ...\n"))
+  *UNSPECIFIED*
 )
 
 ; Version of `if' invokable at the top level of a description file.

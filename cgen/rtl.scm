@@ -1,5 +1,5 @@
 ; Basic RTL support.
-; Copyright (C) 2000, 2001, 2009 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2009, 2010 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -50,7 +50,8 @@
 		; ANYINTMODE - any integer mode
 		; ANYFLOATMODE - any floating point mode
 		; ANYNUMMODE - any numeric mode
-		; ANYEXPRMODE - VOID, PTR, or any numeric mode
+		; ANYEXPRMODE - VOID, PTR, SYM, or any numeric mode
+		; ANYCEXPRMODE - VOID, PTR, or any numeric mode
 		; EXPLNUMMODE - explicit numeric mode, can't be DFLT or VOID
 		; VOIDORNUMMODE - VOID or any numeric mode
 		; VOIDMODE - must be `VOID'
@@ -154,8 +155,8 @@
 
 (define /rtx-valid-mode-types
   '(
-    ANYINTMODE ANYFLOATMODE ANYNUMMODE ANYEXPRMODE EXPLNUMMODE VOIDORNUMMODE
-    VOIDMODE BIMODE INTMODE SYMMODE INSNMODE MACHMODE
+    ANYINTMODE ANYFLOATMODE ANYNUMMODE ANYEXPRMODE ANYCEXPRMODE EXPLNUMMODE
+    VOIDORNUMMODE VOIDMODE BIMODE INTMODE SYMMODE INSNMODE MACHMODE
    )
 )
 

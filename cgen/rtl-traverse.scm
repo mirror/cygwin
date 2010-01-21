@@ -1,5 +1,5 @@
 ;; RTL traversing support.
-;; Copyright (C) 2000, 2001, 2009 Red Hat, Inc.
+;; Copyright (C) 2000, 2001, 2009, 2010 Red Hat, Inc.
 ;; This file is part of CGEN.
 ;; See file COPYING.CGEN for details.
 
@@ -314,6 +314,16 @@
   (let ((val-obj (mode:lookup val)))
     (if (and val-obj
 	     (or (memq (mode:class val-obj) '(INT UINT FLOAT))
+		 (memq val '(DFLT PTR VOID SYM))))
+	#f
+	(/rtx-canon-error cstate "expecting a numeric mode, PTR, VOID, or SYM"
+			  val parent-expr op-num)))
+)
+
+(define (/rtx-canon-anycexprmode val mode parent-expr op-num cstate env depth)
+  (let ((val-obj (mode:lookup val)))
+    (if (and val-obj
+	     (or (memq (mode:class val-obj) '(INT UINT FLOAT))
 		 (memq val '(DFLT PTR VOID))))
 	#f
 	(/rtx-canon-error cstate "expecting a numeric mode, PTR, or VOID"
@@ -552,6 +562,7 @@
 	  (cons 'ANYFLOATMODE /rtx-canon-anyfloatmode)
 	  (cons 'ANYNUMMODE /rtx-canon-anynummode)
 	  (cons 'ANYEXPRMODE /rtx-canon-anyexprmode)
+	  (cons 'ANYCEXPRMODE /rtx-canon-anycexprmode)
 	  (cons 'EXPLNUMMODE /rtx-canon-explnummode)
 	  (cons 'VOIDORNUMMODE /rtx-canon-voidornummode)
 	  (cons 'VOIDMODE /rtx-canon-voidmode)
@@ -611,6 +622,14 @@
 					 (symbol->string (cadr args)))
 			  this-expr parent-expr #f))
 
+    (if /rtx-canon-debug?
+	(begin
+	  (display (spaces (* 4 depth)))
+	  (display "expr-mode ")
+	  (display expr-mode)
+	  (newline)
+	  (force-output)))
+
     (let loop ((env env)
 	       (op-num 0)
 	       (arg-types all-arg-types)
@@ -655,16 +674,24 @@
 				      (else
 				       (vector-ref operands arg-num))))
 				   (expr-to-match-obj (rtx-lookup (rtx-name expr-to-match)))
-				   (result-mode (or (rtx-result-mode expr-to-match-obj)
-						    (let ((expr-mode (rtx-mode expr-to-match)))
-						      (if (eq? expr-mode 'DFLT)
-							  (if (eq? requested-mode-name 'DFLT)
-							      (/rtx-canon-error cstate
-										"unable to determine mode of expression from arguments, please specify a mode"
-										this-expr parent-expr #f)
-							      requested-mode-name)
-							  expr-mode)))))
-			      (vector-set! operands 1 result-mode)))))
+				   (new-expr-mode (or (rtx-result-mode expr-to-match-obj)
+						      (let ((expr-mode (rtx-mode expr-to-match)))
+							(if (eq? expr-mode 'DFLT)
+							    (if (eq? requested-mode-name 'DFLT)
+								(/rtx-canon-error cstate
+										  "unable to determine mode of expression from arguments, please specify a mode"
+										  this-expr parent-expr #f)
+								requested-mode-name)
+							    expr-mode)))))
+			      ;; Verify the mode to be recorded matches the spec.
+			      (let* ((expr-mode-spec (cadr all-arg-types))
+				     (canoner (cdr expr-mode-spec)))
+				;; Ignore the result of the canoner, we just
+				;; want the error checking.
+				(canoner new-expr-mode #f this-expr 1
+					 cstate env depth))
+			      (vector-set! operands 1 new-expr-mode)))))
+
 		     ;; The expression's mode might still be DFLT.
 		     ;; If it is, fetch the mode of the MATCHEXPR operand,
 		     ;; or MATCHSEQ operand, or containing expression.
@@ -1587,6 +1614,7 @@
 	  (cons 'ANYFLOATMODE /rtx-traverse-normal-operand)
 	  (cons 'ANYNUMMODE /rtx-traverse-normal-operand)
 	  (cons 'ANYEXPRMODE /rtx-traverse-normal-operand)
+	  (cons 'ANYCEXPRMODE /rtx-traverse-normal-operand)
 	  (cons 'EXPLNUMMODE /rtx-traverse-normal-operand)
 	  (cons 'VOIDORNUMMODE /rtx-traverse-normal-operand)
 	  (cons 'VOIDMODE /rtx-traverse-normal-operand)

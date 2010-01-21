@@ -1,5 +1,9 @@
 2010-01-20  Doug Evans  <dje@sebabeach.org>
 
+	* rtx-funcs.scm (nan,qnan,snan): New rtl functions.
+	* rtl-c.scm (nan,qnan,snan): New rtl functions.
+	* doc/rtl.texi (Expressions): Add docs for them.
+
 	* rtl-traverse.scm (/rtx-canon-anycexprmode): New function.
 	(/rtx-make-canon-table): Add entry for ANYCEXPRMODE.
 	(/rtx-canon-operands): Print expr-mode if /rtx-canon-debug?

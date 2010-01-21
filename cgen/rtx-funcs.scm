@@ -809,6 +809,25 @@
      #f
 )
 
+(drn (nan &options &mode s1)
+     BI
+     (OPTIONS ANYFLOATMODE RTX) (NA NA MATCHEXPR)
+     UNARY
+     #f
+)
+(drn (qnan &options &mode s1)
+     BI
+     (OPTIONS ANYFLOATMODE RTX) (NA NA MATCHEXPR)
+     UNARY
+     #f
+)
+(drn (snan &options &mode s1)
+     BI
+     (OPTIONS ANYFLOATMODE RTX) (NA NA MATCHEXPR)
+     UNARY
+     #f
+)
+
 ; min/max
 
 (drn (min &options &mode s1 s2)

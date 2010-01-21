@@ -2787,6 +2787,19 @@ Perform a mathematical operation.
 
 @samp{mathop} is one of @code{sqrt}, @code{cos}, @code{sin}.
 
+@item (*nan mode operand)
+Return a boolean indicating if @samp{operand} is a NaN.
+There are three versions.
+
+@itemize @bullet
+@item (nan operand)
+Test whether @samp{operand} is any kind of NaN.
+@item (qnan operand)
+Test whether @samp{operand} is a quiet NaN.
+@item (snan operand)
+Test whether @samp{operand} is a signalling NaN.
+@end itemize
+
 @item (if mode condition then [else])
 Standard @code{if} statement.
 

@@ -1,6 +1,6 @@
 ;; Various RTL transformations.
 ;;
-;; Copyright (C) 2000, 2009 Red Hat, Inc.
+;; Copyright (C) 2000, 2009, 2010 Red Hat, Inc.
 ;; This file is part of CGEN.
 ;; See file COPYING.CGEN for details.
 ;;
@@ -422,8 +422,8 @@
 	      ((OPTIONS)
 	       (assert #f)) ; shouldn't get here
 
-	      ((ANYINTMODE ANYFLOATMODE ANYNUMMODE ANYEXPRMODE EXPLNUMMODE
-		VOIDORNUMMODE VOIDMODE BIMODE INTMODE
+	      ((ANYINTMODE ANYFLOATMODE ANYNUMMODE ANYEXPRMODE ANYCEXPRMODE
+		EXPLNUMMODE VOIDORNUMMODE VOIDMODE BIMODE INTMODE
 		SYMMODE INSNMODE MACHMODE)
 	       #f) ; leave arg untouched
 

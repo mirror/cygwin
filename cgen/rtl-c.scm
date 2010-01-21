@@ -1733,6 +1733,16 @@
   (s-unop *estate* "SIN" #f mode s1)
 )
 
+(define-fn nan (*estate* options mode s1)
+  (s-unop *estate* "NAN" #f mode s1)
+)
+(define-fn qnan (*estate* options mode s1)
+  (s-unop *estate* "QNAN" #f mode s1)
+)
+(define-fn snan (*estate* options mode s1)
+  (s-unop *estate* "SNAN" #f mode s1)
+)
+
 (define-fn min (*estate* options mode s1 s2)
   (s-binop *estate* "MIN" #f mode s1 s2)
 )

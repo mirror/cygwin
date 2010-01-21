@@ -1,3 +1,15 @@
+2010-01-20  Doug Evans  <dje@sebabeach.org>
+
+	* rtl-traverse.scm (/rtx-canon-anycexprmode): New function.
+	(/rtx-make-canon-table): Add entry for ANYCEXPRMODE.
+	(/rtx-canon-operands): Print expr-mode if /rtx-canon-debug?
+	Do final error check on mode assigned to expression.
+	(/rtx-make-traverser-table): Add entry for ANYCEXPRMODE.
+	* rtl-xform.scm (/rtx-trim-args): Handle ANYCEXPRMODE.
+	* rtl.scm (/rtx-valid-mode-types): Add ANYCEXPRMODE.
+	* rtx-funcs.scm (c-code, c-call, c-raw-call): Use ANYCEXPRMODE.
+	(if, cond, case): Use ANYEXPRMODE.
+
 2010-01-19  Doug Evans  <dje@sebabeach.org>
 
 	* testsuite/pmacros-1.test: Add more .splice tests.

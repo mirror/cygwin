@@ -2789,6 +2789,7 @@ Perform a mathematical operation.
 
 @item (*nan mode operand)
 Return a boolean indicating if @samp{operand} is a NaN.
+@samp{mode} must be a floating point mode.
 There are three versions.
 
 @itemize @bullet

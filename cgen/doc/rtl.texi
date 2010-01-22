@@ -2631,20 +2631,17 @@ There is no change in the bits of @samp{value}, they're just interpreted in a
 possibly different mode.  This is most often used to interpret an integer
 value as a float and vice versa.
 
-If @samp{mode} is smaller, @samp{value} is divided into N pieces and
-@samp{word-num} picks which piece.  All pieces have the size of @samp{mode}
-except possibly the last.  If the last piece has a different size,
-it cannot be referenced.
-This follows GCC and is byte order dependent.@footnote{To be
-revisited}.
-Word number 0 is the most significant word if big-endian-words.
-Word number 0 is the least significant word if little-endian-words.
+If @samp{mode} is smaller than the mode of @samp{value}, @samp{value} is
+divided into N pieces and @samp{word-num} picks which piece.
+All pieces have the size of @samp{mode} except possibly the last.
+If the last piece has a different size, it cannot be referenced.
+Word number 0 is the most significant word, regardless of endianness.
 
-If @samp{mode} is larger, @samp{value} is interpreted in the larger mode
-with the upper most significant bits treated as garbage (their value is
-assumed to be unimportant to the context in which the value will be used).
+If @samp{mode} is larger than the mode of @samp{value}, @samp{value} is
+interpreted in the larger mode with the upper most significant bits treated
+as garbage (their value is assumed to be unimportant to the context in which
+the value will be used).
 @samp{word-num} must be @samp{0}.
-This case is byte order independent.
 
 @item (join out-mode in-mode arg1 . arg-rest)
 Concatenate @samp{arg1[,arg2[,...]]} to create a value of mode @samp{out-mode}.

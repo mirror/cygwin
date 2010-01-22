@@ -1,3 +1,7 @@
+2010-01-21  Doug Evans  <dje@sebabeach.org>
+
+	* doc/rtl.texi (Expressions): Fix docs on `subword'.
+
 2010-01-20  Doug Evans  <dje@sebabeach.org>
 
 	* rtx-funcs.scm (nan,qnan,snan): New rtl functions.

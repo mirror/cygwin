@@ -39,11 +39,12 @@ usage() {
     echo ""
     echo "Options:"
     echo "cpus=\"space-separated-list-of-cpus\""
+    echo "force    Force cgen files to be regenerated"
     echo ""
     echo "Things-to-do:"
     echo "config   Configure the tree"
     echo "build    Build the tree"
-    echo "diffs    Generate diffs from what's checked in"
+    echo "diffs    Generate diffs from what is checked in"
     echo ""
     echo "Applications:"
     echo "binutils, gcc, newlib, sim, sid, intrinsics"
@@ -69,6 +70,7 @@ openrisc sh sh64 xc16x xstormy16"
 
 all_sid_cpus="arm m32r mep mt sh xstormy16"
 
+do_force=no
 do_config=no
 do_build=no
 do_binutils=no
@@ -89,6 +91,7 @@ do
     case $a in
     help) usage ; trap "" 0 ; exit 0 ;;
     cpus=*) cgen_cpus=${a/cpus=} sid_cpus=${cgen_cpus} ;;
+    force) do_force=yes ;;
     config) do_config=yes ;;
     build) do_build=yes ;;
     binutils) do_binutils=yes ;;
@@ -195,6 +198,11 @@ build_binutils () {
     prefix=$2
     PATH=${prefix}/bin:$PATH
 
+    if [ "${do_force}" = "yes" ]
+    then
+	touch ${SRC_DIR}/cgen/opcodes.scm
+    fi
+
     echo "Building ${target_sys} binutils, $(date)"
     mkdir -p tmp-src-${target_sys}
     (
@@ -286,6 +294,11 @@ build_sim () {
     prefix=$2
     PATH=${prefix}/bin:$PATH
 
+    if [ "${do_force}" = "yes" ]
+    then
+	touch ${SRC_DIR}/cgen/sim.scm
+    fi
+
     echo "Building ${cpu} sim, $(date)"
     mkdir -p tmp-src-${target_sys}
     (
@@ -314,6 +327,11 @@ build_sid () {
     target_sys=$1
     prefix=$2
     PATH=${prefix}/bin:$PATH
+
+    if [ "${do_force}" = "yes" ]
+    then
+	touch ${SRC_DIR}/cgen/sid.scm
+    fi
 
     echo "Building ${cpu} sid, $(date)"
     mkdir -p tmp-src-${target_sys}
@@ -347,7 +365,7 @@ build_sid () {
 }
 
 build_intrinsics () {
-    (cd .. && sh ./gen-all-intrinsics ${build_dir}/${GCC_DIR})
+    (cd ${SRC_DIR}/cgen && sh ./gen-all-intrinsics ${build_dir}/${GCC_DIR})
     if [ $? != 0 ] ; then exit 1 ; fi
 }
 

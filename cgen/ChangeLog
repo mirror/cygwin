@@ -1,5 +1,8 @@
 2010-01-23  Doug Evans  <dje@sebabeach.org>
 
+	* gen-all: Move build-configuration related parameters to an
+	external file.
+
 	* doc/rtl.texi (Expressions): Add more docs on conversion functions.
 
 2010-01-21  Doug Evans  <dje@sebabeach.org>

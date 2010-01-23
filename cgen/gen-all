@@ -5,15 +5,39 @@
 #
 # NOTE: This script doesn't rm -rf the previous run since it can run
 # different tests.  If you want to start fresh, rm -rf tmp-all yourself.
+#
+# File ./gen-all.rc must exist and must define several env vars.
+# It saves us from having to always pass the same long path names as
+# parameters.
+# The config file lives in "." instead of say "$HOME" so that multiple
+# different configs are easily supported.
+# Typical contents are:
+#
+## Paths to src,gcc,rel relative to ${build_dir}.
+#SRC_DIR="../../../src"
+#GCC_DIR="../../../gcc"
+#REL_DIR="../../.."
+## Location of mpc (gmp,mpfr taken from /usr/{include,lib}).
+#MPC_DIR="$HOME/gnu/rel32/mpc-0.8.1"
 
 set -e
 trap "echo ERROR: $(date)" 0
 
-MPC_DIR="/path/to/mpc"
+if [ ! -f ./gen-all.rc ]
+then
+    echo "Missing gen-all.rc file." >&2
+    exit
+fi
+
+source ./gen-all.rc
+
+# Parameters to configure.
 MPC_CONFIG="--with-mpc=${MPC_DIR}"
+
+# Set up any env vars we need, blech.
 export LD_LIBRARY_PATH="${MPC_DIR}/lib"
 
-echo "Starting gen-all: $(date)"
+build_all_target_sys="fr30-elf"
 
 all_cgen_cpus="arm cris fr30 frv ip2k iq2000 lm32 m32c m32r mep mt \
 openrisc sh sh64 xc16x xstormy16"
@@ -32,6 +56,8 @@ do_diffs=no
 
 cgen_cpus="${all_cgen_cpus}"
 sid_cpus="${all_sid_cpus}"
+
+# Parameter processing.
 
 for a in "$@"
 do
@@ -85,18 +111,7 @@ then
     done
 fi
 
-mkdir -p tmp-all
-cd tmp-all
-build_dir=$(pwd)
-
-# Paths to src,gcc,rel relative to ${build_dir}.
-src="../../../src"
-gcc="../../../gcc"
-reltop="../../.."
-
-build_all_target_sys="fr30-elf"
-build_sys=$(sh ${src}/config.guess)
-host_sys=${build_sys}
+# Utility functions.
 
 config_src () {
     target_sys=$1
@@ -114,7 +129,7 @@ config_src () {
     elif [ "${do_config}" = "yes" ]
     then
 	echo "Configuring: $(date)"
-	../${src}/configure \
+	../${SRC_DIR}/configure \
 	    --prefix=${prefix} \
 	    --build=${build_sys} \
 	    --host=${host_sys} \
@@ -138,7 +153,7 @@ config_gcc () {
     elif [ "${do_config}" = "yes" ]
     then
 	echo "Configuring: $(date)"
-	../${gcc}/configure \
+	../${GCC_DIR}/configure \
 	    --prefix=${prefix} \
 	    --build=${build_sys} \
 	    --host=${host_sys} \
@@ -306,23 +321,36 @@ build_sid () {
 }
 
 build_intrinsics () {
-    (cd .. && sh ./gen-all-intrinsics ${build_dir}/${gcc})
+    (cd .. && sh ./gen-all-intrinsics ${build_dir}/${GCC_DIR})
     if [ $? != 0 ] ; then exit 1 ; fi
 }
 
 build_diffs () {
     # NOTE: cvs will return with a non-zero exit code if there are diffs.
-    (cd ${src}/opcodes && cvs diff -du >${build_dir}/opcodes.diffs)
-    (cd ${src}/sim && cvs diff -du >${build_dir}/sim.diffs)
-    (cd ${src}/sid/component/cgen-cpu && cvs diff -du >${build_dir}/sid.diffs)
-    (cd ${gcc}/gcc/config/mep && svn diff -x -u >${build_dir}/gcc.diffs)
+    (cd ${SRC_DIR}/opcodes && cvs diff -du >${build_dir}/opcodes.diffs)
+    (cd ${SRC_DIR}/sim && cvs diff -du >${build_dir}/sim.diffs)
+    (cd ${SRC_DIR}/sid/component/cgen-cpu && cvs diff -du >${build_dir}/sid.diffs)
+    (cd ${GCC_DIR}/gcc/config/mep && svn diff -x -u >${build_dir}/gcc.diffs)
 }
+
+# And we're off.
+
+echo "Starting gen-all: $(date)"
+
+mkdir -p tmp-all
+cd tmp-all
+build_dir=$(pwd)
+
+# We can't call config.guess until we've cd'd into the build_dir because
+# SRC_DIR, if relative, is relative to build_dir.
+build_sys=$(sh ${SRC_DIR}/config.guess)
+host_sys=${build_sys}
 
 for cpu in ${cgen_cpus}
 do
     # FIXME: arm-eabi is preferred over arm-elf
     target_sys=${cpu}-elf
-    prefix=$(cd ${reltop} && pwd -P)/rel-${target_sys}
+    prefix=$(cd ${REL_DIR} && pwd -P)/rel-${target_sys}
     [ $? != 0 ] && { echo "Error setting prefix" >&2 ; exit 1 ; }
     mkdir -p ${prefix}
 
@@ -366,7 +394,7 @@ for cpu in ${sid_cpus}
 do
     # FIXME: arm-eabi is preferred over arm-elf
     target_sys=${cpu}-elf
-    prefix=$(cd ${reltop} && pwd -P)/rel-${target_sys}
+    prefix=$(cd ${REL_DIR} && pwd -P)/rel-${target_sys}
     [ $? != 0 ] && { echo "Error setting prefix" >&2 ; exit 1 ; }
     mkdir -p ${prefix}
 

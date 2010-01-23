@@ -2,6 +2,7 @@
 
 	* gen-all: Move build-configuration related parameters to an
 	external file.  Add usage info.  Add "force" option.
+	Be smarter about what diffs to generate.
 
 	* doc/rtl.texi (Expressions): Add more docs on conversion functions.
 

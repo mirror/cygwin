@@ -371,10 +371,22 @@ build_intrinsics () {
 
 build_diffs () {
     # NOTE: cvs will return with a non-zero exit code if there are diffs.
-    (cd ${SRC_DIR}/opcodes && cvs diff -du >${build_dir}/opcodes.diffs)
-    (cd ${SRC_DIR}/sim && cvs diff -du >${build_dir}/sim.diffs)
-    (cd ${SRC_DIR}/sid/component/cgen-cpu && cvs diff -du >${build_dir}/sid.diffs)
-    (cd ${GCC_DIR}/gcc/config/mep && svn diff -x -u >${build_dir}/gcc.diffs)
+    if [ "${do_binutils}" = "yes" ]
+    then
+	(cd ${SRC_DIR}/opcodes && cvs diff -du >${build_dir}/opcodes.diffs)
+    fi
+    if [ "${do_sim}" = "yes" ]
+    then
+	(cd ${SRC_DIR}/sim && cvs diff -du >${build_dir}/sim.diffs)
+    fi
+    if [ "${do_sid}" = "yes" ]
+    then
+	(cd ${SRC_DIR}/sid/component/cgen-cpu && cvs diff -du >${build_dir}/sid.diffs)
+    fi
+    if [ "${do_intrinsics}" = "yes" ]
+    then
+	(cd ${GCC_DIR}/gcc/config/mep && svn diff -x -u >${build_dir}/gcc.diffs)
+    fi
 }
 
 # And we're off.

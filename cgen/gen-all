@@ -31,6 +31,31 @@ fi
 
 source ./gen-all.rc
 
+usage() {
+    echo "Usage:"
+    echo "  gen-all help"
+    echo "  gen-all [options] [todos] [apps]"
+    echo "  gen-all all"
+    echo ""
+    echo "Options:"
+    echo "cpus=\"space-separated-list-of-cpus\""
+    echo ""
+    echo "Things-to-do:"
+    echo "config   Configure the tree"
+    echo "build    Build the tree"
+    echo "diffs    Generate diffs from what's checked in"
+    echo ""
+    echo "Applications:"
+    echo "binutils, gcc, newlib, sim, sid, intrinsics"
+    echo ""
+    echo "Notes:"
+    echo "\"all\" can be specified which means \"all of the above\""
+    echo "Options, todos, and apps may be specified in any order."
+    echo ""
+    echo "Example:"
+    echo "sh gen-all build binutils diffs cpus=m32r"
+}
+
 # Parameters to configure.
 MPC_CONFIG="--with-mpc=${MPC_DIR}"
 
@@ -62,6 +87,7 @@ sid_cpus="${all_sid_cpus}"
 for a in "$@"
 do
     case $a in
+    help) usage ; trap "" 0 ; exit 0 ;;
     cpus=*) cgen_cpus=${a/cpus=} sid_cpus=${cgen_cpus} ;;
     config) do_config=yes ;;
     build) do_build=yes ;;

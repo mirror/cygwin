@@ -2760,12 +2760,50 @@ otherwise the result is zero.
 The mode of the result is @samp{BI}.
 @samp{mode} is generally elided or is @samp{BI}.
 
-@item (convop mode operand)
-Perform a mode->mode conversion operation.
+@item (integer-convop mode operand)
+Perform an integer mode->mode conversion operation.
 
-@samp{convop} is one of
-@code{ext}, @code{zext}, @code{trunc}, @code{float}, @code{ufloat},
-@code{fix}, @code{ufix}.
+@samp{integer-convop} is one of:
+
+@itemize @bullet
+@item @code{ext}
+Sign-extend @samp{operand}, which must have an integer mode
+narrower than @samp{mode}, which also must be an integer mode.
+@item @code{zext}
+Zero-extend @samp{operand}, which must have an integer mode
+narrower than @samp{mode}, which also must be an integer mode.
+@item @code{trunc}
+Truncate @samp{operand}, which must have an integer mode
+wider than @samp{mode}, which also must be an integer mode.
+@end itemize
+
+@item (float-convop mode operand)
+Perform a mode->mode conversion operation involving a floating point value.
+
+@samp{float-convop} is one of:
+
+@itemize @bullet
+@item @code{fext}
+Extend @samp{operand}, which must have a floating point mode
+narrower than @samp{mode}, which also must be a floating point mode.
+@item @code{ftrunc}
+Truncate @samp{operand}, which must have a floating point mode
+wider than @samp{mode}, which also must be a floating point mode.
+@item @code{float}
+Convert @samp{operand}, which must have an integer mode,
+to a floating point value of mode @samp{mode}.
+@samp{operand} is treated as a signed integer.
+@item @code{ufloat}
+Convert @samp{operand}, which must have an integer mode,
+to a floating point value of mode @samp{mode}.
+@samp{operand} is treated as an unsigned integer.
+@item @code{fix}
+Convert @samp{operand}, which must have a floating point mode,
+to a signed integer of mode @samp{mode}.
+@item @code{ufix}
+Convert @samp{operand}, which must have a floating point mode,
+to an unsigned integer of mode @samp{mode}.
+@end itemize
 
 @item (cmpop mode operand1 operand2)
 Perform a comparison.

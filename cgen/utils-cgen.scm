@@ -1,16 +1,16 @@
-;;CGEN Utilities.
-;;Copyright (C) 2000, 2002, 2003, 2009 Red Hat, Inc.
-;;This file is part of CGEN.
-;;See file COPYING.CGEN for details.
+;; CGEN Utilities.
+;; Copyright (C) 2000, 2002, 2003, 2009 Red Hat, Inc.
+;; This file is part of CGEN.
+;; See file COPYING.CGEN for details.
 ;;
-;;This file contains utilities specific to cgen.
-;;Generic utilities should go in utils.scm.
+;; This file contains utilities specific to cgen.
+;; Generic utilities should go in utils.scm.
 
-;;True if text of sanitize markers are to be emitted.
-;;This is a debugging tool only, though it could have use in sanitized trees.
+;; True if text of sanitize markers are to be emitted.
+;; This is a debugging tool only, though it could have use in sanitized trees.
 (define include-sanitize-marker? #t)
 
-;;Utility to display command line invocation for debugging purposes.
+;; Utility to display command line invocation for debugging purposes.
 
 (define (display-argv argv)
   (let ((cep (current-error-port)))
@@ -26,11 +26,11 @@
     (newline cep))
 )
 
-;;COS utilities.
-;;Perhaps these should be provided with cos (cgen-object-system), but for
-;;now they live here.
+;; COS utilities.
+;; Perhaps these should be provided with cos (cgen-object-system), but for
+;; now they live here.
 
-;;Define the getter for a list of elements of a class.
+;; Define the getter for a list of elements of a class.
 
 (defmacro define-getters (class class-prefix elm-names)
   (cons 'begin
@@ -43,7 +43,7 @@
 	     elm-names))
 )
 
-;;Define the setter for a list of elements of a class.
+;; Define the setter for a list of elements of a class.
 
 (defmacro define-setters (class class-prefix elm-names)
   (cons 'begin
@@ -56,8 +56,8 @@
 	     elm-names))
 )
 
-;;Make an object, specifying values for particular elements.
-;;??? Eventually move to cos.scm/cos.c.
+;; Make an object, specifying values for particular elements.
+;; ??? Eventually move to cos.scm/cos.c.
 
 (define (vmake class . args)
   (let ((obj (new class)))
@@ -67,8 +67,8 @@
 	  (error "vmake: unknown options:" unrecognized))))
 )
 
-;;; Source locations are recorded as a stack, with (ideally) one extra level
-;;; for each macro invocation.
+;; Source locations are recorded as a stack, with (ideally) one extra level
+;; for each macro invocation.
 
 (define <location> (class-make '<location>
 			       nil
@@ -82,10 +82,10 @@
 (define-getters <location> location (list))
 (define-setters <location> location (list))
 
-;;; A single source location.
-;;; This is recorded as a vector for simplicity.
-;;; END? is true if the location marks the end of the expression.
-;;; NOTE: LINE and COLUMN are origin-0 (the first line is line 0).
+;; A single source location.
+;; This is recorded as a vector for simplicity.
+;; END? is true if the location marks the end of the expression.
+;; NOTE: LINE and COLUMN are origin-0 (the first line is line 0).
 
 (define (make-single-location file line column end?)
   (vector file line column end?)
@@ -96,7 +96,7 @@
 (define (single-location-column sloc) (vector-ref sloc 2))
 (define (single-location-end? sloc) (vector-ref sloc 3))
 
-;;; Return a single-location in a readable form.
+;; Return a single-location in a readable form.
 
 (define (single-location->string sloc)
   ;; +1: numbers are recorded origin-0
@@ -108,8 +108,8 @@
 		 (if (single-location-end? sloc) "(end)" ""))
 )
 
-;;; Same as single-location->string, except omit any directory info in
-;;; the file name.
+;; Same as single-location->string, except omit any directory info in
+;; the file name.
 
 (define (single-location->simple-string sloc)
   ;; +1: numbers are recorded origin-0
@@ -121,7 +121,7 @@
 		 (if (single-location-end? sloc) "(end)" ""))
 )
 
-;;; Return a location in a readable form.
+;; Return a location in a readable form.
 
 (define (location->string loc)
   (let ((ref-from " referenced from:"))
@@ -137,8 +137,8 @@
 		  (location-list loc))))))
 )
 
-;;; Return the location information in Guile's source-properties
-;;; in a readable form.
+;; Return the location information in Guile's source-properties
+;; in a readable form.
 
 (define (source-properties-location->string src-props)
   (let ((file (assq-ref src-props 'filename))
@@ -151,43 +151,43 @@
 		   (number->string (+ column 1))))
 )
 
-;;; Return the top location on LOC's stack.
+;; Return the top location on LOC's stack.
 
 (define (location-top loc)
   (car (location-list loc))
 )
 
-;;; Return a new <location> with FILE, LINE pushed onto the stack.
+;; Return a new <location> with FILE, LINE pushed onto the stack.
 
 (define (location-push-single loc file line column end?)
   (make <location> (cons (make-single-location file line column end?)
 			 (location-list loc)))
 )
 
-;;; Return a new <location> with NEW-LOC preappended to LOC.
+;; Return a new <location> with NEW-LOC preappended to LOC.
 
 (define (location-push loc new-loc)
   (make <location> (append (location-list new-loc)
 			   (location-list loc)))
 )
 
-;;; Return an unspecified <location>.
-;;; This is mainly for use in debugging utilities.
-;;; Ideally for .cpu-file related stuff we always have a location,
-;;; but that's not always true.
+;; Return an unspecified <location>.
+;; This is mainly for use in debugging utilities.
+;; Ideally for .cpu-file related stuff we always have a location,
+;; but that's not always true.
 
 (define (unspecified-location)
   (make <location> (list (make-single-location "unspecified" 0 0 #f)))
 )
 
-;;; Return a location denoting a builtin object.
+;; Return a location denoting a builtin object.
 
 (define (builtin-location)
   (make <location> (list (make-single-location "builtin" 0 0 #f)))
 )
 
-;;; Return a <location> object for the current input port.
-;;; END? is true if the location marks the end of the expression.
+;; Return a <location> object for the current input port.
+;; END? is true if the location marks the end of the expression.
 
 (define (current-input-location end?)
   (let ((cip (current-input-port)))
@@ -197,19 +197,19 @@
 						 end?))))
 )
 
-;;; An object property for tracking source locations during macro expansion.
+;; An object property for tracking source locations during macro expansion.
 
 (define location-property (make-object-property))
 
-;;; Set FORM's location to LOC.
+;; Set FORM's location to LOC.
 
 (define (location-property-set! form loc)
   (set! (location-property form) loc)
   *UNSPECIFIED*
 )
 
-;;Each named entry in the description file typically has these three members:
-;;name, comment attrs.
+;; Each named entry in the description file typically has these three members:
+;; name, comment attrs.
 
 (define <ident> (class-make '<ident> '() '(name comment attrs) '()))
 
@@ -224,15 +224,15 @@
 (method-make! <ident> 'set-atlist!
 	      (lambda (self newval) (elm-set! self 'attrs newval)))
 
-;;All objects defined in the .cpu file have these elements.
-;;Where in the class hierarchy they're recorded depends on the object.
-;;Additionally most objects have `name', `comment' and `attrs' elements.
+;; All objects defined in the .cpu file have these elements.
+;; Where in the class hierarchy they're recorded depends on the object.
+;; Additionally most objects have `name', `comment' and `attrs' elements.
 
 (define (obj:name obj) (send obj 'get-name))
 (define (obj-set-name! obj name) (send obj 'set-name! name))
 (define (obj:comment obj) (send obj 'get-comment))
 
-;;Utility to return the name as a string.
+;; Utility to return the name as a string.
 
 (define (obj:str-name obj) (symbol->string (obj:name obj)))
 
@@ -246,17 +246,17 @@
 	       obj-list))
 )
 
-;;Subclass of <ident> for use by description file objects.
+;; Subclass of <ident> for use by description file objects.
 ;;
-;;Records the source location of the object.
+;; Records the source location of the object.
 ;;
-;;We also record an internally generated entry, ordinal, to record the
-;;relative position within the description file.  It's generally more efficient
-;;to record some kinds of objects (e.g. insns) in a hash table.  But we also
-;;want to emit these objects in file order.  Recording the object's relative
-;;position lets us generate an ordered list when we need to.
-;;We can't just use the line number because we want an ordering over multiple
-;;input files.
+;; We also record an internally generated entry, ordinal, to record the
+;; relative position within the description file.  It's generally more efficient
+;; to record some kinds of objects (e.g. insns) in a hash table.  But we also
+;; want to emit these objects in file order.  Recording the object's relative
+;; position lets us generate an ordered list when we need to.
+;; We can't just use the line number because we want an ordering over multiple
+;; input files.
 
 (define <source-ident>
   (class-make '<source-ident> '(<ident>)
@@ -282,14 +282,14 @@
 (define (obj-ordinal obj) (send obj 'get-ordinal))
 (define (obj-set-ordinal! obj ordinal) (send obj 'set-ordinal! ordinal))
 
-;;Return a boolean indicating if X is a <source-ident>.
+;; Return a boolean indicating if X is a <source-ident>.
 
 (define (source-ident? x) (class-instance? <source-ident> x))
 
-;;Parsing utilities
+;; Parsing utilities
 
-;;; A parsing/processing context, used to give better error messages.
-;;; LOCATION must be an object created with make-location.
+;; A parsing/processing context, used to give better error messages.
+;; LOCATION must be an object created with make-location.
 
 (define <context>
   (class-make '<context> nil
@@ -303,46 +303,46 @@
 	      nil)
 )
 
-;;Accessors.
+;; Accessors.
 
 (define-getters <context> context (location prefix))
 
-;;Create a <context> object that is just a prefix.
+;; Create a <context> object that is just a prefix.
 
 (define (make-prefix-context prefix)
   (make <context> #f prefix)
 )
 
-;;Create a <context> object that (current-reader-location) with PREFIX.
+;; Create a <context> object that (current-reader-location) with PREFIX.
 
 (define (make-current-context prefix)
   (make <context> (current-reader-location) prefix)
 )
 
-;;Create a <context> object from <source-ident> object OBJ.
+;; Create a <context> object from <source-ident> object OBJ.
 
 (define (make-obj-context obj prefix)
   (make <context> (obj-location obj) prefix)
 )
 
-;;Create a new context from CONTEXT with TEXT appended to the prefix.
+;; Create a new context from CONTEXT with TEXT appended to the prefix.
 
 (define (context-append context text)
   (make <context> (context-location context)
 	(string-append (context-prefix context) text))
 )
 
-;;Create a new context from CONTEXT with NAME appended to the prefix.
+;; Create a new context from CONTEXT with NAME appended to the prefix.
 
 (define (context-append-name context name)
   (context-append context (stringsym-append ":" name))
 )
 
-;;Call this to issue an error message when all you have is a context.
-;;CONTEXT is a <context> object or #f if there is none.
-;;INTRO is a general introduction to what cgen was doing.
-;;ERRMSG is, yes, you guessed it, the error message.
-;;EXPR is the value that had the error if there is one.
+;; Call this to issue an error message when all you have is a context.
+;; CONTEXT is a <context> object or #f if there is none.
+;; INTRO is a general introduction to what cgen was doing.
+;; ERRMSG is, yes, you guessed it, the error message.
+;; EXPR is the value that had the error if there is one.
 
 (define (context-error context intro errmsg . expr)
   (apply context-owner-error
@@ -352,14 +352,14 @@
 			   (cons errmsg expr)))))
 )
 
-;;Call this to issue an error message when you have a context and an
-;;<ident> or <source-ident> object (we call the "owner").
-;;CONTEXT is a <context> object or #f if there is none.
-;;OWNER is an <ident> or <source-ident> object or #f if there is none.
-;;INTRO is a general introduction to what cgen was doing.
-;;  If OWNER is non-#f, the text " of <object-name>" is appended.
-;;ERRMSG is, yes, you guessed it, the error message.
-;;EXPR is the value that had the error if there is one.
+;; Call this to issue an error message when you have a context and an
+;; <ident> or <source-ident> object (we call the "owner").
+;; CONTEXT is a <context> object or #f if there is none.
+;; OWNER is an <ident> or <source-ident> object or #f if there is none.
+;; INTRO is a general introduction to what cgen was doing.
+;;   If OWNER is non-#f, the text " of <object-name>" is appended.
+;; ERRMSG is, yes, you guessed it, the error message.
+;; EXPR is the value that had the error if there is one.
 
 (define (context-owner-error context owner intro errmsg . expr)
   ;; If we don't have a context, look at the owner to try to find one.
@@ -404,11 +404,11 @@
 		expr))))
 )
 
-;;Parse an object name.
-;;NAME is either a symbol or a list of symbols which are concatenated
-;;together.  Each element can in turn be a list of symbols, and so on.
-;;This supports symbol concatenation in the description file without having
-;;to using string-append or some such.
+;; Parse an object name.
+;; NAME is either a symbol or a list of symbols which are concatenated
+;; together.  Each element can in turn be a list of symbols, and so on.
+;; This supports symbol concatenation in the description file without having
+;; to using string-append or some such.
 
 (define (parse-name context name)
   (string->symbol
@@ -421,9 +421,9 @@
       (else (parse-error context "improper name" name)))))
 )
 
-;;Parse an object comment.
-;;COMMENT is either a string or a list of strings, each element of which may
-;;in turn be a list of strings.
+;; Parse an object comment.
+;; COMMENT is either a string or a list of strings, each element of which may
+;; in turn be a list of strings.
 
 (define (parse-comment context comment)
   (cond ((string? comment) comment)
@@ -434,7 +434,7 @@
 	(else (parse-error context "improper comment" comment)))
 )
 
-;;Parse a symbol.
+;; Parse a symbol.
 
 (define (parse-symbol context value)
   (if (and (not (symbol? value)) (not (string? value)))
@@ -442,7 +442,7 @@
   (->symbol value)
 )
 
-;;Parse a string.
+;; Parse a string.
 
 (define (parse-string context value)
   (if (and (not (symbol? value)) (not (string? value)))
@@ -450,8 +450,8 @@
   (->string value)
 )
 
-;;Parse a number.
-;;VALID-VALUES is a list of numbers and (min . max) pairs.
+;; Parse a number.
+;; VALID-VALUES is a list of numbers and (min . max) pairs.
 
 (define (parse-number context value . valid-values)
   (if (not (number? value))
@@ -466,7 +466,7 @@
       (parse-error context "invalid number" value valid-values))
 )
 
-;;Parse a boolean value
+;; Parse a boolean value
 
 (define (parse-boolean context value)
   (if (boolean? value)
@@ -474,13 +474,13 @@
       (parse-error context "not a boolean (#f/#t)" value))
 )
 
-;;Parse a list of handlers.
-;;Each entry is (symbol "string").
-;;These map function to a handler for it.
-;;The meaning is up to the application but generally the handler is a
-;;C/C++ function name.
-;;ALLOWED is a list valid values for the symbol or #f if anything is allowed.
-;;The result is handlers unchanged.
+;; Parse a list of handlers.
+;; Each entry is (symbol "string").
+;; These map function to a handler for it.
+;; The meaning is up to the application but generally the handler is a
+;; C/C++ function name.
+;; ALLOWED is a list valid values for the symbol or #f if anything is allowed.
+;; The result is handlers unchanged.
 
 (define (parse-handlers context allowed handlers)
   (if (not (list? handlers))
@@ -494,10 +494,10 @@
   handlers
 )
 
-;;Return a boolean indicating if X is a keyword.
-;;This also handles symbols named :foo because Guile doesn't stablely support
-;;:keywords (how does one enable :keywords? read-options doesn't appear to
-;;work).
+;; Return a boolean indicating if X is a keyword.
+;; This also handles symbols named :foo because Guile doesn't stablely support
+;; :keywords (how does one enable :keywords? read-options doesn't appear to
+;; work).
 
 (define (keyword-list? x)
   (and (list? x)
@@ -507,12 +507,12 @@
 		(char=? (string-ref (symbol->string (car x)) 0) #\:))))
 )
 
-;;Convert a list like (#:key1 val1 #:key2 val2 ...) to
-;;((#:key1 val1) (#:key2 val2) ...).
-;;Missing values are specified with an empty list.
-;;This also supports (:sym1 val1 ...) because Guile doesn't stablely support
-;;:keywords (#:keywords work, but #:foo shouldn't appear in the description
-;;language).
+;; Convert a list like (#:key1 val1 #:key2 val2 ...) to
+;; ((#:key1 val1) (#:key2 val2) ...).
+;; Missing values are specified with an empty list.
+;; This also supports (:sym1 val1 ...) because Guile doesn't stablely support
+;; :keywords (#:keywords work, but #:foo shouldn't appear in the description
+;; language).
 
 (define (keyword-list->arg-list kl)
   ;; Scan KL backwards, building up each element as we go.
@@ -536,9 +536,9 @@
 		 (cdr rkl)))))
 )
 
-;;Signal an error if the argument name is not a symbol.
-;;This is done by each of the argument validation routines so the caller
-;;doesn't need to make two calls.
+;; Signal an error if the argument name is not a symbol.
+;; This is done by each of the argument validation routines so the caller
+;; doesn't need to make two calls.
 
 (define (arg-list-validate-name context arg-spec)
   (if (null? arg-spec)
@@ -548,8 +548,8 @@
   *UNSPECIFIED*
 )
 
-;;Signal a parse error if an argument was specified with a value.
-;;ARG-SPEC is (name value).
+;; Signal a parse error if an argument was specified with a value.
+;; ARG-SPEC is (name value).
 
 (define (arg-list-check-no-args context arg-spec)
   (arg-list-validate-name context arg-spec)
@@ -559,8 +559,8 @@
   *UNSPECIFIED*
 )
 
-;;Validate and return a symbol argument.
-;;ARG-SPEC is (name value).
+;; Validate and return a symbol argument.
+;; ARG-SPEC is (name value).
 
 (define (arg-list-symbol-arg context arg-spec)
   (arg-list-validate-name context arg-spec)
@@ -571,15 +571,15 @@
   (cadr arg-spec)
 )
 
-;;Sanitization
+;; Sanitization
 
-;;Sanitization is handled via attributes.  Anything that must be sanitized
-;;has a `sanitize' attribute with the value being the keyword to sanitize on.
-;;Ideally most, if not all, of the guts of the generated sanitization is here.
+;; Sanitization is handled via attributes.  Anything that must be sanitized
+;; has a `sanitize' attribute with the value being the keyword to sanitize on.
+;; Ideally most, if not all, of the guts of the generated sanitization is here.
 
-;;Utility to simplify expression in .cpu file.
-;;Usage: (sanitize isa-name-list keyword entry-type entry-name1 [entry-name2 ...])
-;;Enum attribute `(sanitize keyword)' is added to the entry.
+;; Utility to simplify expression in .cpu file.
+;; Usage: (sanitize isa-name-list keyword entry-type entry-name1 [entry-name2 ...])
+;; Enum attribute `(sanitize keyword)' is added to the entry.
 
 (define (sanitize isa-name-list keyword entry-type . entry-names)
   (for-each (lambda (entry-name)
@@ -631,10 +631,10 @@
   #f ;; caller eval's our result, so return a no-op
 )
 
-;;Return TEXT sanitized with KEYWORD.
-;;TEXT must exist on a line (or lines) by itself.
-;;i.e. it is assumed that it begins at column 1 and ends with a newline.
-;;If KEYWORD is #f, no sanitization is generated.
+;; Return TEXT sanitized with KEYWORD.
+;; TEXT must exist on a line (or lines) by itself.
+;; i.e. it is assumed that it begins at column 1 and ends with a newline.
+;; If KEYWORD is #f, no sanitization is generated.
 
 (define (gen-sanitize keyword text)
   (cond ((null? text) "")
@@ -662,8 +662,8 @@
 		 text))))
 )
 
-;;Return TEXT sanitized with OBJ's sanitization, if it has any.
-;;OBJ may be #f.
+;; Return TEXT sanitized with OBJ's sanitization, if it has any.
+;; OBJ may be #f.
 
 (define (gen-obj-sanitize obj text)
   (if obj
@@ -673,10 +673,10 @@
       (gen-sanitize #f text))
 )
 
-;;Cover procs to handle generation of object declarations and definitions.
-;;All object output should be routed through gen-decl and gen-defn.
+;; Cover procs to handle generation of object declarations and definitions.
+;; All object output should be routed through gen-decl and gen-defn.
 
-;;Send the gen-decl message to OBJ, and sanitize the output if necessary.
+;; Send the gen-decl message to OBJ, and sanitize the output if necessary.
 
 (define (gen-decl obj)
   (logit 3 "Generating decl for "
@@ -689,7 +689,7 @@
 	(else ""))
 )
 
-;;Send the gen-defn message to OBJ, and sanitize the output if necessary.
+;; Send the gen-defn message to OBJ, and sanitize the output if necessary.
 
 (define (gen-defn obj)
   (logit 3 "Generating defn for "
@@ -702,9 +702,9 @@
 	(else ""))
 )
 
-;;Attributes
+;; Attributes
 
-;;Return the C/C++ type to use to hold a value for attribute ATTR.
+;; Return the C/C++ type to use to hold a value for attribute ATTR.
 
 (define (gen-attr-type attr)
   (if (string=? (string-downcase (gen-sym attr)) "isa")
@@ -717,14 +717,14 @@
 	))
 )
 
-;;Return C macros for accessing an object's attributes ATTRS.
-;;PREFIX is one of "cgen_ifld", "cgen_hw", "cgen_operand", "cgen_insn".
-;;ATTRS is an alist of attribute values.  The value is unimportant except that
-;;it is used to determine bool/non-bool.
-;;Non-bools need to be separated from bools as they're each recorded
-;;differently.  Non-bools are recorded in an int for each.  All bools are
-;;combined into one int to save space.
-;;??? We assume there is at least one bool.
+;; Return C macros for accessing an object's attributes ATTRS.
+;; PREFIX is one of "cgen_ifld", "cgen_hw", "cgen_operand", "cgen_insn".
+;; ATTRS is an alist of attribute values.  The value is unimportant except that
+;; it is used to determine bool/non-bool.
+;; Non-bools need to be separated from bools as they're each recorded
+;; differently.  Non-bools are recorded in an int for each.  All bools are
+;; combined into one int to save space.
+;; ??? We assume there is at least one bool.
 
 (define (gen-attr-accessors prefix attrs)
   (string-append
@@ -762,14 +762,14 @@
 	       attrs)
    "\n")
 )
-;;Return C code to declare an enum of attributes ATTRS.
-;;PREFIX is one of "cgen_ifld", "cgen_hw", "cgen_operand", "cgen_insn".
-;;ATTRS is an alist of attribute values.  The value is unimportant except that
-;;it is used to determine bool/non-bool.
-;;Non-bools need to be separated from bools as they're each recorded
-;;differently.  Non-bools are recorded in an int for each.  All bools are
-;;combined into one int to save space.
-;;??? We assume there is at least one bool.
+;; Return C code to declare an enum of attributes ATTRS.
+;; PREFIX is one of "cgen_ifld", "cgen_hw", "cgen_operand", "cgen_insn".
+;; ATTRS is an alist of attribute values.  The value is unimportant except that
+;; it is used to determine bool/non-bool.
+;; Non-bools need to be separated from bools as they're each recorded
+;; differently.  Non-bools are recorded in an int for each.  All bools are
+;; combined into one int to save space.
+;; ??? We assume there is at least one bool.
 
 (define (gen-attr-enum-decl prefix attrs)
   (string-append
@@ -784,29 +784,29 @@
    "\n")
 )
 
-;;Return name of symbol ATTR-NAME.
-;;PREFIX is the prefix arg to gen-attr-enum-decl.
+;; Return name of symbol ATTR-NAME.
+;; PREFIX is the prefix arg to gen-attr-enum-decl.
 
 (define (gen-attr-name prefix attr-name)
   (string-upcase (gen-c-symbol (string-append prefix "_"
 					      (symbol->string attr-name))))
 )
 
-;;Normal gen-mask argument to gen-bool-attrs.
-;;Returns "(1<< PREFIX_NAME)" where PREFIX is from atlist-prefix and
-;;NAME is the name of the attribute.
-;;??? This used to return PREFIX_NAME-CGEN_ATTR_BOOL_OFFSET.
-;;The tradeoff is simplicity vs perceived maximum number of boolean attributes
-;;needed.  In the end the maximum number needn't be fixed, and the simplicity
-;;of the current way is good.
+;; Normal gen-mask argument to gen-bool-attrs.
+;; Returns "(1<< PREFIX_NAME)" where PREFIX is from atlist-prefix and
+;; NAME is the name of the attribute.
+;; ??? This used to return PREFIX_NAME-CGEN_ATTR_BOOL_OFFSET.
+;; The tradeoff is simplicity vs perceived maximum number of boolean attributes
+;; needed.  In the end the maximum number needn't be fixed, and the simplicity
+;; of the current way is good.
 
 (define (gen-attr-mask prefix name)
   (string-append "(1<<" (gen-attr-name prefix name) ")")
 )
 
-;;Return C expression of bitmasks of boolean attributes in ATTRS.
-;;ATTRS is an <attr-list> object, it need not be pre-sorted.
-;;GEN-MASK is a procedure that returns the C code of the mask.
+;; Return C expression of bitmasks of boolean attributes in ATTRS.
+;; ATTRS is an <attr-list> object, it need not be pre-sorted.
+;; GEN-MASK is a procedure that returns the C code of the mask.
 
 (define (gen-bool-attrs attrs gen-mask)
   (let loop ((result "0")
@@ -823,15 +823,15 @@
 	  (else (loop result (cdr alist)))))
 )
 
-;;Return the C definition of OBJ's attributes.
-;;TYPE is one of 'ifld, 'hw, 'operand, 'insn.
-;;[Other objects have attributes but these are the only ones we currently
-;;emit definitions for.]
-;;OBJ is any object that supports the 'get-atlist message.
-;;ALL-ATTRS is an ordered alist of all attributes.
-;;"ordered" means all the non-boolean attributes are at the front and
-;;duplicate entries have been removed.
-;;GEN-MASK is the gen-mask arg to gen-bool-attrs.
+;; Return the C definition of OBJ's attributes.
+;; TYPE is one of 'ifld, 'hw, 'operand, 'insn.
+;; [Other objects have attributes but these are the only ones we currently
+;; emit definitions for.]
+;; OBJ is any object that supports the 'get-atlist message.
+;; ALL-ATTRS is an ordered alist of all attributes.
+;; "ordered" means all the non-boolean attributes are at the front and
+;; duplicate entries have been removed.
+;; GEN-MASK is the gen-mask arg to gen-bool-attrs.
 
 (define (gen-obj-attr-defn type obj all-attrs num-non-bools gen-mask)
   (let* ((attrs (obj-atlist obj))
@@ -860,10 +860,10 @@
    ))
 )
 
-;;Return the C definition of the terminating entry of an object's attributes.
-;;ALL-ATTRS is an ordered alist of all attributes.
-;;"ordered" means all the non-boolean attributes are at the front and
-;;duplicate entries have been removed.
+;; Return the C definition of the terminating entry of an object's attributes.
+;; ALL-ATTRS is an ordered alist of all attributes.
+;; "ordered" means all the non-boolean attributes are at the front and
+;; duplicate entries have been removed.
 
 (define (gen-obj-attr-end-defn all-attrs num-non-bools)
   (let ((all-non-bools (list-take num-non-bools all-attrs)))
@@ -882,35 +882,35 @@
      ))
 )
 
-;;Return a boolean indicating if ATLIST indicates a CTI insn.
+;; Return a boolean indicating if ATLIST indicates a CTI insn.
 
 (define (atlist-cti? atlist)
   (or (atlist-has-attr? atlist 'UNCOND-CTI)
       (atlist-has-attr? atlist 'COND-CTI))
 )
 
-;;Misc. gen-* procs
+;; Misc. gen-* procs
 
-;;Return name of obj as a C symbol.
+;; Return name of obj as a C symbol.
 
 (define (gen-sym obj) (gen-c-symbol (obj:name obj)))
 
-;;Return the name of the selected cpu family.
-;;An error is signalled if more than one has been selected.
+;; Return the name of the selected cpu family.
+;; An error is signalled if more than one has been selected.
 
 (define (gen-cpu-name)
   ;; FIXME: error checking
   (gen-sym (current-cpu))
 )
 
-;;Return HAVE_CPU_<CPU>.
+;; Return HAVE_CPU_<CPU>.
 
 (define (gen-have-cpu cpu)
   (string-append "HAVE_CPU_"
 		 (string-upcase (gen-sym cpu)))
 )
 
-;;Return the bfd mach name for MACH.
+;; Return the bfd mach name for MACH.
 
 (define (gen-mach-bfd-name mach)
   (string-append "bfd_mach_" (gen-c-symbol (mach-bfd-name mach)))
@@ -979,7 +979,7 @@
 	  (symbol<? (obj:name o1) (obj:name o2))))
 )
 
-;;Called before loading the .cpu file to initialize.
+;; Called before loading the .cpu file to initialize.
 
 (define (utils-init!)
   (reader-add-command! 'sanitize
@@ -991,12 +991,12 @@ Mark an entry as being sanitized.
   *UNSPECIFIED*
 )
 
-;;Return a pair of definitions for a C macro that concatenates its
-;;argument symbols.  The definitions are conditional on ANSI C
-;;semantics: one contains ANSI concat operators (##), and the other
-;;uses the empty-comment trick (/**/).  We must do this, rather than
-;;use CONCATn(...) as defined in include/symcat.h, in order to avoid
-;;spuriously expanding our macro's args.
+;; Return a pair of definitions for a C macro that concatenates its
+;; argument symbols.  The definitions are conditional on ANSI C
+;; semantics: one contains ANSI concat operators (##), and the other
+;; uses the empty-comment trick (/**/).  We must do this, rather than
+;; use CONCATn(...) as defined in include/symcat.h, in order to avoid
+;; spuriously expanding our macro's args.
 
 (define (gen-define-with-symcat head . args)
   (string-append

@@ -1370,7 +1370,7 @@
 	  (list 'cond '(expr1 . rest) #t /pmacro-builtin-cond "process first statement whose expr succeeds")
 	  (list 'begin 'rest #t /pmacro-builtin-begin "process a sequence of statements")
 	  (list 'print 'exprs #f /pmacro-builtin-print "print exprs, for debugging purposes")
-	  (list 'dump '(expr)  #f/pmacro-builtin-dump "dump expr, for debugging purposes")
+	  (list 'dump '(expr)  #f /pmacro-builtin-dump "dump expr, for debugging purposes")
 	  (list 'error 'message #f /pmacro-builtin-error "print error message and exit")
 	  (list 'list 'exprs #f /pmacro-builtin-list "return a list of exprs")
 	  (list 'ref '(l n) #f /pmacro-builtin-ref "return n'th element of list l")

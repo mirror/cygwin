@@ -2,6 +2,7 @@
 
 	* cos.scm: Follow commenting convention.  Why did a single ; have to
 	get indented like it does? :-(
+	* utils-cgen.scm: Ditto.
 
 2010-01-23  Doug Evans  <dje@sebabeach.org>
 

@@ -1,173 +1,173 @@
-; Cgen's Object System.
-; Copyright (C) 2000, 2009 Red Hat, Inc.
-; This file is part of CGEN.
-; See file COPYING.CGEN for details.
-;
-; Scheme implementations don't agree on a lot of things beyond the basics.
-; This is a simple object system for cgen's needs.
-; I thought at the start that when Guile had an official object system
-; we'd switch over, but the higher order bit now is to be usable on
-; multiple Scheme implementations: Guile isn't fast enough.
-;
-; NOTE: The original COS supported multiple inheritance.  This does not.
-;
-; Classes look like:
-;
-; #(class-tag
-;   class-name
-;   class-uid ; unique id of class, index into /class-table
-;   parent-name
-;   elm-alist ; not including parent classes
-;   method-alist ; not including parent classes
-;   full-elm-initial-list ; including parent classes
-;   method-cache ; ??? not currently used
-;   class-descriptor)
-;
-; PARENT-NAME is the name of the parent class, if any.
-; If a subclasses b which subclasses c, then parent-name for a is b,
-; the parent-name for b is c, and the parent-name for c is #f.
-;
-; ELM-ALIST is an alist of (symbol vector-offset-with-class . initial-value)
-; for this class only.
-; Values can be looked up by name, via elm-make-[gs]etter routines, or
-; methods can use elm-get/set! for speed.
-; Various Lisp (or Lisp-like) OOP systems (e.g. CLOS, Dylan) call these
-; "slots".  Maybe for consistency "slot" would be a better name.  Some might
-; confuse that with intentions at directions.
-;
-; METHOD-ALIST is an alist of (symbol . procedure) for this class only.
-;
-; FULL-ELM-INITIAL-LIST is the elements of the flattened inheritance tree.
-; Initially it is #f meaning it hasn't been computed yet.
-; It is computed when the class is first instantiated.  During development,
-; it can be reset to #f after some module has been reloaded (as long as no
-; elements have been deleted/added/moved/etc., existing objects are ok).
-;
-; METHOD-CACHE is an alist of the methods of the flattened inheritance
-; tree.  Each element is (symbol . (parent-list-entry . method)).
-; Initially it is #f meaning it hasn't been computed yet.
-; It is computed when the class is first instantiated.  During development,
-; it can be reset to #f after some module has been reloaded (requires all
-; object instantiation to happen later of course).
-; FIXME: We don't yet implement the method cache.
-;
-; CLASS-DESCRIPTOR is the processed form of parent-name-list.
-; There is an entry for the class and one for each parent (recursively):
-; (class offset child-backpointer [parent-descriptor]).
-; offset is the offset in the element vector of the class's elements.
-; child-backpointer is #f in the top level object.
-; ??? child->subclass, parent->superclass?
-; Initially the class-descriptor is #f meaning it hasn't been computed yet.
-; It is computed when the class is first instantiated.  During development,
-; it can be reset to #f after some module has been reloaded (requires all
-; object instantiation to happen later of course).
-;
-; An object is a vector: #(object-tag class-name class-uid elm1 elm2 ...)
-; Vectors are nice in that they're self-evaluating.
-; Both class name and uid are stored here for a better developer experience.
-; It might be better to store the class-descriptor instead, but it's big and
-; vastly reduces the S/N ratio when displaying objects.
-;
-; -----------------------------------------------------------------------------
-;
-; User visible procs:
-;
-; (class-make name parents elements methods) -> class
-;
-; Create a class.  The result is then passed back by procedures requiring
-; a class argument.  Note however that PARENTS is a list of class names,
-; not the class data type.  This allows reloading the definition of a
-; parent class without having to reload any subclasses.  To implement this
-; classes are recorded internally, and `object-init!' must be called if any
-; class has been redefined.
-;
-; (class-list) -> list of all defined classes
-;
-; (class-name class) -> name of CLASS
-;
-; (class-lookup class-name) -> class
-;
-; (class-instance? class object) -> #t if OBJECT is an instance of CLASS
-;
-; (object-class object) -> class of OBJECT
-;
-; (object-class-name object) -> class name of OBJECT
-;
-; (send object method-name . args) -> result of invoking METHOD-NAME
-;
-; (send-next object class-name method-name . args) -> result of invoking next METHOD-NAME
-;
-; (new class) -> instantiate CLASS
-;
-; The object is initialized with values specified when CLASS
-; (and its parent classes) was defined.
-;
-; (vmake class . args) -> instantiate class and initialize it with 'vmake!
-;
-; This is shorthand for (send (new class) 'vmake! args).
-; ARGS is a list of option names and arguments (a la CLOS).
-; ??? Not implemented yet.
-;
-; (method-vmake! object . args) -> modify OBJECT from ARGS
-;
-; This is the standard 'vmake! method, available for use by user-written
-; 'vmake! methods.
-; ??? Not implemented yet.
-;
-; (make class . args) -> instantiate CLASS and initialize it with 'make!
-;
-; This is shorthand for (send (new class) 'make! arg1 ...).
-; This is a positional form of `new'.
-;
-; (method-make-make! class elm1-name elm2-name ...) -> unspecified
-;
-; Create a 'make! method that sets the specified elements.
-;
-; (object-copy object) -> copy of OBJ
-;
-; ??? Whether to discard the parent or keep it and retain specialization
-; is undecided.
-;
-; (object-copy-top object) -> copy of OBJECT with spec'n discarded
-;
-; (class? foo) -> return #t if FOO is a class
-;
-; (object? foo) -> return #t if FOO is an object
-;
-; (method-make! class name lambda) -> unspecified
-;
-; Add method NAME to CLASS.
-;
-; (method-make-forward! class elm-name methods) -> unspecified
-;
-; Add METHODS to CLASS that pass the "message" onto the object in element
-; ELM-NAME.
-;
-; (elm-get object elm-name) -> value of element ELM-NAME in OBJ
-;
-; Can only be used in methods.
-;
-; (elm-set! object elm-name new-value) -> unspecified
-;
-; Set element ELM-NAME in OBJECT to NEW-VALUE.
-; Can only be used in methods.
-;
-; (elm-make-getter class elm-name) -> lambda
-;
-; Return lambda to get the value of ELM-NAME in CLASS.
-;
-; (elm-make-setter class elm-name) -> lambda
-;
-; Return lambda to set the value of ELM-NAME in CLASS.
-;
-; Conventions used in this file:
-; - procs/vars internal to this file are prefixed with "-"
-;   [Of course this could all be put in a module; later if ever since
-;   once Guile has its own official object system we'll convert.  Note that
-;   it currently does not.]
-; - except for a few exceptions, public procs begin with one of
-;   class-, object-, elm-, method-.
-;   The exceptions are make, new, parent, send.
+;; Cgen's Object System.
+;; Copyright (C) 2000, 2009, 2010 Red Hat, Inc.
+;; This file is part of CGEN.
+;; See file COPYING.CGEN for details.
+;;
+;; Scheme implementations don't agree on a lot of things beyond the basics.
+;; This is a simple object system for cgen's needs.
+;; I thought at the start that when Guile had an official object system
+;; we'd switch over, but the higher order bit now is to be usable on
+;; multiple Scheme implementations: Guile isn't fast enough.
+;;
+;; NOTE: The original COS supported multiple inheritance.  This does not.
+;;
+;; Classes look like:
+;;
+;; #(class-tag
+;;   class-name
+;;   class-uid ;; unique id of class, index into /class-table
+;;   parent-name
+;;   elm-alist ;; not including parent classes
+;;   method-alist ;; not including parent classes
+;;   full-elm-initial-list ;; including parent classes
+;;   method-cache ;; ??? not currently used
+;;   class-descriptor)
+;;
+;; PARENT-NAME is the name of the parent class, if any.
+;; If a subclasses b which subclasses c, then parent-name for a is b,
+;; the parent-name for b is c, and the parent-name for c is #f.
+;;
+;; ELM-ALIST is an alist of (symbol vector-offset-with-class . initial-value)
+;; for this class only.
+;; Values can be looked up by name, via elm-make-[gs]etter routines, or
+;; methods can use elm-get/set! for speed.
+;; Various Lisp (or Lisp-like) OOP systems (e.g. CLOS, Dylan) call these
+;; "slots".  Maybe for consistency "slot" would be a better name.  Some might
+;; confuse that with intentions at directions.
+;;
+;; METHOD-ALIST is an alist of (symbol . procedure) for this class only.
+;;
+;; FULL-ELM-INITIAL-LIST is the elements of the flattened inheritance tree.
+;; Initially it is #f meaning it hasn't been computed yet.
+;; It is computed when the class is first instantiated.  During development,
+;; it can be reset to #f after some module has been reloaded (as long as no
+;; elements have been deleted/added/moved/etc., existing objects are ok).
+;;
+;; METHOD-CACHE is an alist of the methods of the flattened inheritance
+;; tree.  Each element is (symbol . (parent-list-entry . method)).
+;; Initially it is #f meaning it hasn't been computed yet.
+;; It is computed when the class is first instantiated.  During development,
+;; it can be reset to #f after some module has been reloaded (requires all
+;; object instantiation to happen later of course).
+;; FIXME: We don't yet implement the method cache.
+;;
+;; CLASS-DESCRIPTOR is the processed form of parent-name-list.
+;; There is an entry for the class and one for each parent (recursively):
+;; (class offset child-backpointer [parent-descriptor]).
+;; offset is the offset in the element vector of the class's elements.
+;; child-backpointer is #f in the top level object.
+;; ??? child->subclass, parent->superclass?
+;; Initially the class-descriptor is #f meaning it hasn't been computed yet.
+;; It is computed when the class is first instantiated.  During development,
+;; it can be reset to #f after some module has been reloaded (requires all
+;; object instantiation to happen later of course).
+;;
+;; An object is a vector: #(object-tag class-name class-uid elm1 elm2 ...)
+;; Vectors are nice in that they're self-evaluating.
+;; Both class name and uid are stored here for a better developer experience.
+;; It might be better to store the class-descriptor instead, but it's big and
+;; vastly reduces the S/N ratio when displaying objects.
+;;
+;; -----------------------------------------------------------------------------
+;;
+;; User visible procs:
+;;
+;; (class-make name parents elements methods) -> class
+;;
+;; Create a class.  The result is then passed back by procedures requiring
+;; a class argument.  Note however that PARENTS is a list of class names,
+;; not the class data type.  This allows reloading the definition of a
+;; parent class without having to reload any subclasses.  To implement this
+;; classes are recorded internally, and `object-init!' must be called if any
+;; class has been redefined.
+;;
+;; (class-list) -> list of all defined classes
+;;
+;; (class-name class) -> name of CLASS
+;;
+;; (class-lookup class-name) -> class
+;;
+;; (class-instance? class object) -> #t if OBJECT is an instance of CLASS
+;;
+;; (object-class object) -> class of OBJECT
+;;
+;; (object-class-name object) -> class name of OBJECT
+;;
+;; (send object method-name . args) -> result of invoking METHOD-NAME
+;;
+;; (send-next object class-name method-name . args) -> result of invoking next METHOD-NAME
+;;
+;; (new class) -> instantiate CLASS
+;;
+;; The object is initialized with values specified when CLASS
+;; (and its parent classes) was defined.
+;;
+;; (vmake class . args) -> instantiate class and initialize it with 'vmake!
+;;
+;; This is shorthand for (send (new class) 'vmake! args).
+;; ARGS is a list of option names and arguments (a la CLOS).
+;; ??? Not implemented yet.
+;;
+;; (method-vmake! object . args) -> modify OBJECT from ARGS
+;;
+;; This is the standard 'vmake! method, available for use by user-written
+;; 'vmake! methods.
+;; ??? Not implemented yet.
+;;
+;; (make class . args) -> instantiate CLASS and initialize it with 'make!
+;;
+;; This is shorthand for (send (new class) 'make! arg1 ...).
+;; This is a positional form of `new'.
+;;
+;; (method-make-make! class elm1-name elm2-name ...) -> unspecified
+;;
+;; Create a 'make! method that sets the specified elements.
+;;
+;; (object-copy object) -> copy of OBJ
+;;
+;; ??? Whether to discard the parent or keep it and retain specialization
+;; is undecided.
+;;
+;; (object-copy-top object) -> copy of OBJECT with spec'n discarded
+;;
+;; (class? foo) -> return #t if FOO is a class
+;;
+;; (object? foo) -> return #t if FOO is an object
+;;
+;; (method-make! class name lambda) -> unspecified
+;;
+;; Add method NAME to CLASS.
+;;
+;; (method-make-forward! class elm-name methods) -> unspecified
+;;
+;; Add METHODS to CLASS that pass the "message" onto the object in element
+;; ELM-NAME.
+;;
+;; (elm-get object elm-name) -> value of element ELM-NAME in OBJ
+;;
+;; Can only be used in methods.
+;;
+;; (elm-set! object elm-name new-value) -> unspecified
+;;
+;; Set element ELM-NAME in OBJECT to NEW-VALUE.
+;; Can only be used in methods.
+;;
+;; (elm-make-getter class elm-name) -> lambda
+;;
+;; Return lambda to get the value of ELM-NAME in CLASS.
+;;
+;; (elm-make-setter class elm-name) -> lambda
+;;
+;; Return lambda to set the value of ELM-NAME in CLASS.
+;;
+;; Conventions used in this file:
+;; - procs/vars internal to this file are prefixed with "-"
+;;   [Of course this could all be put in a module; later if ever since
+;;   once Guile has its own official object system we'll convert.  Note that
+;;   it currently does not.]
+;; - except for a few exceptions, public procs begin with one of
+;;   class-, object-, elm-, method-.
+;;   The exceptions are make, new, parent, send.
 
 (define /class-tag "class")
 (define /object-tag "object")
@@ -187,17 +187,17 @@
 (define /object-unspecified #:unspecified)
 (define /object-unbound #:unbound)
 
-; True if error messages are verbose and debugging messages are printed.
+;; True if error messages are verbose and debugging messages are printed.
 
 (define /object-verbose? #f)
 
-; Cover fn to set verbosity.
+;; Cover fn to set verbosity.
 
 (define (object-set-verbose! verbose?)
   (set! /object-verbose? verbose?)
 )
 
-; Signal error if not class/object.
+;; Signal error if not class/object.
 
 (define (/class-check maybe-class proc-name . extra-text)
   (if (not (class? maybe-class))
@@ -241,15 +241,15 @@
 	 x)
 )
 
-; Low level class operations.
+;; Low level class operations.
 
-; Return boolean indicating if X is a class.
+;; Return boolean indicating if X is a class.
 
 (define (class? class)
   (and (vector? class) (eq? /class-tag (vector-ref class 0)))
 )
 
-; Accessors.
+;; Accessors.
 
 (define (/class-name class) (vector-ref class 1))
 (define (/class-uid class) (vector-ref class 2))
@@ -280,8 +280,8 @@
   (vector-set! class 8 parent-list)
 )
 
-; Make a class.
-; The new definition overrides any existing definition.
+;; Make a class.
+;; The new definition overrides any existing definition.
 
 (define (/class-make! name parent-name elements)
   (let ((class (vector /class-tag name
@@ -303,8 +303,8 @@
     class)
 )
 
-; Lookup a class given its name.
-; The result is the class or #f if not found.
+;; Lookup a class given its name.
+;; The result is the class or #f if not found.
 
 (define (class-lookup name) (assq-ref /class-list name))
 
@@ -327,10 +327,10 @@
       '())
 )
 
-; Cover proc of /class-name for the outside world to use.
-; The result is the name of the class or #f if CLASS is not a class.
-; We could issue an error here, but to be consistent with object-class-name
-; we don't.
+;; Cover proc of /class-name for the outside world to use.
+;; The result is the name of the class or #f if CLASS is not a class.
+;; We could issue an error here, but to be consistent with object-class-name
+;; we don't.
 
 (define (class-name class)
   (if (class? class)
@@ -338,9 +338,9 @@
       #f)
 )
 
-; Class descriptor utilities.
-; A class-descriptor is:
-; (class offset child-backpointer [parent-descriptor])
+;; Class descriptor utilities.
+;; A class-descriptor is:
+;; (class offset child-backpointer [parent-descriptor])
 
 (define (/class-desc? maybe-class-desc)
   (and (pair? maybe-class-desc)
@@ -351,25 +351,25 @@
 (define /class-desc-child caddr)
 (define /class-desc-parents cdddr) ;; nil or list of one element
 
-; Compute the class descriptor of CLASS.
-; OFFSET is the beginning offset in the element vector.
-; We can assume the parents of CLASS have already been initialized.
-;
-; A class-descriptor is:
-; (class offset child (parent-entry))
-; CLASS is the class? data structure of the class.
-; OFFSET is the offset into the object vector of the baseclass's elements.
-; CHILD is the backlink to the direct child class or #f if no subclass.
-; PARENT-ENTRY is the class descriptor of the parent class.
+;; Compute the class descriptor of CLASS.
+;; OFFSET is the beginning offset in the element vector.
+;; We can assume the parents of CLASS have already been initialized.
+;;
+;; A class-descriptor is:
+;; (class offset child (parent-entry))
+;; CLASS is the class? data structure of the class.
+;; OFFSET is the offset into the object vector of the baseclass's elements.
+;; CHILD is the backlink to the direct child class or #f if no subclass.
+;; PARENT-ENTRY is the class descriptor of the parent class.
 
 (define (/class-compute-class-desc class offset child)
 
-  ; OFFSET must be global to the calculation because it is continually
-  ; incremented as we recurse down through the hierarchy (actually, as we
-  ; traverse back up).  At any point in time it is the offset from the start
-  ; of the element vector of the next class's elements.
-  ; Object elements are laid out using a depth first traversal of the
-  ; inheritance tree.
+  ;; OFFSET must be global to the calculation because it is continually
+  ;; incremented as we recurse down through the hierarchy (actually, as we
+  ;; traverse back up).  At any point in time it is the offset from the start
+  ;; of the element vector of the next class's elements.
+  ;; Object elements are laid out using a depth first traversal of the
+  ;; inheritance tree.
 
   (define (compute1 class child)
 
@@ -403,7 +403,7 @@
   (compute1 class child)
 )
 
-; Return the top level class-descriptor of CLASS-DESC.
+;; Return the top level class-descriptor of CLASS-DESC.
 
 (define (/class-desc-top class-desc)
   (if (/class-desc-child class-desc)
@@ -411,7 +411,7 @@
       class-desc)
 )
 
-; Pretty print a class descriptor.
+;; Pretty print a class descriptor.
 
 (define (class-desc-dump class-desc)
   (let* ((cep (current-error-port))
@@ -444,10 +444,10 @@
       ))
 )
 
-; Low level object utilities.
+;; Low level object utilities.
 
-; Make an object.
-; All elements get initial (or unbound) values.
+;; Make an object.
+;; All elements get initial (or unbound) values.
 
 (define (/object-make! class)
   (/class-check-init! class)
@@ -457,8 +457,8 @@
 			 (/class-all-initial-values class)))
 )
 
-; Make an object using VALUES.
-; VALUES must specify all elements in the class (and parent classes).
+;; Make an object using VALUES.
+;; VALUES must specify all elements in the class (and parent classes).
 
 (define (/object-make-with-values! class values)
   (/class-check-init! class)
@@ -468,14 +468,14 @@
 			 values))
 )
 
-; Copy an object.
-; WARNING: A shallow copy is currently done on the elements!
+;; Copy an object.
+;; WARNING: A shallow copy is currently done on the elements!
 
 (define (/object-copy obj)
   (/object-vector-copy obj)
 )
 
-; Accessors.
+;; Accessors.
 
 (define (/object-class-name obj) (vector-ref obj 1))
 (define (/object-class-uid obj) (vector-ref obj 2))
@@ -497,7 +497,7 @@
   /object-unspecified
 )
 
-; Return boolean indicating if X is an object.
+;; Return boolean indicating if X is an object.
 
 (define (object? obj)
   (and (vector? obj)
@@ -505,15 +505,15 @@
        (eq? /object-tag (vector-ref obj 0)))
 )
 
-; Return the class of an object.
+;; Return the class of an object.
 
 (define (object-class obj)
   (/object-check obj "object-class")
   (/object-class obj)
 )
 
-; Cover proc of /object-class-name for the outside world to use.
-; The result is the name of the class or #f if OBJ is not an object.
+;; Cover proc of /object-class-name for the outside world to use.
+;; The result is the name of the class or #f if OBJ is not an object.
 
 (define (object-class-name obj)
   (if (object? obj)
@@ -521,21 +521,21 @@
       #f)
 )
 
-; Class operations.
+;; Class operations.
 
-; Return the list of initial values for CLASS.
-; The result does not include parent classes.
+;; Return the list of initial values for CLASS.
+;; The result does not include parent classes.
 
 (define (/class-my-initial-values class)
   (map cadr (/class-elements class))
 )
 
-; Initialize class if not already done.
-; FIXME: Need circularity check.  Later.
+;; Initialize class if not already done.
+;; FIXME: Need circularity check.  Later.
 
 (define (/class-check-init! class)
-  ; This should be fast the second time through, so don't do any
-  ; computation until we know it's necessary.
+  ;; This should be fast the second time through, so don't do any
+  ;; computation until we know it's necessary.
 
   (if (/class-all-initial-values class)
 
@@ -543,11 +543,11 @@
 
       (begin
 
-	; First pass ensures all parents are initialized.
+	;; First pass ensures all parents are initialized.
 	(for-each /class-check-init!
 		  (/class-parent-classes class))
 
-	; Next pass initializes the initial value list.
+	;; Next pass initializes the initial value list.
 	(letrec ((get-inits
 		  (lambda (class)
 		    (let ((parents (/class-parent-classes class)))
@@ -559,8 +559,8 @@
 				(/class-my-initial-values class))))
 	    (/class-set-all-initial-values! class inits)))
 
-	; Next pass initializes the class's class-descriptor.
-	; Object elements begin at offset 3 in the element vector.
+	;; Next pass initializes the class's class-descriptor.
+	;; Object elements begin at offset 3 in the element vector.
 	(/class-set-class-desc! class
 				(/class-compute-class-desc class 3 #f))
 	))
@@ -568,16 +568,16 @@
   /object-unspecified
 )
 
-; Make a class.
-;
-; PARENTS is the name of parent class as a list, i.e. () or (<parent>).
-; It's a list just in case multiple-inheritance is added one day.
-; The parent need not exist yet, though it must exist when the class
-; is first instantiated.
-; ELMS is a either a list of either element names or name/value pairs.
-; Elements without initial values are marked as "unbound".
-; METHODS is an initial alist of methods.  More methods can be added with
-; method-make!.
+;; Make a class.
+;;
+;; PARENTS is the name of parent class as a list, i.e. () or (<parent>).
+;; It's a list just in case multiple-inheritance is added one day.
+;; The parent need not exist yet, though it must exist when the class
+;; is first instantiated.
+;; ELMS is a either a list of either element names or name/value pairs.
+;; Elements without initial values are marked as "unbound".
+;; METHODS is an initial alist of methods.  More methods can be added with
+;; method-make!.
 
 (define (class-make name parents elms methods)
   (if (> (length parents) 1)
@@ -587,13 +587,13 @@
 
   (let ((elm-list #f))
 
-    ; Mark elements without initial values as unbound, and
-    ; compute indices into the element vector (relative to the class's
-    ; offset).
-    ; Elements are recorded as (symbol initial-value . vector-index)
+    ;; Mark elements without initial values as unbound, and
+    ;; compute indices into the element vector (relative to the class's
+    ;; offset).
+    ;; Elements are recorded as (symbol initial-value . vector-index)
     (let loop ((elm-list-tmp '()) (index 0) (elms elms))
       (if (null? elms)
-	  (set! elm-list (reverse! elm-list-tmp)) ; done
+	  (set! elm-list (reverse! elm-list-tmp)) ;; done
 	  (if (pair? (car elms))
 	      (loop (acons (caar elms)
 			   (cons (cdar elms) index)
@@ -610,18 +610,18 @@
 				(if (null? parents) #f (car parents))
 				elm-list)))
 
-      ; Create the standard `make!' method.
-      ; The caller can override afterwards if desired.
-      ; Note that if there are any parent classes then we don't know the names
-      ; of all of the elements yet, that is only known after the class has been
-      ; initialized which only happens when the class is first instantiated.
-      ; This method won't be called until that happens though so we're safe.
-      ; This is written without knowledge of the names, it just initializes
-      ; all elements.
+      ;; Create the standard `make!' method.
+      ;; The caller can override afterwards if desired.
+      ;; Note that if there are any parent classes then we don't know the names
+      ;; of all of the elements yet, that is only known after the class has been
+      ;; initialized which only happens when the class is first instantiated.
+      ;; This method won't be called until that happens though so we're safe.
+      ;; This is written without knowledge of the names, it just initializes
+      ;; all elements.
       (method-make! result 'make!
 		    (lambda args
 		      (let ((self (car args)))
-			; Ensure exactly all of the elements are provided.
+			;; Ensure exactly all of the elements are provided.
 			(if (not (= (length args)
 				    (- (vector-length self) 2)))
 			    (/object-error "make!" "" "wrong number of arguments to method `make!'"))
@@ -631,7 +631,7 @@
       result))
 )
 
-; Create an object of a class CLASS.
+;; Create an object of a class CLASS.
 
 (define (new class)
   (/class-check class "new")
@@ -643,26 +643,26 @@
   (/object-make! class)
 )
 
-; Make a copy of OBJ.
-; WARNING: A shallow copy is done on the elements!
+;; Make a copy of OBJ.
+;; WARNING: A shallow copy is done on the elements!
 
 (define (object-copy obj)
   (/object-check obj "object-copy")
   (/object-copy obj)
 )
 
-; Make a copy of OBJ.
-; This makes a copy of top level object, with any specialization discarded.
-; WARNING: A shallow copy is done on the elements!
-; FIXME: Delete, specialization gone.
+;; Make a copy of OBJ.
+;; This makes a copy of top level object, with any specialization discarded.
+;; WARNING: A shallow copy is done on the elements!
+;; FIXME: Delete, specialization gone.
 
 (define (object-copy-top obj)
   (/object-check obj "object-copy-top")
   (/object-copy obj)
 )
 
-; Assign object SRC to object DST.
-; They must have the same class.
+;; Assign object SRC to object DST.
+;; They must have the same class.
 
 (define (object-assign! dst src)
   (/object-check dst "object-assign!")
@@ -679,9 +679,9 @@
   /object-unspecified
 )
 
-; Utility to define a standard `make!' method.
-; A standard make! method is one in which all it does is initialize
-; fields from args.
+;; Utility to define a standard `make!' method.
+;; A standard make! method is one in which all it does is initialize
+;; fields from args.
 
 (define (method-make-make! class args)
   (let ((lambda-expr
@@ -694,14 +694,14 @@
     )
 )
 
-; The "standard" way to invoke `make!' is (send (new class) 'make! ...).
-; This puts all that in a cover function.
+;; The "standard" way to invoke `make!' is (send (new class) 'make! ...).
+;; This puts all that in a cover function.
 
 (define (make class . operands)
   (apply send (append (cons (new class) '()) '(make!) operands))
 )
 
-; Return #t if class X is a subclass of BASE-NAME.
+;; Return #t if class X is a subclass of BASE-NAME.
 
 (define (/class-subclass? base-name x)
   (if (eq? base-name (/class-name x))
@@ -712,9 +712,9 @@
 	    #f)))
 )
 
-; Return #t if OBJECT is an instance of CLASS.
-; This does not signal an error if OBJECT is not an object as this is
-; intended to be used in class predicates.
+;; Return #t if OBJECT is an instance of CLASS.
+;; This does not signal an error if OBJECT is not an object as this is
+;; intended to be used in class predicates.
 
 (define (class-instance? class object)
   (/class-check class "class-instance?")
@@ -723,10 +723,10 @@
       #f)
 )
 
-; Element operations.
+;; Element operations.
 
-; Lookup an element in a class-desc.
-; The result is elm-index or #f if not found.
+;; Lookup an element in a class-desc.
+;; The result is elm-index or #f if not found.
 
 (define (/class-lookup-element class-desc elm-name)
   (let* ((class (/class-desc-class class-desc))
@@ -740,7 +740,7 @@
 	      (/class-lookup-element (car parents) elm-name)))))
 )
 
-; Return a boolean indicating if ELM-NAME is bound in OBJ.
+;; Return a boolean indicating if ELM-NAME is bound in OBJ.
 
 (define (elm-bound? obj elm-name)
   (/object-check obj "elm-bound?")
@@ -750,7 +750,7 @@
 	(/object-error "elm-get" self "element not present: " elm-name)))
 )
 
-; Subroutine of elm-get.
+;; Subroutine of elm-get.
 
 (define (/elm-make-method-getter self elm-name)
   (/object-check self "elm-get")
@@ -763,17 +763,17 @@
 	(/object-error "elm-get" self "element not present: " elm-name)))
 )
 
-; Get an element from an object.
-; If OBJ is `self' then the caller is required to be a method and we emit
-; memoized code.  Otherwise we do things the slow way.
-; ??? There must be a better way.
-; What this does is turn
-; (elm-get self 'foo)
-; into
-; ((/elm-make-method-get self 'foo) self)
-; Note the extra set of parens.  /elm-make-method-get then does the lookup of
-; foo and returns a memoizing macro that returns the code to perform the
-; operation with O(1).  Cute, but I'm hoping there's an easier/better way.
+;; Get an element from an object.
+;; If OBJ is `self' then the caller is required to be a method and we emit
+;; memoized code.  Otherwise we do things the slow way.
+;; ??? There must be a better way.
+;; What this does is turn
+;; (elm-get self 'foo)
+;; into
+;; ((/elm-make-method-get self 'foo) self)
+;; Note the extra set of parens.  /elm-make-method-get then does the lookup of
+;; foo and returns a memoizing macro that returns the code to perform the
+;; operation with O(1).  Cute, but I'm hoping there's an easier/better way.
 
 (defmacro elm-get (self elm-name)
   (if (eq? self 'self)
@@ -781,7 +781,7 @@
       `(elm-xget ,self ,elm-name))
 )
 
-; Subroutine of elm-set!.
+;; Subroutine of elm-set!.
 
 (define (/elm-make-method-setter self elm-name)
   (/object-check self "elm-set!")
@@ -794,9 +794,9 @@
 	(/object-error "elm-set!" self "element not present: " elm-name)))
 )
 
-; Set an element in an object.
-; This can only be used by methods.
-; See the comments for `elm-get'!
+;; Set an element in an object.
+;; This can only be used by methods.
+;; See the comments for `elm-get'!
 
 (defmacro elm-set! (self elm-name new-val)
   (if (eq? self 'self)
@@ -804,9 +804,9 @@
       `(elm-xset! ,self ,elm-name ,new-val))
 )
 
-; Get an element from an object.
-; This is for invoking from outside a method, and without having to
-; use elm-make-getter.  It should be used sparingly.
+;; Get an element from an object.
+;; This is for invoking from outside a method, and without having to
+;; use elm-make-getter.  It should be used sparingly.
 
 (define (elm-xget obj elm-name)
   (/object-check obj "elm-xget")
@@ -816,9 +816,9 @@
 	(/object-error "elm-xget" obj "element not present: " elm-name)))
 )
 
-; Set an element in an object.
-; This is for invoking from outside a method, and without having to
-; use elm-make-setter.  It should be used sparingly.
+;; Set an element in an object.
+;; This is for invoking from outside a method, and without having to
+;; use elm-make-setter.  It should be used sparingly.
 
 (define (elm-xset! obj elm-name new-val)
   (/object-check obj "elm-xset!")
@@ -828,20 +828,20 @@
 	(/object-error "elm-xset!" obj "element not present: " elm-name)))
 )
 
-; Return a boolean indicating if object OBJ has element ELM-NAME.
+;; Return a boolean indicating if object OBJ has element ELM-NAME.
 
 (define (elm-present? obj elm-name)
   (/object-check obj "elm-present?")
   (->bool (/class-lookup-element (/object-class-desc obj) elm-name))
 )
 
-; Return lambda to get element ELM-NAME in CLASS.
-; FIXME: validate elm-name.
+;; Return lambda to get element ELM-NAME in CLASS.
+;; FIXME: validate elm-name.
 
 (define (elm-make-getter class elm-name)
   (/class-check class "elm-make-getter")
-  ; We use delay here as we can't assume parent classes have been
-  ; initialized yet.
+  ;; We use delay here as we can't assume parent classes have been
+  ;; initialized yet.
   (let ((fast-index (delay (/class-lookup-element
 			    (/class-class-desc class) elm-name))))
     (lambda (obj)
@@ -849,13 +849,13 @@
 	(/object-elm-get obj index))))
 )
 
-; Return lambda to set element ELM-NAME in CLASS.
-; FIXME: validate elm-name.
+;; Return lambda to set element ELM-NAME in CLASS.
+;; FIXME: validate elm-name.
 
 (define (elm-make-setter class elm-name)
   (/class-check class "elm-make-setter")
-  ; We use delay here as we can't assume parent classes have been
-  ; initialized yet.
+  ;; We use delay here as we can't assume parent classes have been
+  ;; initialized yet.
   (let ((fast-index (delay (/class-lookup-element
 			    (/class-class-desc class) elm-name))))
     (lambda (obj newval)
@@ -863,10 +863,10 @@
 	(/object-elm-set! obj index newval))))
 )
 
-; Method operations.
+;; Method operations.
 
-; Lookup the next method in a class.
-; This means begin the search in the parent.
+;; Lookup the next method in a class.
+;; This means begin the search in the parent.
 
 (define (/method-lookup-next class-desc method-name)
   (let ((parent-descs (/class-desc-parents class-desc)))
@@ -876,9 +876,9 @@
 	  (/method-lookup parent-desc method-name))))
 )
 
-; Lookup a method in a class.
-; The result is (class-desc . method).  If the method is found in a parent
-; class, the associated parent class descriptor is returned.
+;; Lookup a method in a class.
+;; The result is (class-desc . method).  If the method is found in a parent
+;; class, the associated parent class descriptor is returned.
 
 (define (/method-lookup class-desc method-name)
   (if /object-verbose?
@@ -890,18 +890,18 @@
     (if meth
 	;; Found.
 	(cons class-desc (cdr meth))
-	; Method not found, search parents.
+	;; Method not found, search parents.
 	(/method-lookup-next class-desc method-name)))
 )
 
-; Return a boolean indicating if object OBJ has method NAME.
+;; Return a boolean indicating if object OBJ has method NAME.
 
 (define (method-present? obj name)
   (/object-check obj "method-present?")
   (->bool (/method-lookup (/object-class-desc obj) name))
 )
 
-; Add a method to a class.
+;; Add a method to a class.
 
 (define (method-make! class method-name method)
   (/class-check class "method-make!")
@@ -913,11 +913,11 @@
   /object-unspecified
 )
 
-; Utility to create "forwarding" methods.
-; METHODS are forwarded to class member ELM-NAME, assumed to be an object.
-; The created methods take a variable number of arguments.
-; Argument length checking will be done by the receiving method.
-; FIXME: ensure elm-name is a symbol
+;; Utility to create "forwarding" methods.
+;; METHODS are forwarded to class member ELM-NAME, assumed to be an object.
+;; The created methods take a variable number of arguments.
+;; Argument length checking will be done by the receiving method.
+;; FIXME: ensure elm-name is a symbol
 
 (define (method-make-forward! class elm-name methods)
   (for-each (lambda (method-name)
@@ -933,7 +933,7 @@
   /object-unspecified
 )
 
-; Utility of send, send-next.
+;; Utility of send, send-next.
 
 (define (/object-method-notify obj method-name maybe-next)
   (set! /object-verbose? #f)
@@ -949,11 +949,11 @@
   (set! /object-verbose? #t)
 )
 
-; Invoke a method in an object.
-; When the method is invoked, the (possible parent class) object in which the
-; method is found is passed to the method.
-; ??? The word `send' comes from "sending messages".  Perhaps should pick
-; a better name for this operation.
+;; Invoke a method in an object.
+;; When the method is invoked, the (possible parent class) object in which the
+;; method is found is passed to the method.
+;; ??? The word `send' comes from "sending messages".  Perhaps should pick
+;; a better name for this operation.
 
 (define (send obj method-name . args)
   (/object-check obj "send")
@@ -967,18 +967,18 @@
 	(/object-error "send" obj "method not supported: " method-name)))
 )
 
-; Invoke the next method named METHOD-NAME in the heirarchy of OBJ.
-; i.e. the method that would have been invoked if the calling method
-; didn't exist.
-; CLASS-NAME is the class of the invoking method.
-; It is present to simplify things: otherwise we have to either include in
-; objects the notion a current class or specialization, or include the class
-; as an argument to methods.
-; This may only be called by a method.
-; ??? Ideally we shouldn't need either CLASS-NAME or METHOD-NAME arguments.
-; They could be removed with a bit of effort, but is it worth it?
-; One possibility is if method-make! was a macro, then maybe send-next could
-; work with method-make! and get the values from it.
+;; Invoke the next method named METHOD-NAME in the heirarchy of OBJ.
+;; i.e. the method that would have been invoked if the calling method
+;; didn't exist.
+;; CLASS-NAME is the class of the invoking method.
+;; It is present to simplify things: otherwise we have to either include in
+;; objects the notion a current class or specialization, or include the class
+;; as an argument to methods.
+;; This may only be called by a method.
+;; ??? Ideally we shouldn't need either CLASS-NAME or METHOD-NAME arguments.
+;; They could be removed with a bit of effort, but is it worth it?
+;; One possibility is if method-make! was a macro, then maybe send-next could
+;; work with method-make! and get the values from it.
 
 (define (send-next obj class-name method-name . args)
   (/object-check obj "send-next")
@@ -993,9 +993,9 @@
 	(/object-error "send-next" obj "method not supported: " method-name)))
 )
 
-; Miscellaneous publically accessible utilities.
+;; Miscellaneous publically accessible utilities.
 
-; Reset the object system (delete all classes).
+;; Reset the object system (delete all classes).
 
 (define (object-reset!)
   (set! /class-list (list))
@@ -1003,9 +1003,9 @@
   /object-unspecified
 )
 
-; Call once to initialize the object system.
-; Only necessary if classes have been modified after objects have been
-; instantiated.  This usually happens during development only.
+;; Call once to initialize the object system.
+;; Only necessary if classes have been modified after objects have been
+;; instantiated.  This usually happens during development only.
 
 (define (object-init!)
   (for-each (lambda (class)
@@ -1019,11 +1019,11 @@
   /object-unspecified
 )
 
-; Return list of all classes.
+;; Return list of all classes.
 
 (define (class-list) (map cdr /class-list))
 
-; Utility to map over a class and all its parent classes, recursively.
+;; Utility to map over a class and all its parent classes, recursively.
 
 (define (class-map-over-class proc class)
   (cons (proc class)
@@ -1031,7 +1031,7 @@
 	     (/class-parent-classes class)))
 )
 
-; Return class tree of a class or object.
+;; Return class tree of a class or object.
 
 (define (class-tree class-or-object)
   (cond ((class? class-or-object)
@@ -1042,7 +1042,7 @@
 			     "not a class or object")))
 )
 
-; Return names of each alist.
+;; Return names of each alist.
 
 (define (/class-alist-names class)
   (list (/class-name class)
@@ -1050,7 +1050,7 @@
 	(map car (/class-methods class)))
 )
 
-; Return complete layout of class-or-object.
+;; Return complete layout of class-or-object.
 
 (define (class-layout class-or-object)
   (cond ((class? class-or-object)
@@ -1061,16 +1061,16 @@
 			     "not a class or object")))
 )
 
-; Like assq but based on the `name' element.
-; WARNING: Slow.
+;; Like assq but based on the `name' element.
+;; WARNING: Slow.
 
 (define (object-assq name obj-list)
   (find-first (lambda (o) (eq? (elm-xget o 'name) name))
 	      obj-list)
 )
 
-; Like memq but based on the `name' element.
-; WARNING: Slow.
+;; Like memq but based on the `name' element.
+;; WARNING: Slow.
 
 (define (object-memq name obj-list)
   (let loop ((r obj-list))
@@ -1079,11 +1079,11 @@
 	  (else (loop (cdr r)))))
 )
 
-; Misc. internal utilities.
+;; Misc. internal utilities.
 
-; We need a fast vector copy operation.
-; If `vector-copy' doesn't exist (which is assumed to be the fast one),
-; provide a simple version.
+;; We need a fast vector copy operation.
+;; If `vector-copy' doesn't exist (which is assumed to be the fast one),
+;; provide a simple version.
 
 (if (defined? 'vector-copy)
     (define /object-vector-copy vector-copy)

@@ -1,7 +1,7 @@
 // sh.cxx - Implementations of hand-written functions for the sh
 // simulator. -*- C++ -*-
 
-// Copyright (C) 2006 Red Hat.
+// Copyright (C) 2006, 2010 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -203,14 +203,14 @@ template<class CGEN_CPU>
 SF
 sh_cpu<CGEN_CPU>::sh64_fldi0 ()
 {
-  return this->fpu.ops->floatsisf (& this->fpu, 0);
+  return this->fpu.ops->floatsisf (& this->fpu, fp::round_default, 0);
 }
 
 template<class CGEN_CPU>
 SF
 sh_cpu<CGEN_CPU>::sh64_fldi1 ()
 {
-  return this->fpu.ops->floatsisf (& this->fpu, 1);
+  return this->fpu.ops->floatsisf (& this->fpu, fp::round_default, 1);
 }
 
 template<class CGEN_CPU>
@@ -301,14 +301,14 @@ template<class CGEN_CPU>
 SF
 sh_cpu<CGEN_CPU>::sh64_fcnvds(DF drgh)
 {
-  return this->fpu.ops->ftruncdfsf (& this->fpu, drgh);
+  return this->fpu.ops->ftruncdfsf (& this->fpu, fp::round_default, drgh);
 }
 
 template<class CGEN_CPU>
 DF
 sh_cpu<CGEN_CPU>::sh64_fcnvsd(SF frgh)
 {
-  return this->fpu.ops->fextsfdf (& this->fpu, frgh);
+  return this->fpu.ops->fextsfdf (& this->fpu, fp::round_default, frgh);
 }
 
 template<class CGEN_CPU>
@@ -329,28 +329,28 @@ template<class CGEN_CPU>
 DF
 sh_cpu<CGEN_CPU>::sh64_floatld(SF frgh)
 {
-  return this->fpu.ops->floatsidf (& this->fpu, frgh);
+  return this->fpu.ops->floatsidf (& this->fpu, fp::round_default, frgh);
 }
 
 template<class CGEN_CPU>
 SF
 sh_cpu<CGEN_CPU>::sh64_floatls(SF frgh)
 {
-  return this->fpu.ops->floatsisf (& this->fpu, frgh);
+  return this->fpu.ops->floatsisf (& this->fpu, fp::round_default, frgh);
 }
 
 template<class CGEN_CPU>
 DF
 sh_cpu<CGEN_CPU>::sh64_floatqd(DF drgh)
 {
-  return this->fpu.ops->floatdidf (& this->fpu, drgh);
+  return this->fpu.ops->floatdidf (& this->fpu, fp::round_default, drgh);
 }
 
 template<class CGEN_CPU>
 SF
 sh_cpu<CGEN_CPU>::sh64_floatqs(DF drgh)
 {
-  return this->fpu.ops->floatdisf (& this->fpu, drgh);
+  return this->fpu.ops->floatdisf (& this->fpu, fp::round_default, drgh);
 }
 
 template<class CGEN_CPU>
@@ -422,28 +422,28 @@ template<class CGEN_CPU>
 SF
 sh_cpu<CGEN_CPU>::sh64_ftrcdl(DF drgh)
 {
-  return this->fpu.ops->fixdfsi (& this->fpu, drgh);
+  return this->fpu.ops->fixdfsi (& this->fpu, fp::round_default, drgh);
 }
 
 template<class CGEN_CPU>
 SF
 sh_cpu<CGEN_CPU>::sh64_ftrcsl(SF frgh)
 {
-  return this->fpu.ops->fixsfsi (& this->fpu, frgh);
+  return this->fpu.ops->fixsfsi (& this->fpu, fp::round_default, frgh);
 }
 
 template<class CGEN_CPU>
 DF
 sh_cpu<CGEN_CPU>::sh64_ftrcdq(DF drgh)
 {
-  return this->fpu.ops->fixdfdi (& this->fpu, drgh);
+  return this->fpu.ops->fixdfdi (& this->fpu, fp::round_default, drgh);
 }
 
 template<class CGEN_CPU>
 DF
 sh_cpu<CGEN_CPU>::sh64_ftrcsq(SF frgh)
 {
-  return this->fpu.ops->fixsfdi (& this->fpu, frgh);
+  return this->fpu.ops->fixsfdi (& this->fpu, fp::round_default, frgh);
 }
 
 template<class CGEN_CPU>
@@ -451,7 +451,7 @@ void
 sh_cpu<CGEN_CPU>::sh64_ftrvs(unsigned g, unsigned h, unsigned f)
 {
   int i, j;
-  SF zero = this->fpu.ops->floatsisf (& this->fpu, 0);
+  SF zero = this->fpu.ops->floatsisf (& this->fpu, fp::round_default, 0);
   for (i = 0; i < 4; i++)
     {
       SF result = zero;

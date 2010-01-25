@@ -1,3 +1,12 @@
+2010-01-24  Doug Evans  <dje@sebabeach.org>
+
+	* cgen-fpu.h (cgen_fp_ops): Update signatures of floating point
+	conversion functions.
+	* cgen-fpu.cxx (cgen_fp_ops): Ditto.
+	* cgen-types (fpconv_kind): New enum.
+	* fp.h (enum round_mode_t): Define values in terms of cgen's
+	builtin values.
+
 2009-11-23  Doug Evans  <dje@sebabeach.org>
 
 	* cgen-engine.h (EXTRACT_MSB0_SINT): Renamed from EXTRACT_MSB0_INT.

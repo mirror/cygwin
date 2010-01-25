@@ -1,5 +1,17 @@
 2010-01-24  Doug Evans  <dje@sebabeach.org>
 
+	* utils-cgen.scm (<location>): Define using new define-class.
+	(<ident>, <source-ident>, <context>): Ditto.
+
+	* cos.scm (/object-string): New function.
+	(/object-error): Use it.
+	(/object-count-true): New function
+	(object-copy-top): Delete.  All callers changed to call object-copy.
+	(/parse-member-list, /build-getter-defs, /build-setter-defs): New fns.
+	(define-class, define-interface, define-method): New macros.
+	(define-getters, define-setters, vmake): Moved here ...
+	* utils-cgen.scm: ... from here.
+
 	* cos.scm: Follow commenting convention.  Why did a single ; have to
 	get indented like it does? :-(
 	* utils-cgen.scm: Ditto.

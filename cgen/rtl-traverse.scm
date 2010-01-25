@@ -2059,7 +2059,7 @@
 ; Create a copy of ESTATE.
 
 (define (estate-copy estate)
-  (object-copy-top estate)
+  (object-copy estate)
 )
 
 ;; Create a copy of ESTATE with environment stack ENV-STACK added,

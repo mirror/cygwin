@@ -61,7 +61,7 @@
 ; FIXME: No longer used.
 
 (define (unit:make-insn-timing u issue done)
-  (let ((result (object-copy-top u)))
+  (let ((result (object-copy u)))
     (elm-xset! result 'issue issue)
     (elm-xset! result 'done done)
     result)

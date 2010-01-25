@@ -337,7 +337,7 @@
 ; VALUE is either ... ???
 
 (define (ifld-new-value f value)
-  (let ((new-f (object-copy-top f)))
+  (let ((new-f (object-copy f)))
     (ifld-set-value! new-f value)
     new-f)
 )
@@ -347,7 +347,7 @@
 (method-make!
  <ifield> 'set-word-offset!
  (lambda (self word-offset)
-   (let ((bitrange (object-copy-top (/ifld-bitrange self))))
+   (let ((bitrange (object-copy (/ifld-bitrange self))))
      (bitrange-set-word-offset! bitrange word-offset)
      (elm-set! self 'bitrange bitrange)
      *UNSPECIFIED*))
@@ -359,7 +359,7 @@
 ; Return a copy of F with new {word-offset}.
 
 (define (ifld-new-word-offset f word-offset)
-  (let ((new-f (object-copy-top f)))
+  (let ((new-f (object-copy f)))
     (ifld-set-word-offset! new-f word-offset)
     new-f)
 )

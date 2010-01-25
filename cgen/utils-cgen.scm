@@ -26,61 +26,16 @@
     (newline cep))
 )
 
-;; COS utilities.
-;; Perhaps these should be provided with cos (cgen-object-system), but for
-;; now they live here.
-
-;; Define the getter for a list of elements of a class.
-
-(defmacro define-getters (class class-prefix elm-names)
-  (cons 'begin
-	(map (lambda (elm-name)
-	       (if (pair? elm-name)
-		   `(define ,(symbol-append class-prefix '- (cdr elm-name))
-		      (elm-make-getter ,class (quote ,(car elm-name))))
-		   `(define ,(symbol-append class-prefix '- elm-name)
-		      (elm-make-getter ,class (quote ,elm-name)))))
-	     elm-names))
-)
-
-;; Define the setter for a list of elements of a class.
-
-(defmacro define-setters (class class-prefix elm-names)
-  (cons 'begin
-	(map (lambda (elm-name)
-	       (if (pair? elm-name)
-		   `(define ,(symbol-append class-prefix '-set- (cdr elm-name) '!)
-		      (elm-make-setter ,class (quote ,(car elm-name))))
-		   `(define ,(symbol-append class-prefix '-set- elm-name '!)
-		      (elm-make-setter ,class (quote ,elm-name)))))
-	     elm-names))
-)
-
-;; Make an object, specifying values for particular elements.
-;; ??? Eventually move to cos.scm/cos.c.
-
-(define (vmake class . args)
-  (let ((obj (new class)))
-    (let ((unrecognized (send obj 'vmake! args)))
-      (if (null? unrecognized)
-	  obj
-	  (error "vmake: unknown options:" unrecognized))))
-)
-
 ;; Source locations are recorded as a stack, with (ideally) one extra level
 ;; for each macro invocation.
 
-(define <location> (class-make '<location>
-			       nil
-			       '(
-				 ;; A list of "single-location" objects,
-				 ;; sorted by most recent location first.
-				 list
-				 )
-			       nil))
-
-(define-getters <location> location (list))
-(define-setters <location> location (list))
+(define-class <location> location- () 
+  (
+   ;; A list of "single-location" objects,
+   ;; sorted by most recent location first.
+   !list
+   )
+)
 
 ;; A single source location.
 ;; This is recorded as a vector for simplicity.
@@ -211,26 +166,52 @@
 ;; Each named entry in the description file typically has these three members:
 ;; name, comment attrs.
 
-(define <ident> (class-make '<ident> '() '(name comment attrs) '()))
+(define-class <ident> ident- () (!name !comment !attrs))
 
-(method-make! <ident> 'get-name (lambda (self) (elm-get self 'name)))
-(method-make! <ident> 'get-comment (lambda (self) (elm-get self 'comment)))
-(method-make! <ident> 'get-atlist (lambda (self) (elm-get self 'attrs)))
-
-(method-make! <ident> 'set-name!
-	      (lambda (self newval) (elm-set! self 'name newval)))
-(method-make! <ident> 'set-comment!
-	      (lambda (self newval) (elm-set! self 'comment newval)))
-(method-make! <ident> 'set-atlist!
-	      (lambda (self newval) (elm-set! self 'attrs newval)))
-
-;; All objects defined in the .cpu file have these elements.
+;; All objects defined in the .cpu file have name, comment, attrs elements.
 ;; Where in the class hierarchy they're recorded depends on the object.
-;; Additionally most objects have `name', `comment' and `attrs' elements.
+;; Each object is required to provide these interfaces.
 
-(define (obj:name obj) (send obj 'get-name))
-(define (obj-set-name! obj name) (send obj 'set-name! name))
-(define (obj:comment obj) (send obj 'get-comment))
+(define-interface obj-name get-name)
+(define-interface obj-comment get-comment)
+;; FIXME: See definition of obj-atlist.
+(define-interface obj-atlist1 get-atlist)
+
+(define-interface obj-set-name! set-name! newval)
+(define-interface obj-set-comment! set-comment! newval)
+(define-interface obj-set-atlist! set-atlist! newval)
+
+;; Get/set attributes of OBJ.
+;; OBJ is any object which supports the get-atlist interface.
+
+(define (obj-atlist obj)
+  (let ((result (obj-atlist1 obj)))
+    ;; As a speed up, we allow objects to specify an empty attribute list
+    ;; with #f or (), rather than creating an attr-list object.
+    ;; ??? There is atlist-empty now which should be used directly, after
+    ;; which we can delete use and rename obj-atlist1 -> obj-atlist.
+    (if (or (null? result) (not result))
+	atlist-empty
+	result))
+)
+
+(define-method <ident> get-name (self)
+  (ident-name self))
+(define-method <ident> get-comment (self)
+  (ident-comment self))
+(define-method <ident> get-atlist (self)
+  (ident-attrs self))
+
+(define-method <ident> set-name! (self newval)
+  (ident-set-name! self newval))
+(define-method <ident> set-comment! (self newval)
+  (ident-set-comment! self newval))
+(define-method <ident> set-atlist! (self newval)
+  (ident-set-attrs! self newval))
+
+;; FIXME: Delete and replace with the above interfaces.
+(define (obj:name obj) (obj-name obj))
+(define (obj:comment obj) (obj-comment obj))
 
 ;; Utility to return the name as a string.
 
@@ -258,54 +239,45 @@
 ;; We can't just use the line number because we want an ordering over multiple
 ;; input files.
 
-(define <source-ident>
-  (class-make '<source-ident> '(<ident>)
-	      '(
-		;; A <location> object.
-		(location . #f)
-		;; #f for ordinal means "unassigned"
-		(ordinal . #f)
-		)
-	      '()))
+(define-class <source-ident> source-ident- (<ident>)
+  (
+   ;; A <location> object.
+   (/!location . #f)
+   ;; #f for ordinal means "unassigned"
+   (/!ordinal . #f)
+   )
+)
 
-(method-make! <source-ident> 'get-location
-	      (lambda (self) (elm-get self 'location)))
-(method-make! <source-ident> 'set-location!
-	      (lambda (self newval) (elm-set! self 'location newval)))
-(define (obj-location obj) (send obj 'get-location))
-(define (obj-set-location! obj location) (send obj 'set-location! location))
+(define-interface obj-location get-location)
+(define-interface obj-set-location! set-location! newval)
 
-(method-make! <source-ident> 'get-ordinal
-	      (lambda (self) (elm-get self 'ordinal)))
-(method-make! <source-ident> 'set-ordinal!
-	      (lambda (self newval) (elm-set! self 'ordinal newval)))
-(define (obj-ordinal obj) (send obj 'get-ordinal))
-(define (obj-set-ordinal! obj ordinal) (send obj 'set-ordinal! ordinal))
+(define-method <source-ident> get-location (self)
+  (/source-ident-location self))
+(define-method <source-ident> set-location! (self newval)
+  (/source-ident-set-location! self newval))
 
-;; Return a boolean indicating if X is a <source-ident>.
+(define-interface obj-ordinal get-ordinal)
+(define-interface obj-set-ordinal! set-ordinal! newval)
 
-(define (source-ident? x) (class-instance? <source-ident> x))
+(define-method <source-ident> get-ordinal (self)
+  (/source-ident-ordinal self))
+(define-method <source-ident> set-ordinal! (self newval)
+  (/source-ident-set-ordinal! self newval))
 
 ;; Parsing utilities
 
 ;; A parsing/processing context, used to give better error messages.
 ;; LOCATION must be an object created with make-location.
 
-(define <context>
-  (class-make '<context> nil
-	      '(
-		;; Location of the object being processed,
-		;; or #f if unknown (or there is none).
-		(location . #f)
-		;; Error message prefix or #f if there is none.
-		(prefix . #f)
-		)
-	      nil)
+(define-class <context> context- ()
+  (
+   ;; Location of the object being processed,
+   ;; or #f if unknown (or there is none).
+   (location . #f)
+   ;; Error message prefix or #f if there is none.
+   (prefix . #f)
+   )
 )
-
-;; Accessors.
-
-(define-getters <context> context (location prefix))
 
 ;; Create a <context> object that is just a prefix.
 
@@ -762,6 +734,7 @@
 	       attrs)
    "\n")
 )
+
 ;; Return C code to declare an enum of attributes ATTRS.
 ;; PREFIX is one of "cgen_ifld", "cgen_hw", "cgen_operand", "cgen_insn".
 ;; ATTRS is an alist of attribute values.  The value is unimportant except that

@@ -372,7 +372,7 @@
 (define (mode-make-int bits)
   (if (or (<= bits 0) (> bits 64))
       (error "unsupported number of bits" bits))
-  (let ((result (object-copy-top INT)))
+  (let ((result (object-copy INT)))
     (elm-xset! result 'bits bits)
     (elm-xset! result 'bytes (bits->bytes bits))
     result)
@@ -381,7 +381,7 @@
 (define (mode-make-uint bits)
   (if (or (<= bits 0) (> bits 64))
       (error "unsupported number of bits" bits))
-  (let ((result (object-copy-top UINT)))
+  (let ((result (object-copy UINT)))
     (elm-xset! result 'bits bits)
     (elm-xset! result 'bytes (bits->bytes bits))
     result)
@@ -615,10 +615,10 @@ Define a mode, all arguments specified.
   ;; While setting the real values of WI/UWI/AI/IAI is defered to
   ;; mode-set-word-modes!, create usable entries in the table.
   ;; The entries must be usable as h/w elements may be defined that use them.
-  (set! WI (object-copy-top (mode:lookup 'SI)))
-  (set! UWI (object-copy-top (mode:lookup 'USI)))
-  (set! AI (object-copy-top (mode:lookup 'USI)))
-  (set! IAI (object-copy-top (mode:lookup 'USI)))
+  (set! WI (object-copy (mode:lookup 'SI)))
+  (set! UWI (object-copy (mode:lookup 'USI)))
+  (set! AI (object-copy (mode:lookup 'USI)))
+  (set! IAI (object-copy (mode:lookup 'USI)))
   (mode:add! 'WI WI)
   (mode:add! 'UWI UWI)
   (mode:add! 'AI AI)

@@ -29,11 +29,10 @@
 ;;
 ;; ELM-ALIST is an alist of (symbol vector-offset-with-class . initial-value)
 ;; for this class only.
-;; Values can be looked up by name, via elm-make-[gs]etter routines, or
-;; methods can use elm-get/set! for speed.
+;; Values can be looked up by name, via elm-make-[gs]etter routines.
 ;; Various Lisp (or Lisp-like) OOP systems (e.g. CLOS, Dylan) call these
 ;; "slots".  Maybe for consistency "slot" would be a better name.  Some might
-;; confuse that with intentions at directions.
+;; confuse that with intentions at directions though.
 ;;
 ;; METHOD-ALIST is an alist of (symbol . procedure) for this class only.
 ;;
@@ -70,16 +69,40 @@
 ;;
 ;; -----------------------------------------------------------------------------
 ;;
-;; User visible procs:
+;; User visible procs/macros:
 ;;
-;; (class-make name parents elements methods) -> class
+;; (define-class name prefix parents members)
+;;
+;; This is a macro that defines several things:
+;; - the class object with the specified class members
+;; - a predicate to identify instances of this class, named "class?"
+;; - getters and setters for each member
+;; NAME is the name of the class.
+;; Convention requires class names to be decorated as <class-name>.
+;; ??? This might change to require the actual class object, but not yet.
+;; PREFIX is prepended to member getters/setters.
+;; PARENTS is a list of parent class names.
+;; It must contain at most one element, multiple inheritance isn't supported.
+;; Each element of MEMBERS is either member-name (for uninitialized
+;;  elements) or (member-name . initial-value).
+;; MEMBER-NAME may begin with modifiers / and !:
+;; / - member is private: getter/setter begins with /
+;; ! - member is writable: readonly members do not get a setter
+;; / and ! may not appear elsewhere in MEMBER-NAME.
+;; / and ! may appear in either order.
+;;
+;; (class-make name parents members unused) -> class
 ;;
 ;; Create a class.  The result is then passed back by procedures requiring
-;; a class argument.  Note however that PARENTS is a list of class names,
-;; not the class data type.  This allows reloading the definition of a
-;; parent class without having to reload any subclasses.  To implement this
-;; classes are recorded internally, and `object-init!' must be called if any
-;; class has been redefined.
+;; a class argument.
+;; NAME is the name of the class.
+;; Convention requires class names to be decorated as <class-name>.
+;; PARENTS is a list of parent class names.
+;; It must contain at most one element, multiple inheritance isn't supported.
+;; ??? This might change to require the actual class object, but not yet.
+;; MEMBERS is a list of members, each list member is either a name (for
+;; uninitialized elements) or (name . initial-value).
+;; UNUSED must be the empty list, it will eventually be deleted.
 ;;
 ;; (class-list) -> list of all defined classes
 ;;
@@ -123,12 +146,15 @@
 ;;
 ;; Create a 'make! method that sets the specified elements.
 ;;
-;; (object-copy object) -> copy of OBJ
+;; (object-copy object) -> copy of OBJECT
 ;;
-;; ??? Whether to discard the parent or keep it and retain specialization
-;; is undecided.
+;; Return a copy of OBJECT.
+;; NOTE: This does a shallow copy.
 ;;
-;; (object-copy-top object) -> copy of OBJECT with spec'n discarded
+;; (object-assign! dstsrc) -> unspecified
+;;
+;; Assign the contents of SRC to DST.
+;; Both must be objects of the same class.
 ;;
 ;; (class? foo) -> return #t if FOO is a class
 ;;
@@ -154,20 +180,20 @@
 ;;
 ;; (elm-make-getter class elm-name) -> lambda
 ;;
-;; Return lambda to get the value of ELM-NAME in CLASS.
+;; Return efficient lambda to get the value of ELM-NAME in CLASS.
 ;;
 ;; (elm-make-setter class elm-name) -> lambda
 ;;
-;; Return lambda to set the value of ELM-NAME in CLASS.
+;; Return efficient lambda to set the value of ELM-NAME in CLASS.
 ;;
 ;; Conventions used in this file:
-;; - procs/vars internal to this file are prefixed with "-"
-;;   [Of course this could all be put in a module; later if ever since
-;;   once Guile has its own official object system we'll convert.  Note that
-;;   it currently does not.]
-;; - except for a few exceptions, public procs begin with one of
-;;   class-, object-, elm-, method-.
-;;   The exceptions are make, new, parent, send.
+;; - procs/vars internal to this file are prefixed with "/"
+;; - except for a few exceptions, public procs/macros begin with one of
+;;   define-, class-, object-, elm-, method-.
+;;   The exceptions are make, vmake, new, send, send-next.
+;;
+;; NOTES:
+;; - "send" as a public interface is deprecated
 
 (define /class-tag "class")
 (define /object-tag "object")
@@ -227,18 +253,37 @@
 
 (define (/object-error proc-name x . text)
   (error (string-append proc-name ": "
-			(apply string-append (map ->string text))
+			(apply string-append (map /object->string text))
 			(if (object? x)
 			    (string-append
-			     " (class: " (->string (/object-class-name x))
+			     " (class: " (/object->string (/object-class-name x))
 			     (if (method-present? x 'get-name)
 				 (string-append ", name: "
-						(->string (send x 'get-name)))
+						(/object->string (send x 'get-name)))
 				 "")
 			     ")")
 			    "")
 			"")
 	 x)
+)
+
+;; Utility to count the number of non-#f elements in FLAGS.
+
+(define (/object-count-true flags)
+  (let loop ((result 0) (flags flags))
+    (if (null? flags)
+	result
+	(loop (+ result (if (car flags) 1 0))
+	      (cdr flags))))
+)
+
+;; If S is a symbol, convert it to a string.
+;; Otherwise S must be a string, returned unchanged.
+
+(define (/object->string s)
+  (cond ((symbol? s) (symbol->string s))
+	((string? s) s)
+	(else (error "not a symbol or string" s)))
 )
 
 ;; Low level class operations.
@@ -376,7 +421,7 @@
     ;; Build the result first, then build our parents so that our parents have
     ;; the right value for the CHILD-BACKPOINTER field.
     ;; FIXME: Can't assume append! works that way.
-    ;; Use a bogus value for offset for the moment.
+    ;; Use a bogus value (999) for offset for the moment.
     ;; The correct value is set later.
 
     (let ((result (list class 999 child)))
@@ -576,14 +621,13 @@
 ;; is first instantiated.
 ;; ELMS is a either a list of either element names or name/value pairs.
 ;; Elements without initial values are marked as "unbound".
-;; METHODS is an initial alist of methods.  More methods can be added with
-;; method-make!.
+;; UNUSED must be the empty list, it will eventually be deleted.
 
-(define (class-make name parents elms methods)
+(define (class-make name parents elms unused)
   (if (> (length parents) 1)
-      (/object-error 'class-make parents "multiple-inheritance is not supported"))
-  (if (> (length methods) 0)
-      (/object-error 'class-make methods "methods specified with class"))
+      (/object-error "class-make" parents "multiple-inheritance is not supported"))
+  (if (not (null? unused))
+      (/object-error "class-make" methods "unused parameter must be ()"))
 
   (let ((elm-list #f))
 
@@ -651,16 +695,6 @@
   (/object-copy obj)
 )
 
-;; Make a copy of OBJ.
-;; This makes a copy of top level object, with any specialization discarded.
-;; WARNING: A shallow copy is done on the elements!
-;; FIXME: Delete, specialization gone.
-
-(define (object-copy-top obj)
-  (/object-check obj "object-copy-top")
-  (/object-copy obj)
-)
-
 ;; Assign object SRC to object DST.
 ;; They must have the same class.
 
@@ -690,8 +724,7 @@
 					  (list 'quote elm) elm))
 		      args)
 		 '(self))))
-    (method-make! class 'make! (eval1 lambda-expr))
-    )
+    (method-make! class 'make! (eval1 lambda-expr)))
 )
 
 ;; The "standard" way to invoke `make!' is (send (new class) 'make! ...).
@@ -722,6 +755,126 @@
       (/class-subclass? (/class-name class) (/object-class object))
       #f)
 )
+
+;; Subroutine of define-class.
+;; Parse a define-class member list and return a list of five elements:
+;; - list of all members
+;; - list of public readable members
+;; - list of public writable members
+;; - list of private readable members
+;; - list of private writable members
+;; MEMBER-SPEC is a list of members, with private members prefixed with '/',
+;; and writable members prefixed with '!'.  / and ! may appear in any order.
+;; Each element is either member-name or (member-name . initial-value).
+
+(define (/parse-member-list member-spec)
+  (let loop ((member-spec member-spec)
+	     (members nil)
+	     (public-readable nil)
+	     (public-writable nil)
+	     (private-readable nil)
+	     (private-writable nil))
+    (if (null? member-spec)
+	(list (reverse! members)
+	      (reverse! public-readable)
+	      (reverse! public-writable)
+	      (reverse! private-readable)
+	      (reverse! private-writable))
+	(let* ((spec (car member-spec))
+	       (sym (if (pair? spec) (car spec) spec))
+	       (str (symbol->string sym)))
+	  (let ((private? (string-index str #\/))
+		(writable? (string-index str #\!)))
+	    ;; ??? Assumes /,! are first characters.
+	    (let* ((stripped-str (substring str (/object-count-true (list private? writable?))))
+		   (stripped-sym (string->symbol stripped-str)))
+	      (loop (cdr member-spec)
+		    ;; Combine initial value if present.
+		    (cons (if (pair? spec)
+			      (cons stripped-sym (cdr spec))
+			      stripped-sym)
+			  members)
+		    (if (not private?)
+			(cons stripped-sym public-readable)
+			public-readable)
+		    (if (and (not private?) writable?)
+			(cons stripped-sym public-writable)
+			public-writable)
+		    (if private?
+			(cons stripped-sym private-readable)
+			private-readable)
+		    (if (and private? writable?)
+			(cons stripped-sym private-writable)
+			private-writable)))))))
+)
+
+;; Subroutine of define-class.
+;; Return a list of definitions of member getters.
+
+(define (/build-getter-defs class prefix members private?)
+  (let ((str-prefix (symbol->string prefix)))
+    (cons 'begin
+	  (map (lambda (m)
+		 (let* ((elm-name (if (pair? m) (car m) m))
+			(name (string-append (if private? "/" "")
+					     str-prefix
+					     (symbol->string elm-name)))
+			(getter-name (string->symbol name)))
+		   `(define ,getter-name
+		      (elm-make-getter ,class (quote ,elm-name)))))
+	       members)))
+)
+
+;; Subroutine of define-class.
+;; Return a list of definitions of member getters.
+
+(define (/build-setter-defs class prefix members private?)
+  (let ((str-prefix (symbol->string prefix)))
+    (cons 'begin
+	  (map (lambda (m)
+		 (let* ((elm-name (if (pair? m) (car m) m))
+			(name (string-append (if private? "/" "")
+					     str-prefix
+					     "set-"
+					     (symbol->string elm-name)
+					     "!"))
+			(getter-name (string->symbol name)))
+		   `(define ,getter-name
+		      (elm-make-setter ,class (quote ,elm-name)))))
+	       members)))
+)
+
+;; Main routine to define a class.
+;;
+;; This defines several things:
+;; - the class object with the specified class members
+;; - a predicate to identify instances of this class, named "class?"
+;; - getters and setters for each member
+;;
+;; Private members are specified as /member.
+;; Writable members are specified as !member.
+;; / and ! may be combined in any order.
+;;
+;; By convention name is formatted as <class-name>.
+
+(defmacro define-class (name prefix parents members)
+  (let* ((parsed-members (/parse-member-list members))
+	 (str-name (symbol->string name))
+	 (str-name-len (string-length str-name))
+	 (name-sans-decorations (substring str-name 1 (- str-name-len 1))))
+    ;; Enforce the <class> naming convention.
+    (if (or (not (eq? (string-ref str-name 0) #\<))
+	    (not (eq? (string-ref str-name (- str-name-len 1)) #\>)))
+	(/object-error "define-class" name " not formatted as <class>: "))
+    `(begin
+       (define ,name (class-make (quote ,name) (quote ,parents) (quote ,(car parsed-members)) nil))
+       ,(/build-getter-defs name prefix (list-ref parsed-members 1) #f)
+       ,(/build-setter-defs name prefix (list-ref parsed-members 2) #f)
+       ,(/build-getter-defs name prefix (list-ref parsed-members 3) #t)
+       ,(/build-setter-defs name prefix (list-ref parsed-members 4) #t)
+       (define ,(string->symbol (string-append name-sans-decorations "?"))
+	 (lambda (obj) (class-instance? ,name obj)))))
+)
 
 ;; Element operations.
 
@@ -747,7 +900,7 @@
   (let ((index (/class-lookup-element (/object-class-desc obj) elm-name)))
     (if index
 	(not (eq? (/object-elm-get obj index) /object-unbound))
-	(/object-error "elm-get" self "element not present: " elm-name)))
+	(/object-error "elm-bound?" obj "element not present: " elm-name)))
 )
 
 ;; Subroutine of elm-get.
@@ -953,7 +1106,7 @@
 ;; When the method is invoked, the (possible parent class) object in which the
 ;; method is found is passed to the method.
 ;; ??? The word `send' comes from "sending messages".  Perhaps should pick
-;; a better name for this operation.
+;; a better name for this operation, except this is deprecated as a public API.
 
 (define (send obj method-name . args)
   (/object-check obj "send")
@@ -979,6 +1132,8 @@
 ;; They could be removed with a bit of effort, but is it worth it?
 ;; One possibility is if method-make! was a macro, then maybe send-next could
 ;; work with method-make! and get the values from it.
+;;
+;; While `send' is deprecated, this is not, yet anyway.
 
 (define (send-next obj class-name method-name . args)
   (/object-check obj "send-next")
@@ -992,32 +1147,23 @@
 	       (cons obj args))
 	(/object-error "send-next" obj "method not supported: " method-name)))
 )
+
+;; Create an interface.
+;; This defines a function named NAME that invokes METHOD-NAME.
+
+(defmacro define-interface (name method-name . arg-list)
+  `(define (,name object ,@arg-list)
+     (send object (quote ,method-name) ,@arg-list))
+)
+
+;; Wrapper to define a method.
+;; `self' must be the first argument.
+
+(defmacro define-method (class name args . body)
+  `(method-make! ,class (quote ,name) ,(cons 'lambda (cons args body)))
+)
 
 ;; Miscellaneous publically accessible utilities.
-
-;; Reset the object system (delete all classes).
-
-(define (object-reset!)
-  (set! /class-list (list))
-  (set! /class-table (vector))
-  /object-unspecified
-)
-
-;; Call once to initialize the object system.
-;; Only necessary if classes have been modified after objects have been
-;; instantiated.  This usually happens during development only.
-
-(define (object-init!)
-  (for-each (lambda (class)
-	      (/class-set-all-initial-values! class #f)
-	      (/class-set-all-methods! class #f)
-	      (/class-set-class-desc! class #f))
-	    (class-list))
-  (for-each (lambda (class)
-	      (/class-check-init! class))
-	    (class-list))
-  /object-unspecified
-)
 
 ;; Return list of all classes.
 
@@ -1059,6 +1205,42 @@
 	 (class-map-over-class /class-alist-names (/object-class class-or-object)))
 	(else (/object-error "class-layout" class-or-object
 			     "not a class or object")))
+)
+
+;; Define the getter for a list of elements of a class.
+
+(defmacro define-getters (class class-prefix elm-names)
+  (cons 'begin
+	(map (lambda (elm-name)
+	       (if (pair? elm-name)
+		   `(define ,(symbol-append class-prefix '- (cdr elm-name))
+		      (elm-make-getter ,class (quote ,(car elm-name))))
+		   `(define ,(symbol-append class-prefix '- elm-name)
+		      (elm-make-getter ,class (quote ,elm-name)))))
+	     elm-names))
+)
+
+;; Define the setter for a list of elements of a class.
+
+(defmacro define-setters (class class-prefix elm-names)
+  (cons 'begin
+	(map (lambda (elm-name)
+	       (if (pair? elm-name)
+		   `(define ,(symbol-append class-prefix '-set- (cdr elm-name) '!)
+		      (elm-make-setter ,class (quote ,(car elm-name))))
+		   `(define ,(symbol-append class-prefix '-set- elm-name '!)
+		      (elm-make-setter ,class (quote ,elm-name)))))
+	     elm-names))
+)
+
+;; Make an object, specifying values for particular elements.
+
+(define (vmake class . args)
+  (let ((obj (new class)))
+    (let ((unrecognized (send obj 'vmake! args)))
+      (if (null? unrecognized)
+	  obj
+	  (error "vmake: unknown options:" unrecognized))))
 )
 
 ;; Like assq but based on the `name' element.

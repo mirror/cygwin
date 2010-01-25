@@ -949,7 +949,7 @@
 	 (error "hw-index:cxmake-get: result needs a mode" self))
      (cx:make (if (mode:host? mode)
 		  ; FIXME: Temporary hack to generate same code as before.
-		  (let ((xmode (object-copy-top mode)))
+		  (let ((xmode (object-copy mode)))
 		    (obj-cons-attr! xmode (bool-attr-make 'FORCE-C #t))
 		    xmode)
 		  mode)

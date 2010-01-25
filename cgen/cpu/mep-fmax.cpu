@@ -224,7 +224,7 @@
 (fmax-conv fceilws  #xE #x0 fmax-FRd-int fmax-FRn     (set fmax-FRd-int (c-call SI "fmax_fceilws" fmax-FRn)))
 (fmax-conv ffloorws #xF #x0 fmax-FRd-int fmax-FRn     (set fmax-FRd-int (c-call SI "fmax_ffloorws" fmax-FRn)))
 (fmax-conv fcvtws   #x4 #x1 fmax-FRd-int fmax-FRn     (set fmax-FRd-int (c-call SI "fmax_fcvtws" fmax-FRn)))
-(fmax-conv fcvtsw   #x0 #x9 fmax-FRd     fmax-FRn-int (set fmax-FRd (float SF fmax-FRn-int)))
+(fmax-conv fcvtsw   #x0 #x9 fmax-FRd     fmax-FRn-int (set fmax-FRd (float SF FPCONV-DEFAULT fmax-FRn-int)))
 
 ;------------------------------------------------------------------------------
 ; Comparisons

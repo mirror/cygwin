@@ -135,11 +135,13 @@
 	  (parse-enum-vals context prefix vals)))
 )
 
-; Read an enum description
-; This is the main routine for analyzing enums in the .cpu file.
-; CONTEXT is a <context> object for error messages.
-; ARG-LIST is an associative list of field name and field value.
-; /enum-parse is invoked to create the `enum' object.
+;; Read an enum description
+;; This is the main routine for analyzing enums in the .cpu file.
+;; CONTEXT is a <context> object for error messages.
+;; ARG-LIST is an associative list of field name and field value.
+;; /enum-parse is invoked to create the `enum' object.
+;;
+;; FIXME: Change (values ((foo 42) (bar 43))) to (values (foo 42) (bar 43)).
 
 (define (/enum-read context . arg-list)
   (let (
@@ -412,6 +414,24 @@ Define an instruction opcode enum, all arguments specified.
 "
 		       nil '(name comment attrs prefix ifld vals)
 		       define-full-insn-enum)
+
+  *UNSPECIFIED*
+)
+
+(define (enum-builtin!)
+  ;; Provide FPCONV-DEFAULT == 0 as an enum constant to use as the `how'
+  ;; parameter to the floating point conversion functions.
+  ;; ??? Add standard IEEE rounding modes?
+  (define-enum '(name fpconv-kind)
+    '(comment "builtin floating point conversion kinds")
+    '(attrs VIRTUAL) ;; let app provide def'n instead of each cpu's desc.h
+    '(prefix FPCONV-)
+    '(values ((DEFAULT 0)
+	      (TIES-TO-EVEN 1)
+	      (TIES-TO-AWAY 2)
+	      (TOWARD-ZERO 3)
+	      (TOWARD-POSITIVE 4)
+	      (TOWARD-NEGATIVE 5))))
 
   *UNSPECIFIED*
 )

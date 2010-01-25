@@ -828,11 +828,11 @@
 				"))"))))
 )
 
-; Mode conversions.
-; MODE is the mode name.
+;; Integer mode conversions.
+;; MODE is the mode name.
 
-(define (s-convop estate name mode s1)
-  ; Get S1 in its normal mode, then convert.
+(define (s-int-convop estate name mode s1)
+  ;; Get S1 in its normal mode, then convert.
   (let ((s (rtl-c-get estate DFLT s1))
 	(mode (mode:lookup mode)))
     (if (and (not (estate-rtl-cover-fns? estate))
@@ -841,20 +841,35 @@
 		 (string-append "((" (obj:str-name mode) ")"
 				" (" (obj:str-name (cx:mode s)) ")"
 				" (" (cx:c s) "))"))
-	(if (or (mode-float? mode)
-		(mode-float? (cx:mode s)))
-	    (cx:make mode
-		     (string-append "CGEN_CPU_FPU (current_cpu)->ops->"
-				    (string-downcase name)
-				    (string-downcase (obj:str-name (rtx-sem-mode (cx:mode s))))
-				    (string-downcase (obj:str-name (rtx-sem-mode mode)))
-				    " (CGEN_CPU_FPU (current_cpu), "
-				    (cx:c s) ")"))
-	    (cx:make mode
-		     (string-append name
-				    (obj:str-name (rtx-sem-mode (cx:mode s)))
-				    (obj:str-name (rtx-sem-mode mode))
-				    " (" (cx:c s) ")")))))
+	(cx:make mode
+		 (string-append name
+				(obj:str-name (rtx-sem-mode (cx:mode s)))
+				(obj:str-name (rtx-sem-mode mode))
+				" (" (cx:c s) ")"))))
+)
+
+;; Floating point mode conversions.
+;; MODE is the mode name.
+
+(define (s-float-convop estate name mode how1 s1)
+  ;; Get S1 in its normal mode, then convert.
+  (let ((s (rtl-c-get estate DFLT s1))
+	(mode (mode:lookup mode))
+	(how (rtl-c-get estate DFLT how1)))
+    (if (and (not (estate-rtl-cover-fns? estate))
+	     (mode:host? (cx:mode s)))
+	(cx:make mode
+		 (string-append "((" (obj:str-name mode) ")"
+				" (" (obj:str-name (cx:mode s)) ")"
+				" (" (cx:c s) "))"))
+	(cx:make mode
+		 (string-append "CGEN_CPU_FPU (current_cpu)->ops->"
+				(string-downcase name)
+				(string-downcase (obj:str-name (rtx-sem-mode (cx:mode s))))
+				(string-downcase (obj:str-name (rtx-sem-mode mode)))
+				" (CGEN_CPU_FPU (current_cpu), "
+				(cx:c how) ", "
+				(cx:c s) ")"))))
 )
 
 ; Compare SRC1 and SRC2 in mode MODE.
@@ -1790,31 +1805,32 @@
 )
 
 (define-fn ext (*estate* options mode s1)
-  (s-convop *estate* "EXT" mode s1)
+  (s-int-convop *estate* "EXT" mode s1)
 )
 (define-fn zext (*estate* options mode s1)
-  (s-convop *estate* "ZEXT" mode s1)
+  (s-int-convop *estate* "ZEXT" mode s1)
 )
 (define-fn trunc (*estate* options mode s1)
-  (s-convop *estate* "TRUNC" mode s1)
+  (s-int-convop *estate* "TRUNC" mode s1)
 )
-(define-fn fext (*estate* options mode s1)
-  (s-convop *estate* "FEXT" mode s1)
+
+(define-fn fext (*estate* options mode how s1)
+  (s-float-convop *estate* "FEXT" mode how s1)
 )
-(define-fn ftrunc (*estate* options mode s1)
-  (s-convop *estate* "FTRUNC" mode s1)
+(define-fn ftrunc (*estate* options mode how s1)
+  (s-float-convop *estate* "FTRUNC" mode how s1)
 )
-(define-fn float (*estate* options mode s1)
-  (s-convop *estate* "FLOAT" mode s1)
+(define-fn float (*estate* options mode how s1)
+  (s-float-convop *estate* "FLOAT" mode how s1)
 )
-(define-fn ufloat (*estate* options mode s1)
-  (s-convop *estate* "UFLOAT" mode s1)
+(define-fn ufloat (*estate* options mode how s1)
+  (s-float-convop *estate* "UFLOAT" mode how s1)
 )
-(define-fn fix (*estate* options mode s1)
-  (s-convop *estate* "FIX" mode s1)
+(define-fn fix (*estate* options mode how s1)
+  (s-float-convop *estate* "FIX" mode how s1)
 )
-(define-fn ufix (*estate* options mode s1)
-  (s-convop *estate* "UFIX" mode s1)
+(define-fn ufix (*estate* options mode how s1)
+  (s-float-convop *estate* "UFIX" mode how s1)
 )
 
 (define-fn eq (*estate* options mode s1 s2)

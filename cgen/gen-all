@@ -50,7 +50,7 @@ usage() {
     echo "binutils, gcc, newlib, sim, sid, intrinsics"
     echo ""
     echo "Notes:"
-    echo "\"all\" can be specified which means \"all of the above\""
+    echo "\"all\" can be specified which means \"config, build, and diff everything\""
     echo "Options, todos, and apps may be specified in any order."
     echo ""
     echo "Example:"
@@ -71,15 +71,17 @@ openrisc sh sh64 xc16x xstormy16"
 all_sid_cpus="arm m32r mep mt sh xstormy16"
 
 do_force=no
+
 do_config=no
 do_build=no
+do_diffs=no
+
 do_binutils=no
 do_gcc=no
 do_newlib=no
 do_sim=no
 do_sid=no
 do_intrinsics=no
-do_diffs=no
 
 cgen_cpus="${all_cgen_cpus}"
 sid_cpus="${all_sid_cpus}"
@@ -94,27 +96,33 @@ do
     force) do_force=yes ;;
     config) do_config=yes ;;
     build) do_build=yes ;;
+    diffs) do_diffs=yes ;;
     binutils) do_binutils=yes ;;
     gcc) do_gcc=yes ;;
     newlib) do_newlib=yes ;;
     sim) do_sim=yes ;;
     sid) do_sid=yes ;;
     intrinsics) do_intrinsics=yes ;;
-    diffs) do_diffs=yes ;;
     all)
 	do_config=yes
 	do_build=yes
+	do_diffs=yes
 	do_binutils=yes
 	do_gcc=yes
 	do_newlib=yes
 	do_sim=yes
 	do_sid=yes
 	do_intrinsics=yes
-	do_diffs=yes
 	;;
     *) echo "Invalid option: $a" >&2 ; exit 1 ;;
     esac
 done
+
+if [ "${do_config}" = "no" -a "${do_build}" = "no" -a "${do_diffs}" = "no" ]
+then
+    echo "Nothing to do." >&2
+    exit 1
+fi
 
 for c in ${cgen_cpus}
 do
@@ -365,8 +373,13 @@ build_sid () {
 }
 
 build_intrinsics () {
-    (cd ${SRC_DIR}/cgen && sh ./gen-all-intrinsics ${build_dir}/${GCC_DIR})
-    if [ $? != 0 ] ; then exit 1 ; fi
+    if [ "${do_build}" = "yes" ]
+    then
+	echo "Building intrinsics: $(date)"
+	(cd ${SRC_DIR}/cgen && sh ./gen-all-intrinsics ${build_dir}/${GCC_DIR})
+	if [ $? != 0 ] ; then exit 1 ; fi
+	echo "Build done: $(date)"
+    fi
 }
 
 build_diffs () {

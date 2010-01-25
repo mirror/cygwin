@@ -1,7 +1,7 @@
 // cgen-fpu.h - CPU components.  -*- C++ -*-
 // CGEN fpu support for SID
 //
-// Copyright (C) 2005 Red Hat.
+// Copyright (C) 2005, 2010 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -72,33 +72,33 @@ public:
   virtual int unordereddf (const cgen_fpu*, DF, DF);
 
   /* SF/DF conversion ops */
-  virtual DF fextsfdf (const cgen_fpu*, SF);
-  virtual SF ftruncdfsf (const cgen_fpu*, DF);
+  virtual DF fextsfdf (const cgen_fpu*, int, SF);
+  virtual SF ftruncdfsf (const cgen_fpu*, int, DF);
 
-  virtual SF floatsisf (const cgen_fpu*, SI);
-  virtual SF floatdisf (const cgen_fpu*, DI);
+  virtual SF floatsisf (const cgen_fpu*, int, SI);
+  virtual SF floatdisf (const cgen_fpu*, int, DI);
 #if 0 // not implemented yet
-  virtual SF ufloatsisf (const cgen_fpu*, USI);
-  virtual SF ufloatdisf (const cgen_fpu*, UDI);
+  virtual SF ufloatsisf (const cgen_fpu*, int, USI);
+  virtual SF ufloatdisf (const cgen_fpu*, int, UDI);
 #endif // not implemented yet
 
-  virtual SI fixsfsi (const cgen_fpu*, SF);
-  virtual DI fixsfdi (const cgen_fpu*, SF);
+  virtual SI fixsfsi (const cgen_fpu*, int, SF);
+  virtual DI fixsfdi (const cgen_fpu*, int, SF);
 #if 0 // not implemented yet
-  virtual USI ufixsfsi (const cgen_fpu*, SF);
-  virtual UDI ufixsfdi (const cgen_fpu*, SF);
+  virtual USI ufixsfsi (const cgen_fpu*, int, SF);
+  virtual UDI ufixsfdi (const cgen_fpu*, int, SF);
 #endif
-  virtual DF floatsidf (const cgen_fpu*, SI);
-  virtual DF floatdidf (const cgen_fpu*, DI);
+  virtual DF floatsidf (const cgen_fpu*, int, SI);
+  virtual DF floatdidf (const cgen_fpu*, int, DI);
 #if 0
-  virtual DF ufloatsidf (const cgen_fpu*, USI);
-  virtual DF ufloatdidf (const cgen_fpu*, UDI);
+  virtual DF ufloatsidf (const cgen_fpu*, int, USI);
+  virtual DF ufloatdidf (const cgen_fpu*, int, UDI);
 #endif
-  virtual SI fixdfsi (const cgen_fpu*, DF);
-  virtual DI fixdfdi (const cgen_fpu*, DF);
+  virtual SI fixdfsi (const cgen_fpu*, int, DF);
+  virtual DI fixdfdi (const cgen_fpu*, int, DF);
 #if 0
-  virtual USI ufixdfsi (const cgen_fpu*, DF);
-  virtual UDI ufixdfdi (const cgen_fpu*, DF);
+  virtual USI ufixdfsi (const cgen_fpu*, int, DF);
+  virtual UDI ufixdfdi (const cgen_fpu*, int, DF);
 
   /* XF mode support (kept separate 'cus not always present) */
   virtual XF addxf (const cgen_fpu*, XF, XF);
@@ -121,20 +121,20 @@ public:
   virtual int gtxf (const cgen_fpu*, XF, XF);
   virtual int gexf (const cgen_fpu*, XF, XF);
 
-  virtual XF extsfxf (const cgen_fpu*, SF);
-  virtual XF extdfxf (const cgen_fpu*, DF);
-  virtual SF truncxfsf (const cgen_fpu*, XF);
-  virtual DF truncxfdf (const cgen_fpu*, XF);
+  virtual XF extsfxf (const cgen_fpu*, int, SF);
+  virtual XF extdfxf (const cgen_fpu*, int, DF);
+  virtual SF truncxfsf (const cgen_fpu*, int, XF);
+  virtual DF truncxfdf (const cgen_fpu*, int, XF);
 
-  virtual XF floatsixf (const cgen_fpu*, SI);
-  virtual XF floatdixf (const cgen_fpu*, DI);
-  virtual XF ufloatsixf (const cgen_fpu*, USI);
-  virtual XF ufloatdixf (const cgen_fpu*, UDI);
+  virtual XF floatsixf (const cgen_fpu*, int, SI);
+  virtual XF floatdixf (const cgen_fpu*, int, DI);
+  virtual XF ufloatsixf (const cgen_fpu*, int, USI);
+  virtual XF ufloatdixf (const cgen_fpu*, int, UDI);
 
-  virtual SI fixxfsi (const cgen_fpu*, XF);
-  virtual DI fixxfdi (const cgen_fpu*, XF);
-  virtual USI ufixxfsi (const cgen_fpu*, XF);
-  virtual UDI ufixxfdi (const cgen_fpu*, XF);
+  virtual SI fixxfsi (const cgen_fpu*, int, XF);
+  virtual DI fixxfdi (const cgen_fpu*, int, XF);
+  virtual USI ufixxfsi (const cgen_fpu*, int, XF);
+  virtual UDI ufixxfdi (const cgen_fpu*, int, XF);
 
   /* TF mode support (kept separate 'cus not always present) */
   virtual TF addtf (const cgen_fpu*, TF, TF);
@@ -157,20 +157,20 @@ public:
   virtual int gttf (const cgen_fpu*, TF, TF);
   virtual int getf (const cgen_fpu*, TF, TF);
 
-  virtual TF extsftf (const cgen_fpu*, SF);
-  virtual TF extdftf (const cgen_fpu*, DF);
-  virtual SF trunctfsf (const cgen_fpu*, TF);
-  virtual DF trunctfdf (const cgen_fpu*, TF);
+  virtual TF extsftf (const cgen_fpu*, int, SF);
+  virtual TF extdftf (const cgen_fpu*, int, DF);
+  virtual SF trunctfsf (const cgen_fpu*, int, TF);
+  virtual DF trunctfdf (const cgen_fpu*, int, TF);
 
-  virtual TF floatsitf (const cgen_fpu*, SI);
-  virtual TF floatditf (const cgen_fpu*, DI);
-  virtual TF ufloatsitf (const cgen_fpu*, USI);
-  virtual TF ufloatditf (const cgen_fpu*, UDI);
+  virtual TF floatsitf (const cgen_fpu*, int, SI);
+  virtual TF floatditf (const cgen_fpu*, int, DI);
+  virtual TF ufloatsitf (const cgen_fpu*, int, USI);
+  virtual TF ufloatditf (const cgen_fpu*, int, UDI);
 
-  virtual SI fixtfsi (const cgen_fpu*, TF);
-  virtual DI fixtfdi (const cgen_fpu*, TF);
-  virtual USI ufixtfsi (const cgen_fpu*, TF);
-  virtual UDI ufixtfdi (const cgen_fpu*, TF);
+  virtual SI fixtfsi (const cgen_fpu*, int, TF);
+  virtual DI fixtfdi (const cgen_fpu*, int, TF);
+  virtual USI ufixtfsi (const cgen_fpu*, int, TF);
+  virtual UDI ufixtfdi (const cgen_fpu*, int, TF);
 #endif // not implemented yet
 };
 

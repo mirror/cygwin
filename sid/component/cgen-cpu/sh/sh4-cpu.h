@@ -175,17 +175,17 @@ current_cpu->hardware.h_fr[((regno) + (1))] = SUBWORDSISF (SUBWORDDFSI (newval, 
 }
  }
 
-  inline DF h_fsd_get (UINT regno) const { return ((current_cpu->h_prbit_get ()) ? (current_cpu->h_drc_get (regno)) : (CGEN_CPU_FPU (current_cpu)->ops->fextsfdf (CGEN_CPU_FPU (current_cpu), current_cpu->hardware.h_fr[regno]))); }
+  inline DF h_fsd_get (UINT regno) const { return ((current_cpu->h_prbit_get ()) ? (current_cpu->h_drc_get (regno)) : (CGEN_CPU_FPU (current_cpu)->ops->fextsfdf (CGEN_CPU_FPU (current_cpu), FPCONV_DEFAULT, current_cpu->hardware.h_fr[regno]))); }
   inline void h_fsd_set (UINT regno, DF newval) { if (current_cpu->h_prbit_get ()) {
 current_cpu->h_drc_set (regno, newval);
 } else {
-current_cpu->h_frc_set (regno, CGEN_CPU_FPU (current_cpu)->ops->ftruncdfsf (CGEN_CPU_FPU (current_cpu), newval));
+current_cpu->h_frc_set (regno, CGEN_CPU_FPU (current_cpu)->ops->ftruncdfsf (CGEN_CPU_FPU (current_cpu), FPCONV_DEFAULT, newval));
 }
  }
 
-  inline DF h_fmov_get (UINT regno) const { return ((NOTBI (current_cpu->h_szbit_get ())) ? (CGEN_CPU_FPU (current_cpu)->ops->fextsfdf (CGEN_CPU_FPU (current_cpu), current_cpu->h_frc_get (regno))) : (((((((regno) & (1))) == (1))) ? (current_cpu->h_xd_get (((regno) & ((~ (1)))))) : (current_cpu->h_dr_get (regno))))); }
+  inline DF h_fmov_get (UINT regno) const { return ((NOTBI (current_cpu->h_szbit_get ())) ? (CGEN_CPU_FPU (current_cpu)->ops->fextsfdf (CGEN_CPU_FPU (current_cpu), FPCONV_DEFAULT, current_cpu->h_frc_get (regno))) : (((((((regno) & (1))) == (1))) ? (current_cpu->h_xd_get (((regno) & ((~ (1)))))) : (current_cpu->h_dr_get (regno))))); }
   inline void h_fmov_set (UINT regno, DF newval) { if (NOTBI (current_cpu->h_szbit_get ())) {
-current_cpu->h_frc_set (regno, CGEN_CPU_FPU (current_cpu)->ops->ftruncdfsf (CGEN_CPU_FPU (current_cpu), newval));
+current_cpu->h_frc_set (regno, CGEN_CPU_FPU (current_cpu)->ops->ftruncdfsf (CGEN_CPU_FPU (current_cpu), FPCONV_DEFAULT, newval));
 } else {
 if (((((regno) & (1))) == (1))) {
 current_cpu->h_xd_set (((regno) & ((~ (1)))), newval);

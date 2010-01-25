@@ -1,6 +1,6 @@
 // cgen-types.h - Types for CGEN-based SID simulators.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2010 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -45,6 +45,18 @@ typedef unsigned long IADDR;
 typedef unsigned long ADDR;
 // Deprecated.
 typedef IADDR PCADDR;  
+
+// Builtin floating point conversion kinds.
+// The values here are defined by cgen.
+
+enum fpconv_kind {
+  FPCONV_DEFAULT = 0,
+  FPCONV_TIES_TO_EVEN = 1,
+  FPCONV_TIES_TO_AWAY = 2,
+  FPCONV_TOWARD_ZERO = 3,
+  FPCONV_TOWARD_POSITIVE = 4,
+  FPCONV_TOWARD_NEGATIVE = 5
+};
 
 } // namespace cgen
 

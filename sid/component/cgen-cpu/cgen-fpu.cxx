@@ -1,7 +1,7 @@
 // cgen-fpu.cxx - CPU components.  -*- C++ -*-
 // CGEN fpu support for SID
 //
-// Copyright (C) 2005 Red Hat.
+// Copyright (C) 2005, 2010 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -230,7 +230,8 @@ int cgen_fp_ops::unordereddf (const cgen_fpu *fpu, DF x, DF y)
 }
 
 /* SF/DF conversion ops */
-DF cgen_fp_ops::fextsfdf (const cgen_fpu *fpu, SF x)
+
+DF cgen_fp_ops::fextsfdf (const cgen_fpu *fpu, int how, SF x)
 {
   fp r (x);
   DF tmp;
@@ -238,7 +239,7 @@ DF cgen_fp_ops::fextsfdf (const cgen_fpu *fpu, SF x)
   return tmp;
 }
 
-SF cgen_fp_ops::ftruncdfsf (const cgen_fpu *fpu, DF x)
+SF cgen_fp_ops::ftruncdfsf (const cgen_fpu *fpu, int how, DF x)
 {
   fp r (x);
   SF tmp;
@@ -246,7 +247,7 @@ SF cgen_fp_ops::ftruncdfsf (const cgen_fpu *fpu, DF x)
   return tmp;
 }
 
-SF cgen_fp_ops::floatsisf (const cgen_fpu* fpu, SI x)
+SF cgen_fp_ops::floatsisf (const cgen_fpu* fpu, int how, SI x)
 {
   fp r = fp::from_int (x);
   check_result (fpu, r);
@@ -255,7 +256,7 @@ SF cgen_fp_ops::floatsisf (const cgen_fpu* fpu, SI x)
   return tmp;
 }
 
-SF cgen_fp_ops::floatdisf (const cgen_fpu *fpu, DI x)
+SF cgen_fp_ops::floatdisf (const cgen_fpu *fpu, int how, DI x)
 {
   fp r = fp::from_int (x);
   check_result (fpu, r);
@@ -265,11 +266,11 @@ SF cgen_fp_ops::floatdisf (const cgen_fpu *fpu, DI x)
 }
 
 #if 0 // not implemented yet
-SF cgen_fp_ops::ufloatsisf (const cgen_fpu*, USI);
-SF cgen_fp_ops::ufloatdisf (const cgen_fpu*, UDI);
+SF cgen_fp_ops::ufloatsisf (const cgen_fpu*, int how, USI);
+SF cgen_fp_ops::ufloatdisf (const cgen_fpu*, int how, UDI);
 #endif // not implemented yet
 
-SI cgen_fp_ops::fixsfsi (const cgen_fpu *fpu, SF x)
+SI cgen_fp_ops::fixsfsi (const cgen_fpu *fpu, int how, SF x)
 {
   fp r (x);
   SI tmp;
@@ -277,7 +278,7 @@ SI cgen_fp_ops::fixsfsi (const cgen_fpu *fpu, SF x)
   return tmp;
 }
 
-DI cgen_fp_ops::fixsfdi (const cgen_fpu *fpu, SF x)
+DI cgen_fp_ops::fixsfdi (const cgen_fpu *fpu, int how, SF x)
 {
   fp r (x);
   DI tmp;
@@ -286,10 +287,11 @@ DI cgen_fp_ops::fixsfdi (const cgen_fpu *fpu, SF x)
 }
 
 #if 0 // not implemented yet
-USI cgen_fp_ops::ufixsfsi (const cgen_fpu*, SF)
-UDI cgen_fp_ops::ufixsfdi (const cgen_fpu*, SF);
+USI cgen_fp_ops::ufixsfsi (const cgen_fpu*, int how, SF);
+UDI cgen_fp_ops::ufixsfdi (const cgen_fpu*, int how, SF);
 #endif
-DF cgen_fp_ops::floatsidf (const cgen_fpu *fpu, SI x)
+
+DF cgen_fp_ops::floatsidf (const cgen_fpu *fpu, int how, SI x)
 {
   fp r = fp::from_int (x);
   check_result (fpu, r);
@@ -298,7 +300,7 @@ DF cgen_fp_ops::floatsidf (const cgen_fpu *fpu, SI x)
   return tmp;
 }
 
-DF cgen_fp_ops::floatdidf (const cgen_fpu *fpu, DI x)
+DF cgen_fp_ops::floatdidf (const cgen_fpu *fpu, int how, DI x)
 {
   fp r = fp::from_int (x);
   check_result (fpu, r);
@@ -308,10 +310,11 @@ DF cgen_fp_ops::floatdidf (const cgen_fpu *fpu, DI x)
 }
 
 #if 0
-DF cgen_fp_ops::ufloatsidf (const cgen_fpu*, USI);
-DF cgen_fp_ops::ufloatdidf (const cgen_fpu*, UDI);
+DF cgen_fp_ops::ufloatsidf (const cgen_fpu*, int how, USI);
+DF cgen_fp_ops::ufloatdidf (const cgen_fpu*, int how, UDI);
 #endif
-SI cgen_fp_ops::fixdfsi (const cgen_fpu *fpu, DF x)
+
+SI cgen_fp_ops::fixdfsi (const cgen_fpu *fpu, int how, DF x)
 {
   fp r (x);
   SI tmp;
@@ -319,7 +322,7 @@ SI cgen_fp_ops::fixdfsi (const cgen_fpu *fpu, DF x)
   return tmp;
 }
 
-DI cgen_fp_ops::fixdfdi (const cgen_fpu *fpu, DF x)
+DI cgen_fp_ops::fixdfdi (const cgen_fpu *fpu, int how, DF x)
 {
   fp r (x);
   DI tmp;
@@ -328,8 +331,8 @@ DI cgen_fp_ops::fixdfdi (const cgen_fpu *fpu, DF x)
 }
 
 #if 0
-USI cgen_fp_ops::ufixdfsi (const cgen_fpu*, DF);
-UDI cgen_fp_ops::ufixdfdi (const cgen_fpu*, DF);
+USI cgen_fp_ops::ufixdfsi (const cgen_fpu*, int how, DF);
+UDI cgen_fp_ops::ufixdfdi (const cgen_fpu*, int how, DF);
 
 /* XF mode support (kept separate 'cus not always present) */
 XF cgen_fp_ops::addxf (const cgen_fpu*, XF, XF);
@@ -352,20 +355,20 @@ int cgen_fp_ops::lexf (const cgen_fpu*, XF, XF);
 int cgen_fp_ops::gtxf (const cgen_fpu*, XF, XF);
 int cgen_fp_ops::gexf (const cgen_fpu*, XF, XF);
 
-XF cgen_fp_ops::extsfxf (const cgen_fpu*, SF);
-XF cgen_fp_ops::extdfxf (const cgen_fpu*, DF);
-SF cgen_fp_ops::truncxfsf (const cgen_fpu*, XF);
-DF cgen_fp_ops::truncxfdf (const cgen_fpu*, XF);
+XF cgen_fp_ops::extsfxf (const cgen_fpu*, int how, SF);
+XF cgen_fp_ops::extdfxf (const cgen_fpu*, int how, DF);
+SF cgen_fp_ops::truncxfsf (const cgen_fpu*, int how, XF);
+DF cgen_fp_ops::truncxfdf (const cgen_fpu*, int how, XF);
 
-XF cgen_fp_ops::floatsixf (const cgen_fpu*, SI);
-XF cgen_fp_ops::floatdixf (const cgen_fpu*, DI);
-XF cgen_fp_ops::ufloatsixf (const cgen_fpu*, USI);
-XF cgen_fp_ops::ufloatdixf (const cgen_fpu*, UDI);
+XF cgen_fp_ops::floatsixf (const cgen_fpu*, int how, SI);
+XF cgen_fp_ops::floatdixf (const cgen_fpu*, int how, DI);
+XF cgen_fp_ops::ufloatsixf (const cgen_fpu*, int how, USI);
+XF cgen_fp_ops::ufloatdixf (const cgen_fpu*, int how, UDI);
 
-SI cgen_fp_ops::fixxfsi (const cgen_fpu*, XF);
-DI cgen_fp_ops::fixxfdi (const cgen_fpu*, XF);
-USI cgen_fp_ops::ufixxfsi (const cgen_fpu*, XF);
-UDI cgen_fp_ops::ufixxfdi (const cgen_fpu*, XF);
+SI cgen_fp_ops::fixxfsi (const cgen_fpu*, int how, XF);
+DI cgen_fp_ops::fixxfdi (const cgen_fpu*, int how, XF);
+USI cgen_fp_ops::ufixxfsi (const cgen_fpu*, int how, XF);
+UDI cgen_fp_ops::ufixxfdi (const cgen_fpu*, int how, XF);
 
 /* TF mode support (kept separate 'cus not always present) */
 TF cgen_fp_ops::addtf (const cgen_fpu*, TF, TF);
@@ -388,20 +391,20 @@ int cgen_fp_ops::letf (const cgen_fpu*, TF, TF);
 int cgen_fp_ops::gttf (const cgen_fpu*, TF, TF);
 int cgen_fp_ops::getf (const cgen_fpu*, TF, TF);
 
-TF cgen_fp_ops::extsftf (const cgen_fpu*, SF);
-TF cgen_fp_ops::extdftf (const cgen_fpu*, DF);
-SF cgen_fp_ops::trunctfsf (const cgen_fpu*, TF);
-DF cgen_fp_ops::trunctfdf (const cgen_fpu*, TF);
+TF cgen_fp_ops::extsftf (const cgen_fpu*, int how, SF);
+TF cgen_fp_ops::extdftf (const cgen_fpu*, int how, DF);
+SF cgen_fp_ops::trunctfsf (const cgen_fpu*, int how, TF);
+DF cgen_fp_ops::trunctfdf (const cgen_fpu*, int how, TF);
 
-TF cgen_fp_ops::floatsitf (const cgen_fpu*, SI);
-TF cgen_fp_ops::floatditf (const cgen_fpu*, DI);
-TF cgen_fp_ops::ufloatsitf (const cgen_fpu*, USI);
-TF cgen_fp_ops::ufloatditf (const cgen_fpu*, UDI);
+TF cgen_fp_ops::floatsitf (const cgen_fpu*, int how, SI);
+TF cgen_fp_ops::floatditf (const cgen_fpu*, int how, DI);
+TF cgen_fp_ops::ufloatsitf (const cgen_fpu*, int how, USI);
+TF cgen_fp_ops::ufloatditf (const cgen_fpu*, int how, UDI);
 
-SI cgen_fp_ops::fixtfsi (const cgen_fpu*, TF);
-DI cgen_fp_ops::fixtfdi (const cgen_fpu*, TF);
-USI cgen_fp_ops::ufixtfsi (const cgen_fpu*, TF);
-UDI cgen_fp_ops::ufixtfdi (const cgen_fpu*, TF);
+SI cgen_fp_ops::fixtfsi (const cgen_fpu*, int how, TF);
+DI cgen_fp_ops::fixtfdi (const cgen_fpu*, int how, TF);
+USI cgen_fp_ops::ufixtfsi (const cgen_fpu*, int how, TF);
+UDI cgen_fp_ops::ufixtfdi (const cgen_fpu*, int how, TF);
 #endif // not implemented yet
 
 }; // namespace cgen 

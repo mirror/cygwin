@@ -1,3 +1,12 @@
+2010-01-24  Doug Evans  <dje@sebabeach.org>
+
+	* sh.cxx (sh64_fldi0): Update call to floating point convertion func.
+	(sh64_fldi1, sh64_fcnvds, sh64_fcnvsd, sh64_floatld, sh64_floatls,
+	sh64_floatqd, sh64_floatqs, sh64_ftrcdl, sh64_ftrcsl, sh64_ftrcdq,
+	sh64_ftrcsq, sh64_ftrvs): Ditto.
+	* sh2a-fpu-cpu.h, * sh2e-cpu.h, * sh3e-cpu.h, * sh4-cpu.h,
+	* sh4a-cpu.h, * sh5-cpu.h: Regenerate.
+
 2010-01-02  Doug Evans  <dje@sebabeach.org>
 
 	* sh-desc.h, * sh2-cpu.h, * sh2-decode.cxx, * sh2-decode.h,

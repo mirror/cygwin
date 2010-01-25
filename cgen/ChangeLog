@@ -1,5 +1,19 @@
 2010-01-24  Doug Evans  <dje@sebabeach.org>
 
+	* desc-cpu.scm (cgen-desc.h): Don't print virtual enums.
+	* sid-cpu.scm (cgen-desc.h): Ditto.
+	* enum.scm (enum-builtin!): New function.
+	* read.scm (reader-install-builtin!): Call it.
+	* rtl-c.scm (s-convop): Delete, replaced with ...
+	(s-int-convop, s-float-convop): ... new fns.
+	(ext, zext, trunc): Update.
+	(fext, ftrunc, float, ufloat, fix, ufix): Update.
+	* rtx-funcs.scm (fext, ftrunc, float, ufloat, fix, ufix): New parameter
+	`how'.
+	* cpu/mep-fmax.cpu (fcvtsw): Update.
+	* cpu/sh.cpu (h-fsd, h-fmov): Update.
+	* doc/rtl.texi (float-convop): Update.
+
 	* gen-all: Be more consistent with intrinsic generation.
 
 	* utils-cgen.scm (<location>): Define using new define-class.

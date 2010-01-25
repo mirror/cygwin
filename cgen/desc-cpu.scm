@@ -976,8 +976,13 @@ init_tables (void)
    ;		  "MODEL_"
    ;		  (append (map list (map obj:name (current-model-list))) '((max))))
    ;"#define MAX_MODELS ((int) MODEL_MAX)\n\n"
-   "/* Enums.  */\n\n"
-   (string-map gen-decl (current-enum-list))
+   (let ((enums (find (lambda (obj) (not (obj-has-attr? obj 'VIRTUAL)))
+		      (current-enum-list))))
+     (if (null? enums)
+	 ""
+	 (string-list
+	  "/* Enums.  */\n\n"
+	  (string-map gen-decl enums))))
    "/* Attributes.  */\n\n"
    (string-map gen-decl (current-attr-list))
    "/* Number of architecture variants.  */\n"

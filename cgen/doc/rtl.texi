@@ -2777,8 +2777,18 @@ Truncate @samp{operand}, which must have an integer mode
 wider than @samp{mode}, which also must be an integer mode.
 @end itemize
 
-@item (float-convop mode operand)
+@item (float-convop mode how operand)
 Perform a mode->mode conversion operation involving a floating point value.
+
+Conversions involving floating point values need to specify
+how things like truncation will be performed, e.g., the rounding mode.
+@samp{how} is an rtx of mode @samp{INT} that specifies how the conversion
+will be performed.  The interpretation of @samp{how} is architecture-dependent,
+except that a value of zero has a specific meaning:
+If a particular floating-point conversion can only be done one way,
+or if the conversion is to be done the ``default'' way, specify zero
+for @samp{how}.
+What ``the default way'' is is application-dependent.
 
 @samp{float-convop} is one of:
 
@@ -2804,6 +2814,23 @@ to a signed integer of mode @samp{mode}.
 Convert @samp{operand}, which must have a floating point mode,
 to an unsigned integer of mode @samp{mode}.
 @end itemize
+
+An enum is defined that specifies several predefined rounding modes.
+
+@smallexample
+(define-enum
+  (name fpconv-kind)
+  (comment "builtin floating point conversion kinds")
+  (attrs VIRTUAL) ;; let app provide def'n instead of each cpu's desc.h
+  (prefix FPCONV-)
+  (values ((DEFAULT 0)
+           (TIES-TO-EVEN 1)
+           (TIES-TO-AWAY 2)
+           (TOWARD-ZERO 3)
+           (TOWARD-POSITIVE 4)
+           (TOWARD-NEGATIVE 5)))
+)
+@end smallexample
 
 @item (cmpop mode operand1 operand2)
 Perform a comparison.

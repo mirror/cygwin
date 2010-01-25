@@ -941,7 +941,7 @@
 ;     ...
 ;)
 
-; Conversions.
+;; Integer conversions.
 
 (drn (ext &options &mode s1)
      #f
@@ -961,39 +961,42 @@
      UNARY
      #f
 )
-(drn (fext &options &mode s1)
+
+;; Conversions involving floating point values.
+
+(drn (fext &options &mode how s1)
      #f
-     (OPTIONS ANYFLOATMODE RTX) (NA NA ANY)
+     (OPTIONS ANYFLOATMODE RTX RTX) (NA NA INT ANY)
      UNARY
      #f
 )
-(drn (ftrunc &options &mode s1)
+(drn (ftrunc &options &mode how s1)
      #f
-     (OPTIONS ANYFLOATMODE RTX) (NA NA ANY)
+     (OPTIONS ANYFLOATMODE RTX RTX) (NA NA INT ANY)
      UNARY
      #f
 )
-(drn (float &options &mode s1)
+(drn (float &options &mode how s1)
      #f
-     (OPTIONS ANYFLOATMODE RTX) (NA NA ANY)
+     (OPTIONS ANYFLOATMODE RTX RTX) (NA NA INT ANY)
      UNARY
      #f
 )
-(drn (ufloat &options &mode s1)
+(drn (ufloat &options &mode how s1)
      #f
-     (OPTIONS ANYFLOATMODE RTX) (NA NA ANY)
+     (OPTIONS ANYFLOATMODE RTX RTX) (NA NA INT ANY)
      UNARY
      #f
 )
-(drn (fix &options &mode s1)
+(drn (fix &options &mode how s1)
      #f
-     (OPTIONS ANYINTMODE RTX) (NA NA ANY)
+     (OPTIONS ANYINTMODE RTX RTX) (NA NA INT ANY)
      UNARY
      #f
 )
-(drn (ufix &options &mode s1)
+(drn (ufix &options &mode how s1)
      #f
-     (OPTIONS ANYINTMODE RTX) (NA NA ANY)
+     (OPTIONS ANYINTMODE RTX RTX) (NA NA INT ANY)
      UNARY
      #f
 )

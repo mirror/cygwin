@@ -938,6 +938,7 @@ Define a preprocessor-style macro.
 (define (reader-install-builtin!)
   ; The order here is important.
   (attr-builtin!)
+  (enum-builtin!)
   (mode-builtin!)
   (ifield-builtin!)
   (hardware-builtin!)

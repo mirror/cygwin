@@ -85,8 +85,13 @@
 namespace @arch@ {
 \n"
 
-   "// Enums.\n\n"
-   (lambda () (string-map gen-decl (current-enum-list)))
+   (let ((enums (find (lambda (obj) (not (obj-has-attr? obj 'VIRTUAL)))
+		      (current-enum-list))))
+     (if (null? enums)
+	 ""
+	 (string-list
+	  "// Enums.\n\n"
+	  (string-map gen-decl enums))))
 
    /gen-attr-decls
    /gen-insn-attr-decls

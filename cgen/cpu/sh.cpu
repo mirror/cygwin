@@ -1249,11 +1249,11 @@
   (type register DF (16))
   (indices keyword "" (.map -build-freg-name (.iota 16)))
   (get (index)
-       (if DF prbit (reg h-drc index) (fext DF (reg h-fr index))))
+       (if DF prbit (reg h-drc index) (fext DF FPCONV-DEFAULT (reg h-fr index))))
   (set (index newval)
        (if prbit
 	   (set (reg h-drc index) newval)
-	   (set (reg h-frc index) (ftrunc SF newval))))
+	   (set (reg h-frc index) (ftrunc SF FPCONV-DEFAULT newval))))
 )
 
 (define-pmacro (even x) (eq (and x 1) 0))
@@ -1269,7 +1269,7 @@
   (get (index)
        (if DF (not szbit)
 	   ; single precision operation
-	   (fext DF (reg h-frc index))
+	   (fext DF FPCONV-DEFAULT (reg h-frc index))
 	   ; double or extended operation
 	   (if DF (extd index)
 	       (reg h-xd (and index (inv 1)))
@@ -1277,7 +1277,7 @@
   (set (index newval)
        (if (not szbit)
 	   ; single precision operation
-	   (set (reg h-frc index) (ftrunc SF newval))
+	   (set (reg h-frc index) (ftrunc SF FPCONV-DEFAULT newval))
 	   ; double or extended operation
 	   (if (extd index)
 	       (set (reg h-xd (and index (inv 1))) newval)

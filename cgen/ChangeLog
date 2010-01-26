@@ -1,3 +1,7 @@
+2010-01-25  Doug Evans  <dje@sebabeach.org>
+
+	* co-for-gen-all: Simplify a bit.
+
 2010-01-24  Doug Evans  <dje@sebabeach.org>
 
 	* desc-cpu.scm (cgen-desc.h): Don't print virtual enums.

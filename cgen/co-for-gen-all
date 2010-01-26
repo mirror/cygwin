@@ -11,40 +11,40 @@ id=$1
 
 rm -f co-gcc.log
 svn co svn+ssh://${id}@gcc.gnu.org/svn/gcc/trunk gcc >& co-gcc.log
-grep "^U " co-gcc.log
-grep "^[AMC] " co-gcc.log
 
 rm -f co-binutils.log
 cvs -d :ext:${id}@sourceware.org:/cvs/src co binutils >& co-binutils.log
-grep "^U " co-binutils.log
-grep "^[AMC] " co-binutils.log
 
 rm -f co-cgen.log
 cvs -d :ext:${id}@sourceware.org:/cvs/src co naked-cgen >& co-cgen.log
-grep "^U " co-cgen.log
-grep "^[AMC] " co-cgen.log
 
 rm -f co-sid.log
 sid_modules="naked-sid naked-tcl naked-tk"
 cvs -d :ext:${id}@sourceware.org:/cvs/src co ${sid_modules} >& co-sid.log
-grep "^U " co-sid.log
-grep "^[AMC] " co-sid.log
 
 rm -f co-gdb.log
 gdb_modules="naked-gdb naked-sim naked-readline naked-libdecnumber"
 cvs -d :ext:${id}@sourceware.org:/cvs/src co ${gdb_modules} >& co-gdb.log
-grep "^U " co-gdb.log
-grep "^[AMC] " co-gdb.log
 
 rm -f co-newlib.log
 newlib_modules="naked-newlib naked-libgloss"
 cvs -d :ext:${id}@sourceware.org:/cvs/src co ${dejagnu_modules} >& co-newlib.log
-grep "^U " co-newlib.log
-grep "^[AMC] " co-newlib.log
 
 # dejagnu is gone from sourceware
 #rm -f co-dejagnu.log
 #dejagnu_modules="naked-dejagnu naked-expect"
 #cvs -d :ext:${id}@sourceware.org:/cvs/src co ${dejagnu_modules} >& co-dejagnu.log
-#grep "^U " co-dejagnu.log
-#grep "^[AMC] " co-dejagnu.log
+
+for pkg in gcc binutils cgen sid gdb newlib
+do
+    echo "-------------------"
+    echo "Updated in $pkg ..."
+    grep "^U " co-${pkg}.log
+done
+
+for pkg in gcc binutils cgen sid gdb newlib
+do
+    echo "-------------------"
+    echo "New/modified in $pkg ..."
+    grep "^[AMC] " co-${pkg}.log
+done

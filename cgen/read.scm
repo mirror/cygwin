@@ -1,77 +1,77 @@
-; Top level file for reading and recording .cpu file contents.
-; Copyright (C) 2000, 2001, 2006, 2009, 2010 Red Hat, Inc.
-; This file is part of CGEN.
-; See file COPYING.CGEN for details.
+;; Top level file for reading and recording .cpu file contents.
+;; Copyright (C) 2000, 2001, 2006, 2009, 2010 Red Hat, Inc.
+;; This file is part of CGEN.
+;; See file COPYING.CGEN for details.
 
-; This file [and its subordinates] contain no C code (well, as little as
-; possible).  That lives at a layer above us.
+;; This file [and its subordinates] contain no C code (well, as little as
+;; possible).  That lives at a layer above us.
 
-; A .cpu file consists of several sections:
-;
-; - basic definitions (e.g. cpu variants, word size, endianness, etc.)
-; - enums (enums are used throughout so by convention there is a special
-;   section in which they're defined)
-; - attributes
-; - instruction fields and formats
-; - hardware descriptions (e.g. registers, allowable immediate values)
-; - model descriptions (e.g. pipelines, latencies, etc.)
-; - instruction operands (mapping of insn fields to associated hardware)
-; - instruction definitions
-; - macro instruction definitions
+;; A .cpu file consists of several sections:
+;;
+;; - basic definitions (e.g. cpu variants, word size, endianness, etc.)
+;; - enums (enums are used throughout so by convention there is a special
+;;   section in which they're defined)
+;; - attributes
+;; - instruction fields and formats
+;; - hardware descriptions (e.g. registers, allowable immediate values)
+;; - model descriptions (e.g. pipelines, latencies, etc.)
+;; - instruction operands (mapping of insn fields to associated hardware)
+;; - instruction definitions
+;; - macro instruction definitions
 
-; TODO:
-; - memory access, layout, etc.
-; - floating point quirks
-; - ability to describe an ABI
-; - anything else that comes along
+;; TODO:
+;; - memory access, layout, etc.
+;; - floating point quirks
+;; - ability to describe an ABI
+;; - anything else that comes along
 
-; Notes:
-; - by convention most objects are subclasses of <ident> (having name, comment,
-;   and attrs elements and they are the first three elements of any .cpu file
-;   entry
+;; Notes:
+;; - by convention most objects are subclasses of <ident> (having name, comment,
+;;   and attrs elements and they are the first three elements of any .cpu file
+;;   entry
 
-; Guidelines:
-; - Try to conform to R5RS, try to limit guile-ness.
-;   The current code is undoubtedly off in many places.
+;; Guidelines:
+;; - Try to conform to R5RS, try to limit guile-ness.
+;;   The current code is undoubtedly off in many places.
 
-; Conventions:
-; [I want there to be a plethora of conventions and I want them strictly
-; adhered to.  ??? There's probably a few violations here and there.
-; No big deal - fix them!]
-; These conventions are subject to revision.
-;
-; - procs/vars local to a file are named "-foo"
-; - only routines that emit application code begin with "gen-"
-; - symbols beginning with "c-" are either variables containing C code
-;   or procedures that generate C code, similarily for C++ and "c++-"
-; - variables containing C code begin with "c-"
-; - only routines that emit an entire file begin with "cgen-"
-; - all .cpu file elements shall have -foo-parse and -foo-read procedures
-; - global vars containing class definitions shall be named "<class-name>"
-; - procs related to a particular class shall be named "class-name-proc-name",
-;   class-name may be abbreviated
-; - procs that test whether something is an object of a particular class
-;   shall be named "class-name?"
-; - in keeping with Scheme conventions, predicates shall have a "?" suffix
-; - in keeping with Scheme conventions, methods and procedures that modify an
-;   argument or have other side effects shall have a "!" suffix,
-;   usually these procs return "*UNSPECIFIED*"
-; - all -foo-parse,parse-foo procs shall have `context' as the first arg
-;   [FIXME: not all such procs have been converted]
-; - stay away from non-portable C symbols.
+;; Conventions:
+;; [I want there to be a plethora of conventions and I want them strictly
+;; adhered to.  ??? There's probably a few violations here and there.
+;; No big deal - fix them!]
+;; These conventions are subject to revision.
+;;
+;; - procs/vars local to a file are named "-foo"
+;; - only routines that emit application code begin with "gen-"
+;; - symbols beginning with "c-" are either variables containing C code
+;;   or procedures that generate C code, similarily for C++ and "c++-"
+;; - variables containing C code begin with "c-"
+;; - only routines that emit an entire file begin with "cgen-"
+;; - all .cpu file elements shall have -foo-parse and -foo-read procedures
+;; - global vars containing class definitions shall be named "<class-name>"
+;; - procs related to a particular class shall be named "class-name-proc-name",
+;;   class-name may be abbreviated
+;; - procs that test whether something is an object of a particular class
+;;   shall be named "class-name?"
+;; - in keeping with Scheme conventions, predicates shall have a "?" suffix
+;; - in keeping with Scheme conventions, methods and procedures that modify an
+;;   argument or have other side effects shall have a "!" suffix,
+;;   usually these procs return "*UNSPECIFIED*"
+;; - all -foo-parse,parse-foo procs shall have `context' as the first arg
+;;   [FIXME: not all such procs have been converted]
+;; - stay away from non-portable C symbols.
 
-; Variables representing misc. global constants.
+;; Variables representing misc. global constants.
 
-; A list of three numbers designating the cgen version: major minor fixlevel.
-; The "50" is a generic indicator that we're between 1.1 and 1.2.
+;; A list of three numbers designating the cgen version: major minor fixlevel.
+;; The "50" is a generic indicator that we're between 1.1 and 1.2.
 (define /CGEN-VERSION '(1 1 50))
 (define (cgen-major) (car /CGEN-VERSION))
 (define (cgen-minor) (cadr /CGEN-VERSION))
 (define (cgen-fixlevel) (caddr /CGEN-VERSION))
 
-; A list of two numbers designating the description language version.
-; Note that this is different from /CGEN-VERSION.
-; See section "RTL Versions" of the docs.
+;; A list of two numbers designating the description language version.
+;; Note that this is different from /CGEN-VERSION.
+;; See section "RTL Versions" of the docs.
 (define /CGEN-RTL-VERSION #f)
 (define /default-rtl-version '(0 7))
 (define (cgen-rtl-version) /CGEN-RTL-VERSION)
@@ -110,8 +110,8 @@
     (set! /CGEN-RTL-VERSION new-version))
 )
 
-; Which application is in use (UNKNOWN, DESC, OPCODES, SIMULATOR, ???).
-; This is mostly for descriptive purposes.
+;; Which application is in use (UNKNOWN, DESC, OPCODES, SIMULATOR, ???).
+;; This is mostly for descriptive purposes.
 (define APPLICATION 'UNKNOWN)
 
 ;; Load the base cgen files.
@@ -120,9 +120,9 @@
 (load "cos")
 (load "slib/logical")
 (load "slib/sort")
-; Used to pretty-print debugging messages.
+;; Used to pretty-print debugging messages.
 (load "slib/pp")
-; Used by pretty-print.
+;; Used by pretty-print.
 (load "slib/random")
 (load "slib/genwrite")
 (load "utils")
@@ -150,21 +150,21 @@
 (load "utils-gen")
 (load "pgmr-tools")
 
-; Reader state data.
-; All state regarding the reading of a .cpu file is kept in an object of
-; class <reader>.
+;; Reader state data.
+;; All state regarding the reading of a .cpu file is kept in an object of
+;; class <reader>.
 
-; Class to record info for each top-level `command' (for lack of a better
-; word) in the description file.
-; Top level commands are things like define-*.
+;; Class to record info for each top-level `command' (for lack of a better
+;; word) in the description file.
+;; Top level commands are things like define-*.
 
 (define <command>
   (class-make '<command>
 	      '(<ident>)
 	      '(
-		; argument spec to `lambda'
+		;; argument spec to `lambda'
 		arg-spec
-		; lambda that processes the entry
+		;; lambda that processes the entry
 		handler
 		)
 	      nil)
@@ -173,7 +173,7 @@
 (define command-arg-spec (elm-make-getter <command> 'arg-spec))
 (define command-handler (elm-make-getter <command> 'handler))
 
-; Return help text for COMMAND.
+;; Return help text for COMMAND.
 
 (define (command-help cmd)
   (string-append
@@ -183,58 +183,58 @@
    "\n")
 )
 
-; A pair of two lists: machs to keep, machs to drop.
-; The default is "keep all machs", "drop none".
+;; A pair of two lists: machs to keep, machs to drop.
+;; The default is "keep all machs", "drop none".
 
 (define /keep-all-machs '((all)))
 
-; Main reader state class.
+;; Main reader state class.
 
 (define <reader>
   (class-make '<reader>
 	      nil
 	      (list
-	       ; Selected machs to keep.
-	       ; A pair of two lists: the car lists the machs to keep, the cdr
-	       ; lists the machs to drop.  Two special entries are `all' and
-	       ; `base'.  Both are only valid in the keep list.  `base' is a
-	       ; place holder for objects that are common to all machine
-	       ; variants in the architecture, it is the default value of the
-	       ; MACH attribute.  If `all' is present the drop list is still
-	       ; processed.
+	       ;; Selected machs to keep.
+	       ;; A pair of two lists: the car lists the machs to keep, the cdr
+	       ;; lists the machs to drop.  Two special entries are `all' and
+	       ;; `base'.  Both are only valid in the keep list.  `base' is a
+	       ;; place holder for objects that are common to all machine
+	       ;; variants in the architecture, it is the default value of the
+	       ;; MACH attribute.  If `all' is present the drop list is still
+	       ;; processed.
 	       (cons 'keep-mach /keep-all-machs)
 
-	       ; Selected isas to keep or `all'.
+	       ;; Selected isas to keep or `all'.
 	       '(keep-isa . (all))
 
-	       ; Boolean indicating if command tracing is on.
+	       ;; Boolean indicating if command tracing is on.
 	       (cons 'trace-commands? #f)
 
-	       ; Boolean indicating if pmacro tracing is on.
+	       ;; Boolean indicating if pmacro tracing is on.
 	       (cons 'trace-pmacros? #f)
 
-	       ; Issue diagnostics for instruction format issues.
+	       ;; Issue diagnostics for instruction format issues.
 	       (cons 'verify-iformat? #f)
 
-	       ; Currently select cpu family, computed from `keep-mach'.
-	       ; Some applications don't care, and this is moderately
-	       ; expensive to compute so we use delay/force.
+	       ;; Currently select cpu family, computed from `keep-mach'.
+	       ;; Some applications don't care, and this is moderately
+	       ;; expensive to compute so we use delay/force.
 	       'current-cpu
 
-	       ; Associative list of file entry commands
-	       ; (e.g. define-insn, etc.).
-	       ; Each entry is (name . command-object).
+	       ;; Associative list of file entry commands
+	       ;; (e.g. define-insn, etc.).
+	       ;; Each entry is (name . command-object).
 	       (cons 'commands nil)
 
-	       ; The current source location.
-	       ; This is recorded here by the higher level reader and is
-	       ; fetched by commands as necessary.
+	       ;; The current source location.
+	       ;; This is recorded here by the higher level reader and is
+	       ;; fetched by commands as necessary.
 	       'location
 	       )
 	      nil)
 )
 
-; Accessors.
+;; Accessors.
 
 (define-getters <reader> reader
   (keep-mach keep-isa
@@ -257,12 +257,12 @@
   (assq-ref (reader-commands CURRENT-READER) name)
 )
 
-; Reader state for current .cpu file.
+;; Reader state for current .cpu file.
 
 (define CURRENT-READER #f)
 
-; Return the current source location in readable form.
-; FIXME: Currently unused, keep for reference for awhile.
+;; Return the current source location in readable form.
+;; FIXME: Currently unused, keep for reference for awhile.
 
 (define (/readable-current-location)
   (let ((loc (current-reader-location)))
@@ -347,10 +347,10 @@
 		     (if (null? maybe-help-text) #f (car maybe-help-text)))
 )
 
-; Return the current source location.
-;
-; If CURRENT-READER is uninitialized, return "unspecified" location.
-; This is done so that things like define-pmacro work in interactive mode.
+;; Return the current source location.
+;;
+;; If CURRENT-READER is uninitialized, return "unspecified" location.
+;; This is done so that things like define-pmacro work in interactive mode.
 
 (define (current-reader-location)
   (if CURRENT-READER
@@ -358,7 +358,7 @@
       (unspecified-location))
 )
 
-; Process a macro-expanded entry.
+;; Process a macro-expanded entry.
 
 (define (/reader-process-expanded-1! entry)
   (let ((location (location-property entry)))
@@ -431,17 +431,17 @@
   *UNSPECIFIED*
 )
 
-; Process file entry ENTRY.
-; LOC is a <location> object for ENTRY.
+;; Process file entry ENTRY.
+;; LOC is a <location> object for ENTRY.
 
 (define (/reader-process! entry loc)
   (if (not (form? entry))
       (parse-error loc "improperly formed entry" entry))
 
-  ; First do macro expansion, but not if define-pmacro of course.
-  ; ??? Singling out define-pmacro this way seems a bit odd.  The way to look
-  ; at it, I guess, is to think of define-pmacro as (currently) the only
-  ; "syntactic" command (it doesn't pre-evaluate its arguments).
+  ;; First do macro expansion, but not if define-pmacro of course.
+  ;; ??? Singling out define-pmacro this way seems a bit odd.  The way to look
+  ;; at it, I guess, is to think of define-pmacro as (currently) the only
+  ;; "syntactic" command (it doesn't pre-evaluate its arguments).
   (let ((expansion (if (eq? (car entry) 'define-pmacro)
 		       (begin (location-property-set! entry loc) entry)
 		       (if (reader-trace-pmacros? CURRENT-READER)
@@ -452,17 +452,17 @@
   *UNSPECIFIED*
 )
 
-; Read in and process FILE.
-;
-; It would be nice to get the line number of the beginning of the object,
-; but that's extra work, so for now we do the simple thing and use
-; port-line after we've read an entry.
+;; Read in and process FILE.
+;;
+;; It would be nice to get the line number of the beginning of the object,
+;; but that's extra work, so for now we do the simple thing and use
+;; port-line after we've read an entry.
 
 (define (reader-read-file! file)
   (let ((readit (lambda ()
 		  (let loop ((entry (read)))
 		    (if (eof-object? entry)
-			#t ; done
+			#t ;; done
 			(begin
 			  ;; ??? The location we pass here isn't ideal.
 			  ;; Ideally we'd pass the start location of the
@@ -479,33 +479,33 @@
   *UNSPECIFIED*
 )
 
-; Cpu data is recorded in an object of class <arch>.
-; This is necessary as we need to allow recording of multiple cpu descriptions
-; simultaneously.
-; Class <arch> is defined in mach.scm.
+;; Cpu data is recorded in an object of class <arch>.
+;; This is necessary as we need to allow recording of multiple cpu descriptions
+;; simultaneously.
+;; Class <arch> is defined in mach.scm.
 
-; Global containing all data of the currently selected architecture.
+;; Global containing all data of the currently selected architecture.
 
 (define CURRENT-ARCH #f)
 
-; `keep-mach' processing.
+;; `keep-mach' processing.
 
-; Return the currently selected cpu family.
-; If a specific cpu family has been selected, each machine that is kept must
-; be in that cpu family [so there's no ambiguity in the result].
-; This is a moderately expensive computation so use delay/force.
+;; Return the currently selected cpu family.
+;; If a specific cpu family has been selected, each machine that is kept must
+;; be in that cpu family [so there's no ambiguity in the result].
+;; This is a moderately expensive computation so use delay/force.
 
 (define (current-cpu) (force (reader-current-cpu CURRENT-READER)))
 
-; Return a boolean indicating if CPU-NAME is to be kept.
-; ??? Currently this is always true.  Note that this doesn't necessarily apply
-; to machs in CPU-NAME.
+;; Return a boolean indicating if CPU-NAME is to be kept.
+;; ??? Currently this is always true.  Note that this doesn't necessarily apply
+;; to machs in CPU-NAME.
 
 (define (keep-cpu? cpu-name) #t)
 
-; Cover proc to set `keep-mach'.
-; MACH-NAME-LIST is a comma separated string of machines to keep and drop
-; (if prefixed with !).
+;; Cover proc to set `keep-mach'.
+;; MACH-NAME-LIST is a comma separated string of machines to keep and drop
+;; (if prefixed with !).
 
 (define (/keep-mach-set! mach-name-list)
   (let* ((mach-name-list (string-cut mach-name-list #\,))
@@ -517,7 +517,7 @@
     (reader-set-keep-mach! CURRENT-READER
 			   (cons (map string->symbol keep)
 				 (map string->symbol drop)))
-    ; Reset current-cpu.
+    ;; Reset current-cpu.
     (reader-set-current-cpu!
      CURRENT-READER
      (delay (let ((selected-machs (find (lambda (mach)
@@ -535,8 +535,8 @@
     *UNSPECIFIED*)
 )
 
-; Validate the user-provided keep-mach list against the list of machs
-; specified in the .cpu file (in define-arch).
+;; Validate the user-provided keep-mach list against the list of machs
+;; specified in the .cpu file (in define-arch).
 
 (define (keep-mach-validate!)
   (let ((mach-names (cons 'all (current-arch-mach-name-list)))
@@ -553,10 +553,10 @@
   *UNSPECIFIED*
 )
 
-; Return #t if a machine in MACH-LIST, a list of symbols, is to be kept.
-; If any machine in MACH-LIST is to be kept, the result is #t.
-; If MACH-LIST is the empty list (no particular mach specified, thus the base
-; mach), the result is #t.
+;; Return #t if a machine in MACH-LIST, a list of symbols, is to be kept.
+;; If any machine in MACH-LIST is to be kept, the result is #t.
+;; If MACH-LIST is the empty list (no particular mach specified, thus the base
+;; mach), the result is #t.
 
 (define (keep-mach? mach-list)
   (if (null? mach-list)
@@ -568,38 +568,38 @@
 	     (all? (memq 'all keep))
 	     (drop? (map (lambda (m) (memq m drop)) mach-list)))
 	(any-true? (map (lambda (k d)
-			  ; keep if K(ept) or ALL? and not D(ropped)
+			  ;; keep if K(ept) or ALL? and not D(ropped)
 			  (->bool (and (or k all?) (not d))))
 			keep? drop?))))
 )
 
-; Return non-#f if the object containing ATLIST is to be kept.
-; OBJ is the container object or #f if there is none.
-; The object is kept if its attribute list specifies a `MACH' that is
-; kept (and not dropped) or does not have the `MACH' attribute (which means
-; it has the default value which means it's for use with all machines).
+;; Return non-#f if the object containing ATLIST is to be kept.
+;; OBJ is the container object or #f if there is none.
+;; The object is kept if its attribute list specifies a `MACH' that is
+;; kept (and not dropped) or does not have the `MACH' attribute (which means
+;; it has the default value which means it's for use with all machines).
 
 (define (keep-mach-atlist? atlist obj)
-  ; The MACH attribute is not created until the .cpu file is read in which
-  ; is too late for us [we will get called for builtin objects].
-  ; Thus we peek inside the attribute list directly.
-  ; ??? Maybe postpone creation of builtins until after define-arch?
+  ;; The MACH attribute is not created until the .cpu file is read in which
+  ;; is too late for us [we will get called for builtin objects].
+  ;; Thus we peek inside the attribute list directly.
+  ;; ??? Maybe postpone creation of builtins until after define-arch?
   (let ((machs (atlist-attr-value-no-default atlist 'MACH obj)))
     (if (null? machs)
 	#t
 	(keep-mach? machs)))
 )
 
-; Return a boolean indicating if the object containing ATLIST is to be kept.
-; OBJ is the container object or #f if there is none.
-; The object is kept if both its isa and its mach are kept.
+;; Return a boolean indicating if the object containing ATLIST is to be kept.
+;; OBJ is the container object or #f if there is none.
+;; The object is kept if both its isa and its mach are kept.
 
 (define (keep-atlist? atlist obj)
   (and (keep-mach-atlist? atlist obj)
        (keep-isa-atlist? atlist obj))
 )
 
-; Return a boolean indicating if multiple cpu families are being kept.
+;; Return a boolean indicating if multiple cpu families are being kept.
 
 (define (keep-multiple?)
   (let ((selected-machs (find (lambda (mach)
@@ -611,14 +611,14 @@
 			 selected-machs))))
 )
 
-; Return a boolean indicating if everything is kept.
+;; Return a boolean indicating if everything is kept.
 
 (define (keep-all?)
   (equal? (reader-keep-mach CURRENT-READER) /keep-all-machs)
 )
 
-; Ensure all cpu families were kept, necessary for generating files that
-; encompass the entire architecture.
+;; Ensure all cpu families were kept, necessary for generating files that
+;; encompass the entire architecture.
 
 (define (assert-keep-all)
   (if (not (keep-all?))
@@ -626,8 +626,8 @@
   *UNSPECIFIED*
 )
 
-; Ensure exactly one cpu family was kept, necessary for generating files that
-; are specific to one cpu family.
+;; Ensure exactly one cpu family was kept, necessary for generating files that
+;; are specific to one cpu family.
 
 (define (assert-keep-one)
   (if (keep-multiple?)
@@ -635,14 +635,14 @@
   *UNSPECIFIED*
 )
 
-; `keep-isa' processing.
+;; `keep-isa' processing.
 
-; Cover proc to set `keep-isa'.
-; ISA-NAME-LIST is a comma separated string of isas to keep.
-; ??? We don't support the !drop notation of keep-mach processing.
-; Perhaps we should as otherwise there are two different styles the user
-; has to remember.  On the other hand, !drop support is moderately complicated,
-; and it can be added in an upward compatible manner later.
+;; Cover proc to set `keep-isa'.
+;; ISA-NAME-LIST is a comma separated string of isas to keep.
+;; ??? We don't support the !drop notation of keep-mach processing.
+;; Perhaps we should as otherwise there are two different styles the user
+;; has to remember.  On the other hand, !drop support is moderately complicated,
+;; and it can be added in an upward compatible manner later.
 
 (define (/keep-isa-set! isa-name-list)
   (let ((isa-name-list (map string->symbol (string-cut isa-name-list #\,))))
@@ -651,8 +651,8 @@
   *UNSPECIFIED*
 )
 
-; Validate the user-provided keep-isa list against the list of isas
-; specified in the .cpu file (in define-arch).
+;; Validate the user-provided keep-isa list against the list of isas
+;; specified in the .cpu file (in define-arch).
 
 (define (keep-isa-validate!)
   (let ((isa-names (cons 'all (current-arch-isa-name-list)))
@@ -665,7 +665,7 @@
   *UNSPECIFIED*
 )
 
-; Return currently selected isa (there must be exactly one).
+;; Return currently selected isa (there must be exactly one).
 
 (define (current-isa)
   (let ((keep-isa (reader-keep-isa CURRENT-READER)))
@@ -679,10 +679,10 @@
 	    (error "multiple isas selected" keep-isa))))
 )
 
-; Return #t if an isa in ISA-LIST, a list of symbols, is to be kept.
-; If any isa in ISA-LIST is to be kept, the result is #t.
-; If ISA-LIST is the empty list (no particular isa specified) use the default
-; isa.
+;; Return #t if an isa in ISA-LIST, a list of symbols, is to be kept.
+;; If any isa in ISA-LIST is to be kept, the result is #t.
+;; If ISA-LIST is the empty list (no particular isa specified) use the default
+;; isa.
 
 (define (keep-isa? isa-list)
   ;; If unspecified, the default is the first one in the list.
@@ -697,24 +697,24 @@
     (any-true? keep?))
 )
 
-; Return #t if the object containing ATLIST is to be kept.
-; OBJ is the container object or #f if there is none.
-; The object is kept if its attribute list specifies an `ISA' that is
-; kept or does not have the `ISA' attribute (which means it has the default
-; value) and the default isa is being kept.
+;; Return #t if the object containing ATLIST is to be kept.
+;; OBJ is the container object or #f if there is none.
+;; The object is kept if its attribute list specifies an `ISA' that is
+;; kept or does not have the `ISA' attribute (which means it has the default
+;; value) and the default isa is being kept.
 
 (define (keep-isa-atlist? atlist obj)
   (let ((isas (atlist-attr-value atlist 'ISA obj)))
     (keep-isa? isas))
 )
 
-; Return non-#f if object OBJ is to be kept, according to its ISA attribute.
+;; Return non-#f if object OBJ is to be kept, according to its ISA attribute.
 
 (define (keep-isa-obj? obj)
   (keep-isa-atlist? (obj-atlist obj) obj)
 )
 
-; Return a boolean indicating if multiple isas are being kept.
+;; Return a boolean indicating if multiple isas are being kept.
 
 (define (keep-isa-multiple?)
   (let ((keep (reader-keep-isa CURRENT-READER)))
@@ -723,7 +723,7 @@
 	     (> (length (current-arch-isa-name-list)) 1))))
 )
 
-; Return list of isa names currently being kept.
+;; Return list of isa names currently being kept.
 
 (define (current-keep-isa-name-list)
   (reader-keep-isa CURRENT-READER)
@@ -795,24 +795,24 @@
   *UNSPECIFIED*
 )
 
-; If #f, treat reserved fields as operands and extract them with the insn.
-; Code can then be emitted in the extraction routines to validate them.
-; If #t, treat reserved fields as part of the opcode.
-; This complicates the decoding process as these fields have to be
-; checked too.
-; ??? Unimplemented.
+;; If #f, treat reserved fields as operands and extract them with the insn.
+;; Code can then be emitted in the extraction routines to validate them.
+;; If #t, treat reserved fields as part of the opcode.
+;; This complicates the decoding process as these fields have to be
+;; checked too.
+;; ??? Unimplemented.
 
 (define option:reserved-as-opcode? #f)
 
-; Process options passed in on the command line.
-; OPTIONS is a space separated string of name=value values.
-; Each application is required to provide: option-init!, option-set!.
+;; Process options passed in on the command line.
+;; OPTIONS is a space separated string of name=value values.
+;; Each application is required to provide: option-init!, option-set!.
 
 (define (set-cgen-options! options)
   (option-init!)
   (for-each (lambda (opt)
 	      (if (null? opt)
-		  #t ; ignore extraneous spaces
+		  #t ;; ignore extraneous spaces
 		  (let ((name (string->symbol (car opt)))
 			(value (cdr opt)))
 		    (logit 1 "Setting option `" name "' to \""
@@ -822,15 +822,15 @@
 		 (string-cut options #\space)))
 )
 
-; Application specific object creation support.
-;
-; Each entry in the .cpu file has a basic container class.
-; Each application adds functionality by subclassing the container
-; and registering with set-for-new! the proper class to create.
-; ??? Not sure this is the best way to handle this, but it does keep the
-; complexity down while not requiring as dynamic a language as I had before.
-; ??? Class local variables would provide a more efficient way to do this.
-; Assuming one wants to continue on this route.
+;; Application specific object creation support.
+;;
+;; Each entry in the .cpu file has a basic container class.
+;; Each application adds functionality by subclassing the container
+;; and registering with set-for-new! the proper class to create.
+;; ??? Not sure this is the best way to handle this, but it does keep the
+;; complexity down while not requiring as dynamic a language as I had before.
+;; ??? Class local variables would provide a more efficient way to do this.
+;; Assuming one wants to continue on this route.
 
 (define /cpu-new-class-list nil)
 
@@ -838,8 +838,8 @@
   (set! /cpu-new-class-list (acons parent child /cpu-new-class-list))
 )
 
-; Lookup the class registered with set-for-new!
-; If none registered, return PARENT.
+;; Lookup the class registered with set-for-new!
+;; If none registered, return PARENT.
 
 (define (lookup-for-new parent)
   (let ((child (assq-ref /cpu-new-class-list parent)))
@@ -848,7 +848,7 @@
 	parent))
 )
 
-; .cpu file loader support
+;; .cpu file loader support
 
 ;; #t if an error was found (but processing continued)
 (define /continuable-error-found? #f)
@@ -876,8 +876,8 @@
 		       "(if test then . else)\n"
 		       nil '(test then . else) /cmd-if)
 
-  ; Rather than add cgen-internal specific stuff to pmacros.scm, we create
-  ; the pmacro commands here.
+  ;; Rather than add cgen-internal specific stuff to pmacros.scm, we create
+  ;; the pmacro commands here.
   (pmacros-init!)
   (reader-add-command! 'define-pmacro
 		       "\
@@ -896,12 +896,12 @@ Define a preprocessor-style macro.
   *UNSPECIFIED*
 )
 
-; Prepare to parse a .cpu file.
-; This initializes the application independent tables.
-; KEEP-MACH specifies what machs to keep.
-; KEEP-ISA specifies what isas to keep.
-; OPTIONS is a list of options to control code generation.
-; The values are application dependent.
+;; Prepare to parse a .cpu file.
+;; This initializes the application independent tables.
+;; KEEP-MACH specifies what machs to keep.
+;; KEEP-ISA specifies what isas to keep.
+;; OPTIONS is a list of options to control code generation.
+;; The values are application dependent.
 
 (define (/init-parse-cpu! keep-mach keep-isa options)
   (set! /cpu-new-class-list nil)
@@ -911,8 +911,8 @@ Define a preprocessor-style macro.
   (/keep-isa-set! keep-isa)
   (set-cgen-options! options)
 
-  ; The order here is important.
-  (arch-init!) ; Must be done first.
+  ;; The order here is important.
+  (arch-init!) ;; Must be done first.
   (enum-init!)
   (attr-init!)
   (types-init!)
@@ -931,31 +931,31 @@ Define a preprocessor-style macro.
   *UNSPECIFIED*
 )
 
-; Install any builtin objects.
-; This is deferred until define-arch is read.
-; One reason is that attributes MACH and ISA don't exist until then.
+;; Install any builtin objects.
+;; This is deferred until define-arch is read.
+;; One reason is that attributes MACH and ISA don't exist until then.
 
 (define (reader-install-builtin!)
-  ; The order here is important.
+  ;; The order here is important.
   (attr-builtin!)
   (enum-builtin!)
   (mode-builtin!)
   (ifield-builtin!)
   (hardware-builtin!)
   (operand-builtin!)
-  ; This is mainly for the insn attributes.
+  ;; This is mainly for the insn attributes.
   (insn-builtin!)
   (rtl-builtin!)
   *UNSPECIFIED*
 )
 
-; Do anything necessary for the application independent parts after parsing
-; a .cpu file.
-; The lists get cons'd in reverse order.  One thing this does is change them
-; back to file order, it makes things easier for the human viewer.
+;; Do anything necessary for the application independent parts after parsing
+;; a .cpu file.
+;; The lists get cons'd in reverse order.  One thing this does is change them
+;; back to file order, it makes things easier for the human viewer.
 
 (define (/finish-parse-cpu!)
-  ; The order here is generally the reverse of init-parse-cpu!.
+  ;; The order here is generally the reverse of init-parse-cpu!.
   (rtl-finish!)
   (minsn-finish!)
   (insn-finish!)
@@ -968,18 +968,18 @@ Define a preprocessor-style macro.
   (types-finish!)
   (attr-finish!)
   (enum-finish!)
-  (arch-finish!) ; Must be done last.
+  (arch-finish!) ;; Must be done last.
 
   *UNSPECIFIED*
 )
 
-; Perform a global error checking pass after the .cpu file has been read in.
+;; Perform a global error checking pass after the .cpu file has been read in.
 
 (define (/global-error-checks)
-  ; ??? None yet.
-  ; TODO:
-  ; - all hardware elements with same name must have same rank and
-  ;   compatible modes (which for now means same float mode or all int modes)
+  ;; ??? None yet.
+  ;; TODO:
+  ;; - all hardware elements with same name must have same rank and
+  ;;   compatible modes (which for now means same float mode or all int modes)
   #f
 )
 
@@ -996,16 +996,16 @@ Define a preprocessor-style macro.
   *UNSPECIFIED*
 )
 
-; Version of `if' invokable at the top level of a description file.
-; This is a work-in-progress.  Its presence in the description file is ok,
-; but the implementation will need to evolve.
+;; Version of `if' invokable at the top level of a description file.
+;; This is a work-in-progress.  Its presence in the description file is ok,
+;; but the implementation will need to evolve.
 
 (define (/cmd-if test then . else)
   (if (> (length else) 1)
       (parse-error #f
 		   "wrong number of arguments to `if'"
 		   (cons 'if (cons test (cons then else)))))
-  ; ??? rtx-eval test
+  ;; ??? rtx-eval test
   (if (or (not (pair? test))
 	  (not (memq (car test) '(keep-isa? keep-mach? application-is?))))
       (parse-error #f
@@ -1032,23 +1032,23 @@ Define a preprocessor-style macro.
 	     (reader-process-expanded! (car else))))))
 )
 
-; Top level routine for loading .cpu files.
-; FILE is the name of the .cpu file to load.
-; KEEP-MACH is a string of comma separated machines to keep
-; (or not keep if prefixed with !).
-; KEEP-ISA is a string of comma separated isas to keep.
-; OPTIONS is the OPTIONS argument to -init-parse-cpu!.
-; TRACE-OPTIONS is a random list of things to trace.
-; DIAGNOSTIC-OPTIONS is a random list of things to warn/error about.
-; APP-INITER! is an application specific zero argument proc (thunk)
-; to call after -init-parse-cpu!
-; APP-FINISHER! is an application specific zero argument proc to call after
-; -finish-parse-cpu!
-; ANALYZER! is a zero argument proc to call after loading the .cpu file.
-; It is expected to set up various tables and things useful for the application
-; in question.
-;
-; This function isn't local because it's used by dev.scm.
+;; Top level routine for loading .cpu files.
+;; FILE is the name of the .cpu file to load.
+;; KEEP-MACH is a string of comma separated machines to keep
+;; (or not keep if prefixed with !).
+;; KEEP-ISA is a string of comma separated isas to keep.
+;; OPTIONS is the OPTIONS argument to -init-parse-cpu!.
+;; TRACE-OPTIONS is a random list of things to trace.
+;; DIAGNOSTIC-OPTIONS is a random list of things to warn/error about.
+;; APP-INITER! is an application specific zero argument proc (thunk)
+;; to call after -init-parse-cpu!
+;; APP-FINISHER! is an application specific zero argument proc to call after
+;; -finish-parse-cpu!
+;; ANALYZER! is a zero argument proc to call after loading the .cpu file.
+;; It is expected to set up various tables and things useful for the application
+;; in question.
+;;
+;; This function isn't local because it's used by dev.scm.
 
 (define (cpu-load file keep-mach keep-isa options
 		  trace-options diagnostic-options
@@ -1075,11 +1075,11 @@ Define a preprocessor-style macro.
   *UNSPECIFIED*
 )
 
-; Argument parsing utilities.
+;; Argument parsing utilities.
 
-; Generate a usage message.
-; ERRTYPE is one of 'help, 'unknown, 'missing.
-; OPTION is the option that had the error or "" if ERRTYPE is 'help.
+;; Generate a usage message.
+;; ERRTYPE is one of 'help, 'unknown, 'missing.
+;; OPTION is the option that had the error or "" if ERRTYPE is 'help.
 
 (define (cgen-usage errtype option arguments)
   (let ((cep (current-error-port)))
@@ -1113,23 +1113,23 @@ Define a preprocessor-style macro.
       (else (quit 2))))
 )
 
-; Poor man's getopt.
-; [We don't know where to find the real one until we've parsed the args,
-; and this isn't something we need to get too fancy about anyways.]
-; The result is always ((a . b) . c).
-; If the argument is valid, the result is ((opt-spec . arg) . remaining-argv),
-; or (('unknown . option) . remaining-argv) if `option' isn't recognized,
-; or (('missing . option) . remaining argv) if `option' is missing a required
-; argument,
-; or ((#f . #f) . #f) if there are no more arguments.
-; OPT-SPEC is a list of option specs.
-; Each element is an alist of at least 3 elements: option argument help-text.
-; `option' is a string or symbol naming the option.  e.g. -a, --help, "-i".
-; symbols are supported for backward compatibility, -i is a complex number.
-; `argument' is a string naming the argument or #f if the option takes no
-; arguments.
-; `help-text' is a string that is printed with the usage information.
-; Elements beyond `help-text' are ignored.
+;; Poor man's getopt.
+;; [We don't know where to find the real one until we've parsed the args,
+;; and this isn't something we need to get too fancy about anyways.]
+;; The result is always ((a . b) . c).
+;; If the argument is valid, the result is ((opt-spec . arg) . remaining-argv),
+;; or (('unknown . option) . remaining-argv) if `option' isn't recognized,
+;; or (('missing . option) . remaining argv) if `option' is missing a required
+;; argument,
+;; or ((#f . #f) . #f) if there are no more arguments.
+;; OPT-SPEC is a list of option specs.
+;; Each element is an alist of at least 3 elements: option argument help-text.
+;; `option' is a string or symbol naming the option.  e.g. -a, --help, "-i".
+;; symbols are supported for backward compatibility, -i is a complex number.
+;; `argument' is a string naming the argument or #f if the option takes no
+;; arguments.
+;; `help-text' is a string that is printed with the usage information.
+;; Elements beyond `help-text' are ignored.
 
 (define (/getopt argv opt-spec)
   (if (null? argv)
@@ -1139,11 +1139,11 @@ Define a preprocessor-style macro.
 	      ((and (cadr opt) (null? (cdr argv)))
 	       (cons (cons 'missing (car argv)) (cdr argv)))
 	      ((cadr opt) (cons (cons opt (cadr argv)) (cddr argv)))
-	      (else ; must be option that doesn't take an argument
+	      (else ;; must be option that doesn't take an argument
 	       (cons (cons opt #f) (cdr argv))))))
 )
 
-; Return (cadr args) or print a pretty error message if not possible.
+;; Return (cadr args) or print a pretty error message if not possible.
 
 (define (option-arg args)
   (if (and (pair? args) (pair? (cdr args)))
@@ -1153,10 +1153,10 @@ Define a preprocessor-style macro.
 		   (car args)))
 )
 
-; List of common arguments.
-;
-; ??? Another useful arg would be one that says "do file generation with
-; arguments specified up til now, then continue with next batch of args".
+;; List of common arguments.
+;;
+;; ??? Another useful arg would be one that says "do file generation with
+;; arguments specified up til now, then continue with next batch of args".
 
 (define common-arguments
   '(("-a" "arch-file" "specify path of .cpu file to load")
@@ -1183,31 +1183,31 @@ Define a preprocessor-style macro.
     )
 )
 
-; Default place to look.
-; This gets overridden to point to the directory of the loaded .cpu file.
-; ??? Ideally this would be local to this file.
+;; Default place to look.
+;; This gets overridden to point to the directory of the loaded .cpu file.
+;; ??? Ideally this would be local to this file.
 
 (define arch-path (string-append srcdir "/cpu"))
 
-; Accessors for application option specs
+;; Accessors for application option specs
 
 (define (opt-get-first-pass opt)
   (or (list-ref opt 3) (lambda args #f)))
 (define (opt-get-second-pass opt)
   (or (list-ref opt 4) (lambda args #f)))
 
-; Parse options and call generators.
-; ARGS is a #:keyword delimited list of arguments.
-; #:app-name name
-; #:arg-spec optspec ; FIXME: rename to #:opt-spec
-; #:init init-routine
-; #:finish finish-routine
-; #:analyze analysis-routine
-; #:argv command-line-arguments
-;
-; ARGSPEC is a list of (option option-arg comment option-handler) elements.
-; OPTION-HANDLER is either (lambda () ...) or (lambda (arg) ...) and
-; processes the option.
+;; Parse options and call generators.
+;; ARGS is a #:keyword delimited list of arguments.
+;; #:app-name name
+;; #:arg-spec optspec ;; FIXME: rename to #:opt-spec
+;; #:init init-routine
+;; #:finish finish-routine
+;; #:analyze analysis-routine
+;; #:argv command-line-arguments
+;;
+;; ARGSPEC is a list of (option option-arg comment option-handler) elements.
+;; OPTION-HANDLER is either (lambda () ...) or (lambda (arg) ...) and
+;; processes the option.
 
 (define /cgen
   (lambda args
@@ -1241,18 +1241,18 @@ Define a preprocessor-style macro.
 			  (loop (cddr args))))
 	      (else (error "cgen: unknown argument" (car args))))))
 
-      ; ARGS has been processed, now we can process ARGV.
+      ;; ARGS has been processed, now we can process ARGV.
 
       (let (
 	    (opt-spec (append common-arguments opt-spec))
-	    (app-args nil)    ; application's args are queued here
+	    (app-args nil)    ;; application's args are queued here
 	    (repl? #f)
 	    (arch-file #f)
-	    (keep-mach "all") ; default is all machs
-	    (keep-isa "all")  ; default is all isas
+	    (keep-mach "all") ;; default is all machs
+	    (keep-isa "all")  ;; default is all isas
 	    (flags "")
 	    (moreopts? #t)
-	    (debugging #f)    ; default is off, for speed
+	    (debugging #f)    ;; default is off, for speed
 	    (trace-options "")
 	    (diagnostic-options "")
 	    (cep (current-error-port))
@@ -1297,7 +1297,7 @@ Define a preprocessor-style macro.
 		      (set! keep-mach arg)
 		      )
 		     ((str=? "-s" (car opt))
-		      #f ; ignore, already processed by caller
+		      #f ;; ignore, already processed by caller
 		      )
 		     ((str=? "-t" (car opt))
 		      (set! trace-options arg)
@@ -1324,18 +1324,18 @@ Define a preprocessor-style macro.
 			(newline)
 			(quit 0)
 			))
-		     ; Else this is an application specific option.
+		     ;; Else this is an application specific option.
 		     (else
-		      ; Record it for later processing.  Note that they're
-		      ; recorded in reverse order (easier).  This is undone
-		      ; later.
+		      ;; Record it for later processing.  Note that they're
+		      ;; recorded in reverse order (easier).  This is undone
+		      ;; later.
 		      (set! app-args (acons opt arg app-args)))
 		     )))
 	    (if moreopts? (loop (cdr new-argv)))
 	    )
-	  ) ; end of loop
+	  ) ;; end of loop
 
-	; All arguments have been parsed.
+	;; All arguments have been parsed.
 
 	(cgen-call-with-debugging
 	 debugging
@@ -1379,10 +1379,10 @@ Define a preprocessor-style macro.
 		     (reverse app-args))))
 	)
       )
-    #f) ; end of lambda
+    #f) ;; end of lambda
 )
 
-; Main entry point called by application file generators.
+;; Main entry point called by application file generators.
 
 (define cgen
   (lambda args

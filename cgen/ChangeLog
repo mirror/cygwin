@@ -1,6 +1,7 @@
 2010-01-27  Doug Evans  <dje@sebabeach.org>
 
 	* read.scm: Follow commenting convention.
+	* mach.scm: Follow commenting convention.
 
 	* pmacros.scm: Follow commenting convention.  Replace change to
 	$pmacro to %pmacro.  $pmacro is confusing with $ in assembler syntax.

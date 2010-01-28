@@ -1,17 +1,17 @@
-; CPU architecture description.
-; Copyright (C) 2000, 2003, 2009 Red Hat, Inc.
-; This file is part of CGEN.
-; See file COPYING.CGEN for details.
+;; CPU architecture description.
+;; Copyright (C) 2000, 2003, 2009 Red Hat, Inc.
+;; This file is part of CGEN.
+;; See file COPYING.CGEN for details.
 
-; Top level class that records everything about a cpu.
-; FIXME: Rename this to something else and rename <arch-data> to <arch>
-; for consistency with other classes (define-foo -> <foo> object).
+;; Top level class that records everything about a cpu.
+;; FIXME: Rename this to something else and rename <arch-data> to <arch>
+;; for consistency with other classes (define-foo -> <foo> object).
 
 (define <arch>
   (class-make '<arch>
 	      nil
 	      '(
-		; An object of type <arch-data>.
+		;; An object of type <arch-data>.
 		data
 
 		;; ??? All should really be assumed to be a black-box table.
@@ -31,30 +31,30 @@
 		(minsn-table . ())
 		(subr-list . ())
 
-		(insn-extract . #f) ; FIXME: wip (and move elsewhere)
-		(insn-execute . #f) ; FIXME: wip (and move elsewhere)
+		(insn-extract . #f) ;; FIXME: wip (and move elsewhere)
+		(insn-execute . #f) ;; FIXME: wip (and move elsewhere)
 
-		; standard values derived from the input data
+		;; standard values derived from the input data
 		derived
 
-		; #t if multi-insns have been instantiated
+		;; #t if multi-insns have been instantiated
 		(multi-insns-instantiated? . #f)
-		; #t if instructions have been analyzed
+		;; #t if instructions have been analyzed
 		(insns-analyzed? . #f)
-		; #t if semantics were included in the analysis
+		;; #t if semantics were included in the analysis
 		(semantics-analyzed? . #f)
-		; #t if alias insns were included in the analysis
+		;; #t if alias insns were included in the analysis
 		(aliases-analyzed? . #f)
 
-		; ordinal of next object that needs one
+		;; ordinal of next object that needs one
 		(next-ordinal . 0)
 		)
 	      nil)
 )
 
-; Accessors.
-; Each getter is arch-foo.
-; Each setter is arch-set-foo!.
+;; Accessors.
+;; Each getter is arch-foo.
+;; Each setter is arch-set-foo!.
 
 (define-getters <arch> arch
   (data
@@ -82,8 +82,8 @@
    )
 )
 
-; For elements recorded as a table, return a sorted list.
-; ??? All elements should really be assumed to be a black-box table.
+;; For elements recorded as a table, return a sorted list.
+;; ??? All elements should really be assumed to be a black-box table.
 
 (define (arch-ifld-list arch)
   (/ident-object-table->list (arch-ifld-table arch))
@@ -199,35 +199,35 @@
   (hashq-ref iot key)
 )
 
-; Class for recording things specified in `define-arch'.
-; This simplifies define-arch as the global arch object CURRENT-ARCH
-; must exist before loading the .cpu file.
+;; Class for recording things specified in `define-arch'.
+;; This simplifies define-arch as the global arch object CURRENT-ARCH
+;; must exist before loading the .cpu file.
 
 (define <arch-data>
   (class-make '<arch-data>
 	      '(<ident>)
 	      '(
-		; Default alignment of memory operations.
-		; One of aligned, unaligned, forced.
+		;; Default alignment of memory operations.
+		;; One of aligned, unaligned, forced.
 		default-alignment
 
-		; Orientation of insn bit numbering (#f->msb=0, #t->lsb=0).
+		;; Orientation of insn bit numbering (#f->msb=0, #t->lsb=0).
 		insn-lsb0?
 
-		; List of all machs.
-		; Each element is pair of (mach-name . sanitize-key)
-		; where sanitize-key is #f if there is none.
-		; blah blah blah ... ooohhh, evil sanitize key, blah blah blah
+		;; List of all machs.
+		;; Each element is pair of (mach-name . sanitize-key)
+		;; where sanitize-key is #f if there is none.
+		;; blah blah blah ... ooohhh, evil sanitize key, blah blah blah
 		machs
 
-		; List of all isas (instruction set architecture).
-		; Each element is a pair of (isa-name . sanitize-key)
-		; where sanitize-key is #f if there is none.
-		; There is usually just one.  ARM has two (arm, thumb).
-		; blah blah blah ... ooohhh, evil sanitize key, blah blah blah
+		;; List of all isas (instruction set architecture).
+		;; Each element is a pair of (isa-name . sanitize-key)
+		;; where sanitize-key is #f if there is none.
+		;; There is usually just one.  ARM has two (arm, thumb).
+		;; blah blah blah ... ooohhh, evil sanitize key, blah blah blah
 		isas
 
-		; ??? Defaults for other things should be here.
+		;; ??? Defaults for other things should be here.
 		)
 	      nil)
 )
@@ -236,10 +236,10 @@
   (default-alignment insn-lsb0? machs isas)
 )
 
-; Add, list, lookup accessors for <arch>.
-;
-; For the lookup routines, the result is the object or #f if not found.
-; For some, if X is already an object, return that.
+;; Add, list, lookup accessors for <arch>.
+;;
+;; For the lookup routines, the result is the object or #f if not found.
+;; For some, if X is already an object, return that.
 
 (define (current-arch-name) (obj:name (arch-data CURRENT-ARCH)))
 
@@ -261,24 +261,24 @@
   (map car (adata-isas (arch-data CURRENT-ARCH)))
 )
 
-; Attributes.
-; Recorded as a pair of lists.
-; The car is a list of <attribute> objects.
-; The cdr is an associative list of (name . <attribute>) elements, for lookup.
-; Could use a hash table except that there currently aren't that many.
+;; Attributes.
+;; Recorded as a pair of lists.
+;; The car is a list of <attribute> objects.
+;; The cdr is an associative list of (name . <attribute>) elements, for lookup.
+;; Could use a hash table except that there currently aren't that many.
 
 (define (current-attr-list) (car (arch-attr-list CURRENT-ARCH)))
 
 (define (current-attr-add! a)
-  ; NOTE: While putting this test in define-attr feels better, having it here
-  ; is more robust, internal calls get checked too.  Thus it's here.
-  ; Ditto for all the other such tests in this file.
+  ;; NOTE: While putting this test in define-attr feels better, having it here
+  ;; is more robust, internal calls get checked too.  Thus it's here.
+  ;; Ditto for all the other such tests in this file.
   (if (current-attr-lookup (obj:name a))
       (parse-error (make-current-context "define-attr")
 		   "attribute already defined" (obj:name a)))
   (let ((adata (arch-attr-list CURRENT-ARCH)))
-    ; Build list in normal order so we don't have to reverse it at the end
-    ; (since our format is non-trivial).
+    ;; Build list in normal order so we don't have to reverse it at the end
+    ;; (since our format is non-trivial).
     (if (null? (car adata))
 	(arch-set-attr-list! CURRENT-ARCH
 			     (cons (cons a nil)
@@ -293,7 +293,7 @@
   (assq-ref (cdr (arch-attr-list CURRENT-ARCH)) attr-name)
 )
 
-; Enums.
+;; Enums.
 
 (define (current-enum-list) (arch-enum-list CURRENT-ARCH))
 
@@ -309,7 +309,7 @@
   (object-assq enum-name (current-enum-list))
 )
 
-; Keywords.
+;; Keywords.
 
 (define (current-kw-list) (arch-kw-list CURRENT-ARCH))
 
@@ -325,7 +325,7 @@
   (object-assq kw-name (current-kw-list))
 )
 
-; Instruction sets.
+;; Instruction sets.
 
 (define (current-isa-list) (arch-isa-list CURRENT-ARCH))
 
@@ -355,7 +355,7 @@
 	    obj-list))
 )
 
-; Cpu families.
+;; Cpu families.
 
 (define (current-cpu-list) (arch-cpu-list CURRENT-ARCH))
 
@@ -371,7 +371,7 @@
   (object-assq cpu-name (current-cpu-list))
 )
 
-; Machines.
+;; Machines.
 
 (define (current-mach-list) (arch-mach-list CURRENT-ARCH))
 
@@ -387,7 +387,7 @@
   (object-assq mach-name (current-mach-list))
 )
 
-; Models.
+;; Models.
 
 (define (current-model-list) (arch-model-list CURRENT-ARCH))
 
@@ -420,8 +420,8 @@
 (define (current-hw-lookup hw)
   (if (object? hw)
       hw
-      ; This doesn't use object-assq on purpose.  Hardware objects handle
-      ; get-name specially.
+      ;; This doesn't use object-assq on purpose.  Hardware objects handle
+      ;; get-name specially.
       (find-first (lambda (hw-obj) (eq? (send hw-obj 'get-name) hw))
 		  (current-hw-list)))
 )
@@ -470,15 +470,15 @@
 	    #f)))
 )
 
-; Return a boolean indicating if <ifield> F is currently defined.
-; This is slightly complicated because multiple isas can have different
-; ifields with the same name.
+;; Return a boolean indicating if <ifield> F is currently defined.
+;; This is slightly complicated because multiple isas can have different
+;; ifields with the same name.
 
 (define (/ifld-already-defined? f)
   (let ((iflds (/ident-object-table-lookup (car (arch-ifld-table CURRENT-ARCH))
 					   (obj:name f))))
-    ; We've got all the ifields with the same name,
-    ; now see if any have the same ISA as F.
+    ;; We've got all the ifields with the same name,
+    ;; now see if any have the same ISA as F.
     (if iflds
 	(let ((result #f)
 	      (f-isas (obj-isa-list f)))
@@ -529,15 +529,15 @@
 	#f))
 )
 
-; Return a boolean indicating if <operand> OP is currently defined.
-; This is slightly complicated because multiple isas can have different
-; operands with the same name.
+;; Return a boolean indicating if <operand> OP is currently defined.
+;; This is slightly complicated because multiple isas can have different
+;; operands with the same name.
 
 (define (/op-already-defined? op)
   (let ((ops (/ident-object-table-lookup (car (arch-op-table CURRENT-ARCH))
 					 (obj:name op))))
-    ; We've got all the operands with the same name,
-    ; now see if any have the same ISA as OP.
+    ;; We've got all the operands with the same name,
+    ;; now see if any have the same ISA as OP.
     (if ops
 	(let ((result #f)
 	      (op-isas (obj-isa-list op)))
@@ -549,12 +549,12 @@
 	#f))
 )
 
-; Instruction field formats.
+;; Instruction field formats.
 
 (define (current-ifmt-list) (arch-ifmt-list CURRENT-ARCH))
 
-; Semantic formats (akin to ifmt's, except includes semantics to distinguish
-; insns).
+;; Semantic formats (akin to ifmt's, except includes semantics to distinguish
+;; insns).
 
 (define (current-sfmt-list) (arch-sfmt-list CURRENT-ARCH))
 
@@ -594,15 +594,15 @@
 	#f))
 )
 
-; Return a boolean indicating if <insn> INSN is currently defined.
-; This is slightly complicated because multiple isas can have different
-; insns with the same name.
+;; Return a boolean indicating if <insn> INSN is currently defined.
+;; This is slightly complicated because multiple isas can have different
+;; insns with the same name.
 
 (define (/insn-already-defined? insn)
   (let ((insns (/ident-object-table-lookup (car (arch-insn-table CURRENT-ARCH))
 					   (obj:name insn))))
-    ; We've got all the insns with the same name,
-    ; now see if any have the same ISA as INSN.
+    ;; We've got all the insns with the same name,
+    ;; now see if any have the same ISA as INSN.
     (if insns
 	(let ((result #f)
 	      (insn-isas (obj-isa-list insn)))
@@ -650,15 +650,15 @@
 	#f))
 )
 
-; Return a boolean indicating if <macro-insn> MINSN is currently defined.
-; This is slightly complicated because multiple isas can have different
-; macro-insns with the same name.
+;; Return a boolean indicating if <macro-insn> MINSN is currently defined.
+;; This is slightly complicated because multiple isas can have different
+;; macro-insns with the same name.
 
 (define (/minsn-already-defined? m)
   (let ((minsns (/ident-object-table-lookup (car (arch-minsn-table CURRENT-ARCH))
 					    (obj:name m))))
-    ; We've got all the macro-insns with the same name,
-    ; now see if any have the same ISA as M.
+    ;; We've got all the macro-insns with the same name,
+    ;; now see if any have the same ISA as M.
     (if minsns
 	(let ((result #f)
 	      (m-isas (obj-isa-list m)))
@@ -670,7 +670,7 @@
 	#f))
 )
 
-; rtx subroutines.
+;; rtx subroutines.
 
 (define (current-subr-list) (map cdr (arch-subr-list CURRENT-ARCH)))
 
@@ -687,9 +687,9 @@
   (assq-ref (arch-subr-list CURRENT-ARCH) name)
 )
 
-; Arch parsing support.
+;; Arch parsing support.
 
-; Parse an alignment spec.
+;; Parse an alignment spec.
 
 (define (/arch-parse-alignment context alignment)
   (if (memq alignment '(aligned unaligned forced))
@@ -697,16 +697,16 @@
       (parse-error context "invalid alignment" alignment))
 )
 
-; Parse an arch mach spec.
-; The value is a list of mach names or (mach-name sanitize-key) elements.
-; The result is a list of (mach-name . sanitize-key) elements.
+;; Parse an arch mach spec.
+;; The value is a list of mach names or (mach-name sanitize-key) elements.
+;; The result is a list of (mach-name . sanitize-key) elements.
 
 (define (/arch-parse-machs context machs)
   (for-each (lambda (m)
 	      (if (or (symbol? m)
 		      (and (list? m) (= (length m) 2)
 			   (symbol? (car m)) (symbol? (cadr m))))
-		  #t ; ok
+		  #t ;; ok
 		  (parse-error context "bad arch mach spec" m)))
 	    machs)
   (map (lambda (m)
@@ -716,16 +716,16 @@
        machs)
 )
 
-; Parse an arch isa spec.
-; The value is a list of isa names or (isa-name sanitize-key) elements.
-; The result is a list of (isa-name . sanitize-key) elements.
+;; Parse an arch isa spec.
+;; The value is a list of isa names or (isa-name sanitize-key) elements.
+;; The result is a list of (isa-name . sanitize-key) elements.
 
 (define (/arch-parse-isas context isas)
   (for-each (lambda (m)
 	      (if (or (symbol? m)
 		      (and (list? m) (= (length m) 2)
 			   (symbol? (car m)) (symbol? (cadr m))))
-		  #t ; ok
+		  #t ;; ok
 		  (parse-error context "bad arch isa spec" m)))
 	    isas)
   (map (lambda (m)
@@ -735,10 +735,10 @@
        isas)
 )
 
-; Parse an architecture description
-; This is the main routine for building an arch object from a cpu
-; description in the .cpu file.
-; All arguments are in raw (non-evaluated) form.
+;; Parse an architecture description
+;; This is the main routine for building an arch object from a cpu
+;; description in the .cpu file.
+;; All arguments are in raw (non-evaluated) form.
 
 (define (/arch-parse context name comment attrs
 		     default-alignment insn-lsb0?
@@ -754,15 +754,15 @@
     (/arch-parse-isas context isas))
 )
 
-; Read an architecture description.
-; This is the main routine for analyzing an arch description in the .cpu file.
-; ARG-LIST is an associative list of field name and field value.
-; parse-arch is invoked to create the `arch' object.
+;; Read an architecture description.
+;; This is the main routine for analyzing an arch description in the .cpu file.
+;; ARG-LIST is an associative list of field name and field value.
+;; parse-arch is invoked to create the `arch' object.
 
 (define /arch-read
   (lambda arg-list
     (let ((context "arch-read")
-	  ; <arch-data> object members and default values
+	  ;; <arch-data> object members and default values
 	  (name "unknown")
 	  (comment "")
 	  (attrs nil)
@@ -771,7 +771,7 @@
 	  (machs #f)
 	  (isas #f)
 	  )
-      ; Loop over each element in ARG-LIST, recording what's found.
+      ;; Loop over each element in ARG-LIST, recording what's found.
       (let loop ((arg-list arg-list))
 	(if (null? arg-list)
 	    nil
@@ -787,19 +787,19 @@
       		((isas) (set! isas (cdr arg)))
 		(else (parse-error context "invalid arch arg" arg)))
 	      (loop (cdr arg-list)))))
-      ; Ensure required fields are present.
+      ;; Ensure required fields are present.
       (if (not machs)
 	  (parse-error context "missing machs spec"))
       (if (not isas)
 	  (parse-error context "missing isas spec"))
-      ; Now that we've identified the elements, build the object.
+      ;; Now that we've identified the elements, build the object.
       (/arch-parse context name comment attrs default-alignment insn-lsb0?
 		   machs isas)
       )
     )
 )
 
-; Define an arch object, name/value pair list version.
+;; Define an arch object, name/value pair list version.
 
 (define define-arch
   (lambda arg-list
@@ -809,16 +809,16 @@
       (keep-mach-validate!)
       (def-isa-attr! (adata-isas a))
       (keep-isa-validate!)
-      ; Install the builtin objects now that we have an arch, and now that
-      ; attributes MACH and ISA exist.
+      ;; Install the builtin objects now that we have an arch, and now that
+      ;; attributes MACH and ISA exist.
       (reader-install-builtin!)
       a))
 )
 
-; Mach/isa processing.
+;; Mach/isa processing.
 
-; Create the MACH attribute.
-; MACHS is the canonicalized machs spec to define-arch: (name . sanitize-key).
+;; Create the MACH attribute.
+;; MACHS is the canonicalized machs spec to define-arch: (name . sanitize-key).
 
 (define (def-mach-attr! machs)
   (let ((mach-enums (append
@@ -839,23 +839,23 @@
   *UNSPECIFIED*
 )
 
-; Return #t if MACH is supported by OBJ.
-; This is done by looking for the MACH attribute in OBJ.
-; By definition, objects that support the default (base) mach support
-; all machs.
+;; Return #t if MACH is supported by OBJ.
+;; This is done by looking for the MACH attribute in OBJ.
+;; By definition, objects that support the default (base) mach support
+;; all machs.
 
 (define (mach-supports? mach obj)
   (let ((machs (obj-attr-value obj 'MACH))
 	(name (obj:name mach)))
     (or (memq name machs)
 	(memq 'base machs)))
-	;(let ((deflt (attr-lookup-default 'MACH obj)))
-	;  (any-true? (map (lambda (m) (memq m deflt)) machs)))))
+	;;(let ((deflt (attr-lookup-default 'MACH obj)))
+	;;  (any-true? (map (lambda (m) (memq m deflt)) machs)))))
 )
 
-; Create the ISA attribute.
-; ISAS is the canonicalized isas spec to define-arch: (name . sanitize-key).
-; ISAS is a list of isa names.
+;; Create the ISA attribute.
+;; ISAS is the canonicalized isas spec to define-arch: (name . sanitize-key).
+;; ISAS is a list of isa names.
 
 (define (def-isa-attr! isas)
   (let ((isa-enums (append
@@ -869,8 +869,8 @@
 		    '((max)))))
     (define-attr '(type bitset) '(name ISA)
       '(comment "instruction set selection")
-      ; If there's only one isa, don't (yet) pollute the tables with a value
-      ; for it.
+      ;; If there's only one isa, don't (yet) pollute the tables with a value
+      ;; for it.
       (if (= (length isas) 1)
 	  '(for)
 	  '(for ifield operand insn hardware))
@@ -881,33 +881,33 @@
   *UNSPECIFIED*
 )
 
-; Return the bitset attr value for all isas.
+;; Return the bitset attr value for all isas.
 
 (define (all-isas-attr-value)
   (current-arch-isa-name-list)
 )
 
-; Return an ISA attribute of all isas.
-; This is useful for things like f-nil which exist across all isas.
+;; Return an ISA attribute of all isas.
+;; This is useful for things like f-nil which exist across all isas.
 
 (define (all-isas-attr)
   (bitset-attr-make 'ISA (all-isas-attr-value))
 )
 
-; Return list of ISA names specified by attribute object ATLIST.
+;; Return list of ISA names specified by attribute object ATLIST.
 
 (define (attr-isa-list atlist)
   (atlist-attr-value atlist 'ISA #f)
 )
 
-; Return list of ISA names specified by OBJ.
+;; Return list of ISA names specified by OBJ.
 
 (define (obj-isa-list obj)
   (obj-attr-value obj 'ISA)
 )
 
-; Return #t if <isa> ISA is supported by OBJ.
-; This is done by looking for the ISA attribute in OBJ.
+;; Return #t if <isa> ISA is supported by OBJ.
+;; This is done by looking for the ISA attribute in OBJ.
 
 (define (isa-supports? isa obj)
   (let ((isas (obj-isa-list obj))
@@ -915,132 +915,132 @@
     (->bool (memq name isas)))
 )
 
-; The fetch/decode/execute process.
-; "extract" is a fancy word for fetch/decode.
-; FIXME: wip, not currently used.
-; FIXME: move to inside define-isa, and maybe elsewhere.
-;
+;; The fetch/decode/execute process.
+;; "extract" is a fancy word for fetch/decode.
+;; FIXME: wip, not currently used.
+;; FIXME: move to inside define-isa, and maybe elsewhere.
+;;
 ;(defmacro
-;  define-extract (code)
-;  ;(arch-set-insn-extract! CURRENT-ARCH code)
-;  *UNSPECIFIED*
+;;  define-extract (code)
+;;  ;;(arch-set-insn-extract! CURRENT-ARCH code)
+;;  *UNSPECIFIED*
 ;)
-;
+;;
 ;(defmacro
-;  define-execute (code)
-;  ;(arch-set-insn-execute! CURRENT-ARCH code)
-;  *UNSPECIFIED*
-;)
+;;  define-execute (code)
+;;  ;;(arch-set-insn-execute! CURRENT-ARCH code)
+;;  *UNSPECIFIED*
+;;)
 
-; ISA specification.
-; Each architecture is generally one isa, but in the case of ARM (and a few
-; others) there is more than one.
-;
-; ??? "ISA" has a very well defined meaning, and our usage of it one might
-; want to quibble over.  A better name would be welcome.
+;; ISA specification.
+;; Each architecture is generally one isa, but in the case of ARM (and a few
+;; others) there is more than one.
+;;
+;; ??? "ISA" has a very well defined meaning, and our usage of it one might
+;; want to quibble over.  A better name would be welcome.
 
-; Associated with an instruction set is its framing.
-; This refers to how instructions are laid out at the liw level (where several
-; insns are framed together and executed sequentially or in parallel).
-; ??? If one defines the term "format" as being how an individual instruction
-; is laid out then formatting can be thought of as being different from
-; framing.  However, it's possible for a particular ISA to intertwine the two.
-; Thus this will need to evolve.
-; ??? Not used yet, wip.
+;; Associated with an instruction set is its framing.
+;; This refers to how instructions are laid out at the liw level (where several
+;; insns are framed together and executed sequentially or in parallel).
+;; ??? If one defines the term "format" as being how an individual instruction
+;; is laid out then formatting can be thought of as being different from
+;; framing.  However, it's possible for a particular ISA to intertwine the two.
+;; Thus this will need to evolve.
+;; ??? Not used yet, wip.
 
-(define <iframe> ; pronounced I-frame
+(define <iframe> ;; pronounced I-frame
   (class-make '<iframe> '(<ident>)
 	      '(
-		; list of <itype> objects that make up the frame
+		;; list of <itype> objects that make up the frame
 		insns
 
-		; assembler syntax
+		;; assembler syntax
 		syntax
 
-		; list of (length value) elements that make up the format
-		; Length is in bits.  Value is either a number or a $number
-		; symbol refering to the insn specified in `insns'.
+		;; list of (length value) elements that make up the format
+		;; Length is in bits.  Value is either a number or a $number
+		;; symbol refering to the insn specified in `insns'.
 		value
 
-		; Initial bitnumbers to decode insns by.
-		; ??? At present the rest of the decoding is determined
-		; algorithmically.  May wish to give the user more control
-		; [like psim].
+		;; Initial bitnumbers to decode insns by.
+		;; ??? At present the rest of the decoding is determined
+		;; algorithmically.  May wish to give the user more control
+		;; [like psim].
 		decode-assist
 
-		; rtl that executes instructions in `value'
-		; Fields specified in `value' can be used here.
+		;; rtl that executes instructions in `value'
+		;; Fields specified in `value' can be used here.
 		action
 		)
 	      nil)
 )
 
-; Accessors.
+;; Accessors.
 
 (define-getters <iframe> iframe (insns syntax value decode-assist action))
 
-; Instruction types, recorded in <iframe>.
-; ??? Not used yet, wip.
+;; Instruction types, recorded in <iframe>.
+;; ??? Not used yet, wip.
 
 (define <itype>
   (class-make '<itype> '(<ident>)
 	      '(
-		; length in bits, or initial part if variable length (wip)
+		;; length in bits, or initial part if variable length (wip)
 		length
 
-		; constraint specifying which insns are included
+		;; constraint specifying which insns are included
 		constraint
 
-		; Initial bitnumbers to decode insns by.
-		; ??? At present the rest of the decoding is determined
-		; algorithmically.  May wish to give the user more control
-		; [like psim].
+		;; Initial bitnumbers to decode insns by.
+		;; ??? At present the rest of the decoding is determined
+		;; algorithmically.  May wish to give the user more control
+		;; [like psim].
 		decode-assist
 		)
 	      nil)
 )
 
-; Accessors.
+;; Accessors.
 
 (define-getters <itype> itype (length constraint decode-assist))
 
-; Simulator instruction decode splitting.
-; FIXME: Should live in simulator specific code.  Requires class handling
-; cleanup first.
-;
-; Instructions can be split by particular values for an ifield.
-; The ARM port uses this to split insns into those that set the pc and
-; those that don't.
+;; Simulator instruction decode splitting.
+;; FIXME: Should live in simulator specific code.  Requires class handling
+;; cleanup first.
+;;
+;; Instructions can be split by particular values for an ifield.
+;; The ARM port uses this to split insns into those that set the pc and
+;; those that don't.
 
 (define <decode-split>
   (class-make '<decode-split> '()
 	      '(
-		; Name of ifield to split on.
+		;; Name of ifield to split on.
 		name
 
-		; Constraint.  Only insns satifying this constraint are
-		; split.  #f if no constraint.
+		;; Constraint.  Only insns satifying this constraint are
+		;; split.  #f if no constraint.
 		constraint
 
-		; List of ifield splits.
-		; Each element is one of (name value) or (name (values)).
+		;; List of ifield splits.
+		;; Each element is one of (name value) or (name (values)).
 		values
 		)
 	      nil
 	      )
 )
 
-; Accessors.
+;; Accessors.
 
 (define-getters <decode-split> decode-split (name constraint values))
 
-; Parse a decode-split spec.
-; SPEC is (ifield-name constraint value-list).
-; CONSTRAINT is an rtl expression.  Only insns satifying the constraint
-; are split.
-; Each element of VALUE-LIST is one of (name value) or (name (values)).
-; FIXME: All possible values must be specified.  Need an `else' clause.
-; Ranges would also be useful.
+;; Parse a decode-split spec.
+;; SPEC is (ifield-name constraint value-list).
+;; CONSTRAINT is an rtl expression.  Only insns satifying the constraint
+;; are split.
+;; Each element of VALUE-LIST is one of (name value) or (name (values)).
+;; FIXME: All possible values must be specified.  Need an `else' clause.
+;; Ranges would also be useful.
 
 (define (/isa-parse-decode-split context spec)
   (if (!= (length spec) 3)
@@ -1050,7 +1050,7 @@
 	(constraint (cadr spec))
 	(value-list (caddr spec)))
 
-    ; FIXME: more error checking.
+    ;; FIXME: more error checking.
 
     (make <decode-split>
       name
@@ -1058,7 +1058,7 @@
       value-list))
 )
 
-; Parse a list of decode-split specs.
+;; Parse a list of decode-split specs.
 
 (define (/isa-parse-decode-splits context spec-list)
   (map (lambda (spec)
@@ -1066,72 +1066,72 @@
        spec-list)
 )
 
-; Top level class to describe an isa.
+;; Top level class to describe an isa.
 
 (define <isa>
   (class-make '<isa> '(<ident>)
 	      '(
-		; Default length to record in ifields.
-		; This is used in calculations involving bit numbers.
+		;; Default length to record in ifields.
+		;; This is used in calculations involving bit numbers.
 		default-insn-word-bitsize
 
-		; Length of an unknown instruction.  Used by disassembly
-		; and by the simulator's invalid insn handler.
+		;; Length of an unknown instruction.  Used by disassembly
+		;; and by the simulator's invalid insn handler.
 		default-insn-bitsize
 
-		; Number of bytes of insn that can be initially fetched.
-		; In non-LIW isas this would be the length of the smallest
-		; insn.  For LIW isas it depends - only one LIW isa is
-		; currently supported (m32r).
+		;; Number of bytes of insn that can be initially fetched.
+		;; In non-LIW isas this would be the length of the smallest
+		;; insn.  For LIW isas it depends - only one LIW isa is
+		;; currently supported (m32r).
 		base-insn-bitsize
 
-		; Initial bitnumbers to decode insns by.
-		; ??? At present the rest of the decoding is determined
-		; algorithmically.  May wish to give the user more control
-		; [like psim].
+		;; Initial bitnumbers to decode insns by.
+		;; ??? At present the rest of the decoding is determined
+		;; algorithmically.  May wish to give the user more control
+		;; [like psim].
 		decode-assist
 
-		; Number of instructions that can be fetched at a time
-		; [e.g. 2 on m32r].
+		;; Number of instructions that can be fetched at a time
+		;; [e.g. 2 on m32r].
 		liw-insns
 
-		; Maximum number of instructions the cpu can execute in
-		; parallel.
-		; FIXME: Rename to max-parallel-insns.
+		;; Maximum number of instructions the cpu can execute in
+		;; parallel.
+		;; FIXME: Rename to max-parallel-insns.
 		parallel-insns
 
-		; List of <iframe> objects.
+		;; List of <iframe> objects.
 		;frames
 
-		; Condition tested before execution of any instruction or
-		; #f if there is none.  For architectures like ARM, ARC.
-		; If specified it is a pair of
-		; (condition-field-name . rtl-for-condition)
+		;; Condition tested before execution of any instruction or
+		;; #f if there is none.  For architectures like ARM, ARC.
+		;; If specified it is a pair of
+		;; (condition-field-name . rtl-for-condition)
 		(condition . #f)
 
-		; Code to execute after CONDITION and prior to SEMANTICS.
-		; This is rtl in source form or #f if there is none.
-		; This is generally unused.  It is used on the ARM to set
-		; R15 to the correct value.
-		; The reason it's not specified with SEMANTICS is that it is
-		; believed some applications won't need/want this.
-		; ??? It is a bit of a hack though, as it is used to aid
-		; implementation of apps (e.g. simulator).  Arguably something
-		; that doesn't belong here.  Maybe as more architectures are
-		; ported that have the PC as a general register, a better way
-		; to do this will arise.
+		;; Code to execute after CONDITION and prior to SEMANTICS.
+		;; This is rtl in source form or #f if there is none.
+		;; This is generally unused.  It is used on the ARM to set
+		;; R15 to the correct value.
+		;; The reason it's not specified with SEMANTICS is that it is
+		;; believed some applications won't need/want this.
+		;; ??? It is a bit of a hack though, as it is used to aid
+		;; implementation of apps (e.g. simulator).  Arguably something
+		;; that doesn't belong here.  Maybe as more architectures are
+		;; ported that have the PC as a general register, a better way
+		;; to do this will arise.
 		(setup-semantics . #f)
 
-		; list of simulator instruction splits
-		; FIXME: should live in simulator file (needs class cleanup).
+		;; list of simulator instruction splits
+		;; FIXME: should live in simulator file (needs class cleanup).
 		(decode-splits . ())
 
-		; ??? More may need to migrate here.
+		;; ??? More may need to migrate here.
 		)
 	      nil)
 )
 
-; Accessors.
+;; Accessors.
 
 (define-getters <isa> isa
   (base-insn-bitsize default-insn-bitsize default-insn-word-bitsize
@@ -1145,11 +1145,11 @@
 
 (define (isa-enum isa) (string-append "ISA_" (string-upcase (gen-sym isa))))
 
-; Return minimum/maximum size in bits of all insns in the isa.
+;; Return minimum/maximum size in bits of all insns in the isa.
 
 (define (isa-min-insn-bitsize isa)
-  ; add `65535' in case list is nil (avoids crash)
-  ; [a language with infinite precision can't have min-reduce-iota-0 :-)]
+  ;; add `65535' in case list is nil (avoids crash)
+  ;; [a language with infinite precision can't have min-reduce-iota-0 :-)]
   (apply min (cons 65535
 		   (map insn-length (find (lambda (insn)
 					    (and (not (has-attr? insn 'ALIAS))
@@ -1158,8 +1158,8 @@
 )
 
 (define (isa-max-insn-bitsize isa)
-  ; add `0' in case list is nil (avoids crash)
-  ; [a language with infinite precision can't have max-reduce-iota-0 :-)]
+  ;; add `0' in case list is nil (avoids crash)
+  ;; [a language with infinite precision can't have max-reduce-iota-0 :-)]
   (apply max (cons 0
 		   (map insn-length (find (lambda (insn)
 					    (and (not (has-attr? insn 'ALIAS))
@@ -1167,8 +1167,8 @@
 					  (non-multi-insns (current-insn-list))))))
 )
 
-; Return a boolean indicating if instructions in ISA can be kept in a
-; portable int.
+;; Return a boolean indicating if instructions in ISA can be kept in a
+;; portable int.
 
 (define (isa-integral-insn? isa)
   (<= (isa-max-insn-bitsize isa) 32)
@@ -1188,9 +1188,9 @@
   spec
 )
 
-; Parse an isa condition spec.
-; `condition' here refers to the condition performed by architectures like
-; ARM and ARC before each insn.
+;; Parse an isa condition spec.
+;; `condition' here refers to the condition performed by architectures like
+;; ARM and ARC before each insn.
 
 (define (/isa-parse-condition context spec)
   (if (null? spec)
@@ -1204,7 +1204,7 @@
 	spec))
 )
 
-; Parse a setup-semantics spec.
+;; Parse a setup-semantics spec.
 
 (define (/isa-parse-setup-semantics context spec)
   (if (not (null? spec))
@@ -1212,9 +1212,9 @@
       #f)
 )
 
-; Parse an isa spec.
-; The result is the <isa> object.
-; All arguments are in raw (non-evaluated) form.
+;; Parse an isa spec.
+;; The result is the <isa> object.
+;; All arguments are in raw (non-evaluated) form.
 
 (define (/isa-parse context name comment attrs
 		    base-insn-bitsize default-insn-bitsize default-insn-word-bitsize
@@ -1229,10 +1229,10 @@
     (if (not (memq name (current-arch-isa-name-list)))
 	(parse-error context "isa name is not present in `define-arch'" name))
 
-    ; Isa's are always kept - we need them to validate later uses, even if
-    ; the then resulting object won't be kept.  All isas are also needed to
-    ; compute a proper value for the isas-cache member of <hardware-base>
-    ; for builtin objects.
+    ;; Isa's are always kept - we need them to validate later uses, even if
+    ;; the then resulting object won't be kept.  All isas are also needed to
+    ;; compute a proper value for the isas-cache member of <hardware-base>
+    ;; for builtin objects.
     (make <isa>
       name
       (parse-comment context comment)
@@ -1257,8 +1257,8 @@
       ))
 )
 
-; Read an isa entry.
-; ARG-LIST is an associative list of field name and field value.
+;; Read an isa entry.
+;; ARG-LIST is an associative list of field name and field value.
 
 (define (/isa-read context . arg-list)
   (let (
@@ -1298,8 +1298,8 @@
 	      ((condition) (set! condition (cdr arg)))
 	      ((setup-semantics) (set! setup-semantics (cadr arg)))
 	      ((decode-splits) (set! decode-splits (cdr arg)))
-	      ((insn-types) #t) ; ignore for now
-	      ((frame) #t) ; ignore for now
+	      ((insn-types) #t) ;; ignore for now
+	      ((frame) #t) ;; ignore for now
 	      (else (parse-error context "invalid isa arg" arg)))
 	    (loop (cdr arg-list)))))
 
@@ -1316,7 +1316,7 @@
 		setup-semantics decode-splits))
 )
 
-; Define a <isa> object, name/value pair list version.
+;; Define a <isa> object, name/value pair list version.
 
 (define define-isa
   (lambda arg-list
@@ -1327,7 +1327,7 @@
       i))
 )
 
-; Subroutine of modify-isa to process one add-decode-split spec.
+;; Subroutine of modify-isa to process one add-decode-split spec.
 
 (define (/isa-add-decode-split! context isa spec)
   (let ((decode-split (/isa-parse-decode-split context spec)))
@@ -1335,7 +1335,7 @@
     *UNSPECIFIED*)
 )
 
-; Main routine for modifying existing isa definitions
+;; Main routine for modifying existing isa definitions
 
 (define modify-isa
   (lambda arg-list
@@ -1350,10 +1350,10 @@
 
 	(let loop ((args arg-list))
 	  (if (null? args)
-	      #f ; done
+	      #f ;; done
 	      (let ((arg-spec (car args)))
 		(case (car arg-spec)
-		  ((name) #f) ; ignore, already processed
+		  ((name) #f) ;; ignore, already processed
 		  ((add-decode-split)
 		   (/isa-add-decode-split! context isa (cdr arg-spec)))
 		  (else
@@ -1363,80 +1363,80 @@
     *UNSPECIFIED*)
 )
 
-; Return boolean indicating if ISA supports parallel execution.
+;; Return boolean indicating if ISA supports parallel execution.
 
 (define (isa-parallel-exec? isa) (> (isa-parallel-insns isa) 1))
 
-; Return a boolean indicating if ISA supports conditional execution
-; of all instructions.
+;; Return a boolean indicating if ISA supports conditional execution
+;; of all instructions.
 
 (define (isa-conditional-exec? isa) (->bool (isa-condition isa)))
 
-; The `<cpu>' object collects together various details about a particular
-; subset of the architecture (e.g. perhaps all 32 bit variants of the sparc
-; architecture).
-; This is called a "cpu-family".
-; ??? May be renamed to <family> (both internally and in the .cpu file).
-; ??? Another way to do this would be to discard the family notion and allow
-; machs to inherit from other machs, as well as use isas to distinguish
-; sufficiently dissimilar machs.  This would remove a fuzzy illspecified
-; notion with a concrete one.
-; ??? Maybe a better way to organize sparc32 vs sparc64 is via an isa.
+;; The `<cpu>' object collects together various details about a particular
+;; subset of the architecture (e.g. perhaps all 32 bit variants of the sparc
+;; architecture).
+;; This is called a "cpu-family".
+;; ??? May be renamed to <family> (both internally and in the .cpu file).
+;; ??? Another way to do this would be to discard the family notion and allow
+;; machs to inherit from other machs, as well as use isas to distinguish
+;; sufficiently dissimilar machs.  This would remove a fuzzy illspecified
+;; notion with a concrete one.
+;; ??? Maybe a better way to organize sparc32 vs sparc64 is via an isa.
 
 (define <cpu>
   (class-make '<cpu>
 	      '(<ident>)
 	      '(
-		; one of big/little/either/#f.
-		; If #f, then {insn,data,float}-endian are used.
-		; Otherwise they're ignored.
+		;; one of big/little/either/#f.
+		;; If #f, then {insn,data,float}-endian are used.
+		;; Otherwise they're ignored.
 		endian
 
-		; one of big/little/either.
+		;; one of big/little/either.
 		insn-endian
 
-		; one of big/little/either/big-words/little-words.
-		; If big-words then each word is little-endian.
-		; If little-words then each word is big-endian.
+		;; one of big/little/either/big-words/little-words.
+		;; If big-words then each word is little-endian.
+		;; If little-words then each word is big-endian.
 		data-endian
 
-		; one of big/little/either/big-words/little-words.
+		;; one of big/little/either/big-words/little-words.
 		float-endian
 
-		; number of bits in a word.
+		;; number of bits in a word.
 		word-bitsize
 
-		; number of bits in a chunk of an instruction word, for
-		; endianness conversion purposes; 0 = no chunking
+		;; number of bits in a chunk of an instruction word, for
+		;; endianness conversion purposes; 0 = no chunking
 		insn-chunk-bitsize
 
-		; Transformation to use in generated files should one be
-		; needed.  At present the only supported value is a string
-		; which is the file suffix.
-		; ??? A dubious element of the description language, but given
-		; the quantity of generated files, some machine generated
-		; headers may need to #include other machine generated headers
-		; (e.g. cpuall.h).
+		;; Transformation to use in generated files should one be
+		;; needed.  At present the only supported value is a string
+		;; which is the file suffix.
+		;; ??? A dubious element of the description language, but given
+		;; the quantity of generated files, some machine generated
+		;; headers may need to #include other machine generated headers
+		;; (e.g. cpuall.h).
 		file-transform
 
-		; Allow a cpu family to override the isa parallel-insns spec.
-		; ??? Concession to the m32r port which can go away, in time.
+		;; Allow a cpu family to override the isa parallel-insns spec.
+		;; ??? Concession to the m32r port which can go away, in time.
 		parallel-insns
 
-		; Computed: maximum number of insns which may pass before there
-		; an insn writes back its output operands.
+		;; Computed: maximum number of insns which may pass before there
+		;; an insn writes back its output operands.
 		max-delay
 
 		)
 	      nil)
 )
 
-; Accessors.
+;; Accessors.
 
 (define-getters <cpu> cpu (word-bitsize insn-chunk-bitsize file-transform parallel-insns max-delay))
 (define-setters <cpu> cpu (max-delay))
 
-; Return endianness of instructions.
+;; Return endianness of instructions.
 
 (define (cpu-insn-endian cpu)
   (let ((endian (elm-xget cpu 'endian)))
@@ -1445,7 +1445,7 @@
 	(elm-xget cpu 'insn-endian)))
 )
 
-; Return endianness of data.
+;; Return endianness of data.
 
 (define (cpu-data-endian cpu)
   (let ((endian (elm-xget cpu 'endian)))
@@ -1454,7 +1454,7 @@
 	(elm-xget cpu 'data-endian)))
 )
 
-; Return endianness of floats.
+;; Return endianness of floats.
 
 (define (cpu-float-endian cpu)
   (let ((endian (elm-xget cpu 'endian)))
@@ -1463,10 +1463,10 @@
 	(elm-xget cpu 'float-endian)))
 )
 
-; Parse a cpu family description
-; This is the main routine for building a <cpu> object from a cpu
-; description in the .cpu file.
-; All arguments are in raw (non-evaluated) form.
+;; Parse a cpu family description
+;; This is the main routine for building a <cpu> object from a cpu
+;; description in the .cpu file.
+;; All arguments are in raw (non-evaluated) form.
 
 (define (/cpu-parse context name comment attrs
 		    endian insn-endian data-endian float-endian
@@ -1487,18 +1487,18 @@
 	      insn-chunk-bitsize
 	      file-transform
 	      parallel-insns
-	      0 ; default max-delay. will compute correct value
+	      0 ;; default max-delay. will compute correct value
 	      )
 	(begin
 	  (logit 2 "Ignoring " name ".\n")
-	  #f))) ; cpu is not to be kept
+	  #f))) ;; cpu is not to be kept
 )
 
-; Read a cpu family description
-; This is the main routine for analyzing a cpu description in the .cpu file.
-; CONTEXT is a <context> object for error messages.
-; ARG-LIST is an associative list of field name and field value.
-; /cpu-parse is invoked to create the <cpu> object.
+;; Read a cpu family description
+;; This is the main routine for analyzing a cpu description in the .cpu file.
+;; CONTEXT is a <context> object for error messages.
+;; ARG-LIST is an associative list of field name and field value.
+;; /cpu-parse is invoked to create the <cpu> object.
 
 (define (/cpu-read context . arg-list)
   (let (
@@ -1545,7 +1545,7 @@
 		word-bitsize insn-chunk-bitsize file-transform parallel-insns-))
 )
 
-; Define a cpu family object, name/value pair list version.
+;; Define a cpu family object, name/value pair list version.
 
 (define define-cpu
   (lambda arg-list
@@ -1560,22 +1560,22 @@
       c))
 )
 
-; The `<mach>' object describes one member of a `cpu' family.
+;; The `<mach>' object describes one member of a `cpu' family.
 
 (define <mach>
   (class-make '<mach> '(<ident>)
 	      '(
-		; cpu family this mach is a member of
+		;; cpu family this mach is a member of
 		cpu
-		; bfd name of mach
+		;; bfd name of mach
 		bfd-name
-		; list of <isa> objects
+		;; list of <isa> objects
 		isas
 		)
 	      nil)
 )
 
-; Accessors.
+;; Accessors.
 
 (define-getters <mach> mach (cpu bfd-name isas))
 
@@ -1592,9 +1592,9 @@
 	  (current-mach-list)))
 )
 
-; Parse a machine entry.
-; The result is a <mach> object or #f if the mach isn't to be kept.
-; All arguments are in raw (non-evaluated) form.
+;; Parse a machine entry.
+;; The result is a <mach> object or #f if the mach isn't to be kept.
+;; All arguments are in raw (non-evaluated) form.
 
 (define (/mach-parse context name comment attrs cpu bfd-name isas)
   (logit 2 "Processing mach " name " ...\n")
@@ -1632,12 +1632,12 @@
 
 	  (begin
 	    (logit 2 "Ignoring " name ".\n")
-	    #f)))) ; mach is not to be kept
+	    #f)))) ;; mach is not to be kept
 )
 
-; Read a mach entry.
-; CONTEXT is a <context> object for error messages.
-; ARG-LIST is an associative list of field name and field value.
+;; Read a mach entry.
+;; CONTEXT is a <context> object for error messages.
+;; ARG-LIST is an associative list of field name and field value.
 
 (define (/mach-read context . arg-list)
   (let (
@@ -1672,7 +1672,7 @@
 		 (if isas isas (list (obj:name (car (current-isa-list)))))))
 )
 
-; Define a <mach> object, name/value pair list version.
+;; Define a <mach> object, name/value pair list version.
 
 (define define-mach
   (lambda arg-list
@@ -1683,13 +1683,13 @@
       m))
 )
 
-; Miscellaneous state derived from the input data.
-; FIXME: being redone
+;; Miscellaneous state derived from the input data.
+;; FIXME: being redone
 
-; Size of a word in bits.
-; All selected cpu families must have same value or error.
-; Ergo, don't use this if multiple word-bitsize values are expected.
-; E.g. opcodes support for architectures with both 32 and 64 variants.
+;; Size of a word in bits.
+;; All selected cpu families must have same value or error.
+;; Ergo, don't use this if multiple word-bitsize values are expected.
+;; E.g. opcodes support for architectures with both 32 and 64 variants.
 
 (define (state-word-bitsize)
   (let* ((wb-list (map cpu-word-bitsize (current-cpu-list)))
@@ -1701,81 +1701,81 @@
     result)
 )
 
-; Return maximum word bitsize.
+;; Return maximum word bitsize.
 
 (define (state-max-word-bitsize)
   (apply max (map cpu-word-bitsize (current-cpu-list)))
 )
 
-; Size of normal instruction.
-; All selected isas must have same value or error.
+;; Size of normal instruction.
+;; All selected isas must have same value or error.
 
 (define (state-default-insn-bitsize)
   (let ((dib (map isa-default-insn-bitsize (current-isa-list))))
-    ; FIXME: ensure all have same value.
+    ;; FIXME: ensure all have same value.
     (car dib))
 )
 
-; Number of bytes of insn we can initially fetch.
-; All selected isas must have same value or error.
+;; Number of bytes of insn we can initially fetch.
+;; All selected isas must have same value or error.
 
 (define (state-base-insn-bitsize)
   (let ((bib (map isa-base-insn-bitsize (current-isa-list))))
-    ; FIXME: ensure all have same value.
+    ;; FIXME: ensure all have same value.
     (car bib))
 )
 
-; Return parallel-insns spec.
+;; Return parallel-insns spec.
 
 (define (state-parallel-insns)
-  ; Assert only one cpu family has been selected.
+  ;; Assert only one cpu family has been selected.
   (assert-keep-one)
 
   (let ((par-insns (map isa-parallel-insns (current-isa-list)))
 	(cpu-par-insns (cpu-parallel-insns (current-cpu))))
-    ; ??? The m32r does have parallel execution, but to keep support for the
-    ; base mach simpler, a cpu family is allowed to override the isa spec.
+    ;; ??? The m32r does have parallel execution, but to keep support for the
+    ;; base mach simpler, a cpu family is allowed to override the isa spec.
     (or cpu-par-insns
-	; FIXME: ensure all have same value.
+	;; FIXME: ensure all have same value.
 	(car par-insns)))
 )
 
-; Return boolean indicating if parallel execution support is required.
+;; Return boolean indicating if parallel execution support is required.
 
 (define (state-parallel-exec?)
   (> (state-parallel-insns) 1)
 )
 
-; Return liw-insns spec.
+;; Return liw-insns spec.
 
 (define (state-liw-insns)
   (let ((liw-insns (map isa-liw-insns (current-isa-list))))
-    ; FIXME: ensure all have same value.
+    ;; FIXME: ensure all have same value.
     (car liw-insns))
 )
 
-; Return decode-assist spec.
+;; Return decode-assist spec.
 
 (define (state-decode-assist)
   (isa-decode-assist (current-isa))
 )
 
-; Return boolean indicating if current isa conditionally executes all insn.
+;; Return boolean indicating if current isa conditionally executes all insn.
 
 (define (state-conditional-exec?)
   (isa-conditional-exec? (current-isa))
 )
 
-; Architecture or cpu wide values derived from other data.
+;; Architecture or cpu wide values derived from other data.
 
 (define <derived-arch-data>
   (class-make '<derived-arch-data>
 	      nil
 	      '(
-		; whether all insns can be recorded in a host int
+		;; whether all insns can be recorded in a host int
 		integral-insn?
 
-		; whether a large int is needed for insns
+		;; whether a large int is needed for insns
 		large-insn-word?
 		)
 	      nil)
@@ -1799,7 +1799,7 @@
      ))
 )
 
-; Accessors.
+;; Accessors.
 
 (define (adata-integral-insn? arch)
   (force (elm-xget (arch-derived arch) 'integral-insn?))
@@ -1809,7 +1809,7 @@
   (elm-xget (arch-derived arch) 'large-insn-word?)
 )
 
-; Instruction analysis control.
+;; Instruction analysis control.
 
 ;; The maximum number of virtual insns.
 ;; They can be recorded with negative ordinals, and multi-insns are currently
@@ -1872,7 +1872,7 @@
 	(if (any-true? (map multi-insn? (arch-insn-list arch)))
 
 	    (begin
-	      ; Instantiate sub-insns of all multi-insns.
+	      ;; Instantiate sub-insns of all multi-insns.
 	      (logit 1 "Instantiating multi-insns ...\n")
 
 	      ;; FIXME: Hack to remove differences in generated code when we
@@ -1923,20 +1923,20 @@
   (logit 1 "Done canonicalization.\n")
 )
 
-; Analyze the instruction set.
-; The name is explicitly vague because it's intended that all insn analysis
-; would be controlled here.
-; If the instruction set has already been sufficiently analyzed, do nothing.
-; INCLUDE-ALIASES? is #t if alias insns are to be included.
-; ANALYZE-SEMANTICS? is #t if insn semantics are to be analyzed.
-;
-; This is a very expensive operation, so we only do it as necessary.
-; There are (currently) two different kinds of users: assemblers and
-; simulators.  Assembler style apps don't always need to analyze the semantics.
-; Simulator style apps don't want to include the alias insns.
+;; Analyze the instruction set.
+;; The name is explicitly vague because it's intended that all insn analysis
+;; would be controlled here.
+;; If the instruction set has already been sufficiently analyzed, do nothing.
+;; INCLUDE-ALIASES? is #t if alias insns are to be included.
+;; ANALYZE-SEMANTICS? is #t if insn semantics are to be analyzed.
+;;
+;; This is a very expensive operation, so we only do it as necessary.
+;; There are (currently) two different kinds of users: assemblers and
+;; simulators.  Assembler style apps don't always need to analyze the semantics.
+;; Simulator style apps don't want to include the alias insns.
 
 (define (arch-analyze-insns! arch include-aliases? analyze-semantics?)
-  ; Catch apps that haven't set word sizes yet.
+  ;; Catch apps that haven't set word sizes yet.
   (mode-ensure-word-sizes-defined)
 
   (if (or (not (arch-insns-analyzed? arch))
@@ -1980,7 +1980,7 @@
   *UNSPECIFIED*
 )
 
-; Called before a .cpu file is read in.
+;; Called before a .cpu file is read in.
 
 (define (arch-init!)
 
@@ -2010,7 +2010,7 @@ Define a cpu family, name/value pair list version.
   *UNSPECIFIED*
 )
 
-; Called before a .cpu file is read in.
+;; Called before a .cpu file is read in.
 
 (define (mach-init!)
   (let ((arch CURRENT-ARCH))
@@ -2029,16 +2029,16 @@ Define a machine, name/value pair list version.
   *UNSPECIFIED*
 )
 
-; Called after .cpu file is read in.
+;; Called after .cpu file is read in.
 
 (define (arch-finish!)
   (let ((arch CURRENT-ARCH))
 
-    ; Lists are constructed in the reverse order they appear in the file
-    ; [for simplicity and efficiency].  Restore them to file order for the
-    ; human reader/debugger.
-    ; We don't need to do this for ifld, op, insn, minsn lists because
-    ; they are handled differently.
+    ;; Lists are constructed in the reverse order they appear in the file
+    ;; [for simplicity and efficiency].  Restore them to file order for the
+    ;; human reader/debugger.
+    ;; We don't need to do this for ifld, op, insn, minsn lists because
+    ;; they are handled differently.
     (arch-set-enum-list! arch (reverse (arch-enum-list arch)))
     (arch-set-kw-list! arch (reverse (arch-kw-list arch)))
     (arch-set-isa-list! arch (reverse (arch-isa-list arch)))
@@ -2052,7 +2052,7 @@ Define a machine, name/value pair list version.
   *UNSPECIFIED*
 )
 
-; Called after .cpu file is read in.
+;; Called after .cpu file is read in.
 
 (define (mach-finish!)
   (/adata-set-derived! CURRENT-ARCH)

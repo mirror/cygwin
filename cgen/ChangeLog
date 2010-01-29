@@ -1,5 +1,25 @@
 2010-01-28  Doug Evans  <dje@sebabeach.org>
 
+	* pmacros.scm (pmacros-init!): New arg rtl-version, all callers
+	updated.  Use %-prefix if rtl-version >= 0.9.
+	* read.scm (/supported-rtl-versions): Add (0 9).
+	(/rtl-version-valid?): New function.
+	(/cmd-define-rtl-version): If new rtl version, reinvoke pmacros-init!.
+	(/reader-expr): New function.
+	(reader-process): New function.
+	(/reader-process-with-loc!): Renamed from /reader-process!.
+	Don't pre-expand `if' commands.
+	(/cmd-if): Simplify.  Pmacro-expand test, then, else clauses here.
+	Handle rtl-version-equal?, rtl-version-at-least?.
+	* testsuite/Makefile.am (clean-test-files): Remove *.test.cpu*.
+	* testsuite/Makefile.in: Regenerate.
+	* testsuite/pmacros-1.test: Test both . and % as prefixes.
+	* testsuite/testsuite.cpu (/begin, /print, /dump): New pmacros.
+	(newline, print-match, print-expr, print-thunk): Use them.
+	(internal-verify): Update definition.
+	* doc/rtl.texi (define-rtl-version): Document rtl version 0.9.
+	(Top level conditionals): New node.
+
 	* read.scm (rtl-version-at-least?): Fix typo.
 
 2010-01-27  Doug Evans  <dje@sebabeach.org>

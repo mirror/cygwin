@@ -1344,12 +1344,13 @@
 )
 
 ;; Initialization.
+;; If RTL-VERSION >= (0 9), install %pmacros, otherwise install .pmacros.
 
-(define (pmacros-init!)
+(define (pmacros-init! rtl-version)
   (set! /pmacro-table (make-hash-table 127))
   (set! /smacro-table (make-hash-table 41))
 
-  ;; Some "predefined" pmacros.
+  ;; Predefined pmacros.
 
   (let ((macros
 	 ;; name arg-spec syntactic? function description
@@ -1412,7 +1413,10 @@
 	  (list 'cdar '(x) #f /pmacro-builtin-cdar "return (cdar x)")
 	  (list 'cddr '(x) #f /pmacro-builtin-cddr "return (cddr x)")
 	  (list 'internal-test '(expr) #f /pmacro-builtin-internal-test "testsuite use only")
-	  )))
+	  ))
+	(prefix (if (member rtl-version '((0 7) (0 8)))
+		    /pmacro-orig-prefix
+		    /pmacro-prefix)))
 
     (for-each (lambda (x)
 		(let ((name (list-ref x 0))
@@ -1420,16 +1424,12 @@
 		      (syntactic? (list-ref x 2))
 		      (pmacro (list-ref x 3))
 		      (comment (list-ref x 4)))
-		  (for-each (lambda (prefix)
-			      (let ((full-name (string->symbol (string-append prefix (symbol->string name)))))
-				(/pmacro-set! full-name
-					      (/pmacro-make full-name arg-spec #f syntactic? pmacro comment))
-				(if syntactic?
-				    (/smacro-set! full-name
-						  (/pmacro-make full-name arg-spec #f syntactic? pmacro comment)))))
-			    (list /pmacro-orig-prefix))))
+		  (let ((full-name (string->symbol (string-append prefix (symbol->string name)))))
+		    (/pmacro-set! full-name
+				  (/pmacro-make full-name arg-spec #f syntactic? pmacro comment))
+		    (if syntactic?
+			(/smacro-set! full-name
+				      (/pmacro-make full-name arg-spec #f syntactic? pmacro comment))))))
+
 	      macros))
 )
-
-;; Initialize so we're ready to use after loading.
-(pmacros-init!)

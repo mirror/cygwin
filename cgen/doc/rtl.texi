@@ -282,6 +282,27 @@ This is controlled by the @samp{-m} option.
 
 @item (application-is? application)
 Return ``true'' if the current application generator is @samp{application}.
+Currently valid applications are:
+
+@c There's not a clear separation between the item's name and its
+@c description when viewed from emacs or info.
+@c The : suffix on the names is to help.
+@itemize @bullet
+@item DOC:
+ISA documentation generated from the description file(s).
+@item OPCODES:
+Binutils support
+@item GAS-TEST:
+GAS testsuite generator
+@item SID-SIMULATOR:
+The SID simulator
+@item SIMULATOR:
+The GNU simulator
+@item SIM-TEST:
+The GNU simulator testsuite generator
+@item TESTSUITE:
+The CGEN testsuite
+@end itemize
 
 @item (rtl-version-equal? major minor)
 Return ``true'' if the RTL version specified by the @file{.cpu} file is

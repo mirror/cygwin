@@ -84,7 +84,7 @@
 )
 (define (rtl-version-at-least? major minor)
   (let ((rmajor (cgen-rtl-major))
-	(rminor (cgen-rtl-major)))
+	(rminor (cgen-rtl-minor)))
     (or (> rmajor major)
 	(and (= rmajor major)
 	     (>= rminor minor))))

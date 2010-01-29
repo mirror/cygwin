@@ -1,3 +1,7 @@
+2010-01-28  Doug Evans  <dje@sebabeach.org>
+
+	* read.scm (rtl-version-at-least?): Fix typo.
+
 2010-01-27  Doug Evans  <dje@sebabeach.org>
 
 	* read.scm: Follow commenting convention.

@@ -36,44 +36,60 @@
 
 ;; Some useful pmacros for testcases.
 
-(define-pmacro (newline) (.print "\n"))
+(if (rtl-version-at-least? 0 9)
+    (begin
+      (define-pmacro /begin %begin)
+      (define-pmacro /print %print)
+      (define-pmacro /dump %dump))
+    (begin
+      (define-pmacro /begin .begin)
+      (define-pmacro /print .print)
+      (define-pmacro /dump .dump)))
+
+(define-pmacro (newline) (/print "\n"))
 
 ;; Record name of test for debugging purposes.
 
 (define-pmacro (test-name name)
-  (.print "TEST: " name "\n")
+  (/print "TEST: " name "\n")
 )
 
 ;; Print TEXT as the expected output.
 
 (define-pmacro (print-match text)
-  (.begin
-   (.print "MATCH: ")
-   (.print text)
+  (/begin
+   (/print "MATCH: ")
+   (/print text)
    (newline))
 )
 
 ;; Print EXPR as the text to be verified.
 
 (define-pmacro (print-expr expr)
-  (.begin
-   (.print "EXPR: ")
-   (.dump expr)
+  (/begin
+   (/print "EXPR: ")
+   (/dump expr)
    (newline))
 )
 
 ;; THUNK is invoked to exercise whatever is being tested.
 
 (define-pmacro (print-thunk thunk)
-  (.begin
-   (.print "EXPR: ")
+  (/begin
+   (/print "EXPR: ")
    (thunk)
    (newline))
 )
 
 ;; Wrapper around .internal-test to include pass/fail messages.
-(define-pmacro (internal-verify test-name expr)
-  (.if (.internal-test expr)
-       (.print "PASS: " test-name "\n")
-       (.print "FAIL: " test-name "\n"))
+
+(if (rtl-version-at-least? 0 9)
+    (define-pmacro (internal-verify test-name expr)
+      (%if (%internal-test expr)
+	   (%print "PASS: " test-name "\n")
+	   (%print "FAIL: " test-name "\n")))
+    (define-pmacro (internal-verify test-name expr)
+      (.if (.internal-test expr)
+	   (.print "PASS: " test-name "\n")
+	   (.print "FAIL: " test-name "\n")))
 )

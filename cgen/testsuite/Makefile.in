@@ -261,7 +261,7 @@ check: Makefile test-utils.sh
 .PHONY: clean-test-files
 clean: clean-test-files
 clean-test-files:
-	rm -f *.test.cpu
+	rm -f *.test.cpu*
 	rm -f *.out
 	rm -f *.tmp
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

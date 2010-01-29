@@ -94,7 +94,11 @@
 )
 
 ;; List of supported versions
-(define /supported-rtl-versions '((0 7) (0 8)))
+(define /supported-rtl-versions '((0 7) (0 8) (0 9)))
+
+;; Return a boolean indicating if VERSION is valid.
+
+(define (/rtl-version-valid? version) (member version /supported-rtl-versions))
 
 (define (/cmd-define-rtl-version major minor)
   (if (not (non-negative-integer? major))
@@ -106,8 +110,12 @@
     (if (not (member new-version /supported-rtl-versions))
 	(parse-error #f "Unsupported/invalid rtl version" new-version))
     (if (not (equal? new-version /CGEN-RTL-VERSION))
-	(logit 1 "Setting RTL version to " major "." minor " ...\n"))
-    (set! /CGEN-RTL-VERSION new-version))
+	(begin
+	  (logit 1 "Setting RTL version to " major "." minor " ...\n")
+	  ;; Pmacros are rtl-version-dependent.  If we've changed the RTL
+	  ;; version, re-initialize.
+	  (pmacros-init! new-version)
+	  (set! /CGEN-RTL-VERSION new-version))))
 )
 
 ;; Which application is in use (UNKNOWN, DESC, OPCODES, SIMULATOR, ???).
@@ -358,10 +366,21 @@
       (unspecified-location))
 )
 
-;; Process a macro-expanded entry.
+;; Pmacro-expand EXPR.
+
+(define (/reader-expand expr loc)
+  (if (reader-trace-pmacros? CURRENT-READER)
+      (pmacro-trace expr loc)
+      (pmacro-expand expr loc))
+)
+
+;; Process a pmacro-expanded entry.
 
 (define (/reader-process-expanded-1! entry)
   (let ((location (location-property entry)))
+
+    (if (not (form? entry))
+	(parse-error location "improperly formed entry" entry))
 
     ;; Set the current source location for better diagnostics.
     ;; Access with current-reader-location.
@@ -408,11 +427,8 @@
   *UNSPECIFIED*
 )
 
-;; Process 1 or more macro-expanded entries.
+;; Process one or more pmacro-expanded entries.
 ;; ENTRY is expected to have a location-property object property.
-
-;; NOTE: This is "public" so the .eval pmacro can use it.
-;; This is also used by /cmd-if.
 
 (define (reader-process-expanded! entry)
   ;; () is used to indicate a no-op
@@ -431,23 +447,40 @@
   *UNSPECIFIED*
 )
 
+;; Process ENTRY, which is not yet pmacro-expanded.
+
+(define (reader-process! entry)
+  (/reader-process-with-loc! entry
+			     (or (location-property entry)
+				 (unspecified-location)))
+)
+
 ;; Process file entry ENTRY.
 ;; LOC is a <location> object for ENTRY.
 
-(define (/reader-process! entry loc)
-  (if (not (form? entry))
-      (parse-error loc "improperly formed entry" entry))
-
-  ;; First do macro expansion, but not if define-pmacro of course.
-  ;; ??? Singling out define-pmacro this way seems a bit odd.  The way to look
-  ;; at it, I guess, is to think of define-pmacro as (currently) the only
-  ;; "syntactic" command (it doesn't pre-evaluate its arguments).
-  (let ((expansion (if (eq? (car entry) 'define-pmacro)
-		       (begin (location-property-set! entry loc) entry)
-		       (if (reader-trace-pmacros? CURRENT-READER)
-			   (pmacro-trace entry loc)
-			   (pmacro-expand entry loc)))))
-    (reader-process-expanded! expansion))
+(define (/reader-process-with-loc! entry loc)
+  ;; () is used to indicate a no-op
+  (cond ((null? entry)
+	 #f) ;; nothing to do
+	;; `begin' is used to group a collection of entries into one,
+	;; since pmacro can only return one expression (borrowed from
+	;; Scheme of course).
+	;; Recurse in case there are nested begins.
+	((eq? (car entry) 'begin)
+	 (for-each (lambda (e) (/reader-process-with-loc! e loc))
+		   (cdr entry)))
+	;; Don't do pmacro-expansion for `define-pmacro'.
+	;; ??? Singling out define-pmacro this way seems a bit odd.  The way to
+	;; look at it, I guess, is to think of define-pmacro as (currently) the
+	;; only "syntactic" command (it doesn't pre-evaluate its arguments).
+	;; Defer pmacro-expansion for `if' too.
+	((memq (car entry) '(define-pmacro if))
+	 (location-property-set! entry loc)
+	 (/reader-process-expanded-1! entry))
+	(else
+	 ;; First do pmacro expansion.
+	 (let ((expansion (/reader-expand entry loc)))
+	   (reader-process-expanded! expansion))))
 
   *UNSPECIFIED*
 )
@@ -470,7 +503,7 @@
 			  ;; location (it's easier).
 			  ;; ??? Use source-properties of entry, and only if
 			  ;; not present fall back on current-input-location.
-			  (/reader-process! entry (current-input-location #t))
+			  (/reader-process-with-loc! entry (current-input-location #t))
 			  (loop (read)))))))
 	)
 
@@ -487,7 +520,7 @@
 ;; Global containing all data of the currently selected architecture.
 
 (define CURRENT-ARCH #f)
-
+
 ;; `keep-mach' processing.
 
 ;; Return the currently selected cpu family.
@@ -878,7 +911,7 @@
 
   ;; Rather than add cgen-internal specific stuff to pmacros.scm, we create
   ;; the pmacro commands here.
-  (pmacros-init!)
+  (pmacros-init! /default-rtl-version)
   (reader-add-command! 'define-pmacro
 		       "\
 Define a preprocessor-style macro.
@@ -1005,31 +1038,41 @@ Define a preprocessor-style macro.
       (parse-error #f
 		   "wrong number of arguments to `if'"
 		   (cons 'if (cons test (cons then else)))))
-  ;; ??? rtx-eval test
-  (if (or (not (pair? test))
-	  (not (memq (car test) '(keep-isa? keep-mach? application-is?))))
-      (parse-error #f
-		   "only (if (keep-mach?|keep-isa?|application-is? ...) ...) are currently supported"
-		   test))
-  (case (car test)
-    ((keep-isa?)
-     (if (keep-isa? (cadr test))
-	 (reader-process-expanded! then)
-	 (if (null? else)
-	     #f
-	     (reader-process-expanded! (car else)))))
-    ((keep-mach?)
-     (if (keep-mach? (cadr test))
-	 (reader-process-expanded! then)
-	 (if (null? else)
-	     #f
-	     (reader-process-expanded! (car else)))))
-    ((application-is?)
-     (if (eq? APPLICATION (cadr test))
-	 (reader-process-expanded! then)
-	 (if (null? else)
-	     #f
-	     (reader-process-expanded! (car else))))))
+
+  (let ((etest (/reader-expand test (or (location-property test)
+					(unspecified-location)))))
+
+    ;; ??? rtx-eval etest
+    (if (or (not (pair? etest))
+	    (not (memq (car etest)
+		       '(keep-isa? keep-mach? application-is? rtl-version-equal? rtl-version-at-least?))))
+	(parse-error #f
+		     "only (if (keep-mach?|keep-isa?|application-is?|rtl-version-equal?|rtl-version-at-least? ...) ...) are currently supported"
+		     etest))
+
+    (let ((do-then
+	   (case (car etest)
+	     ((keep-isa?) (keep-isa? (cadr etest)))
+	     ((keep-mach?) (keep-mach? (cadr etest)))
+	     ((application-is?) (eq? APPLICATION (cadr etest)))
+	     ((rtl-version-equal?)
+	      (if (/rtl-version-valid? (cdr etest))
+		  (rtl-version-equal? (cadr etest) (caddr etest))
+		  (parse-error #f "invalid rtl version" (cdr etest))))
+	     ((rtl-version-at-least?)
+	      (if (/rtl-version-valid? (cdr etest))
+		  (rtl-version-at-least? (cadr etest) (caddr etest))
+		  (parse-error #f "invalid rtl version" (cdr etest)))))))
+
+      (if do-then
+	  (begin
+	    (logit 3 "Processing then clause: " then "\n")
+	    (reader-process! then))
+	  (if (null? else)
+	      *UNSPECIFIED*
+	      (begin
+		(logit 3 "Processing else clause: " (car else) "\n")
+		(reader-process! (car else)))))))
 )
 
 ;; Top level routine for loading .cpu files.

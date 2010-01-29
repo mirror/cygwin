@@ -1,4 +1,4 @@
-@c Copyright (C) 2000, 2003, 2009 Red Hat, Inc.
+@c Copyright (C) 2000, 2003, 2009, 2010 Red Hat, Inc.
 @c This file is part of the CGEN manual.
 @c For copying conditions, see the file cgen.texi.
 
@@ -15,6 +15,7 @@ its CPU description language.
 * Trade-offs::                  Various trade-offs in the design
 * Rules and notes::             Rules and notes common to all entries
 * RTL Versions::                Supported versions and differences
+* Top level conditionals::      Conditional definitions
 * Definitions::                 Definitions in the description file
 * Attributes::                  Random data associated with any entry
 * Architecture variants::       Specifying variations of a CPU
@@ -175,6 +176,7 @@ Syntax:
 
 When setting the RTL version, it must be the first thing done
 in the description file or the behaviour is undefined.
+This includes using or defining pmacros, the RTL version must be set first.
 After the RTL version is set, if it is changed the behavior is undefined.
 
 Note that one can still set it to the same version multiple times.
@@ -183,10 +185,10 @@ and one is debugging/testing files individually.
 
 The default RTL version, if @samp{define-rtl-version} is elided, is 0.7.
 
-The latest RTL version is 0.8:
+The latest RTL version is 0.9:
 
 @example
-(define-rtl-version 0 8)
+(define-rtl-version 0 9)
 @end example
 
 Every increment in major and minor versions is generally non-upward
@@ -251,7 +253,71 @@ When computing complete enum names with @samp{print-name},
 CGEN adds a @samp{-} between the prefix and the enum name.
 CGEN does not insert a @samp{-} with @samp{enum-prefix}.
 
+@item 0.9 @code{(define-rtl-version 0 9)}
+
+This version changed the prefix of pmacros from @samp{.} to @samp{%}.
+@samp{.pmacro} is changed to @samp{%pmacro}.
+
 @end itemize
+
+@node Top level conditionals
+@section Top level conditionals
+@cindex Top level conditionals
+
+CGEN supports conditionally defining objects through the use of @samp{if}
+and some specialized predicates.  These must appear at the ``top level'',
+i.e., not inside any other expression, except @samp{begin}.
+
+The following predicates are supported:
+
+@itemize @bullet
+
+@item (keep-isa? (isa-list))
+Return ``true'' if any ISA in @samp{isa-list} is being kept.
+This is controlled by the @samp{-i} option.
+
+@item (keep-mach? (machine-list))
+Return ``true'' if any machine in @samp{machine-list} is being kept.
+This is controlled by the @samp{-m} option.
+
+@item (application-is? application)
+Return ``true'' if the current application generator is @samp{application}.
+
+@item (rtl-version-equal? major minor)
+Return ``true'' if the RTL version specified by the @file{.cpu} file is
+@samp{major.minor}.
+
+@item (rtl-version-at-least? major minor)
+Return ``true'' if the RTL version specified by the @file{.cpu} file is
+at least @samp{major.minor}.
+
+@end itemize
+
+Here's an example from the CGEN testsuite.
+It is used to write some wrappers around a few builtin pmacros
+that are independent of the pmacro prefix character.
+
+@smallexample
+(if (rtl-version-at-least? 0 9)
+    (begin
+      (define-pmacro /begin %begin)
+      (define-pmacro /print %print)
+      (define-pmacro /dump %dump))
+    (begin
+      (define-pmacro /begin .begin)
+      (define-pmacro /print .print)
+      (define-pmacro /dump .dump)))
+@end smallexample
+
+Here's an example from the @samp{SH} cpu description.
+
+@smallexample
+(if (keep-isa? (compact))
+    (include "sh64-compact.cpu"))
+
+(if (keep-isa? (media))
+    (include "sh64-media.cpu"))
+@end smallexample
 
 @node Definitions
 @section Definitions

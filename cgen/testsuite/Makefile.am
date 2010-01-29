@@ -18,6 +18,6 @@ check: Makefile test-utils.sh
 .PHONY: clean-test-files
 clean: clean-test-files
 clean-test-files:
-	rm -f *.test.cpu
+	rm -f *.test.cpu*
 	rm -f *.out
 	rm -f *.tmp

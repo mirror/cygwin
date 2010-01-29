@@ -810,7 +810,7 @@
       (def-isa-attr! (adata-isas a))
       (keep-isa-validate!)
       ;; Install the builtin objects now that we have an arch, and now that
-      ;; attributes MACH and ISA exist.
+      ;; attributes MACH and ISA exist, and now that we know the rtl version.
       (reader-install-builtin!)
       a))
 )

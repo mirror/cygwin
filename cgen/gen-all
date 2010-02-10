@@ -23,6 +23,8 @@
 set -e
 trap "echo ERROR: $(date)" 0
 
+all_args="$@"
+
 if [ ! -f ./gen-all.rc ]
 then
     echo "Missing gen-all.rc file." >&2
@@ -405,6 +407,8 @@ build_diffs () {
 # And we're off.
 
 echo "Starting gen-all: $(date)"
+# Print the command line to make it easier to review old builds.
+echo "Options: ${all_args}"
 
 mkdir -p tmp-all
 cd tmp-all

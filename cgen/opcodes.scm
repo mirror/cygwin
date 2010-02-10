@@ -119,9 +119,9 @@
       (if encode
 	  (string-append "        value = "
 			 ;; NOTE: ENCODE is either, e.g.,
-			 ;; ((value pc) (sra DI value 1))
+			 ;; ((value pc) (sra <mode> value 1))
 			 ;; or
-			 ;; (((<mode> value) (<mode> pc)) (sra DI value 1))
+			 ;; (((<mode> value) (<mode> pc)) (sra <mode> value 1))
 			 (let ((expr (cadr encode))
 			       (value (if (symbol? (caar encode)) (caar encode) (cadr (caar encode))))
 			       (pc (if (symbol? (cadar encode)) (cadar encode) (cadr (cadar encode)))))

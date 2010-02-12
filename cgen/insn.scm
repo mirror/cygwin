@@ -32,16 +32,16 @@
 
 		; The <fmt-desc> of the insn.
 		; This is used to help calculate the ifmt,sfmt members.
-		fmt-desc
+		(fmt-desc . #f)
 
 		; The <iformat> of the insn.
-		ifmt
+		(ifmt . #f)
 
 		; The <sformat> of the insn.
-		sfmt
+		(sfmt . #f)
 
 		; Temp slot for use by applications.
-		tmp
+		(tmp . #f)
 
 		; Instruction semantics.
 		; This is the rtl in source form, as provided in the
@@ -205,8 +205,6 @@
 ; {value-names} is a list of names of {anyof-operands}.
 
 (define (/sub-insn-ifields insn anyof-operands value-names new-values)
-  ; (debug-repl-env insn anyof-operands value-names new-values)
-
   ; Delete ifields of {anyof-operands} and add those for {new-values}.
   (let ((iflds
 	 (append!
@@ -227,7 +225,6 @@
 	; IFLD-LIST is an unsorted list of <ifield> elements.
 	(find-preceder
 	 (lambda (ifld-list owner)
-	   ;(debug-repl-env ifld-list owner)
 	   (cond ((ifield? owner)
 		  owner)
 		 ((anyof-operand? owner)
@@ -240,7 +237,6 @@
 					     (anyof-instance? (derived-ifield-owner f))
 					     (eq? name (obj:name (anyof-instance-parent (derived-ifield-owner f))))))
 				      ifld-list)))
-		    ;(debug-repl-env ifld-list owner)
 		    (assert result)
 		    result))
 		 ((operand? owner) ; derived operands are handled here too
@@ -271,7 +267,6 @@
 ; ANYOF-OPERANDS.  Each element is a <derived-operand>.
 
 (define (/sub-insn-make! insn anyof-operands new-values)
-  ;(debug-repl-env insn anyof-operands new-values)
   (assert (= (length anyof-operands) (length new-values)))
   (assert (all-true? (map anyof-operand? anyof-operands)))
   (assert (all-true? (map derived-operand? new-values)))
@@ -285,10 +280,6 @@
 					     (obj:name newval)))
 		     anyof-operands new-values)
 	 " ...\n")
-
-;  (if (eq? '@sib+disp8-QI-disp32-8
-;	   (obj:name (car new-values)))
-;      (debug-repl-env insn anyof-operands new-values))
 
   (let* ((value-names (map obj:name anyof-operands))
 	 (ifields (/sub-insn-ifields insn anyof-operands value-names new-values))
@@ -545,7 +536,6 @@
 ; Subroutine of /parse-insn-format to parse a symbol ifield spec.
 
 (define (/parse-insn-format-symbol context isa-name-list sym)
-  ;(debug-repl-env sym)
   (let ((op (current-op-lookup sym isa-name-list)))
     (if op
 	(cond ((derived-operand? op)

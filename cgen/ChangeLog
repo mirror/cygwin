@@ -1,3 +1,22 @@
+2010-02-11  Doug Evans  <dje@sebabeach.org>
+
+	* desc-cpu.scm (/gen-cpu-open): Remove comment on K&R support.
+	* utils-cgen.scm (gen-define-with-symcat): Remove K&R support.
+
+	* utils-sim.scm (compute-sformat-argbufs!): Use more consistent name
+	for name of empty sbuf.
+
+	* iformat.scm (/sfmt-search-key, /ifmt-lookup-sfmt!): Add assert.
+
+	* insn.scm (<insn>): Add initial value for members fmt-desc, ifmt,
+	sfmt, tmp.
+	(/sub-insn-ifields): Delete old commented out code.
+	(/sub-insn-make!, /parse-insn-format-symbol): Ditto.
+	* operand.scm (/anyof-merge-setter, anyof-merge-semantics): Ditto.
+
+	* sim-decode.scm (/gen-decode-insn-globals): Tweak formatting of
+	generated code.
+
 2010-02-10  Doug Evans  <dje@sebabeach.org>
 
 	* gen-all: Print options.

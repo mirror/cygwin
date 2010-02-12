@@ -70,7 +70,8 @@ static const struct insn_sem @prefix@_insn_sem[] =
    "\
 };
 
-static const struct insn_sem @prefix@_insn_sem_invalid = {
+static const struct insn_sem @prefix@_insn_sem_invalid =
+{
   VIRTUAL_INSN_X_INVALID, @PREFIX@_INSN_X_INVALID, @PREFIX@_SFMT_EMPTY"
    (if (and (with-parallel?) (not (with-parallel-only?)))
        ", NOPAR, NOPAR"

@@ -1,5 +1,7 @@
 2010-02-11  Doug Evans  <dje@sebabeach.org>
 
+	* testsuite/location-1.test: Use %pmacros.
+
 	* desc-cpu.scm (/gen-cpu-open): Remove comment on K&R support.
 	* utils-cgen.scm (gen-define-with-symcat): Remove K&R support.
 

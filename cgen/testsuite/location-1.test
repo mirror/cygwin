@@ -8,6 +8,7 @@ cpu_file=${test}.test.cpu
 rm -f ${cpu_file}
 
 cat > ${cpu_file} <<EOF
+(define-rtl-version 0 9)
 (include "${srcdir}/../cpu/simplify.inc")
 (include "${srcdir}/testsuite.cpu")
 
@@ -17,8 +18,8 @@ cat > ${cpu_file} <<EOF
   (bad-command name)
 )
 
-(.for-each (.pmacro (name)
-             (.exec (define-test-insn name)))
+(%for-each (%pmacro (name)
+             (%exec (define-test-insn name)))
            test-insns)
 EOF
 

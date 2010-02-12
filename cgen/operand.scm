@@ -1253,7 +1253,6 @@
 ; ((add a b)-object), then return (mem QI (add a b)).
 
 (define (/anyof-merge-getter getter value-names values)
-  ;(debug-repl-env getter value-names values)
   ; ??? This implementation is a quick hack, intended to evolve or be replaced.
   (cond ((not getter)
 	 #f)
@@ -1282,7 +1281,6 @@
 ; ??? `newval' in this context is a reserved word.
 
 (define (/anyof-merge-setter setter value-names values)
-  ;(debug-repl-env setter value-names values)
   ; ??? This implementation is a quick hack, intended to evolve or be replaced.
   (cond ((not setter)
 	 #f)
@@ -1313,7 +1311,6 @@
 ; ((add a b)-object), then return (mem QI (add a b)).
 
 (define (anyof-merge-semantics semantics value-names values)
-  ;(debug-repl-env semantics value-names values)
   ; ??? This implementation is a quick hack, intended to evolve or be replaced.
   (let ((result
 	 (cond ((not semantics)

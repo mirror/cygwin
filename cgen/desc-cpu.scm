@@ -783,11 +783,7 @@ static void
    CGEN_CPU_OPEN_END:     terminates arguments
 
    ??? Simultaneous multiple isas might not make sense, but it's not (yet)
-   precluded.
-
-   ??? We only support ISO C stdargs here, not K&R.
-   Laziness, plus experiment to see if anything requires K&R - eventually
-   K&R will no longer be supported - e.g. GDB is currently trying this.  */
+   precluded.  */
 
 CGEN_CPU_DESC
 @arch@_cgen_cpu_open (enum cgen_cpu_open_arg arg_type, ...)

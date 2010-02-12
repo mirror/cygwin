@@ -259,6 +259,8 @@
 ; fragments in pbb simulators).  Don't cause spurious differences.
 
 (define (/sfmt-search-key insn cti? sorted-used-iflds sem-in-ops sem-out-ops)
+  (assert (insn-ifmt insn))
+
   (let ((op-key (lambda (op)
 		  (string-append " ("
 				 (or (->string (obj-attr-value insn 'sanitize))
@@ -484,6 +486,8 @@
 ; We assume INSN's <iformat> has already been recorded.
 
 (define (/ifmt-lookup-sfmt! insn fmt-desc sfmt-list)
+  (assert (insn-ifmt insn))
+
   (let* ((search-key (/sfmt-search-key insn (-fmt-desc-cti? fmt-desc)
 				       (-fmt-desc-used-iflds fmt-desc)
 				       (-fmt-desc-in-ops fmt-desc)

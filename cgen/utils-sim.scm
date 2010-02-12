@@ -333,7 +333,7 @@
     ; itself.
     (let ((nub-sbufs (list (build-sbuf (car sfmt-contents))))
 	  (empty-sbuf (make <sformat-argbuf>
-			'fmt-empty "no operands" atlist-empty
+			'sfmt-empty "no operands" atlist-empty
 			nil))
 	  )
       (sfmt-set-sbuf! (caar sfmt-contents) (car nub-sbufs))

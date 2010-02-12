@@ -24,7 +24,7 @@ using namespace mep_basic; // FIXME: namespace organization still wip
 sem_status
 mep_sem_x_invalid (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -3895,7 +3895,7 @@ current_cpu->hardware.h_csr[((UINT) 16)] = ORSI (current_cpu->h_csr_get (((UINT)
 sem_status
 mep_sem_sleep (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -3969,7 +3969,7 @@ if (EQSI (FLD (f_2u10), 0)) {
 sem_status
 mep_sem_break (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -3993,7 +3993,7 @@ mep_sem_break (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_syncm (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -6591,7 +6591,7 @@ if (ANDIF (ANDSI (SRLSI (current_cpu->h_csr_get (((UINT) 16)), 12), 1), ANDSI (S
 sem_status
 mep_sem_synccp (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -6812,7 +6812,7 @@ current_cpu->do_syscall (pc, FLD (f_callnum));
 sem_status
 mep_sem_ri_0 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -6836,7 +6836,7 @@ mep_sem_ri_0 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_1 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -6860,7 +6860,7 @@ mep_sem_ri_1 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_2 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -6884,7 +6884,7 @@ mep_sem_ri_2 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_3 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -6908,7 +6908,7 @@ mep_sem_ri_3 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_4 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -6932,7 +6932,7 @@ mep_sem_ri_4 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_5 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -6956,7 +6956,7 @@ mep_sem_ri_5 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_6 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -6980,7 +6980,7 @@ mep_sem_ri_6 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_7 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -7004,7 +7004,7 @@ mep_sem_ri_7 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_8 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -7028,7 +7028,7 @@ mep_sem_ri_8 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_9 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -7052,7 +7052,7 @@ mep_sem_ri_9 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_10 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -7076,7 +7076,7 @@ mep_sem_ri_10 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_11 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -7100,7 +7100,7 @@ mep_sem_ri_11 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_12 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -7124,7 +7124,7 @@ mep_sem_ri_12 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_13 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -7148,7 +7148,7 @@ mep_sem_ri_13 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_14 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -7172,7 +7172,7 @@ mep_sem_ri_14 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_15 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -7196,7 +7196,7 @@ mep_sem_ri_15 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_17 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -7220,7 +7220,7 @@ mep_sem_ri_17 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_20 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -7244,7 +7244,7 @@ mep_sem_ri_20 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_21 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -7268,7 +7268,7 @@ mep_sem_ri_21 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_22 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -7292,7 +7292,7 @@ mep_sem_ri_22 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_23 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;
@@ -7316,7 +7316,7 @@ mep_sem_ri_23 (mep_basic_cpu* current_cpu, mep_scache* sem)
 sem_status
 mep_sem_ri_26 (mep_basic_cpu* current_cpu, mep_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mep_scache* abuf = sem;
   unsigned long long written = 0;

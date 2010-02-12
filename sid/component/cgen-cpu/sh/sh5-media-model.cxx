@@ -570,7 +570,7 @@ sh5_media_sh5_model::model_bnei_after (sh5_cpu *current_cpu, sh5_media_scache *s
 UINT
 sh5_media_sh5_model::model_brk_before (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -584,7 +584,7 @@ sh5_media_sh5_model::model_brk_before (sh5_cpu *current_cpu, sh5_media_scache *s
 UINT
 sh5_media_sh5_model::model_brk_after (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -4800,7 +4800,7 @@ sh5_media_sh5_model::model_mulul_after (sh5_cpu *current_cpu, sh5_media_scache *
 UINT
 sh5_media_sh5_model::model_nop_before (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -4814,7 +4814,7 @@ sh5_media_sh5_model::model_nop_before (sh5_cpu *current_cpu, sh5_media_scache *s
 UINT
 sh5_media_sh5_model::model_nop_after (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -5220,7 +5220,7 @@ sh5_media_sh5_model::model_putcon_after (sh5_cpu *current_cpu, sh5_media_scache 
 UINT
 sh5_media_sh5_model::model_rte_before (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -5234,7 +5234,7 @@ sh5_media_sh5_model::model_rte_before (sh5_cpu *current_cpu, sh5_media_scache *s
 UINT
 sh5_media_sh5_model::model_rte_after (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -5640,7 +5640,7 @@ sh5_media_sh5_model::model_shori_after (sh5_cpu *current_cpu, sh5_media_scache *
 UINT
 sh5_media_sh5_model::model_sleep_before (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -5654,7 +5654,7 @@ sh5_media_sh5_model::model_sleep_before (sh5_cpu *current_cpu, sh5_media_scache 
 UINT
 sh5_media_sh5_model::model_sleep_after (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -6120,7 +6120,7 @@ sh5_media_sh5_model::model_swapq_after (sh5_cpu *current_cpu, sh5_media_scache *
 UINT
 sh5_media_sh5_model::model_synci_before (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -6134,7 +6134,7 @@ sh5_media_sh5_model::model_synci_before (sh5_cpu *current_cpu, sh5_media_scache 
 UINT
 sh5_media_sh5_model::model_synci_after (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -6150,7 +6150,7 @@ sh5_media_sh5_model::model_synci_after (sh5_cpu *current_cpu, sh5_media_scache *
 UINT
 sh5_media_sh5_model::model_synco_before (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -6164,7 +6164,7 @@ sh5_media_sh5_model::model_synco_before (sh5_cpu *current_cpu, sh5_media_scache 
 UINT
 sh5_media_sh5_model::model_synco_after (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7260,7 +7260,7 @@ sh5_media_sh5_media_model::model_bnei_after (sh5_cpu *current_cpu, sh5_media_sca
 UINT
 sh5_media_sh5_media_model::model_brk_before (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7274,7 +7274,7 @@ sh5_media_sh5_media_model::model_brk_before (sh5_cpu *current_cpu, sh5_media_sca
 UINT
 sh5_media_sh5_media_model::model_brk_after (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -17202,7 +17202,7 @@ sh5_media_sh5_media_model::model_mulul_after (sh5_cpu *current_cpu, sh5_media_sc
 UINT
 sh5_media_sh5_media_model::model_nop_before (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -17216,7 +17216,7 @@ sh5_media_sh5_media_model::model_nop_before (sh5_cpu *current_cpu, sh5_media_sca
 UINT
 sh5_media_sh5_media_model::model_nop_after (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -17814,7 +17814,7 @@ sh5_media_sh5_media_model::model_putcon_after (sh5_cpu *current_cpu, sh5_media_s
 UINT
 sh5_media_sh5_media_model::model_rte_before (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -17828,7 +17828,7 @@ sh5_media_sh5_media_model::model_rte_before (sh5_cpu *current_cpu, sh5_media_sca
 UINT
 sh5_media_sh5_media_model::model_rte_after (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -18462,7 +18462,7 @@ sh5_media_sh5_media_model::model_shori_after (sh5_cpu *current_cpu, sh5_media_sc
 UINT
 sh5_media_sh5_media_model::model_sleep_before (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -18476,7 +18476,7 @@ sh5_media_sh5_media_model::model_sleep_before (sh5_cpu *current_cpu, sh5_media_s
 UINT
 sh5_media_sh5_media_model::model_sleep_after (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -19206,7 +19206,7 @@ sh5_media_sh5_media_model::model_swapq_after (sh5_cpu *current_cpu, sh5_media_sc
 UINT
 sh5_media_sh5_media_model::model_synci_before (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -19220,7 +19220,7 @@ sh5_media_sh5_media_model::model_synci_before (sh5_cpu *current_cpu, sh5_media_s
 UINT
 sh5_media_sh5_media_model::model_synci_after (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -19236,7 +19236,7 @@ sh5_media_sh5_media_model::model_synci_after (sh5_cpu *current_cpu, sh5_media_sc
 UINT
 sh5_media_sh5_media_model::model_synco_before (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -19250,7 +19250,7 @@ sh5_media_sh5_media_model::model_synco_before (sh5_cpu *current_cpu, sh5_media_s
 UINT
 sh5_media_sh5_media_model::model_synco_after (sh5_cpu *current_cpu, sh5_media_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh5_media_scache* abuf = sem;
   const sh5_media_idesc* idesc = abuf->idesc;
   int cycles = 0;

@@ -716,7 +716,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_bts_compact_after (sh4a_nofpu_cpu *current_cp
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_clrmac_compact_before (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -736,7 +736,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_clrmac_compact_before (sh4a_nofpu_cpu *curren
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_clrmac_compact_after (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -762,7 +762,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_clrmac_compact_after (sh4a_nofpu_cpu *current
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_clrs_compact_before (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -779,7 +779,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_clrs_compact_before (sh4a_nofpu_cpu *current_
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_clrs_compact_after (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -800,7 +800,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_clrs_compact_after (sh4a_nofpu_cpu *current_c
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_clrt_compact_before (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -820,7 +820,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_clrt_compact_before (sh4a_nofpu_cpu *current_
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_clrt_compact_after (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -1510,7 +1510,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_div0s_compact_after (sh4a_nofpu_cpu *current_
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_div0u_compact_before (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -1530,7 +1530,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_div0u_compact_before (sh4a_nofpu_cpu *current
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_div0u_compact_after (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -1992,7 +1992,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_extuw_compact_after (sh4a_nofpu_cpu *current_
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_frchg_compact_before (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -2006,7 +2006,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_frchg_compact_before (sh4a_nofpu_cpu *current
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_frchg_compact_after (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -2022,7 +2022,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_frchg_compact_after (sh4a_nofpu_cpu *current_
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_fschg_compact_before (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -2036,7 +2036,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_fschg_compact_before (sh4a_nofpu_cpu *current
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_fschg_compact_after (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -5410,7 +5410,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_negc_compact_after (sh4a_nofpu_cpu *current_c
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_nop_compact_before (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -5424,7 +5424,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_nop_compact_before (sh4a_nofpu_cpu *current_c
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_nop_compact_after (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -6068,7 +6068,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_rotr_compact_after (sh4a_nofpu_cpu *current_c
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_rts_compact_before (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -6082,7 +6082,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_rts_compact_before (sh4a_nofpu_cpu *current_c
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_rts_compact_after (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -6099,7 +6099,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_rts_compact_after (sh4a_nofpu_cpu *current_cp
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_sets_compact_before (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -6116,7 +6116,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_sets_compact_before (sh4a_nofpu_cpu *current_
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_sets_compact_after (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -6137,7 +6137,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_sets_compact_after (sh4a_nofpu_cpu *current_c
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_sett_compact_before (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -6157,7 +6157,7 @@ sh4a_nofpu_sh4a_nofpu_model::model_sett_compact_before (sh4a_nofpu_cpu *current_
 UINT
 sh4a_nofpu_sh4a_nofpu_model::model_sett_compact_after (sh4a_nofpu_cpu *current_cpu, sh4a_nofpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh4a_nofpu_scache* abuf = sem;
   const sh4a_nofpu_idesc* idesc = abuf->idesc;
   int cycles = 0;

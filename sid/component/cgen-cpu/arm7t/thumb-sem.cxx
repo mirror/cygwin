@@ -24,7 +24,7 @@ using namespace arm7f; // FIXME: namespace organization still wip
 sem_status
 thumb_sem_x_invalid (arm7f_cpu* current_cpu, thumb_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   thumb_scache* abuf = sem;
   PCADDR pc = abuf->addr;

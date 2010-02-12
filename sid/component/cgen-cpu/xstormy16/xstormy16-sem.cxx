@@ -24,7 +24,7 @@ using namespace xstormy16; // FIXME: namespace organization still wip
 sem_status
 xstormy16_sem_x_invalid (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -4730,7 +4730,7 @@ xstormy16_sem_icallfimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 sem_status
 xstormy16_sem_iret (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -4767,7 +4767,7 @@ xstormy16_sem_iret (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 sem_status
 xstormy16_sem_ret (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -4798,7 +4798,7 @@ xstormy16_sem_ret (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 sem_status
 xstormy16_sem_mul (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -4837,7 +4837,7 @@ xstormy16_sem_mul (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 sem_status
 xstormy16_sem_div (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -4878,7 +4878,7 @@ xstormy16_sem_div (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 sem_status
 xstormy16_sem_sdiv (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -4919,7 +4919,7 @@ xstormy16_sem_sdiv (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 sem_status
 xstormy16_sem_sdivlh (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -4962,7 +4962,7 @@ xstormy16_sem_sdivlh (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 sem_status
 xstormy16_sem_divlh (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -5005,7 +5005,7 @@ xstormy16_sem_divlh (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 sem_status
 xstormy16_sem_reset (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -5023,7 +5023,7 @@ xstormy16_sem_reset (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 sem_status
 xstormy16_sem_nop (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -5041,7 +5041,7 @@ xstormy16_sem_nop (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 sem_status
 xstormy16_sem_halt (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -5059,7 +5059,7 @@ current_cpu->do_halt ();
 sem_status
 xstormy16_sem_hold (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -5077,7 +5077,7 @@ current_cpu->do_hold ();
 sem_status
 xstormy16_sem_holdx (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -5095,7 +5095,7 @@ current_cpu->do_holdx ();
 sem_status
 xstormy16_sem_brk (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -5113,7 +5113,7 @@ current_cpu->do_brk ();
 sem_status
 xstormy16_sem_syscall (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   xstormy16_scache* abuf = sem;
   PCADDR pc = abuf->addr;

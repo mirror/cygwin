@@ -1,3 +1,8 @@
+2010-02-11  Doug Evans  <dje@sebabeach.org>
+
+	* xstormy16-decode.cxx, * xstormy16-decode.h,
+	* xstormy16-sem.cxx: Regenerate.
+
 2010-01-02  Doug Evans  <dje@sebabeach.org>
 
 	* xstormy16-cpu.h, * xstormy16-decode.cxx, * xstormy16-decode.h,

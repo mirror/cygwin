@@ -790,7 +790,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
 void
 thumb_extract_sfmt_empty (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn){
     thumb_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */

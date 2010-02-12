@@ -1588,7 +1588,7 @@ mepcore1_scache::decode (mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_wor
 void
 mepcore1_extract_sfmt_empty (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -4522,7 +4522,7 @@ mepcore1_extract_sfmt_halt (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PC
 void
 mepcore1_extract_sfmt_sleep (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -4566,7 +4566,7 @@ mepcore1_extract_sfmt_swi (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCA
 void
 mepcore1_extract_sfmt_break (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -6170,7 +6170,7 @@ mepcore1_extract_sfmt_bcpeq (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, P
 void
 mepcore1_extract_sfmt_synccp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
     mepcore1_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */

@@ -76,7 +76,7 @@ struct mt_idesc {
 union mt_sem_fields {
   struct { /* no operands */
     int empty;
-  } fmt_empty;
+  } sfmt_empty;
   struct { /*  */
     UINT f_sr1;
     UINT f_sr2;

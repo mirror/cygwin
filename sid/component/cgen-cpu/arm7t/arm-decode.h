@@ -113,7 +113,7 @@ struct arm_idesc {
 union arm_sem_fields {
   struct { /* no operands */
     int empty;
-  } fmt_empty;
+  } sfmt_empty;
   struct { /*  */
     UINT f_swi_comment;
   } sfmt_swi;

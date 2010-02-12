@@ -85,7 +85,7 @@ struct xstormy16_idesc {
 union xstormy16_sem_fields {
   struct { /* no operands */
     int empty;
-  } fmt_empty;
+  } sfmt_empty;
   struct { /*  */
     UINT f_abs24;
   } sfmt_jmpf;

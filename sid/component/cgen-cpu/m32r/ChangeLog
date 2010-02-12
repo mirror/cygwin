@@ -1,3 +1,7 @@
+2010-02-11  Doug Evans  <dje@sebabeach.org>
+
+	* m32r-decode.cxx, * m32r-decode.h, * m32r-sem.cxx: Regenerate.
+
 2010-01-02  Doug Evans  <dje@sebabeach.org>
 
 	* m32r-cpu.h, * m32r-decode.cxx, * m32r-decode.h, * m32r-defs.h,

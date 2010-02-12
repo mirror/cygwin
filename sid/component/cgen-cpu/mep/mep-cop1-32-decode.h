@@ -126,7 +126,7 @@ struct mepcop1_32_idesc {
 union mepcop1_32_sem_fields {
   struct { /* no operands */
     int empty;
-  } fmt_empty;
+  } sfmt_empty;
   struct { /*  */
     UINT f_ivc2_5u21;
     UINT f_ivc2_8u4;

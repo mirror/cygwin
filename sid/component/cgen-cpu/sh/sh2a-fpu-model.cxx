@@ -716,7 +716,7 @@ sh2a_fpu_sh2a_fpu_model::model_bts_compact_after (sh2a_fpu_cpu *current_cpu, sh2
 UINT
 sh2a_fpu_sh2a_fpu_model::model_clrmac_compact_before (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -736,7 +736,7 @@ sh2a_fpu_sh2a_fpu_model::model_clrmac_compact_before (sh2a_fpu_cpu *current_cpu,
 UINT
 sh2a_fpu_sh2a_fpu_model::model_clrmac_compact_after (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -762,7 +762,7 @@ sh2a_fpu_sh2a_fpu_model::model_clrmac_compact_after (sh2a_fpu_cpu *current_cpu, 
 UINT
 sh2a_fpu_sh2a_fpu_model::model_clrt_compact_before (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -782,7 +782,7 @@ sh2a_fpu_sh2a_fpu_model::model_clrt_compact_before (sh2a_fpu_cpu *current_cpu, s
 UINT
 sh2a_fpu_sh2a_fpu_model::model_clrt_compact_after (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -1472,7 +1472,7 @@ sh2a_fpu_sh2a_fpu_model::model_div0s_compact_after (sh2a_fpu_cpu *current_cpu, s
 UINT
 sh2a_fpu_sh2a_fpu_model::model_div0u_compact_before (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -1492,7 +1492,7 @@ sh2a_fpu_sh2a_fpu_model::model_div0u_compact_before (sh2a_fpu_cpu *current_cpu, 
 UINT
 sh2a_fpu_sh2a_fpu_model::model_div0u_compact_after (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3596,7 +3596,7 @@ sh2a_fpu_sh2a_fpu_model::model_fneg_compact_after (sh2a_fpu_cpu *current_cpu, sh
 UINT
 sh2a_fpu_sh2a_fpu_model::model_frchg_compact_before (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3610,7 +3610,7 @@ sh2a_fpu_sh2a_fpu_model::model_frchg_compact_before (sh2a_fpu_cpu *current_cpu, 
 UINT
 sh2a_fpu_sh2a_fpu_model::model_frchg_compact_after (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3626,7 +3626,7 @@ sh2a_fpu_sh2a_fpu_model::model_frchg_compact_after (sh2a_fpu_cpu *current_cpu, s
 UINT
 sh2a_fpu_sh2a_fpu_model::model_fschg_compact_before (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3640,7 +3640,7 @@ sh2a_fpu_sh2a_fpu_model::model_fschg_compact_before (sh2a_fpu_cpu *current_cpu, 
 UINT
 sh2a_fpu_sh2a_fpu_model::model_fschg_compact_after (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7424,7 +7424,7 @@ sh2a_fpu_sh2a_fpu_model::model_negc_compact_after (sh2a_fpu_cpu *current_cpu, sh
 UINT
 sh2a_fpu_sh2a_fpu_model::model_nop_compact_before (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7438,7 +7438,7 @@ sh2a_fpu_sh2a_fpu_model::model_nop_compact_before (sh2a_fpu_cpu *current_cpu, sh
 UINT
 sh2a_fpu_sh2a_fpu_model::model_nop_compact_after (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7906,7 +7906,7 @@ sh2a_fpu_sh2a_fpu_model::model_rotr_compact_after (sh2a_fpu_cpu *current_cpu, sh
 UINT
 sh2a_fpu_sh2a_fpu_model::model_rts_compact_before (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7920,7 +7920,7 @@ sh2a_fpu_sh2a_fpu_model::model_rts_compact_before (sh2a_fpu_cpu *current_cpu, sh
 UINT
 sh2a_fpu_sh2a_fpu_model::model_rts_compact_after (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7937,7 +7937,7 @@ sh2a_fpu_sh2a_fpu_model::model_rts_compact_after (sh2a_fpu_cpu *current_cpu, sh2
 UINT
 sh2a_fpu_sh2a_fpu_model::model_sett_compact_before (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7957,7 +7957,7 @@ sh2a_fpu_sh2a_fpu_model::model_sett_compact_before (sh2a_fpu_cpu *current_cpu, s
 UINT
 sh2a_fpu_sh2a_fpu_model::model_sett_compact_after (sh2a_fpu_cpu *current_cpu, sh2a_fpu_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2a_fpu_scache* abuf = sem;
   const sh2a_fpu_idesc* idesc = abuf->idesc;
   int cycles = 0;

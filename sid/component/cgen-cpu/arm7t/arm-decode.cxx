@@ -1655,7 +1655,7 @@ arm_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, 
 void
 arm_extract_sfmt_empty (arm_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, arm_insn_word entire_insn){
     arm_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */

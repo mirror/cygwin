@@ -24,7 +24,7 @@ using namespace mep_ext1; // FIXME: namespace organization still wip
 sem_status
 mepcop1_16_sem_x_invalid (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcop1_16_scache* abuf = sem;
   unsigned long long written = 0;
@@ -47,7 +47,7 @@ mepcop1_16_sem_x_invalid (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 sem_status
 mepcop1_16_sem_c0nop_P0_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcop1_16_scache* abuf = sem;
   unsigned long long written = 0;
@@ -3929,7 +3929,7 @@ current_cpu->check_option_cp (pc);
 sem_status
 mepcop1_16_sem_cpacsuma0_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcop1_16_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4005,7 +4005,7 @@ current_cpu->ivc2_cpacsuma0 (pc);
 sem_status
 mepcop1_16_sem_cpaccpa0_P0S (mep_ext1_cpu* current_cpu, mepcop1_16_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcop1_16_scache* abuf = sem;
   unsigned long long written = 0;

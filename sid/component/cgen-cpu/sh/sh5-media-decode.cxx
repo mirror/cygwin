@@ -1636,7 +1636,7 @@ sh5_media_scache::decode (sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word b
 void
 sh5_media_extract_sfmt_empty (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn){
     sh5_media_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -1861,7 +1861,7 @@ sh5_media_extract_sfmt_blink (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCAD
 void
 sh5_media_extract_sfmt_brk (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn){
     sh5_media_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -3551,7 +3551,7 @@ sh5_media_extract_sfmt_movi (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
 void
 sh5_media_extract_sfmt_nop (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn){
     sh5_media_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */

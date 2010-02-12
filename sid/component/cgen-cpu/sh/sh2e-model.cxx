@@ -716,7 +716,7 @@ sh2e_sh2e_model::model_bts_compact_after (sh2e_cpu *current_cpu, sh2e_scache *se
 UINT
 sh2e_sh2e_model::model_clrmac_compact_before (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -736,7 +736,7 @@ sh2e_sh2e_model::model_clrmac_compact_before (sh2e_cpu *current_cpu, sh2e_scache
 UINT
 sh2e_sh2e_model::model_clrmac_compact_after (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -762,7 +762,7 @@ sh2e_sh2e_model::model_clrmac_compact_after (sh2e_cpu *current_cpu, sh2e_scache 
 UINT
 sh2e_sh2e_model::model_clrt_compact_before (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -782,7 +782,7 @@ sh2e_sh2e_model::model_clrt_compact_before (sh2e_cpu *current_cpu, sh2e_scache *
 UINT
 sh2e_sh2e_model::model_clrt_compact_after (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -1472,7 +1472,7 @@ sh2e_sh2e_model::model_div0s_compact_after (sh2e_cpu *current_cpu, sh2e_scache *
 UINT
 sh2e_sh2e_model::model_div0u_compact_before (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -1492,7 +1492,7 @@ sh2e_sh2e_model::model_div0u_compact_before (sh2e_cpu *current_cpu, sh2e_scache 
 UINT
 sh2e_sh2e_model::model_div0u_compact_after (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3232,7 +3232,7 @@ sh2e_sh2e_model::model_fneg_compact_after (sh2e_cpu *current_cpu, sh2e_scache *s
 UINT
 sh2e_sh2e_model::model_frchg_compact_before (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3246,7 +3246,7 @@ sh2e_sh2e_model::model_frchg_compact_before (sh2e_cpu *current_cpu, sh2e_scache 
 UINT
 sh2e_sh2e_model::model_frchg_compact_after (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3262,7 +3262,7 @@ sh2e_sh2e_model::model_frchg_compact_after (sh2e_cpu *current_cpu, sh2e_scache *
 UINT
 sh2e_sh2e_model::model_fschg_compact_before (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3276,7 +3276,7 @@ sh2e_sh2e_model::model_fschg_compact_before (sh2e_cpu *current_cpu, sh2e_scache 
 UINT
 sh2e_sh2e_model::model_fschg_compact_after (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -6864,7 +6864,7 @@ sh2e_sh2e_model::model_negc_compact_after (sh2e_cpu *current_cpu, sh2e_scache *s
 UINT
 sh2e_sh2e_model::model_nop_compact_before (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -6878,7 +6878,7 @@ sh2e_sh2e_model::model_nop_compact_before (sh2e_cpu *current_cpu, sh2e_scache *s
 UINT
 sh2e_sh2e_model::model_nop_compact_after (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7346,7 +7346,7 @@ sh2e_sh2e_model::model_rotr_compact_after (sh2e_cpu *current_cpu, sh2e_scache *s
 UINT
 sh2e_sh2e_model::model_rts_compact_before (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7360,7 +7360,7 @@ sh2e_sh2e_model::model_rts_compact_before (sh2e_cpu *current_cpu, sh2e_scache *s
 UINT
 sh2e_sh2e_model::model_rts_compact_after (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7377,7 +7377,7 @@ sh2e_sh2e_model::model_rts_compact_after (sh2e_cpu *current_cpu, sh2e_scache *se
 UINT
 sh2e_sh2e_model::model_sett_compact_before (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7397,7 +7397,7 @@ sh2e_sh2e_model::model_sett_compact_before (sh2e_cpu *current_cpu, sh2e_scache *
 UINT
 sh2e_sh2e_model::model_sett_compact_after (sh2e_cpu *current_cpu, sh2e_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const sh2e_scache* abuf = sem;
   const sh2e_idesc* idesc = abuf->idesc;
   int cycles = 0;

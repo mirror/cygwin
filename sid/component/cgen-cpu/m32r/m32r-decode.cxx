@@ -761,7 +761,7 @@ m32rbf_scache::decode (m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base
 void
 m32rbf_extract_sfmt_empty (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn){
     m32rbf_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -1790,7 +1790,7 @@ m32rbf_extract_sfmt_mvtc (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
 void
 m32rbf_extract_sfmt_nop (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn){
     m32rbf_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -1807,7 +1807,7 @@ m32rbf_extract_sfmt_nop (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
 void
 m32rbf_extract_sfmt_rac (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn){
     m32rbf_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -1824,7 +1824,7 @@ m32rbf_extract_sfmt_rac (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
 void
 m32rbf_extract_sfmt_rte (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn){
     m32rbf_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */

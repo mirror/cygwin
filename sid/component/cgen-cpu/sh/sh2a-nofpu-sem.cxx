@@ -26,7 +26,7 @@ void
 sh2a_nofpu_sem_x_invalid (sh2a_nofpu_cpu* current_cpu, sh2a_nofpu_scache* sem, const int tick, 
 	sh2a_nofpu::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh2a_nofpu_scache* abuf = sem;
   unsigned long long written = 0;
@@ -517,7 +517,7 @@ void
 sh2a_nofpu_sem_clrmac_compact (sh2a_nofpu_cpu* current_cpu, sh2a_nofpu_scache* sem, const int tick, 
 	sh2a_nofpu::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh2a_nofpu_scache* abuf = sem;
   unsigned long long written = 0;
@@ -549,7 +549,7 @@ void
 sh2a_nofpu_sem_clrt_compact (sh2a_nofpu_cpu* current_cpu, sh2a_nofpu_scache* sem, const int tick, 
 	sh2a_nofpu::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh2a_nofpu_scache* abuf = sem;
   unsigned long long written = 0;
@@ -836,7 +836,7 @@ void
 sh2a_nofpu_sem_div0u_compact (sh2a_nofpu_cpu* current_cpu, sh2a_nofpu_scache* sem, const int tick, 
 	sh2a_nofpu::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh2a_nofpu_scache* abuf = sem;
   unsigned long long written = 0;
@@ -1269,7 +1269,7 @@ void
 sh2a_nofpu_sem_frchg_compact (sh2a_nofpu_cpu* current_cpu, sh2a_nofpu_scache* sem, const int tick, 
 	sh2a_nofpu::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh2a_nofpu_scache* abuf = sem;
   unsigned long long written = 0;
@@ -1293,7 +1293,7 @@ void
 sh2a_nofpu_sem_fschg_compact (sh2a_nofpu_cpu* current_cpu, sh2a_nofpu_scache* sem, const int tick, 
 	sh2a_nofpu::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh2a_nofpu_scache* abuf = sem;
   unsigned long long written = 0;
@@ -3051,7 +3051,7 @@ void
 sh2a_nofpu_sem_nop_compact (sh2a_nofpu_cpu* current_cpu, sh2a_nofpu_scache* sem, const int tick, 
 	sh2a_nofpu::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh2a_nofpu_scache* abuf = sem;
   unsigned long long written = 0;
@@ -3312,7 +3312,7 @@ void
 sh2a_nofpu_sem_rts_compact (sh2a_nofpu_cpu* current_cpu, sh2a_nofpu_scache* sem, const int tick, 
 	sh2a_nofpu::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh2a_nofpu_scache* abuf = sem;
   unsigned long long written = 0;
@@ -3346,7 +3346,7 @@ void
 sh2a_nofpu_sem_sett_compact (sh2a_nofpu_cpu* current_cpu, sh2a_nofpu_scache* sem, const int tick, 
 	sh2a_nofpu::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh2a_nofpu_scache* abuf = sem;
   unsigned long long written = 0;

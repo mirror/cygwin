@@ -619,7 +619,7 @@ mt_scache::decode (mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_in
 void
 mt_extract_sfmt_empty (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn){
     mt_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -723,7 +723,7 @@ mt_extract_sfmt_addui (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_
 void
 mt_extract_sfmt_nop (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn){
     mt_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -965,7 +965,7 @@ mt_extract_sfmt_stw (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_wo
 void
 mt_extract_sfmt_break (mt_scache* abuf, mt_cpu* current_cpu, PCADDR pc, mt_insn_word base_insn, mt_insn_word entire_insn){
     mt_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */

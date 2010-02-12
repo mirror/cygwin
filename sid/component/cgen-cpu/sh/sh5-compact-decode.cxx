@@ -3170,7 +3170,7 @@ sh5_compact_scache::decode (sh5_cpu* current_cpu, PCADDR pc, sh5_compact_insn_wo
 void
 sh5_compact_extract_sfmt_empty (sh5_compact_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_compact_insn_word base_insn, sh5_compact_insn_word entire_insn){
     sh5_compact_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -3497,7 +3497,7 @@ sh5_compact_extract_sfmt_braf_compact (sh5_compact_scache* abuf, sh5_cpu* curren
 void
 sh5_compact_extract_sfmt_brk_compact (sh5_compact_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_compact_insn_word base_insn, sh5_compact_insn_word entire_insn){
     sh5_compact_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -3568,7 +3568,7 @@ sh5_compact_extract_sfmt_bsrf_compact (sh5_compact_scache* abuf, sh5_cpu* curren
 void
 sh5_compact_extract_sfmt_clrmac_compact (sh5_compact_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_compact_insn_word base_insn, sh5_compact_insn_word entire_insn){
     sh5_compact_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -3585,7 +3585,7 @@ sh5_compact_extract_sfmt_clrmac_compact (sh5_compact_scache* abuf, sh5_cpu* curr
 void
 sh5_compact_extract_sfmt_clrs_compact (sh5_compact_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_compact_insn_word base_insn, sh5_compact_insn_word entire_insn){
     sh5_compact_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -3602,7 +3602,7 @@ sh5_compact_extract_sfmt_clrs_compact (sh5_compact_scache* abuf, sh5_cpu* curren
 void
 sh5_compact_extract_sfmt_clrt_compact (sh5_compact_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_compact_insn_word base_insn, sh5_compact_insn_word entire_insn){
     sh5_compact_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -3733,7 +3733,7 @@ sh5_compact_extract_sfmt_div0s_compact (sh5_compact_scache* abuf, sh5_cpu* curre
 void
 sh5_compact_extract_sfmt_div0u_compact (sh5_compact_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_compact_insn_word base_insn, sh5_compact_insn_word entire_insn){
     sh5_compact_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -4472,7 +4472,7 @@ sh5_compact_extract_sfmt_fmov9_compact (sh5_compact_scache* abuf, sh5_cpu* curre
 void
 sh5_compact_extract_sfmt_frchg_compact (sh5_compact_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_compact_insn_word base_insn, sh5_compact_insn_word entire_insn){
     sh5_compact_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -4489,7 +4489,7 @@ sh5_compact_extract_sfmt_frchg_compact (sh5_compact_scache* abuf, sh5_cpu* curre
 void
 sh5_compact_extract_sfmt_fschg_compact (sh5_compact_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_compact_insn_word base_insn, sh5_compact_insn_word entire_insn){
     sh5_compact_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -6415,7 +6415,7 @@ sh5_compact_extract_sfmt_negc_compact (sh5_compact_scache* abuf, sh5_cpu* curren
 void
 sh5_compact_extract_sfmt_nop_compact (sh5_compact_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_compact_insn_word base_insn, sh5_compact_insn_word entire_insn){
     sh5_compact_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -6485,7 +6485,7 @@ sh5_compact_extract_sfmt_rotcl_compact (sh5_compact_scache* abuf, sh5_cpu* curre
 void
 sh5_compact_extract_sfmt_rts_compact (sh5_compact_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_compact_insn_word base_insn, sh5_compact_insn_word entire_insn){
     sh5_compact_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */

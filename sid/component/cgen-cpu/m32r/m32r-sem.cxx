@@ -24,7 +24,7 @@ using namespace m32rbf; // FIXME: namespace organization still wip
 sem_status
 m32rbf_sem_x_invalid (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   m32rbf_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -1790,7 +1790,7 @@ m32rbf_sem_neg (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
 sem_status
 m32rbf_sem_nop (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   m32rbf_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -1831,7 +1831,7 @@ m32rbf_sem_not (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
 sem_status
 m32rbf_sem_rac (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   m32rbf_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -1859,7 +1859,7 @@ m32rbf_sem_rac (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
 sem_status
 m32rbf_sem_rach (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   m32rbf_scache* abuf = sem;
   PCADDR pc = abuf->addr;
@@ -1896,7 +1896,7 @@ if (ANDIF (GEDI (tmp_tmp1, MAKEDI (8388608, 0)), LEDI (tmp_tmp1, MAKEDI (1676083
 sem_status
 m32rbf_sem_rte (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   m32rbf_scache* abuf = sem;
   PCADDR pc = abuf->addr;

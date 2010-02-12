@@ -95,7 +95,7 @@ struct sh4al_idesc {
 union sh4al_sem_fields {
   struct { /* no operands */
     int empty;
-  } fmt_empty;
+  } sfmt_empty;
   struct { /*  */
     IADDR i_disp12;
   } sfmt_bra_compact;

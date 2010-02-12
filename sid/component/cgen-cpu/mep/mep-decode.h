@@ -108,7 +108,7 @@ struct mep_idesc {
 union mep_sem_fields {
   struct { /* no operands */
     int empty;
-  } fmt_empty;
+  } sfmt_empty;
   struct { /*  */
     UINT f_callnum;
   } sfmt_sim_syscall;

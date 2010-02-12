@@ -94,7 +94,7 @@ struct sh3_idesc {
 union sh3_sem_fields {
   struct { /* no operands */
     int empty;
-  } fmt_empty;
+  } sfmt_empty;
   struct { /*  */
     IADDR i_disp12;
   } sfmt_bra_compact;

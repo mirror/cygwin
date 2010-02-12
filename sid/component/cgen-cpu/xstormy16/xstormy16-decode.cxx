@@ -2691,7 +2691,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
 void
 xstormy16_extract_sfmt_empty (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
     xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -4713,7 +4713,7 @@ xstormy16_extract_sfmt_icallfimm (xstormy16_scache* abuf, xstormy16_cpu* current
 void
 xstormy16_extract_sfmt_iret (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
     xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -4730,7 +4730,7 @@ xstormy16_extract_sfmt_iret (xstormy16_scache* abuf, xstormy16_cpu* current_cpu,
 void
 xstormy16_extract_sfmt_ret (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
     xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -4747,7 +4747,7 @@ xstormy16_extract_sfmt_ret (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, 
 void
 xstormy16_extract_sfmt_mul (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
     xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -4764,7 +4764,7 @@ xstormy16_extract_sfmt_mul (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, 
 void
 xstormy16_extract_sfmt_sdivlh (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
     xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -4781,7 +4781,7 @@ xstormy16_extract_sfmt_sdivlh (xstormy16_scache* abuf, xstormy16_cpu* current_cp
 void
 xstormy16_extract_sfmt_reset (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
     xstormy16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */

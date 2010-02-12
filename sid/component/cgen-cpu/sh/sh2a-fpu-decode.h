@@ -103,7 +103,7 @@ struct sh2a_fpu_idesc {
 union sh2a_fpu_sem_fields {
   struct { /* no operands */
     int empty;
-  } fmt_empty;
+  } sfmt_empty;
   struct { /*  */
     IADDR i_disp12;
   } sfmt_bra_compact;

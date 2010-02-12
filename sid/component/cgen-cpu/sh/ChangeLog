@@ -1,3 +1,26 @@
+2010-02-11  Doug Evans  <dje@sebabeach.org>
+
+	* sh2-decode.cxx, * sh2-decode.h, * sh2-model.cxx, * sh2-sem.cxx,
+	* sh2a-fpu-decode.cxx, * sh2a-fpu-decode.h,
+	* sh2a-fpu-model.cxx, * sh2a-fpu-sem.cxx,
+	* sh2a-nofpu-decode.cxx, * sh2a-nofpu-decode.h,
+	* sh2a-nofpu-model.cxx, * sh2a-nofpu-sem.cxx,
+	* sh2e-decode.cxx, * sh2e-decode.h, * sh2e-model.cxx, * sh2e-sem.cxx,
+	* sh3-decode.cxx, * sh3-decode.h, * sh3-model.cxx, * sh3-sem.cxx,
+	* sh3e-decode.cxx, * sh3e-decode.h, * sh3e-model.cxx, * sh3e-sem.cxx,
+	* sh4-decode.cxx, * sh4-decode.h, * sh4-model.cxx, * sh4-sem.cxx,
+	* sh4-nofpu-decode.cxx, * sh4-nofpu-decode.h,
+	* sh4-nofpu-model.cxx, * sh4-nofpu-sem.cxx,
+	* sh4a-decode.cxx, * sh4a-decode.h, * sh4a-model.cxx, * sh4a-sem.cxx,
+	* sh4a-nofpu-decode.cxx, * sh4a-nofpu-decode.h,
+	* sh4a-nofpu-model.cxx, * sh4a-nofpu-sem.cxx,
+	* sh4al-decode.cxx, * sh4al-decode.h,
+	* sh4al-model.cxx, * sh4al-sem.cxx,
+	* sh5-compact-decode.cxx, * sh5-compact-decode.h,
+	* sh5-compact-model.cxx, * sh5-compact-sem.cxx,
+	* sh5-media-decode.cxx, * sh5-media-decode.h,
+	* sh5-media-model.cxx, * sh5-media-sem.cxx: Regenerate.
+
 2010-01-24  Doug Evans  <dje@sebabeach.org>
 
 	* sh.cxx (sh64_fldi0): Update call to floating point convertion func.

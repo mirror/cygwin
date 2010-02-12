@@ -24,7 +24,7 @@ using namespace mep_ext1; // FIXME: namespace organization still wip
 sem_status
 mepcop1_32_sem_x_invalid (mep_ext1_cpu* current_cpu, mepcop1_32_scache* sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   mepcop1_32_scache* abuf = sem;
   unsigned long long written = 0;

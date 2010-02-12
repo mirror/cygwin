@@ -2045,7 +2045,7 @@ mepcop1_16_scache::decode (mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_16_insn
 void
 mepcop1_16_extract_sfmt_empty (mepcop1_16_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_16_insn_word base_insn, mepcop1_16_insn_word entire_insn){
     mepcop1_16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -2062,7 +2062,7 @@ mepcop1_16_extract_sfmt_empty (mepcop1_16_scache* abuf, mep_ext1_cpu* current_cp
 void
 mepcop1_16_extract_sfmt_c0nop_P0_P0S (mepcop1_16_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_16_insn_word base_insn, mepcop1_16_insn_word entire_insn){
     mepcop1_16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -2473,7 +2473,7 @@ mepcop1_16_extract_sfmt_cpaddacla0_h_P0S (mepcop1_16_scache* abuf, mep_ext1_cpu*
 void
 mepcop1_16_extract_sfmt_cpacsuma0_P0S (mepcop1_16_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_16_insn_word base_insn, mepcop1_16_insn_word entire_insn){
     mepcop1_16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -2494,7 +2494,7 @@ mepcop1_16_extract_sfmt_cpacsuma0_P0S (mepcop1_16_scache* abuf, mep_ext1_cpu* cu
 void
 mepcop1_16_extract_sfmt_cpaccpa0_P0S (mepcop1_16_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcop1_16_insn_word base_insn, mepcop1_16_insn_word entire_insn){
     mepcop1_16_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */

@@ -172,7 +172,7 @@ restart:
   CASE (INSN_X_AFTER):
     {
       thumb_scache* abuf = vpc;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
       vpc = vpc + 1;
 
@@ -189,7 +189,7 @@ restart:
   CASE (INSN_X_BEFORE):
     {
       thumb_scache* abuf = vpc;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
       vpc = vpc + 1;
 
@@ -206,7 +206,7 @@ restart:
   CASE (INSN_X_CTI_CHAIN):
     {
       thumb_scache* abuf = vpc;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
       vpc = vpc + 1;
 
@@ -228,7 +228,7 @@ restart:
   CASE (INSN_X_CHAIN):
     {
       thumb_scache* abuf = vpc;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
       vpc = vpc + 1;
 
@@ -250,7 +250,7 @@ restart:
   CASE (INSN_X_BEGIN):
     {
       thumb_scache* abuf = vpc;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
       vpc = vpc + 1;
 
@@ -267,7 +267,7 @@ restart:
   CASE (INSN_X_INVALID):
     {
       thumb_scache* abuf = vpc;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
       vpc = vpc + 1;
 

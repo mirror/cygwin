@@ -26,7 +26,7 @@ void
 sh5_compact_sem_x_invalid (sh5_cpu* current_cpu, sh5_compact_scache* sem, const int tick, 
 	sh5_compact::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_compact_scache* abuf = sem;
   unsigned long long written = 0;
@@ -374,7 +374,7 @@ void
 sh5_compact_sem_brk_compact (sh5_cpu* current_cpu, sh5_compact_scache* sem, const int tick, 
 	sh5_compact::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_compact_scache* abuf = sem;
   unsigned long long written = 0;
@@ -536,7 +536,7 @@ void
 sh5_compact_sem_clrmac_compact (sh5_cpu* current_cpu, sh5_compact_scache* sem, const int tick, 
 	sh5_compact::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_compact_scache* abuf = sem;
   unsigned long long written = 0;
@@ -568,7 +568,7 @@ void
 sh5_compact_sem_clrs_compact (sh5_cpu* current_cpu, sh5_compact_scache* sem, const int tick, 
 	sh5_compact::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_compact_scache* abuf = sem;
   unsigned long long written = 0;
@@ -592,7 +592,7 @@ void
 sh5_compact_sem_clrt_compact (sh5_cpu* current_cpu, sh5_compact_scache* sem, const int tick, 
 	sh5_compact::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_compact_scache* abuf = sem;
   unsigned long long written = 0;
@@ -879,7 +879,7 @@ void
 sh5_compact_sem_div0u_compact (sh5_cpu* current_cpu, sh5_compact_scache* sem, const int tick, 
 	sh5_compact::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_compact_scache* abuf = sem;
   unsigned long long written = 0;
@@ -2087,7 +2087,7 @@ void
 sh5_compact_sem_frchg_compact (sh5_cpu* current_cpu, sh5_compact_scache* sem, const int tick, 
 	sh5_compact::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_compact_scache* abuf = sem;
   unsigned long long written = 0;
@@ -2111,7 +2111,7 @@ void
 sh5_compact_sem_fschg_compact (sh5_cpu* current_cpu, sh5_compact_scache* sem, const int tick, 
 	sh5_compact::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_compact_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4224,7 +4224,7 @@ void
 sh5_compact_sem_nop_compact (sh5_cpu* current_cpu, sh5_compact_scache* sem, const int tick, 
 	sh5_compact::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_compact_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4585,7 +4585,7 @@ void
 sh5_compact_sem_rts_compact (sh5_cpu* current_cpu, sh5_compact_scache* sem, const int tick, 
 	sh5_compact::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_compact_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4619,7 +4619,7 @@ void
 sh5_compact_sem_sets_compact (sh5_cpu* current_cpu, sh5_compact_scache* sem, const int tick, 
 	sh5_compact::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_compact_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4643,7 +4643,7 @@ void
 sh5_compact_sem_sett_compact (sh5_cpu* current_cpu, sh5_compact_scache* sem, const int tick, 
 	sh5_compact::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_compact_scache* abuf = sem;
   unsigned long long written = 0;

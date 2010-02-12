@@ -82,7 +82,7 @@ struct thumb_idesc {
 union thumb_sem_fields {
   struct { /* no operands */
     int empty;
-  } fmt_empty;
+  } sfmt_empty;
   struct { /*  */
     UINT f_lbwl_lo;
   } sfmt_bl_lo;

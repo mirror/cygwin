@@ -26,7 +26,7 @@ void
 sh4a_sem_x_invalid (sh4a_cpu* current_cpu, sh4a_scache* sem, const int tick, 
 	sh4a::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh4a_scache* abuf = sem;
   unsigned long long written = 0;
@@ -517,7 +517,7 @@ void
 sh4a_sem_clrmac_compact (sh4a_cpu* current_cpu, sh4a_scache* sem, const int tick, 
 	sh4a::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh4a_scache* abuf = sem;
   unsigned long long written = 0;
@@ -549,7 +549,7 @@ void
 sh4a_sem_clrs_compact (sh4a_cpu* current_cpu, sh4a_scache* sem, const int tick, 
 	sh4a::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh4a_scache* abuf = sem;
   unsigned long long written = 0;
@@ -573,7 +573,7 @@ void
 sh4a_sem_clrt_compact (sh4a_cpu* current_cpu, sh4a_scache* sem, const int tick, 
 	sh4a::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh4a_scache* abuf = sem;
   unsigned long long written = 0;
@@ -860,7 +860,7 @@ void
 sh4a_sem_div0u_compact (sh4a_cpu* current_cpu, sh4a_scache* sem, const int tick, 
 	sh4a::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh4a_scache* abuf = sem;
   unsigned long long written = 0;
@@ -1924,7 +1924,7 @@ void
 sh4a_sem_frchg_compact (sh4a_cpu* current_cpu, sh4a_scache* sem, const int tick, 
 	sh4a::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh4a_scache* abuf = sem;
   unsigned long long written = 0;
@@ -1948,7 +1948,7 @@ void
 sh4a_sem_fschg_compact (sh4a_cpu* current_cpu, sh4a_scache* sem, const int tick, 
 	sh4a::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh4a_scache* abuf = sem;
   unsigned long long written = 0;
@@ -3989,7 +3989,7 @@ void
 sh4a_sem_nop_compact (sh4a_cpu* current_cpu, sh4a_scache* sem, const int tick, 
 	sh4a::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh4a_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4350,7 +4350,7 @@ void
 sh4a_sem_rts_compact (sh4a_cpu* current_cpu, sh4a_scache* sem, const int tick, 
 	sh4a::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh4a_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4384,7 +4384,7 @@ void
 sh4a_sem_sets_compact (sh4a_cpu* current_cpu, sh4a_scache* sem, const int tick, 
 	sh4a::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh4a_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4408,7 +4408,7 @@ void
 sh4a_sem_sett_compact (sh4a_cpu* current_cpu, sh4a_scache* sem, const int tick, 
 	sh4a::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh4a_scache* abuf = sem;
   unsigned long long written = 0;

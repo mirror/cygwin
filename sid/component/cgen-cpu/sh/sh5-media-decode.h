@@ -110,7 +110,7 @@ struct sh5_media_idesc {
 union sh5_media_sem_fields {
   struct { /* no operands */
     int empty;
-  } fmt_empty;
+  } sfmt_empty;
   struct { /*  */
     INT f_imm16;
     UINT f_dest;

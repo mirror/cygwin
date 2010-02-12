@@ -79,7 +79,7 @@ struct m32rbf_idesc {
 union m32rbf_sem_fields {
   struct { /* no operands */
     int empty;
-  } fmt_empty;
+  } sfmt_empty;
   struct { /*  */
     UINT f_uimm8;
   } sfmt_clrpsw;

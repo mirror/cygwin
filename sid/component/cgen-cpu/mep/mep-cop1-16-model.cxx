@@ -30,7 +30,7 @@ mepcop1_16_mep_model::mepcop1_16_mep_model (mep_ext1_cpu *cpu)
 UINT
 mepcop1_16_mep_model::model_c0nop_P0_P0S_before (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -44,7 +44,7 @@ mepcop1_16_mep_model::model_c0nop_P0_P0S_before (mep_ext1_cpu *current_cpu, mepc
 UINT
 mepcop1_16_mep_model::model_c0nop_P0_P0S_after (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3330,7 +3330,7 @@ mepcop1_16_mep_model::model_cpmovhla0_w_P0S_after (mep_ext1_cpu *current_cpu, me
 UINT
 mepcop1_16_mep_model::model_cpacsuma0_P0S_before (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3344,7 +3344,7 @@ mepcop1_16_mep_model::model_cpacsuma0_P0S_before (mep_ext1_cpu *current_cpu, mep
 UINT
 mepcop1_16_mep_model::model_cpacsuma0_P0S_after (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3360,7 +3360,7 @@ mepcop1_16_mep_model::model_cpacsuma0_P0S_after (mep_ext1_cpu *current_cpu, mepc
 UINT
 mepcop1_16_mep_model::model_cpaccpa0_P0S_before (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -3374,7 +3374,7 @@ mepcop1_16_mep_model::model_cpaccpa0_P0S_before (mep_ext1_cpu *current_cpu, mepc
 UINT
 mepcop1_16_mep_model::model_cpaccpa0_P0S_after (mep_ext1_cpu *current_cpu, mepcop1_16_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_16_scache* abuf = sem;
   const mepcop1_16_idesc* idesc = abuf->idesc;
   int cycles = 0;

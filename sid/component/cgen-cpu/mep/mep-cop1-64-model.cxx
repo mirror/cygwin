@@ -5760,7 +5760,7 @@ mepcop1_64_mep_model::model_cdmovi_P0_P1_after (mep_ext1_cpu *current_cpu, mepco
 UINT
 mepcop1_64_mep_model::model_c1nop_P1_before (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_64_scache* abuf = sem;
   const mepcop1_64_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -5774,7 +5774,7 @@ mepcop1_64_mep_model::model_c1nop_P1_before (mep_ext1_cpu *current_cpu, mepcop1_
 UINT
 mepcop1_64_mep_model::model_c1nop_P1_after (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_64_scache* abuf = sem;
   const mepcop1_64_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7080,7 +7080,7 @@ mepcop1_64_mep_model::model_cpmovhla1_w_P1_after (mep_ext1_cpu *current_cpu, mep
 UINT
 mepcop1_64_mep_model::model_cpacsuma1_P1_before (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_64_scache* abuf = sem;
   const mepcop1_64_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7094,7 +7094,7 @@ mepcop1_64_mep_model::model_cpacsuma1_P1_before (mep_ext1_cpu *current_cpu, mepc
 UINT
 mepcop1_64_mep_model::model_cpacsuma1_P1_after (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_64_scache* abuf = sem;
   const mepcop1_64_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7110,7 +7110,7 @@ mepcop1_64_mep_model::model_cpacsuma1_P1_after (mep_ext1_cpu *current_cpu, mepco
 UINT
 mepcop1_64_mep_model::model_cpaccpa1_P1_before (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_64_scache* abuf = sem;
   const mepcop1_64_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7124,7 +7124,7 @@ mepcop1_64_mep_model::model_cpaccpa1_P1_before (mep_ext1_cpu *current_cpu, mepco
 UINT
 mepcop1_64_mep_model::model_cpaccpa1_P1_after (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_64_scache* abuf = sem;
   const mepcop1_64_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7140,7 +7140,7 @@ mepcop1_64_mep_model::model_cpaccpa1_P1_after (mep_ext1_cpu *current_cpu, mepcop
 UINT
 mepcop1_64_mep_model::model_cpacswp_P1_before (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_64_scache* abuf = sem;
   const mepcop1_64_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -7154,7 +7154,7 @@ mepcop1_64_mep_model::model_cpacswp_P1_before (mep_ext1_cpu *current_cpu, mepcop
 UINT
 mepcop1_64_mep_model::model_cpacswp_P1_after (mep_ext1_cpu *current_cpu, mepcop1_64_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_64_scache* abuf = sem;
   const mepcop1_64_idesc* idesc = abuf->idesc;
   int cycles = 0;

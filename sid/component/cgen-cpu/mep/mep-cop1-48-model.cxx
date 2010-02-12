@@ -210,7 +210,7 @@ mepcop1_48_mep_model::model_cmovh_rn_crm_p0_after (mep_ext1_cpu *current_cpu, me
 UINT
 mepcop1_48_mep_model::model_c0nop_P0_P0S_before (mep_ext1_cpu *current_cpu, mepcop1_48_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_48_scache* abuf = sem;
   const mepcop1_48_idesc* idesc = abuf->idesc;
   int cycles = 0;
@@ -224,7 +224,7 @@ mepcop1_48_mep_model::model_c0nop_P0_P0S_before (mep_ext1_cpu *current_cpu, mepc
 UINT
 mepcop1_48_mep_model::model_c0nop_P0_P0S_after (mep_ext1_cpu *current_cpu, mepcop1_48_scache *sem)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   const mepcop1_48_scache* abuf = sem;
   const mepcop1_48_idesc* idesc = abuf->idesc;
   int cycles = 0;

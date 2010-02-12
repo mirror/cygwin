@@ -1744,7 +1744,7 @@ sh2_scache::decode (sh2_cpu* current_cpu, PCADDR pc, sh2_insn_word base_insn, sh
 void
 sh2_extract_sfmt_empty (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR pc, sh2_insn_word base_insn, sh2_insn_word entire_insn){
     sh2_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -2121,7 +2121,7 @@ sh2_extract_sfmt_bsrf_compact (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR pc
 void
 sh2_extract_sfmt_clrmac_compact (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR pc, sh2_insn_word base_insn, sh2_insn_word entire_insn){
     sh2_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -2138,7 +2138,7 @@ sh2_extract_sfmt_clrmac_compact (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR 
 void
 sh2_extract_sfmt_clrt_compact (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR pc, sh2_insn_word base_insn, sh2_insn_word entire_insn){
     sh2_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -2269,7 +2269,7 @@ sh2_extract_sfmt_div0s_compact (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR p
 void
 sh2_extract_sfmt_div0u_compact (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR pc, sh2_insn_word base_insn, sh2_insn_word entire_insn){
     sh2_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -2407,7 +2407,7 @@ sh2_extract_sfmt_extsb_compact (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR p
 void
 sh2_extract_sfmt_frchg_compact (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR pc, sh2_insn_word base_insn, sh2_insn_word entire_insn){
     sh2_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -2424,7 +2424,7 @@ sh2_extract_sfmt_frchg_compact (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR p
 void
 sh2_extract_sfmt_fschg_compact (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR pc, sh2_insn_word base_insn, sh2_insn_word entire_insn){
     sh2_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -3954,7 +3954,7 @@ sh2_extract_sfmt_negc_compact (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR pc
 void
 sh2_extract_sfmt_nop_compact (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR pc, sh2_insn_word base_insn, sh2_insn_word entire_insn){
     sh2_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */
@@ -3998,7 +3998,7 @@ sh2_extract_sfmt_rotcl_compact (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR p
 void
 sh2_extract_sfmt_rts_compact (sh2_scache* abuf, sh2_cpu* current_cpu, PCADDR pc, sh2_insn_word base_insn, sh2_insn_word entire_insn){
     sh2_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
 
 
   /* Record the fields for the semantic handler.  */

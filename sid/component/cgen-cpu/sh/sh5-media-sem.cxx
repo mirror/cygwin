@@ -26,7 +26,7 @@ void
 sh5_media_sem_x_invalid (sh5_cpu* current_cpu, sh5_media_scache* sem, const int tick, 
 	sh5_media::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_media_scache* abuf = sem;
   unsigned long long written = 0;
@@ -553,7 +553,7 @@ void
 sh5_media_sem_brk (sh5_cpu* current_cpu, sh5_media_scache* sem, const int tick, 
 	sh5_media::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_media_scache* abuf = sem;
   unsigned long long written = 0;
@@ -4788,7 +4788,7 @@ void
 sh5_media_sem_nop (sh5_cpu* current_cpu, sh5_media_scache* sem, const int tick, 
 	sh5_media::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_media_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5148,7 +5148,7 @@ void
 sh5_media_sem_rte (sh5_cpu* current_cpu, sh5_media_scache* sem, const int tick, 
 	sh5_media::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_media_scache* abuf = sem;
   unsigned long long written = 0;
@@ -5479,7 +5479,7 @@ void
 sh5_media_sem_sleep (sh5_cpu* current_cpu, sh5_media_scache* sem, const int tick, 
 	sh5_media::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_media_scache* abuf = sem;
   unsigned long long written = 0;
@@ -6194,7 +6194,7 @@ void
 sh5_media_sem_synci (sh5_cpu* current_cpu, sh5_media_scache* sem, const int tick, 
 	sh5_media::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_media_scache* abuf = sem;
   unsigned long long written = 0;
@@ -6213,7 +6213,7 @@ void
 sh5_media_sem_synco (sh5_cpu* current_cpu, sh5_media_scache* sem, const int tick, 
 	sh5_media::write_stacks &buf)
 {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
   sh5_media_scache* abuf = sem;
   unsigned long long written = 0;

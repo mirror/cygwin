@@ -100,7 +100,7 @@ struct sh2e_idesc {
 union sh2e_sem_fields {
   struct { /* no operands */
     int empty;
-  } fmt_empty;
+  } sfmt_empty;
   struct { /*  */
     IADDR i_disp12;
   } sfmt_bra_compact;

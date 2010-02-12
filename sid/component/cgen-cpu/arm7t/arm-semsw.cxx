@@ -1326,7 +1326,7 @@ npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
     {
       abuf = vpc;
       vpc = vpc + 1;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
 
 ((void) 0); /*nop*/
@@ -1963,7 +1963,7 @@ npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABL
 
   CASE (FRAG_X_TRAILER):
     {
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
 
 ((void) 0); /*nop*/
@@ -1978,7 +1978,7 @@ npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABL
     {
       abuf = vpc;
       vpc = vpc + 1;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
 
 {
@@ -2002,7 +2002,7 @@ npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABL
     {
       abuf = vpc;
       vpc = vpc + 1;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
 
 {
@@ -2021,7 +2021,7 @@ npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABL
     {
       abuf = vpc;
       vpc = vpc + 1;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
 
 {
@@ -2040,7 +2040,7 @@ npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABL
     {
       abuf = vpc;
       vpc = vpc + 1;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
 
 {
@@ -2064,7 +2064,7 @@ npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABL
     {
       abuf = vpc;
       vpc = vpc + 1;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
 
 {
@@ -2088,7 +2088,7 @@ npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABL
     {
       abuf = vpc;
       vpc = vpc + 1;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
 
 {
@@ -2107,7 +2107,7 @@ npc = ZEXTQISI (current_cpu->GETMEMQI (pc, addr)); br_status = BRANCH_UNCACHEABL
     {
       abuf = vpc;
       vpc = vpc + 1;
-#define FLD(f) abuf->fields.fmt_empty.f
+#define FLD(f) abuf->fields.sfmt_empty.f
       PCADDR pc = abuf->addr;
 
 {

@@ -29,7 +29,7 @@ details. */
 #include <ddk/ntifs.h>
 #include "wide_path.h"
 
-static const char version[] = "$Revision: 1.59 $";
+static const char version[] = "$Revision: 1.60 $";
 
 static char *prog_name;
 static char *file_arg, *output_arg;
@@ -772,8 +772,6 @@ do_pathconv (char *filename)
 	      buf = get_long_name (tmp = buf, len);
 	      free (tmp);
 	    }
-	  /* buf gets moved into the array so we have to set tmp for later
-	     freeing beforehand. */
 	  tmp = buf;
 	  if (strncmp (buf, "\\\\?\\", 4) == 0)
 	    {
@@ -782,13 +780,13 @@ do_pathconv (char *filename)
 		len = 6;
 	      if (strlen (buf) < MAX_PATH + len)
 		{
-		  buf += len;
+		  tmp += len;
 		  if (len == 6)
-		    *buf = '\\';
+		    *tmp = '\\';
 		}
 	    }
 	  if (mixed_flag)
-	    convert_slashes (buf);
+	    convert_slashes (tmp);
 	}
     }
 
@@ -796,7 +794,7 @@ do_pathconv (char *filename)
   if (buf2)
     free (buf2);
   if (buf)
-    free (tmp);
+    free (buf);
 }
 
 static void

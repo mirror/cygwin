@@ -203,6 +203,8 @@ thumb_extract_sfmt_strh (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, 
 static void
 thumb_extract_sfmt_ldrh (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn);
 static void
+thumb_extract_sfmt_ldsb (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn);
+static void
 thumb_extract_sfmt_str_imm (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn);
 static void
 thumb_extract_sfmt_ldr_imm (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn);
@@ -533,7 +535,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 86 : /* fall through */
       case 87 :
         entire_insn = entire_insn >> 16;
-        itype = THUMB_INSN_LDSB; thumb_extract_sfmt_ldrb (this, current_cpu, pc, base_insn, entire_insn); goto done;
+        itype = THUMB_INSN_LDSB; thumb_extract_sfmt_ldsb (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 88 : /* fall through */
       case 89 :
         entire_insn = entire_insn >> 16;
@@ -1573,6 +1575,35 @@ thumb_extract_sfmt_ldrh (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, 
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ldrh)\t"
+        << " f_rb:0x" << hex << f_rb << dec
+        << " f_ro:0x" << hex << f_ro << dec
+        << " f_rd:0x" << hex << f_rd << dec
+        << endl;
+    }
+
+#undef FLD
+}
+
+void
+thumb_extract_sfmt_ldsb (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn){
+    thumb_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_str.f
+    UINT f_ro;
+    UINT f_rb;
+    UINT f_rd;
+
+    f_ro = EXTRACT_LSB0_UINT (insn, 16, 8, 3);
+    f_rb = EXTRACT_LSB0_UINT (insn, 16, 5, 3);
+    f_rd = EXTRACT_LSB0_UINT (insn, 16, 2, 3);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_rb) = f_rb;
+  FLD (f_ro) = f_ro;
+  FLD (f_rd) = f_rd;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_ldsb)\t"
         << " f_rb:0x" << hex << f_rb << dec
         << " f_ro:0x" << hex << f_ro << dec
         << " f_rd:0x" << hex << f_rd << dec

@@ -1,3 +1,7 @@
+2010-02-12  Doug Evans  <dje@sebabeach.org>
+
+	* sh5-media-decode.cxx: Regenerate.
+
 2010-02-11  Doug Evans  <dje@sebabeach.org>
 
 	* sh2-decode.cxx, * sh2-decode.h, * sh2-model.cxx, * sh2-sem.cxx,

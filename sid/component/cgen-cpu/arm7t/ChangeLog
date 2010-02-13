@@ -1,3 +1,7 @@
+2010-02-12  Doug Evans  <dje@sebabeach.org>
+
+	* thumb-decode.cxx: Regenerate.
+
 2010-02-11  Doug Evans  <dje@sebabeach.org>
 
 	* arm-decode.cxx, * arm-decode.h, * arm-sem.cxx, * arm-semsw.cxx,

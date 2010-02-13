@@ -1,3 +1,8 @@
+2010-02-12  Doug Evans  <dje@sebabeach.org>
+
+	* iformat.scm (/sfmt-search-key): Use iformat key instead of list
+	of ifields.
+
 2010-02-11  Doug Evans  <dje@sebabeach.org>
 
 	* testsuite/location-1.test: Use %pmacros.

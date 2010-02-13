@@ -284,11 +284,11 @@
 				 ")")))
 	)
     (list
+     ;; Use the iformat key so that each sformat maps to only one iformat.
+     (if (= (length sorted-used-iflds) 0)
+	 "no-used-ifields"
+	 (ifmt-key (insn-ifmt insn)))
      cti?
-     (insn-length insn)
-     (string-map (lambda (ifld)
-		   (string-append " (" (obj:str-name ifld) " " (ifld-ilk ifld) ")"))
-		 sorted-used-iflds)
      (string-map op-key
 		 sem-in-ops)
      (string-map op-key

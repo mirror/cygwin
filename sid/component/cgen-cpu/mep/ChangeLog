@@ -1,3 +1,7 @@
+2010-02-12  Doug Evans  <dje@sebabeach.org>
+
+	* mep-core1-decode.cxx, * mep-decode.cxx: Regenerate.
+
 2010-02-11  Doug Evans  <dje@sebabeach.org>
 
 	* mep-cop1-16-decode.cxx, * mep-cop1-16-decode.h,

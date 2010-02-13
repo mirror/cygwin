@@ -265,6 +265,8 @@ sh5_media_extract_sfmt_beqi (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
 static void
 sh5_media_extract_sfmt_blink (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
 static void
+sh5_media_extract_sfmt_bnei (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
+static void
 sh5_media_extract_sfmt_brk (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
 static void
 sh5_media_extract_sfmt_byterev (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
@@ -323,6 +325,10 @@ sh5_media_extract_sfmt_fstxd (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCAD
 static void
 sh5_media_extract_sfmt_fstxs (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
 static void
+sh5_media_extract_sfmt_fsubd (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
+static void
+sh5_media_extract_sfmt_ftrcdq (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
+static void
 sh5_media_extract_sfmt_ftrvs (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
 static void
 sh5_media_extract_sfmt_getcfg (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
@@ -361,11 +367,15 @@ sh5_media_extract_sfmt_ldxw (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
 static void
 sh5_media_extract_sfmt_mcmv (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
 static void
+sh5_media_extract_sfmt_mmacnfx_wl (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
+static void
 sh5_media_extract_sfmt_movi (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
 static void
 sh5_media_extract_sfmt_nop (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
 static void
 sh5_media_extract_sfmt_ori (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
+static void
+sh5_media_extract_sfmt_prefi (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
 static void
 sh5_media_extract_sfmt_pta (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn);
 static void
@@ -799,7 +809,7 @@ sh5_media_scache::decode (sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word b
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 211 :
         if ((entire_insn & 0xfc0f000f) == 0x34030000)
-          { itype = SH5_MEDIA_INSN_FSUBD; sh5_media_extract_sfmt_faddd (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = SH5_MEDIA_INSN_FSUBD; sh5_media_extract_sfmt_fsubd (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 212 :
         if ((entire_insn & 0xfc0f000f) == 0x34040000)
@@ -851,7 +861,7 @@ sh5_media_scache::decode (sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word b
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 233 :
         if ((entire_insn & 0xfc0f000f) == 0x38090000)
-          { itype = SH5_MEDIA_INSN_FTRCDQ; sh5_media_extract_sfmt_fabsd (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = SH5_MEDIA_INSN_FTRCDQ; sh5_media_extract_sfmt_ftrcdq (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 234 :
         if ((entire_insn & 0xfc0f000f) == 0x380a0000)
@@ -935,7 +945,7 @@ sh5_media_scache::decode (sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word b
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 293 :
         if ((entire_insn & 0xfc0f000f) == 0x48050000)
-          { itype = SH5_MEDIA_INSN_MMACNFX_WL; sh5_media_extract_sfmt_mcmv (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = SH5_MEDIA_INSN_MMACNFX_WL; sh5_media_extract_sfmt_mmacnfx_wl (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 297 :
         if ((entire_insn & 0xfc0f000f) == 0x48090000)
@@ -1529,7 +1539,7 @@ sh5_media_scache::decode (sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word b
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 897 :
         if ((entire_insn & 0xfc0ffc0f) == 0xe001fc00)
-          { itype = SH5_MEDIA_INSN_PREFI; sh5_media_extract_sfmt_alloco (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = SH5_MEDIA_INSN_PREFI; sh5_media_extract_sfmt_prefi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 898 :
         if ((entire_insn & 0xfc0f000f) == 0xe0020000)
@@ -1577,7 +1587,7 @@ sh5_media_scache::decode (sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word b
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 917 :
         if ((entire_insn & 0xfc0f018f) == 0xe4050000)
-          { itype = SH5_MEDIA_INSN_BNEI; sh5_media_extract_sfmt_beqi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+          { itype = SH5_MEDIA_INSN_BNEI; sh5_media_extract_sfmt_bnei (this, current_cpu, pc, base_insn, entire_insn); goto done; }
         itype = SH5_MEDIA_INSN_X_INVALID; sh5_media_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 928 : /* fall through */
       case 929 : /* fall through */
@@ -1854,6 +1864,45 @@ sh5_media_extract_sfmt_blink (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCAD
     {
       FLD (in_trb) = f_trb;
       FLD (out_rd) = f_dest;
+    }
+#undef FLD
+}
+
+void
+sh5_media_extract_sfmt_bnei (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn){
+    sh5_media_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_beqi.f
+    UINT f_left;
+    INT f_imm6;
+    UINT f_likely;
+    UINT f_tra;
+
+    f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
+    f_imm6 = EXTRACT_MSB0_SINT (insn, 32, 16, 6);
+    f_likely = EXTRACT_MSB0_UINT (insn, 32, 22, 1);
+    f_tra = EXTRACT_MSB0_UINT (insn, 32, 25, 3);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_imm6) = f_imm6;
+  FLD (f_likely) = f_likely;
+  FLD (f_left) = f_left;
+  FLD (f_tra) = f_tra;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_bnei)\t"
+        << " f_imm6:0x" << hex << f_imm6 << dec
+        << " f_likely:0x" << hex << f_likely << dec
+        << " f_left:0x" << hex << f_left << dec
+        << " f_tra:0x" << hex << f_tra << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rm) = f_left;
+      FLD (in_tra) = f_tra;
     }
 #undef FLD
 }
@@ -2851,6 +2900,77 @@ sh5_media_extract_sfmt_fstxs (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCAD
 }
 
 void
+sh5_media_extract_sfmt_fsubd (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn){
+    sh5_media_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_faddd.f
+    UINT f_left;
+    UINT f_right;
+    UINT f_dest;
+
+    f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
+    f_right = EXTRACT_MSB0_UINT (insn, 32, 16, 6);
+    f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_left) = f_left;
+  FLD (f_right) = f_right;
+  FLD (f_dest) = f_dest;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_fsubd)\t"
+        << " f_left:0x" << hex << f_left << dec
+        << " f_right:0x" << hex << f_right << dec
+        << " f_dest:0x" << hex << f_dest << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_drg) = f_left;
+      FLD (in_drh) = f_right;
+      FLD (out_drf) = f_dest;
+    }
+#undef FLD
+}
+
+void
+sh5_media_extract_sfmt_ftrcdq (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn){
+    sh5_media_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_fabsd.f
+    UINT f_left;
+    UINT f_right;
+    UINT f_dest;
+    UINT f_left_right;
+
+    f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
+    f_right = EXTRACT_MSB0_UINT (insn, 32, 16, 6);
+    f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
+  f_left_right = f_left;
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_left_right) = f_left_right;
+  FLD (f_dest) = f_dest;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_ftrcdq)\t"
+        << " f_left_right:0x" << hex << f_left_right << dec
+        << " f_dest:0x" << hex << f_dest << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_drgh) = f_left_right;
+      FLD (out_drf) = f_dest;
+    }
+#undef FLD
+}
+
+void
 sh5_media_extract_sfmt_ftrvs (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn){
     sh5_media_insn_word insn = entire_insn;
 #define FLD(f) abuf->fields.sfmt_ftrvs.f
@@ -3519,6 +3639,43 @@ sh5_media_extract_sfmt_mcmv (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADD
 }
 
 void
+sh5_media_extract_sfmt_mmacnfx_wl (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn){
+    sh5_media_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_mcmv.f
+    UINT f_left;
+    UINT f_right;
+    UINT f_dest;
+
+    f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
+    f_right = EXTRACT_MSB0_UINT (insn, 32, 16, 6);
+    f_dest = EXTRACT_MSB0_UINT (insn, 32, 22, 6);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_dest) = f_dest;
+  FLD (f_left) = f_left;
+  FLD (f_right) = f_right;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_mmacnfx_wl)\t"
+        << " f_dest:0x" << hex << f_dest << dec
+        << " f_left:0x" << hex << f_left << dec
+        << " f_right:0x" << hex << f_right << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rd) = f_dest;
+      FLD (in_rm) = f_left;
+      FLD (in_rn) = f_right;
+      FLD (out_rd) = f_dest;
+    }
+#undef FLD
+}
+
+void
 sh5_media_extract_sfmt_movi (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn){
     sh5_media_insn_word insn = entire_insn;
 #define FLD(f) abuf->fields.sfmt_movi.f
@@ -3596,6 +3753,33 @@ sh5_media_extract_sfmt_ori (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR
     {
       FLD (in_rm) = f_left;
       FLD (out_rd) = f_dest;
+    }
+#undef FLD
+}
+
+void
+sh5_media_extract_sfmt_prefi (sh5_media_scache* abuf, sh5_cpu* current_cpu, PCADDR pc, sh5_media_insn_word base_insn, sh5_media_insn_word entire_insn){
+    sh5_media_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_alloco.f
+    UINT f_left;
+
+    f_left = EXTRACT_MSB0_UINT (insn, 32, 6, 6);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_left) = f_left;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_prefi)\t"
+        << " f_left:0x" << hex << f_left << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rm) = f_left;
+      FLD (out_rm) = f_left;
     }
 #undef FLD
 }

@@ -300,6 +300,8 @@ mepcore1_extract_sfmt_lhucpm1 (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu,
 static void
 mepcore1_extract_sfmt_uci (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
+mepcore1_extract_sfmt_dsp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
+static void
 mepcore1_extract_sfmt_sb (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
 static void
 mepcore1_extract_sfmt_sh (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn);
@@ -1383,7 +1385,7 @@ mepcore1_scache::decode (mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_wor
       case 237 :
         entire_insn = entire_insn >> 16;
         itype = MEPCORE1_INSN_RI_23; mepcore1_extract_sfmt_break (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 240 : itype = MEPCORE1_INSN_DSP; mepcore1_extract_sfmt_uci (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 240 : itype = MEPCORE1_INSN_DSP; mepcore1_extract_sfmt_dsp (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 241 :
         {
           unsigned int val = (((insn >> 8) & (3 << 4)) | ((insn >> 0) & (15 << 0)));
@@ -2160,6 +2162,44 @@ mepcore1_extract_sfmt_uci (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCA
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_uci)\t"
+        << " f_rm:0x" << hex << f_rm << dec
+        << " f_rn:0x" << hex << f_rn << dec
+        << " f_16u16:0x" << hex << f_16u16 << dec
+        << endl;
+    }
+
+  /* Record the fields for profiling.  */
+  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))
+    {
+      FLD (in_rm) = f_rm;
+      FLD (in_rn) = f_rn;
+      FLD (out_rn) = f_rn;
+    }
+#undef FLD
+}
+
+void
+mepcore1_extract_sfmt_dsp (mepcore1_scache* abuf, mep_ext1_cpu* current_cpu, PCADDR pc, mepcore1_insn_word base_insn, mepcore1_insn_word entire_insn){
+    mepcore1_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_uci.f
+    UINT f_rn;
+    UINT f_rm;
+    UINT f_16u16;
+
+    f_rn = EXTRACT_MSB0_UINT (insn, 32, 4, 4);
+    f_rm = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_16u16 = EXTRACT_MSB0_UINT (insn, 32, 16, 16);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_rm) = f_rm;
+  FLD (f_rn) = f_rn;
+  FLD (f_16u16) = f_16u16;
+  FLD (i_rm) = & current_cpu->hardware.h_gpr[f_rm];
+  FLD (i_rn) = & current_cpu->hardware.h_gpr[f_rn];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_dsp)\t"
         << " f_rm:0x" << hex << f_rm << dec
         << " f_rn:0x" << hex << f_rn << dec
         << " f_16u16:0x" << hex << f_16u16 << dec

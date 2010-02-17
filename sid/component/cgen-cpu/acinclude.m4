@@ -9,7 +9,7 @@ AC_DEFUN([gcc_AC_CHECK_DECL],
 AC_CACHE_VAL(gcc_cv_have_decl_$1,
 [AC_TRY_COMPILE([$4],
 [#ifndef $1
-char *(*pfn) = (char *(*)) $1 ;
+char *(*pfn)(char *) = (char *(*)(char *)) $1 ;
 #endif], eval "gcc_cv_have_decl_$1=yes", eval "gcc_cv_have_decl_$1=no")])
 if eval "test \"`echo '$gcc_cv_have_decl_'$1`\" = yes"; then
   AC_MSG_RESULT(yes) ; ifelse([$2], , :, [$2])

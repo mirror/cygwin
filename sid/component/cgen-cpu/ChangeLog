@@ -1,3 +1,10 @@
+2010-02-17  Nick Clifton  <nickc@redhat.com>
+
+	* acinclude.m4 (gcc_AC_CHECK_DECL): Add parameter type to function
+	pointer cast, in order to allow compilation by newer versions of
+	g++.
+        * configure: Regenerate.
+
 2010-01-24  Doug Evans  <dje@sebabeach.org>
 
 	* cgen-fpu.h (cgen_fp_ops): Update signatures of floating point

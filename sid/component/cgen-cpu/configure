@@ -21378,7 +21378,7 @@ int
 main ()
 {
 #ifndef $ac_func
-char *(*pfn) = (char *(*)) $ac_func ;
+char *(*pfn)(char *) = (char *(*)(char *)) $ac_func ;
 #endif
   ;
   return 0;

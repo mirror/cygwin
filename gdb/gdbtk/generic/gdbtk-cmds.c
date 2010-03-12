@@ -27,6 +27,7 @@
 #include "inferior.h"
 #include "source.h"
 #include "symfile.h"
+#include "psympriv.h"
 #include "objfiles.h"
 #include "gdbcore.h"
 #include "demangle.h"

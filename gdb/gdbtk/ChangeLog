@@ -1,3 +1,15 @@
+2010-03-24  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-bp.c (gdb_set_bp): set_breakpoint is no more.
+	Use create_breakpoint.
+	(gdbtk_obj_array, gdbtk_obj_array_ptr, gdbtk_obj_array_cnt):
+	New globals.
+	(gdbtk_read_next_line): New function.
+	(gdb_actions_command): Rewrite using new command_line
+	infrastructure.
+	(gdb_get_tracepoint_info): Actions are now stored in the breakpoint
+	struct's commands element.
+
 2010-03-12  Tom Tromey  <tromey@redhat.com>
 
 	* generic/gdbtk-cmds.c: Include psymtab.h, not psympriv.h.

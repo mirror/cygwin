@@ -1,3 +1,13 @@
+2010-03-30  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-bp.c (gdb_get_breakpoint_info): Breakpoint
+	commands are now reference counted. Adjust data pointers.
+	(gdb_get_tracepoint_info): Likewise.
+	(gdb_actions_command): Don't free previous actions. If the
+	commands aren't valid, we would prefer to keep the old ones
+	any way. break_point_set_commands will also clobber any
+	previous results anyway.
+
 2010-03-24  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-bp.c (gdb_set_bp): set_breakpoint is no more.

@@ -362,7 +362,7 @@ gdb_get_breakpoint_info (ClientData clientData, Tcl_Interp *interp, int objc,
 			    Tcl_NewIntObj (b->ignore_count));
 
   Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
-			    get_breakpoint_commands (b->commands));
+			    get_breakpoint_commands (b->commands ? b->commands->commands : NULL));
 
   Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
 			    Tcl_NewStringObj (b->cond_string, -1));
@@ -684,9 +684,6 @@ gdb_actions_command (ClientData clientData, Tcl_Interp *interp,
       return TCL_ERROR;
     }
 
-  /* Free any existing actions.  */
-  free_command_lines (&tp->commands);
-
   /* Validate and set new tracepoint actions.  */
   Tcl_ListObjGetElements (interp, objv[2], &gdbtk_obj_array_cnt,
 			  &gdbtk_obj_array);
@@ -773,12 +770,15 @@ gdb_get_tracepoint_info (ClientData clientData, Tcl_Interp *interp,
 
   /* Append a list of actions */
   action_list = Tcl_NewObj ();
-  for (cl = tp->commands; cl != NULL; cl = cl->next)
+  if (tp->commands != NULL)
     {
-      Tcl_ListObjAppendElement (interp, action_list,
-				Tcl_NewStringObj (cl->line, -1));
+      for (cl = tp->commands->commands; cl != NULL; cl = cl->next)
+	{
+	  Tcl_ListObjAppendElement (interp, action_list,
+				    Tcl_NewStringObj (cl->line, -1));
+	}
+      Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr, action_list);
     }
-  Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr, action_list);
 
   return TCL_OK;
 }

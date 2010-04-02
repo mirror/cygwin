@@ -362,7 +362,7 @@ gdb_get_breakpoint_info (ClientData clientData, Tcl_Interp *interp, int objc,
 			    Tcl_NewIntObj (b->ignore_count));
 
   Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
-			    get_breakpoint_commands (b->commands ? b->commands->commands : NULL));
+			    get_breakpoint_commands ((breakpoint_commands (b)) ? breakpoint_commands (b) : NULL));
 
   Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
 			    Tcl_NewStringObj (b->cond_string, -1));
@@ -772,7 +772,7 @@ gdb_get_tracepoint_info (ClientData clientData, Tcl_Interp *interp,
   action_list = Tcl_NewObj ();
   if (tp->commands != NULL)
     {
-      for (cl = tp->commands->commands; cl != NULL; cl = cl->next)
+      for (cl = breakpoint_commands (tp); cl != NULL; cl = cl->next)
 	{
 	  Tcl_ListObjAppendElement (interp, action_list,
 				    Tcl_NewStringObj (cl->line, -1));

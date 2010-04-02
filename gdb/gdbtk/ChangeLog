@@ -1,3 +1,9 @@
+2010-04-02  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-bp.c (gdb_get_breakpoint_info): Use
+	breakpoint_commands to access breakpoint commands.
+	(gdb_get_tracepoint_info): Likewise for tracepoint actions.
+
 2010-03-30  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-bp.c (gdb_get_breakpoint_info): Breakpoint

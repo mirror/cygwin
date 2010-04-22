@@ -1,60 +1,59 @@
-# Vietnamese Translation for GProf.
-# Copyright © 2010 Free Software Foundation, Inc.
+# Translation of binutils gprof to Bulgarian
+# Copyright (C) 2009 Free Software Foundation, Inc.
 # This file is distributed under the same license as the binutils package.
-# Clytie Siddall <clytie@riverland.net.au>, 2005-2010.
 #
+# Roumen Petrov <transl@roumenpetrov.info>, 2009.
 msgid ""
 msgstr ""
 "Project-Id-Version: gprof 2.20.1\n"
 "Report-Msgid-Bugs-To: bug-binutils@gnu.org\n"
 "POT-Creation-Date: 2010-03-03 15:06+0100\n"
-"PO-Revision-Date: 2010-04-22 22:27+0930\n"
-"Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
-"Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
+"PO-Revision-Date: 2010-04-21 22:47+0300\n"
+"Last-Translator: Roumen Petrov <transl@roumenpetrov.info>\n"
+"Language-Team: Bulgarian <dict@fsa-bg.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: LocFactoryEditor 1.8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: alpha.c:102 mips.c:54
 msgid "<indirect child>"
-msgstr "<con gián tiếp>"
+msgstr "<косвен потомък>"
 
 #: alpha.c:107 mips.c:59
 #, c-format
 msgid "[find_call] %s: 0x%lx to 0x%lx\n"
-msgstr "[lời_gọi_tìm] %s: 0x%lx đến 0x%lx\n"
+msgstr "[find_call] %s: 0x%lx към 0x%lx\n"
 
 #: alpha.c:129
 #, c-format
 msgid "[find_call] 0x%lx: jsr%s <indirect_child>\n"
-msgstr "[lời_gọi_tìm] 0x%lx: jsr%s <con gián tiếp>\n"
+msgstr "[find_call] 0x%lx: jsr%s <косвен_потомък>\n"
 
 #: alpha.c:139
 #, c-format
 msgid "[find_call] 0x%lx: bsr"
-msgstr "[lời_gọi_tìm] 0x%lx: bsr"
+msgstr "[find_call] 0x%lx: bsr <относително адресиране>"
 
 #: basic_blocks.c:128 call_graph.c:89 hist.c:105
 #, c-format
 msgid "%s: %s: unexpected end of file\n"
-msgstr "%s: %s: kết thúc tập tin bất thường\n"
+msgstr "%s: %s: неочакван край на файл\n"
 
 #: basic_blocks.c:196
 #, c-format
 msgid "%s: warning: ignoring basic-block exec counts (use -l or --line)\n"
-msgstr "%s: cảnh báo : đang bỏ qua các số đếm thực hiện kiểu khối cơ bản (hãy dùng « -l » hay « --line »)\n"
+msgstr "%s: предупреждение: игнориране на броене за базов-блок (да се използва -l или --line)\n"
 
 #. FIXME: This only works if bfd_vma is unsigned long.
 #: basic_blocks.c:289 basic_blocks.c:299
 #, c-format
 msgid "%s:%d: (%s:0x%lx) %lu executions\n"
-msgstr "%s:%d: (%s:0x%lx) %lu lần thực hiện\n"
+msgstr "%s:%d: (%s:0x%lx) %lu изпълнения\n"
 
 #: basic_blocks.c:290 basic_blocks.c:300
 msgid "<unknown>"
-msgstr "<không rõ>"
+msgstr "<неизвестен>"
 
 #: basic_blocks.c:543
 #, c-format
@@ -68,9 +67,9 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"%d dòng đầu :\n"
+"Връх %d Редове:\n"
 "\n"
-"    Dòng\tTổng\n"
+"     Ред       Брой\n"
 "\n"
 
 #: basic_blocks.c:567
@@ -81,23 +80,23 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Tóm tắt thi hành:\n"
+"Накратко за изпълнението:\n"
 "\n"
 
 #: basic_blocks.c:568
 #, c-format
 msgid "%9ld   Executable lines in this file\n"
-msgstr "%9ld   Dòng có thể thi hành trong tập tin này\n"
+msgstr "%9ld   Изпълними редове в файла\n"
 
 #: basic_blocks.c:570
 #, c-format
 msgid "%9ld   Lines executed\n"
-msgstr "%9ld   Dòng đã được thi hành\n"
+msgstr "%9ld   Редове изпълнени\n"
 
 #: basic_blocks.c:571
 #, c-format
 msgid "%9.2f   Percent of the file executed\n"
-msgstr "%9.2f   Phần trăm tập tin đã được thi hành\n"
+msgstr "%9.2f   Проценти от изпълнения файл\n"
 
 #: basic_blocks.c:575
 #, c-format
@@ -106,17 +105,17 @@ msgid ""
 "%9lu   Total number of line executions\n"
 msgstr ""
 "\n"
-"%9lu   Tổng dòng đã được thi hành\n"
+"%9lu   Общ брой на изпълнените редове\n"
 
 #: basic_blocks.c:577
 #, c-format
 msgid "%9.2f   Average executions per line\n"
-msgstr "%9.2f   Số trung bình lần thì hành trong mỗi dòng\n"
+msgstr "%9.2f   Средно изпълняване за ред\n"
 
 #: call_graph.c:68
 #, c-format
 msgid "[cg_tally] arc from %s to %s traversed %lu times\n"
-msgstr "[cg_tally] hình cung từ %s đến %s được đi qua %lu lần\n"
+msgstr "[cg_tally] дъгата от %s до %s е премината %lu пъти\n"
 
 #: cg_print.c:74
 #, c-format
@@ -124,7 +123,7 @@ msgid ""
 "\t\t     Call graph (explanation follows)\n"
 "\n"
 msgstr ""
-"\t\t     Đồ thị gọi (có giải thích sau)\n"
+"\t\tГраф на извикванията (обяснението следва)\n"
 "\n"
 
 #: cg_print.c:76
@@ -133,7 +132,7 @@ msgid ""
 "\t\t\tCall graph\n"
 "\n"
 msgstr ""
-"\t\t\tĐồ thị gọi\n"
+"\t\t\tГраф на извикванията\n"
 "\n"
 
 #: cg_print.c:79 hist.c:466
@@ -143,7 +142,7 @@ msgid ""
 "granularity: each sample hit covers %ld byte(s)"
 msgstr ""
 "\n"
-"độ hạt: mỗi lần ghé mẫu chiếm %ld byte"
+"точност: всяка проба е за %ld байта"
 
 #: cg_print.c:83
 #, c-format
@@ -151,7 +150,7 @@ msgid ""
 " for %.2f%% of %.2f seconds\n"
 "\n"
 msgstr ""
-" trong %.2f%% trên %.2f giây\n"
+" за %.2f%% от %.2f секунди\n"
 "\n"
 
 #: cg_print.c:87
@@ -160,65 +159,65 @@ msgid ""
 " no time propagated\n"
 "\n"
 msgstr ""
-" không có thời gian đã truyền bá\n"
+" без разпространяване за време\n"
 "\n"
 
 #: cg_print.c:96 cg_print.c:99 cg_print.c:101
 msgid "called"
-msgstr "đã gọi"
+msgstr "извик."
 
 #: cg_print.c:96 cg_print.c:101
 msgid "total"
-msgstr "tổng"
+msgstr "общо"
 
 #: cg_print.c:96
 msgid "parents"
-msgstr "cha"
+msgstr "родители"
 
 #: cg_print.c:98 cg_print.c:99
 msgid "index"
-msgstr "chỉ mục"
+msgstr "индекс"
 
 #: cg_print.c:98
-#, c-format
+#, fuzzy, c-format
 msgid "%time"
-msgstr "%time (thời gian)"
+msgstr "време"
 
 #: cg_print.c:98 cg_print.c:99
 msgid "self"
-msgstr "bản thân"
+msgstr "собст."
 
 #: cg_print.c:98
 msgid "descendants"
-msgstr "con cháu"
+msgstr "наследници"
 
 #: cg_print.c:99 hist.c:492
 msgid "name"
-msgstr "tên"
+msgstr "име"
 
 #: cg_print.c:101
 msgid "children"
-msgstr "con"
+msgstr "потомци"
 
 #: cg_print.c:106
 #, c-format
 msgid "index %% time    self  children    called     name\n"
-msgstr "chỉ mục %% thời gian    bản thân     con    đã gọi     tên\n"
+msgstr "индекс%% време   собс. потомци      извик.     име \n"
 
 #: cg_print.c:129
 #, c-format
 msgid " <cycle %d as a whole> [%d]\n"
-msgstr " <chu kỳ toàn bộ %d> [%d]\n"
+msgstr " <цикъл %d от> [%d]\n"
 
 #: cg_print.c:355
 #, c-format
 msgid "%6.6s %5.5s %7.7s %11.11s %7.7s %7.7s     <spontaneous>\n"
-msgstr "%6.6s %5.5s %7.7s %11.11s %7.7s %7.7s     <tự sinh>\n"
+msgstr "%6.6s %5.5s %7.7s %11.11s %7.7s %7.7s     <спонтанни>\n"
 
 #: cg_print.c:356
 #, c-format
 msgid "%6.6s %5.5s %7.7s %7.7s %7.7s %7.7s     <spontaneous>\n"
-msgstr "%6.6s %5.5s %7.7s %7.7s %7.7s %7.7s     <tự sinh>\n"
+msgstr "%6.6s %5.5s %7.7s %7.7s %7.7s %7.7s     <спонтанни>\n"
 
 #: cg_print.c:590
 #, c-format
@@ -226,148 +225,148 @@ msgid ""
 "Index by function name\n"
 "\n"
 msgstr ""
-"Chỉ mục theo tên hàm\n"
+"Индекс по име на функция\n"
 "\n"
 
 #: cg_print.c:647 cg_print.c:656
 #, c-format
 msgid "<cycle %d>"
-msgstr "<chu kỳ %d>"
+msgstr "<цикъл %d>"
 
 #: corefile.c:60
 #, c-format
 msgid "%s: unable to parse mapping file %s.\n"
-msgstr "%s: không thể phân tách tập tin ánh xạ %s.\n"
+msgstr "%s: не може да се обработи файла със съответствията %s.\n"
 
 #: corefile.c:84 corefile.c:496
 #, c-format
 msgid "%s: could not open %s.\n"
-msgstr "%s: không thể mở %s.\n"
+msgstr "%s: не може да се отвори %s.\n"
 
 #: corefile.c:183
 #, c-format
 msgid "%s: %s: not in executable format\n"
-msgstr "%s: %s: không phải theo định dạng có thể thực hiện\n"
+msgstr "%s: %s: не е изпълним формат\n"
 
 #: corefile.c:194
 #, c-format
 msgid "%s: can't find .text section in %s\n"
-msgstr "%s: không tìm thấy phần văn bản « .text » trong %s\n"
+msgstr "%s: не може да се намери изпълнима(.text) секция в %s\n"
 
 #: corefile.c:269
 #, c-format
 msgid "%s: ran out room for %lu bytes of text space\n"
-msgstr "%s: không đủ sức chứa đối với vùng văn bản %lu byte\n"
+msgstr "%s: недостиг на %lu байта за изпълнима секция\n"
 
 #: corefile.c:283
 #, c-format
 msgid "%s: can't do -c\n"
-msgstr "%s: không thể làm « -c »\n"
+msgstr "%s: не може с команда -c\n"
 
 #: corefile.c:322
 #, c-format
 msgid "%s: -c not supported on architecture %s\n"
-msgstr "%s: tùy chọn « -c »  không được hỗ trợ trên kiến trúc %s\n"
+msgstr "%s: -c не се поддържа за архитектура %s\n"
 
 #: corefile.c:505 corefile.c:590
 #, c-format
 msgid "%s: file `%s' has no symbols\n"
-msgstr "%s: tập tin « %s » không có ký hiệu\n"
+msgstr "%s: файлът '%s' е без символи\n"
 
 #: corefile.c:851
 #, c-format
 msgid "%s: somebody miscounted: ltab.len=%d instead of %ld\n"
-msgstr "%s: sai đếm: ltab.len=%d thay cho %ld\n"
+msgstr "%s: нещо не е преброено: ltab.len=%d вместо %ld\n"
 
 #: gmon_io.c:84
 #, c-format
 msgid "%s: address size has unexpected value of %u\n"
-msgstr "%s: kích cỡ địa chỉ có giá trị bất thường %u\n"
+msgstr "%s: размерът на адрес е с неочаквана стойност от %u\n"
 
 #: gmon_io.c:319 gmon_io.c:415
 #, c-format
 msgid "%s: file too short to be a gmon file\n"
-msgstr "%s: tập tin quá ngắn cho tập tin kiểu gmon\n"
+msgstr "%s: файлът е твърде къс, за да бъде файл на \"gmon\"\n"
 
 #: gmon_io.c:329 gmon_io.c:458
 #, c-format
 msgid "%s: file `%s' has bad magic cookie\n"
-msgstr "%s: tập tin « %s » có cookie ma thuật sai\n"
+msgstr "%s: файлът '%s' е с неправилна \"магическа бисквитка\"\n"
 
 #: gmon_io.c:340
 #, c-format
 msgid "%s: file `%s' has unsupported version %d\n"
-msgstr "%s: tập tin « %s » có phiên bản không được hỗ trợ %d\n"
+msgstr "%s: файлът '%s' е за неподдържана версия %d\n"
 
 #: gmon_io.c:370
 #, c-format
 msgid "%s: %s: found bad tag %d (file corrupted?)\n"
-msgstr "%s: %s: tìm thế thẻ sai %d (tập tin bị hỏng?)\n"
+msgstr "%s: %s: открит неправилна отметка %d (повреден файл?)\n"
 
 #: gmon_io.c:437
 #, c-format
 msgid "%s: profiling rate incompatible with first gmon file\n"
-msgstr "%s: tỷ lệ tính hiện trạng không tương thích với tập tin gmon thứ nhất\n"
+msgstr "%s: честотата на диагностика е несъвместима с първия файл на \"gmon\"\n"
 
 #: gmon_io.c:488
 #, c-format
 msgid "%s: incompatible with first gmon file\n"
-msgstr "%s: không tương thích với tập tin gmon thứ nhất\n"
+msgstr "%s: несъвместим с първия файл на \"gmon\"\n"
 
 #: gmon_io.c:518
 #, c-format
 msgid "%s: file '%s' does not appear to be in gmon.out format\n"
-msgstr "%s: tập tin « %s » có vẻ là không theo định dạng « gmon.out »\n"
+msgstr "%s: файлът'%s', изглежда, не е в формата на gmon.out\n"
 
 #: gmon_io.c:531
 #, c-format
 msgid "%s: unexpected EOF after reading %d/%d bins\n"
-msgstr "%s: gặp kết thúc tập tin bất thường sau khi đọc %d/%d thùng\n"
+msgstr "%s: неочакван край на файл(EOF) след прочитане на %d/%d \"сандъци\"\n"
 
 #: gmon_io.c:565
 #, c-format
 msgid "time is in ticks, not seconds\n"
-msgstr "tính thời gian theo tích, không phải theo giây\n"
+msgstr "времето е в отметки, а не в секунди\n"
 
 #: gmon_io.c:571 gmon_io.c:748
 #, c-format
 msgid "%s: don't know how to deal with file format %d\n"
-msgstr "%s: không biết xử lý định dạng tập tin %d như thế nào\n"
+msgstr "%s: не е известно как да се обработи файлов формат %d\n"
 
 #: gmon_io.c:578
 #, c-format
 msgid "File `%s' (version %d) contains:\n"
-msgstr "Tập tin « %s » (phiên bản %d) chứa:\n"
+msgstr "Файлът '%s' (версия %d) съдържа:\n"
 
 #: gmon_io.c:581
 #, c-format
 msgid "\t%d histogram record\n"
-msgstr "\t%d mục ghi biểu đồ tần xuất\n"
+msgstr "\t%d запис с хистограма\n"
 
 #: gmon_io.c:582
 #, c-format
 msgid "\t%d histogram records\n"
-msgstr "\t%d mục ghi biểu đồ tần xuất\n"
+msgstr "\t%d записа(-и) с хистограма\n"
 
 #: gmon_io.c:584
 #, c-format
 msgid "\t%d call-graph record\n"
-msgstr "\t%d mục ghi đồ thị gọi\n"
+msgstr "\t%d запис за граф на извикванията\n"
 
 #: gmon_io.c:585
 #, c-format
 msgid "\t%d call-graph records\n"
-msgstr "\t%d mục ghi đồ thị gọi\n"
+msgstr "\t%d записа(-и) за граф на извикванията\n"
 
 #: gmon_io.c:587
 #, c-format
 msgid "\t%d basic-block count record\n"
-msgstr "\t%d mục ghi tổng khối cơ bản\n"
+msgstr "\t%d запис за базов-блок\n"
 
 #: gmon_io.c:588
 #, c-format
 msgid "\t%d basic-block count records\n"
-msgstr "\t%d mục ghi tổng khối cơ bản\n"
+msgstr "\t%d записа(-и) за базов-блок\n"
 
 #: gprof.c:159
 #, c-format
@@ -386,104 +385,75 @@ msgid ""
 "\t[--demangle[=STYLE]] [--no-demangle] [--external-symbol-table=name] [@FILE]\n"
 "\t[image-file] [profile-file...]\n"
 msgstr ""
-"Sử dụng: %s [-[abcDhilLsTvwxyz]] [-[ACeEfFJnNOpPqSQZ][name]] [-I dirs]\n"
-"\t[-d[số]]\n"
-"\t[-k from/to]\ttừ/đến\n"
-"\t[-m tổng_tối_thiểu]\n"
-"\t[-t độ_dài_bảng]\n"
-"\t[--[no-]annotated-source[=tên]] \t[không] có nguồn đã phụ chú\n"
-"\t[--[no-]exec-counts[=tên]]\t\t[không] có số đếm lần thực hiện\n"
-"\t[--[no-]flat-profile[=tên]] \t\t[không] có hồ sơ phẳng\n"
-"\t[--[no-]graph[=tên]]\t\t\t[không] có đồ thị\n"
-"\t[--[no-]time=tên] \t\t\t\t[không] có thời gian\n"
-"\t[--all-lines] \t\t\t\t\tmọi dòng\n"
-"\t[--brief] \t\t\t\t\t\tngắn\n"
-"\t[--debug[=cấp]]\t\t\t\tgỡ lỗi\n"
-"\t[--function-ordering] \t\t\tsắp xếp hàm\n"
-"\t[--file-ordering]\t\t\t\tsắp xếp tập tin\n"
-"\t[--directory-path=thư_mục] \tđường dẫn thư mục\n"
-"\t[--display-unused-functions]\thiển thị các hàm không dùng\n"
-"\t[--file-format=tên] \t\t\tđịnh dạng tập tin\n"
-"\t[--file-info] \t\t\t\t\tthông tin tập tin\n"
-"\t[--help] \t\t\t\t\t\ttrợ giúp\n"
-"\t[--line] \t\t\t\t\t\tdòng\n"
-"\t[--min-count=số]\t\t\t\tsố đếm tối thiểu\n"
-"\t[--no-static] \t\t\t\t\tkhông tĩnh\n"
-"\t[--print-path] \t\t\t\tđường dẫn in\n"
-"\t[--separate-files]\t\t\t\tcác tập tin riêng\n"
-"\t[--static-call-graph] \t\t\tđồ thị gọi tĩnh\n"
-"\t[--sum] \t\t\t\t\t\tcộng\n"
-"\t[--table-length=dài] \t\t\tđộ dài bảng\n"
-"\t[--traditional]\t\t\t\t\ttruyền thống\n"
-"\t[--version] \t\t\t\t\tphiên bản\n"
-"\t[--width=số] \t\t\t\t\tđộ rộng\n"
-"\t[--ignore-non-functions]\t\tbỏ qua các cái khác hàm\n"
-"\t[--demangle[=kiểu_dáng]] \t\ttháo gỡ\n"
-"\t[@TẬP_TIN]\n"
-"\t[--no-demangle]\t\t\t\tkhông tháo gỡ\n"
-"\t[--external-symbol-table=tên]\tbảng ký hiệu bên ngoài\n"
-"\t[image-file] \t\t\t\t\ttập tin ảnh\n"
-"\t[profile-file...]\t\t\t\t\ttập tin hồ sơ\n"
+"Употреба: %s [-[abcDhilLsTvwxyz]] [-[ACeEfFJnNOpPqSQZ][име]] [-I директории]\n"
+"\t[-d[число]] [-k от/до] [-m мин-брой] [-t таблица-размер]\n"
+"\t[--[no-]annotated-source[=име]] [--[no-]exec-counts[=име]]\n"
+"\t[--[no-]flat-profile[=име]] [--[no-]graph[=име]]\n"
+"\t[--[no-]time=име] [--all-lines] [--brief] [--debug[=ниво]]\n"
+"\t[--function-ordering] [--file-ordering]\n"
+"\t[--directory-path=dirs] [--display-unused-functions]\n"
+"\t[--file-format=име] [--file-info] [--help] [--line] [--min-count=n]\n"
+"\t[--no-static] [--print-path] [--separate-files]\n"
+"\t[--static-call-graph] [--sum] [--table-length=размер] [--traditional]\n"
+"\t[--version] [--width=n] [--ignore-non-functions]\n"
+"\t[--demangle[=ДЕКОРАЦИЯ]] [--no-demangle] [--external-symbol-table=име] [@ФАЙЛ]\n"
+"\t[файл-образ] [диагностичен-файл...]\n"
 
 #: gprof.c:175
 #, c-format
 msgid "Report bugs to %s\n"
-msgstr "Hãy thông báo lỗi cho %s\n"
+msgstr "Подавайте доклади за грешки на %s\n"
 
 #: gprof.c:251
 #, c-format
 msgid "%s: debugging not supported; -d ignored\n"
-msgstr "%s: không hỗ trợ khả năng gõ lỗi nên bỏ qua tùy chọn « -d »\n"
+msgstr "%s: трасирането не се поддържа; -d е игнориран\n"
 
 #: gprof.c:331
 #, c-format
 msgid "%s: unknown file format %s\n"
-msgstr "%s: định dạng tập tin lạ %s\n"
+msgstr "%s: неизвестен файлов формат %s\n"
 
 #. This output is intended to follow the GNU standards document.
 #: gprof.c:419
 #, c-format
 msgid "GNU gprof %s\n"
-msgstr "GNU gprof %s\n"
+msgstr "ГНУ gprof %s\n"
 
 #: gprof.c:420
 #, c-format
 msgid "Based on BSD gprof, copyright 1983 Regents of the University of California.\n"
-msgstr ""
-"Dựa vào phần mềm gprof của BSD\n"
-"tác quyền © năm 1983 của các Quan nhiếp chính của Trường Đại Học California (Mỹ).\n"
+msgstr "На базата на BSD gprof, авторско право 1983 Regents of the University of California.\n"
 
 #: gprof.c:421
 #, c-format
 msgid "This program is free software.  This program has absolutely no warranty.\n"
-msgstr "Chương trình này là phần mềm tự do. Chương trình này không bảo hành gì cả.\n"
+msgstr "Тази програма е свободен софтуер.  Тази програма е без гаранции.\n"
 
 #: gprof.c:462
 #, c-format
 msgid "%s: unknown demangling style `%s'\n"
-msgstr "%s: kiểu dạng tháo gõ lạ « %s »\n"
+msgstr "%s: непознато декориране на имена '%s'\n"
 
 #: gprof.c:482
 #, c-format
 msgid "%s: Only one of --function-ordering and --file-ordering may be specified.\n"
-msgstr ""
-"%s: Có thể ghi rõ chỉ một của hai đối số « --function-ordering » (sắp xếp hàm)\n"
-"và « --file-ordering » (sắp xếp tập tin).\n"
+msgstr "%s: Само една между --function-ordering и --file-ordering може да се зададе.\n"
 
 #: gprof.c:534
 #, c-format
 msgid "%s: sorry, file format `prof' is not yet supported\n"
-msgstr "%s: tiếc là chưa hỗ trợ định dạng tập tin « prof »\n"
+msgstr "%s: за съжаление, файловия формат 'prof', все още не се поддържа\n"
 
 #: gprof.c:588
 #, c-format
 msgid "%s: gmon.out file is missing histogram\n"
-msgstr "%s: tập tin « gmon.out » còn thiếu biểu đồ tần xuất\n"
+msgstr "%s: gmon.out файл без хистограма\n"
 
 #: gprof.c:595
 #, c-format
 msgid "%s: gmon.out file is missing call-graph data\n"
-msgstr "%s: tập tin « gmon.out » file còn thiếu dữ liệu đồ thị gọi\n"
+msgstr "%s: gmon.out файл без граф за извикванията\n"
 
 #: hist.c:133
 #, c-format
@@ -492,9 +462,9 @@ msgid ""
 "%s: from '%s'\n"
 "%s: to '%s'\n"
 msgstr ""
-"%s: đơn vị chiều đã thay đổi giữa hai mục ghi đồ thị\n"
-"%s: từ « %s »\n"
-"%s: sang « %s »\n"
+"%s: мярката на скалата е променена между записите с хистограма\n"
+"%s: от '%s'\n"
+"%s: на '%s'\n"
 
 #: hist.c:143
 #, c-format
@@ -503,29 +473,29 @@ msgid ""
 "%s: from '%c'\n"
 "%s: to '%c'\n"
 msgstr ""
-"%s: cách viết tắt chiều đã thay đổi giữa hai mục ghi đồ thị\n"
-"%s: từ « %c »\n"
-"%s: sang « %c »\n"
+"%s: съкращението на скалата е променено между записите с хистограма\n"
+"%s: от '%c'\n"
+"%s: на '%c'\n"
 
 #: hist.c:157
 #, c-format
 msgid "%s: different scales in histogram records"
-msgstr "%s: tỷ lệ khác nhau trong mục ghi đồ thị"
+msgstr "%s: различни скали в записите за хистограма"
 
 #: hist.c:194
 #, c-format
 msgid "%s: overlapping histogram records\n"
-msgstr "%s: mục ghi đồ thị chồng chéo lên nhau\n"
+msgstr "%s: припокрити записи с хистограма\n"
 
 #: hist.c:228
 #, c-format
 msgid "%s: %s: unexpected EOF after reading %u of %u samples\n"
-msgstr "%s: %s: gặp kết thúc tập tin bất thường sau khi đọc %u trên %u mẫu\n"
+msgstr "%s: %s: неочакван край на файл(EOF) след прочитане на %u от %u проби\n"
 
 #: hist.c:462
 #, c-format
 msgid "%c%c/call"
-msgstr "%c%c/lời gọi"
+msgstr "%c%c/извикване"
 
 #: hist.c:470
 #, c-format
@@ -533,7 +503,7 @@ msgid ""
 " for %.2f%% of %.2f %s\n"
 "\n"
 msgstr ""
-" trong %.2f%% trên %.2f %s\n"
+" за %.2f%% от %.2f %s\n"
 "\n"
 
 #: hist.c:476
@@ -543,7 +513,7 @@ msgid ""
 "Each sample counts as %g %s.\n"
 msgstr ""
 "\n"
-"Mỗi mẫu được tính là %g %s.\n"
+"Всяка проба се брой за %g %s.\n"
 
 #: hist.c:481
 #, c-format
@@ -551,28 +521,28 @@ msgid ""
 " no time accumulated\n"
 "\n"
 msgstr ""
-" chưa tích lũy thời gian\n"
+" без натрупване за време\n"
 "\n"
 
 #: hist.c:488
 msgid "cumulative"
-msgstr "lũy tích"
+msgstr "натрупани"
 
 #: hist.c:488
 msgid "self  "
-msgstr "bản thân  "
+msgstr "собст."
 
 #: hist.c:488
 msgid "total "
-msgstr "tổng "
+msgstr "общо"
 
 #: hist.c:491
 msgid "time"
-msgstr "thời gian"
+msgstr "време"
 
 #: hist.c:491
 msgid "calls"
-msgstr "lời gọi"
+msgstr "извикв."
 
 #: hist.c:580
 #, c-format
@@ -585,39 +555,39 @@ msgstr ""
 "\n"
 "\n"
 "\n"
-"hồ sơ phẳng:\n"
+"диагностика:\n"
 
 #: hist.c:586
 #, c-format
 msgid "Flat profile:\n"
-msgstr "Hồ sơ phẳng:\n"
+msgstr "Диагностика:\n"
 
 #: hist.c:705
 #, c-format
 msgid "%s: found a symbol that covers several histogram records"
-msgstr "%s: tìm thấy một ký hiệu bàn đến vài mục ghi đồ thị"
+msgstr "%s: намерен е символ, който покрива няколко записа с хистограма"
 
 #: mips.c:71
 #, c-format
 msgid "[find_call] 0x%lx: jal"
-msgstr "[lời_gọi_tìm] 0x%lx: jal"
+msgstr "[find_call] 0x%lx: jal (адрес на функция)"
 
 #: mips.c:99
 #, c-format
 msgid "[find_call] 0x%lx: jalr\n"
-msgstr "[lời_gọi_tìm] 0x%lx: jalr\n"
+msgstr "[find_call] 0x%lx: jalr (косвено извикване)\n"
 
 #: source.c:162
 #, c-format
 msgid "%s: could not locate `%s'\n"
-msgstr "%s: không tìm thấy « %s »\n"
+msgstr "%s: не може да се намери '%s'\n"
 
 #: source.c:237
 #, c-format
 msgid "*** File %s:\n"
-msgstr "••• Tập tin %s:\n"
+msgstr "*** Файл %s:\n"
 
 #: utils.c:99
 #, c-format
 msgid " <cycle %d>"
-msgstr " <chu kỳ %d>"
+msgstr " <цикъл %d>"

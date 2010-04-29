@@ -1,3 +1,12 @@
+2010-04-29  Keith Seitz  <keiths@redhat.com>
+
+	insight/347
+	* generic/gdbtk-varobj.c (variable_value): Use TRY_CATCH
+	when calling varobj_set_value.
+	* library/vartree.itb (changeValue): Make note of new
+	assumption that input is decimal (unless prefixed to change
+	the input radix).
+
 2010-04-02  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-bp.c (gdb_get_breakpoint_info): Use

@@ -50,7 +50,7 @@ QUICKREF
  *  OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
  *  SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  *
- *  $Id: strsignal.c,v 1.1 2010/05/11 20:27:20 jjohnstn Exp $
+ *  $Id: strsignal.c,v 1.2 2010/05/18 14:52:38 cgf Exp $
  */
 
 #include <string.h>
@@ -242,7 +242,7 @@ _DEFUN (strsignal, (signal),
       buffer = "Profiling timer expired";
       break;
 #endif
-#ifdef SIGLOST
+#if defined(SIGLOST) && SIGLOST != SIGPWR
     case SIGLOST:
       buffer = "Resource lost";
       break;

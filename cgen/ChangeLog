@@ -1,4 +1,4 @@
-2010-05-28  DJ Delorie  <dj@redhat.com>
+2010-06-01  DJ Delorie  <dj@redhat.com>
 
 	* cpu/xstormy16.cpu (movgriipostincgr, movgriipredecgr,
 	movfgriipredecgr): Fix increment/decrement amount.

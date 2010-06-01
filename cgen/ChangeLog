@@ -1,3 +1,8 @@
+2010-05-28  DJ Delorie  <dj@redhat.com>
+
+	* cpu/xstormy16.cpu (movgriipostincgr, movgriipredecgr,
+	movfgriipredecgr): Fix increment/decrement amount.
+
 2010-02-12  Doug Evans  <dje@sebabeach.org>
 
 	* iformat.scm (/sfmt-search-key): Use iformat key instead of list

@@ -1,3 +1,7 @@
+2010-05-28  DJ Delorie  <dj@redhat.com>
+
+	* xstormy16-sem.cxx: Regenerate.
+
 2010-02-11  Doug Evans  <dje@sebabeach.org>
 
 	* xstormy16-decode.cxx, * xstormy16-decode.h,

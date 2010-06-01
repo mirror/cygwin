@@ -923,7 +923,7 @@ if (FLD (f_op2m)) {
   }
 }
   {
-    SI opval = ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), 1);
+    SI opval = ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), ADDSI (FLD (f_op2m), 1));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
     current_cpu->h_gr_set (FLD (f_Rs), opval);
@@ -948,7 +948,7 @@ xstormy16_sem_movgriipredecgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem
 
 {
   {
-    SI opval = SUBSI (current_cpu->h_gr_get (FLD (f_Rs)), 1);
+    SI opval = SUBSI (current_cpu->h_gr_get (FLD (f_Rs)), ADDSI (FLD (f_op2m), 1));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
     current_cpu->h_gr_set (FLD (f_Rs), opval);
@@ -1778,7 +1778,7 @@ xstormy16_sem_movfgriipredecgr (xstormy16_cpu* current_cpu, xstormy16_scache* se
 
 {
   {
-    SI opval = SUBSI (current_cpu->h_gr_get (FLD (f_Rs)), 1);
+    SI opval = SUBSI (current_cpu->h_gr_get (FLD (f_Rs)), ADDSI (FLD (f_op2m), 1));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
     current_cpu->h_gr_set (FLD (f_Rs), opval);

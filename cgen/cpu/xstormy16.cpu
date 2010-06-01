@@ -725,7 +725,7 @@
 		   (set-alignfix-mem (add Rs imm12) Rdm)
 		   (set (mem QI (add Rs imm12)) Rdm))
 	       (set-psw-nowrite (index-of Rdm) Rdm ws2)
-	       (set Rs (add Rs 1)))
+	       (set Rs (add Rs (add ws2 1))))
      ()
 )
 
@@ -735,7 +735,7 @@
      ("mov$ws2 (--$Rs,$imm12),$Rdm")
      (+ OP1_6 OP2A_A ws2 Rs OP4M_1 Rdm OP5_0 imm12)
      (sequence ()
-	       (set Rs (sub Rs 1))
+	       (set Rs (sub Rs (add ws2 1)))
 	       (set-psw-nowrite (index-of Rdm) Rdm ws2)
 	       (if ws2
 		   (set-alignfix-mem (add Rs imm12) Rdm)
@@ -968,7 +968,7 @@
      ("movf$ws2 ($Rb,--$Rs,$imm12),$Rdm")
      (+ OP1_6 OP2A_E ws2 Rs OP4M_1 Rdm OP5A_0 Rb imm12)
      (sequence ()
-	       (set Rs (sub Rs 1))
+	       (set Rs (sub Rs (add ws2 1)))
 	       (set-psw-nowrite (index-of Rdm) Rdm ws2)
 	       (if ws2
 		   (set (mem HI (and (add (join SI HI Rb Rs) imm12) #xFFFFFFFE)) Rdm)

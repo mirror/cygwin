@@ -1,3 +1,14 @@
+2010-06-18  Pierre Muller  <muller@ics.u-strasbg.fr>
+
+	* generic/gdbtk-cmds.c: Add cygwin macros to allow compilation 
+	with old or recent cygwin version.
+	(gdb_path_conv): Use cygwin_conv_path function.
+	(gdb_eval): Adapt to new field in val_print.
+	* generic/gdbtk-register.c (get_register): Likewise.
+	* generic/gdbtk-wrapper.c (wrap_val_print): Likewise.
+	* generic/gdbtk.c (_initialize_gdbtk): Use cygwin_attach_handle_to_fd
+	call to allow compilation with old and new cygwin version.
+
 2010-04-29  Keith Seitz  <keiths@redhat.com>
 
 	insight/347

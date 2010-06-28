@@ -1,3 +1,7 @@
+2010-06-28  Alan Modra  <amodra@gmail.com>
+
+	* cpu/mep.opc (mep_examine_ivc2_insns): Delete set but unused var.
+
 2010-06-01  DJ Delorie  <dj@redhat.com>
 
 	* cpu/xstormy16.cpu (movgriipostincgr, movgriipredecgr,

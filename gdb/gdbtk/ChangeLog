@@ -1,3 +1,8 @@
+2010-07-04  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-bp.c (gdb_set_bp): Update arguments for API
+	change in create_breakpoint.
+
 2010-06-18  Pierre Muller  <muller@ics.u-strasbg.fr>
 
 	* generic/gdbtk-cmds.c: Add cygwin macros to allow compilation 

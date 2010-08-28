@@ -1,7 +1,7 @@
 /* cygcheck.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -26,6 +26,7 @@
 #include "cygwin/include/mntent.h"
 #include "cygwin/cygprops.h"
 #undef cygwin_internal
+#include "loadlib.h"
 
 #define alloca __builtin_alloca
 
@@ -63,7 +64,7 @@ void dump_dodgy_apps (int verbose);
 /* Forward declaration */
 static void usage (FILE *, int);
 
-static const char version[] = "$Revision: 1.123 $";
+static const char version[] = "$Revision: 1.124 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1409,7 +1410,7 @@ dump_sysinfo ()
 	display_error ("dump_sysinfo: GetVersionEx()");
     }
 
-  HMODULE k32 = LoadLibrary ("kernel32.dll");
+  HMODULE k32 = GetModuleHandleW (L"kernel32.dll");
 
   switch (osversion.dwPlatformId)
     {
@@ -1838,8 +1839,6 @@ dump_sysinfo ()
 	      name);
     }
 
-  if (!FreeLibrary (k32))
-    display_error ("dump_sysinfo: FreeLibrary()");
   SetErrorMode (prev_mode);
   if (givehelp)
     {

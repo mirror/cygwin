@@ -828,6 +828,27 @@
 				"))"))))
 )
 
+;; Process fp predicates, e.g. nan, qnan, snan.
+;; SRC-MODE is the mode name of SRC.
+;; The result has mode BI.
+
+(define (s-float-predop estate name src-mode src)
+  (let* ((val (rtl-c-get estate src-mode src))
+	 (mode (cx:mode val))
+	 (sem-mode (rtx-sem-mode mode)))
+    ;; FIXME: Argument checking.
+
+    (if (not (mode-float? mode))
+	(estate-error estate "non floating-point mode" src-mode))
+
+    (cx:make (mode:lookup 'BI)
+	     (string-append "CGEN_CPU_FPU (current_cpu)->ops->"
+			    (string-downcase name)
+			    (string-downcase (obj:str-name sem-mode))
+			    " (CGEN_CPU_FPU (current_cpu), "
+			    (cx:c val) ")")))
+)
+
 ;; Integer mode conversions.
 ;; MODE is the mode name.
 
@@ -1749,13 +1770,13 @@
 )
 
 (define-fn nan (*estate* options mode s1)
-  (s-unop *estate* "NAN" #f mode s1)
+  (s-float-predop *estate* "NAN" mode s1)
 )
 (define-fn qnan (*estate* options mode s1)
-  (s-unop *estate* "QNAN" #f mode s1)
+  (s-float-predop *estate* "QNAN" mode s1)
 )
 (define-fn snan (*estate* options mode s1)
-  (s-unop *estate* "SNAN" #f mode s1)
+  (s-float-predop *estate* "SNAN" mode s1)
 )
 
 (define-fn min (*estate* options mode s1 s2)

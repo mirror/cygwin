@@ -1,3 +1,8 @@
+2010-08-30  Doug Evans  <dje@sebabeach.org>
+
+	* rtl-c.scm (s-float-predop): New function.
+	(nan, qnan, snan): Call it.
+
 2010-06-28  Alan Modra  <amodra@gmail.com>
 
 	* cpu/mep.opc (mep_examine_ivc2_insns): Delete set but unused var.

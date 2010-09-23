@@ -13,4 +13,5 @@ File Attributes
   Tag_ARM_ISA_use: Yes
   Tag_THUMB_ISA_use: Thumb-2
   Tag_MPextension_use: Allowed
+  Tag_DIV_use: Allowed in v7-A with integer division extension
   Tag_Virtualization_use: TrustZone

@@ -710,7 +710,7 @@
 		  "_VALUE(attrs) "
 		  (if (bool-attr? attr)
 		      (string-append
-		       "(((attrs)->bool & (1 << "
+		       "(((attrs)->bool_ & (1 << "
 		       (string-upcase prefix)
 		       "_"
 		       (string-upcase (gen-sym attr))

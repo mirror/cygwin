@@ -1,3 +1,8 @@
+2010-10-09  Matt Rice  <ratmice@gmail.com>
+
+	* utils-cgen.scm (gen-attr-accessors): Rename bool attribute to bool_.
+	* cpu/mep.opc (mep_cgen_insn_supported): Ditto.
+
 2010-08-30  Doug Evans  <dje@sebabeach.org>
 
 	* rtl-c.scm (s-float-predop): New function.

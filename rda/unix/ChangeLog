@@ -1,3 +1,8 @@
+2010-10-14  Kevin Buettner  <kevinb@redhat.com>
+
+	* lwp-pool.c (hash_find): Initialize `do_step' in the newly allocated
+	lwp struct.
+
 2009-11-30  Kevin Buettner  <kevinb@redhat.com>
 
 	* diagnostics.h, diagnostics.c (print_sigint_message): New function.

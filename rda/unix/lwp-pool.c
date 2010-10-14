@@ -489,6 +489,7 @@ hash_find (pid_t lwp)
   l->state = lwp_state_uninitialized;
   l->next = l->prev = NULL;
   l->status = 42;
+  l->do_step = 0;
 
   hash[slot] = l;
   hash_population++;

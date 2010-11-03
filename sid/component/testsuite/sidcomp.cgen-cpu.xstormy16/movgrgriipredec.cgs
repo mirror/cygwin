@@ -11,18 +11,18 @@ data:	.byte 0xfa,0xce,0xde,0xad
 
 	.global movgrgriipredec
 movgrgriipredec:
-	mov r1, #data
-	mov.b r2, (--r1, 1)
+	mov    r1, #data
+	mov.b  r2, (--r1, 1)
 	assert r2, 0xfa
-	mov.b r2, (--r1, 3)
+	mov.b  r2, (--r1, 3)
 	assert r2, 0xce
 
-	mov r1, #data
-	mov.w r2, (--r1, 2)
+	mov    r1, #data
+	mov.w  r2, (--r1, 2)
 	assert r2, 0xcefa
-	add r1, #4
-	mov.w r2, (--r1, 1)
-	assert r2, 0xface
+	add    r1, #4
+	mov.w  r2, (--r1, 1)
+	assert r2, 0xcefa
 
 	br okay
 

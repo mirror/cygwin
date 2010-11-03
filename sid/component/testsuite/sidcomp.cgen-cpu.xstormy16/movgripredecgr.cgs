@@ -13,17 +13,16 @@ edata:
 	.global movgripredecgr
 movgripredecgr:
 	;mov.b (--r0),r0
-	mov r1, #edata
+	mov    r1, #edata
+	mov    r2, #0xfc
+	mov.b  (--r1), r2		; fa ce de fc
+	mov.w  r2, (r1)
+	assert r2, 0xfcde
 
-	mov r2, #0xfc
-	mov.b (--r1), r2		; fa ce de fc
-	mov.w r2, (r1)
-	assert r2, 0xdefc
-
-	mov r2, #0xae
-	sub r1, #1
-	mov.b (--r1), r2		; fa ae fc ad
-	mov.w r2, (r1, -1)
+	mov    r2, #0xae
+	sub    r1, #1
+	mov.b  (--r1), r2		; fa ae fc ad
+	mov.w  r2, (r1, -1)
 	assert r2, 0xaefa
 
 	br okay

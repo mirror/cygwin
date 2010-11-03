@@ -11,20 +11,20 @@ data:	.byte 0xfa,0xce,0xde,0xad
 
 	.global movgrgripredec
 movgrgripredec:
-	mov r1, #data
-	add r1, #3
-	mov.b r2, (--r1)
+	mov    r1, #data
+	add    r1, #3
+	mov.b  r2, (--r1)
 	assert r2, 0xde
-	mov.b r2, (--r1)
+	mov.b  r2, (--r1)
 	assert r2, 0xce
 
-	mov r1, #data
-	add r1, #4
-	mov.w r2, (--r1)
+	mov    r1, #data
+	add    r1, #4
+	mov.w  r2, (--r1)
 	assert r2, 0xadde
-	add r1, #3
-	mov.w r2, (--r1)
-	assert r2, 0xdead
+	add    r1, #3
+	mov.w  r2, (--r1)
+	assert r2, 0xadde
 
 	br okay
 

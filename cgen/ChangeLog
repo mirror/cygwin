@@ -1,3 +1,18 @@
+2010-10-28  Nick Clifton<nickc@redhat.com>
+
+	* cpu/xstormy16.cpu (alignfix-mem-far): New macro.  Like
+	alignfix-mem, but works with 32-bit addresses.
+	(set-alignfix-mem-far): New macro.  Like set-alignfix-mem but
+	works with 32-bit addresses.
+	(movfgrgri, movfgrgripostinc, movfgrgripredec, movfgrgrii,
+	movfgrgriipostinc, movfgrgriipredec): Use alignfix-mem-far.
+	(movfgrigr, movfgripostincgr, movfgripredecgr): Use
+	set-alignfix-mem-far.
+	(movfgrgriipostinc, movfgriipostincgr): Propagate addition to
+	source register into base register.
+	(movfgrgriipredec, movfgriipredecgr): Propagate subtraction from
+	source register into base register.
+
 2010-10-09  Matt Rice  <ratmice@gmail.com>
 
 	* utils-cgen.scm (gen-attr-accessors): Rename bool attribute to bool_.

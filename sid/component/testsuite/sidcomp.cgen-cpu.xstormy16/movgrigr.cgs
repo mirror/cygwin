@@ -11,25 +11,25 @@ data:	.byte 0xfa,0xce,0xde,0xad
 
 	.global movgrigr
 movgrigr:
-	mov r1, #data
-	mov.w r2, (r1)
+	mov    r1, #data
+	mov.w  r2, (r1)
 	assert r2, 0xcefa
 
-	mov r2, #0xfc
-	mov.b (r1), r2		; fc ce de ad
-	mov.w r2, (r1)
+	mov    r2, #0xfc
+	mov.b  (r1), r2		; fc ce de ad
+	mov.w  r2, (r1)
 	assert r2, 0xcefc
 
-	mov r2, #0xae
-	add r1, #1
-	mov.b (r1), r2		; fc ae de ad
-	mov.w r2, (r1)
-	assert r2, 0xfcae
+	mov    r2, #0xae
+	add    r1, #1
+	mov.b  (r1), r2		; fc ae de ad
+	mov.w  r2, (r1)
+	assert r2, 0xaefc
 
-	mov.w (r1), r2		; fc ae de ad
-	sub r1, #1
-	mov.w r2, (r1)
-	assert r2, 0xfcae
+	mov.w  (r1), r2		; fc ae de ad
+	sub    r1, #1
+	mov.w  r2, (r1)
+	assert r2, 0xaefc
 
 	br okay
 

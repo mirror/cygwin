@@ -11,16 +11,16 @@ data:	.byte 0xfa,0xce,0xde,0xad
 
 	.global movgrgrii
 movgrgrii:
-	mov r1, #data
-	mov.b r2, (r1, 1)
+	mov    r1, #data
+	mov.b  r2, (r1, 1)
 	assert r2, 0xce
-	mov.b r2, (r1, 3)
+	mov.b  r2, (r1, 3)
 	assert r2, 0xad
 
-	mov.w r2, (r1, 2)
+	mov.w  r2, (r1, 2)
 	assert r2, 0xadde
-	mov.w r2, (r1, 1)
-	assert r2, 0xface
+	mov.w  r2, (r1, 1)
+	assert r2, 0xcefa
 
 	br okay
 

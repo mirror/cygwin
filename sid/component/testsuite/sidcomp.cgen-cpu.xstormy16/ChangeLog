@@ -1,3 +1,28 @@
+2010-11-03  Nick Clifton  <nickc@redhat.com>
+
+	* testutils.inc (pass): Update parameter layout for write
+	syscall.
+	(fail): Likewise.
+	* movgrgrii.cgs: Fix endianness typo in assertion.
+	* movgrgriipostinc.cgs: Likewise.
+	* movgrgriipredec.cgs: Likewise.
+	* movgrgripostinc.cgs: Likewise.
+	* movgrgripredec.cgs: Likewise.
+	* movgrigr.cgs: Likewise.
+	* movgriipostincgr.cgs: Likewise.
+	* movgripostincgr.cgs: Likewise.
+	* movgripredecgr.cgs: Likewise.
+	* rrcgrgr.cgs: Rotate only inserts carry flag once.
+	* rrcgrimm4.cgs: Likewise.
+	* movfgrgriipostinc.cgs: New test.  Checks MOVF load with post
+	increment.
+	* movfgrgriipredec.cgs: New test.  Checks MOVF load with pre
+	decrement.
+	* movfgriipostincgr.cgs: New test.  Checks MOVF store with post
+	increment.
+	* movfgriipostincgr.cgs: New test.  Checks MOVF store with pre
+	decrement.
+
 2001-12-17  matthew green  <mrg@redhat.com>
 
 	* callgr.cgs: Fix test.
@@ -32,7 +57,7 @@
 	* movlowgr.cgs: Likewise.
 
 2001-07-22  matthew green  <mrg@redhat.com>
-	
+
 	* bnhmemimm.cgs: New test.
 	* bphmemimm.cgs: Likewise.
 	* clr1hmemimm.cgs: Likewise.

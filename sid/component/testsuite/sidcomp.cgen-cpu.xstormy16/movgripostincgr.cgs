@@ -11,17 +11,16 @@ data:	.byte 0xfa,0xce,0xde,0xad
 
 	.global movgripostincgr
 movgripostincgr:
-	mov r1, #data
+	mov    r1, #data
+	mov    r2, #0xfc
+	mov.b  (r1++), r2		; fc ce de ad
+	mov.w  r2, (r1)
+	assert r2, 0xcefc
 
-	mov r2, #0xfc
-	mov.b (r1++), r2		; fc ce de ad
-	mov.w r2, (r1)
-	assert r2, 0xfcce
-
-	mov r2, #0xae
-	add r1, #1
-	mov.b (r1++), r2		; fa fc ae ad
-	mov.w r2, (r1, -1)
+	mov    r2, #0xae
+	add    r1, #1
+	mov.b  (r1++), r2		; fc ce ae ad
+	mov.w  r2, (r1, -1)
 	assert r2, 0xadae
 
 	br okay

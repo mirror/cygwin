@@ -30,20 +30,22 @@ fail_str:
 	.endm
 
 	.macro pass
-	mov r1, #5	; write syscall
-	mov r2, #1	; write(fileno(stdout), "pass", 5)
-	mov.w r3, #pass_str
-	mov r4, #5
+	mov     r1, #5	; write syscall
+	mov     r2, #1	; write(fileno(stdout), "pass", 5)
+	mov.w   r3, #pass_str
+	mov     r4, #0
+	mov     r5, #5  ; length
 	.byte 0x01
 	.byte 0x00
 	exit 0
 	.endm
 
 	.macro fail
-	mov r1, #5	; write syscall
-	mov r2, #1	; write(fileno(stdout), "fail", 5)
-	mov.w r3, #fail_str
-	mov r4, #5
+	mov     r1, #5	; write syscall
+	mov     r2, #1	; write(fileno(stdout), "fail", 5)
+	mov.w   r3, #fail_str
+	mov     r4, #0
+	mov     r5, #5  ; length
 	.byte 0x01
 	.byte 0x00
 	exit 1

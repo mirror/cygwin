@@ -1,0 +1,36 @@
+# xstormy16 testcase for movf[.b] $Rdm,($Rb,--$Rs,N) -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.data
+data:	.byte 0xfa,0xce,0xde,0xad
+mdata:	.byte 0x01,0x02,0x03,0x04
+	.text
+
+	.global movfgrgriipredec
+movfgrgriipredec:
+	mov     r1, @lo(#mdata)
+	mov     r8, @hi(#mdata)
+	movf.b  r2, (r8,--r1)
+	assert  r2, 0xad
+	movf.b  r2, (r8,--r1,1)
+	assert  r2, 0xad
+
+	movf.w  r2, (r8,--r1,0)
+	assert  r2, 0xcefa
+
+	mov	r1, #0x0000
+	mov     r8, #0x0002
+	movf.w	r2, (r8,--r1,0)
+	assert  r1, 0xfffe
+	assert  r8, 0x0001
+	
+	br      okay
+
+wrong:
+	fail
+okay:
+	pass

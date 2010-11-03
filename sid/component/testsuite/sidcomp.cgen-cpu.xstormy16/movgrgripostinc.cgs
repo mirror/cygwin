@@ -11,18 +11,18 @@ data:	.byte 0xfa,0xce,0xde,0xad
 
 	.global movgrgripostinc
 movgrgripostinc:
-	mov r1, #data
-	mov.b r2, (r1++)
+	mov    r1, #data
+	mov.b  r2, (r1++)
 	assert r2, 0xfa
-	mov.b r2, (r1++)
+	mov.b  r2, (r1++)
 	assert r2, 0xce
 
-	mov r1, #data
-	mov.w r2, (r1++)
+	mov    r1, #data
+	mov.w  r2, (r1++)
 	assert r2, 0xcefa
-	sub r1, #1
-	mov.w r2, (r1++)
-	assert r2, 0xface
+	sub    r1, #1
+	mov.w  r2, (r1++)
+	assert r2, 0xcefa
 
 	br okay
 

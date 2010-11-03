@@ -7,11 +7,11 @@
 
 	.global rrcgrimm4
 rrcgrimm4:
-	mov r1, #0x84
-	mov r3, #0xffff
-	add r3, #1
-	rrc r1, #2
-	assert r1, 0xc021
+	mov    r1, #0x84
+	mov    r3, #0xffff
+	add    r3, #1
+	rrc    r1, #2
+	assert r1, 0x4021
 
 	br okay
 

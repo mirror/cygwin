@@ -554,7 +554,7 @@ gdb_set_bp (ClientData clientData, Tcl_Interp *interp,
 			 (pending ? AUTO_BOOLEAN_TRUE : AUTO_BOOLEAN_FALSE),
 			 NULL	/* breakpoint ops */,
 			 0	/* from_tty */,
-			 enabled);
+			 enabled, 0);
     }
 
   if (e.reason < 0)

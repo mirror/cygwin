@@ -1,3 +1,8 @@
+2010-11-13  Keith Seitz  <keiths@valrhona.uglyboxes.com>
+
+	* generic/gdbtk-bp.c (gdb_set_bp): Update for recent
+	create_breakpoint API update.
+
 2010-07-04  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-bp.c (gdb_set_bp): Update arguments for API

@@ -1,7 +1,7 @@
 /* Startup code for Insight.
 
-   Copyright (C) 1994, 1995, 1996, 1997, 1998, 2000, 200, 2002, 2003, 2004, 2008
-   Free Software Foundation, Inc.
+   Copyright (C) 1994, 1995, 1996, 1997, 1998, 2000, 200, 2002, 2003, 2004,
+   2008, 2010 Free Software Foundation, Inc.
 
    Written by Stu Grossman <grossman@cygnus.com> of Cygnus Support.
 
@@ -808,8 +808,8 @@ gdbtk_annotate_signal (void)
   Tcl_Eval (gdbtk_interp, "gdbtk_stop_idle_callback");
 
   buf = xstrprintf ("gdbtk_signal %s {%s}",
-	     target_signal_to_name (tp->stop_signal),
-	     target_signal_to_string (tp->stop_signal));
+	     target_signal_to_name (tp->suspend.stop_signal),
+	     target_signal_to_string (tp->suspend.stop_signal));
   if (Tcl_Eval (gdbtk_interp, buf) != TCL_OK)
     report_error ();
   free(buf);

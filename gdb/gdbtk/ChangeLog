@@ -1,3 +1,8 @@
+2010-12-01  Keith Seitz  <keiths@valrhona.uglyboxes.com>
+
+	* generic/gdbtk-hooks.c (gdbtk_annotate_signal): Update to reflect
+	recnet thread_info changes.
+
 2010-11-13  Keith Seitz  <keiths@valrhona.uglyboxes.com>
 
 	* generic/gdbtk-bp.c (gdb_set_bp): Update for recent

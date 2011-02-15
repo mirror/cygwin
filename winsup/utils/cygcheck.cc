@@ -1,7 +1,7 @@
 /* cygcheck.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -64,7 +64,7 @@ void dump_dodgy_apps (int verbose);
 /* Forward declaration */
 static void usage (FILE *, int);
 
-static const char version[] = "$Revision: 1.125 $";
+static const char version[] = "$Revision: 1.126 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",

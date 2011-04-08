@@ -1,5 +1,6 @@
 /* Tcl/Tk command definitions for Insight - Breakpoints.
-   Copyright (C) 2001, 2002, 2008, 2009, 2010 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2008, 2009, 2010, 2011
+   Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -826,12 +827,11 @@ tracepoint_exists (char *args)
   VEC(breakpoint_p) *tp_vec = NULL;
   int ix;
   struct breakpoint *tp;
-  char **canonical;
   struct symtabs_and_lines sals;
   char *file = NULL;
   int result = -1;
 
-  sals = decode_line_1 (&args, 1, NULL, 0, &canonical, NULL);
+  sals = decode_line_1 (&args, 1, NULL, 0, NULL, NULL);
   if (sals.nelts == 1)
     {
       resolve_sal_pc (&sals.sals[0]);

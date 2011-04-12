@@ -276,7 +276,6 @@ get_register (int regnum, map_arg arg)
   CORE_ADDR addr;
   enum lval_type lval;
   struct type *reg_vtype;
-  gdb_byte buffer[MAX_REGISTER_SIZE];
   int format;
   struct cleanup *old_chain = NULL;
   struct ui_file *stb;
@@ -330,7 +329,7 @@ get_register (int regnum, map_arg arg)
 	{
 	  int idx = ((gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG)
 		     ? j : register_size (gdbarch, regnum) - 1 - j);
-	  sprintf (ptr, "%02x", (unsigned char) buffer[idx]);
+	  sprintf (ptr, "%02x", (unsigned char) valaddr[idx]);
 	  ptr += 2;
 	}
       fputs_unfiltered (buf, stb);

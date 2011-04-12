@@ -1,3 +1,16 @@
+2011-04-11  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-bp.c (tracepoint_exists): Remove recently
+	removed "not_found_ptr" argument from call to decode_line_1.
+	* generic/gdbtk-stack.c (gdb_get_vars_command): Likewise.
+	* generic/gdbtk-cmds.c (gdb_get_line_command): Likewise.
+	(gdb_get_file_command): Likewise.
+	(gdb_get_function_command): Likewise.
+
+	From Kevin Buettner  <kevinb@redhat.com>
+	* generic/gdbtk-register.c (): Delete declaration of `buffer'.
+	Use `valaddr' in its place.
+
 2011-04-08  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-bp.c (tracepoint_exists): Update for

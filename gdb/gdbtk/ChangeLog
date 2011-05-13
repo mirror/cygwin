@@ -1,3 +1,23 @@
+2011-05-12  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-hooks.c (gdbtk_create_breakpoint): Change
+	parameter from `int' to `struct breakpoint *'.
+	(gdbtk_delete_breakpoint): Likewise.
+	(gdbtk_modify_breakpoint): Likewise.
+	* generic/gdbtk-bp.c (ALL_BREAKPOINTS): Define.
+	(breakpoint_list): Remove.
+	(breakpoint_list_size): Remove.
+	(Gdbtk_Breakpoint_Init): Remove initialization of breakpoint_list.
+	(gdb_find_bp_at_addr): Rewrite using ALL_BREAKPOINTS.
+	(gdb_find_bp_at_line): Likewise.
+	(gdb_get_breakpoint_info): Likewise.
+	(gdb_get_breakpoint_list): Likewise.
+	(gdbtk_create_breakpoint): Change parameter from `int' to
+	`struct breakpoint *' and update function.
+	(gdbtk_delete_breakpoint): Likewise.
+	(gdbtk_modify_breakpoint): Likewise.	
+	(breakpoint_notify): Rewrite using ALL_BREAKPOINTS.
+
 2011-04-11  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-bp.c (tracepoint_exists): Remove recently

@@ -1,7 +1,7 @@
 /* 
  * getopt.c
  *
- * $Id: getopt.c,v 1.9 2009/02/08 18:02:17 keithmarshall Exp $
+ * $Id: getopt.c,v 1.10 2011/05/31 20:24:51 keithmarshall Exp $
  *
  * Implementation of the `getopt', `getopt_long' and `getopt_long_only'
  * APIs, for inclusion in the MinGW runtime library.
@@ -21,9 +21,9 @@
  * DISCLAIMED. This includes but is not limited to warranties of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * $Revision: 1.9 $
+ * $Revision: 1.10 $
  * $Author: keithmarshall $
- * $Date: 2009/02/08 18:02:17 $
+ * $Date: 2011/05/31 20:24:51 $
  *
  */
 
@@ -308,6 +308,48 @@ struct option *opt, int index, int *retindex, const CHAR *optstring )
   /* ... otherwise, the return value becomes the status code.
    */
   return opt[index].val;
+}
+
+static __inline__
+int getopt_verify( const CHAR *nextchar, const CHAR *optstring )
+{
+  /* Helper function, called by getopt_parse() when invoked
+   * by getopt_long_only(), to verify when an unmatched or an
+   * ambiguously matched long form option string is valid as
+   * a short form option specification.
+   */
+  if( ! (nextchar && *nextchar && optstring && *optstring) )
+    /*
+     * There are no characters to be matched, or there are no
+     * valid short form option characters to which they can be
+     * matched, so this can never be valid.
+     */
+    return 0;
+
+  while( *nextchar )
+  {
+    /* For each command line character in turn ...
+     */
+    const CHAR *test;
+    if( (test = getopt_match( *nextchar++, optstring )) == NULL )
+      /*
+       * ... there is no short form option to match the current
+       * candidate, so the entire argument fails.
+       */
+      return 0;
+
+    if( test[1] == getopt_takes_argument )
+      /*
+       * The current candidate is valid, and it matches an option
+       * which takes an argument, so this command line argument is
+       * a valid short form option specification; accept it.
+       */
+      return 1;
+  }
+  /* If we get to here, then every character in the command line
+   * argument was valid as a short form option; accept it.
+   */
+  return 1;
 }
 
 static
@@ -614,6 +656,22 @@ int getopt_parse( int mode, getopt_std_args, ... )
 	      {
 		/* if this is not the first, then we have an ambiguity ...
 		 */
+		if( (mode == getopt_mode_long_only)
+		  /*
+		   * However, in the case of getopt_long_only(), if
+		   * the entire ambiguously matched string represents
+		   * a valid short option specification, then we may
+		   * proceed to interpret it as such.
+		   */
+		&&  getopt_verify( nextchar, optstring )  )
+		  return getopt_parse( mode, argc, argv, optstring );
+
+		/* If we get to here, then the ambiguously matched
+		 * partial long option isn't valid for short option
+		 * evaluation; reset parser context to resume with
+		 * the following command line argument, diagnose
+		 * ambiguity, and bail out.
+		 */
 		optopt = 0;
 		nextchar = NULL;
 		optind = argind + 1;
@@ -634,11 +692,19 @@ int getopt_parse( int mode, getopt_std_args, ... )
 	  return getopt_resolved( mode, argc, argv, &argind,
 	      longopts, matched, optindex, optstring );
 	}
-	if( mode < getopt_mode_long_only )
+	/* if here, then we had what SHOULD have been a long form option,
+	 * but it is unmatched ...
+	 */
+	if( (mode < getopt_mode_long_only)
+	  /*
+	   * ... although paradoxically, `mode == getopt_mode_long_only'
+	   * allows us to still try to match it as a short form option.
+	   */
+        ||  (getopt_verify( nextchar, optstring ) == 0)  )
 	{
-	  /* if here, then we had what SHOULD have been a long form option,
-	   * but it is unmatched; (perversely, `mode == getopt_mode_long_only'
-	   * allows us to still try to match it as a short form option).
+	  /* When it cannot be matched, reset the parsing context to
+	   * resume from the next argument, diagnose the failed match,
+	   * and bail out.
 	   */
 	  optopt = 0;
 	  nextchar = NULL;
@@ -715,4 +781,4 @@ __weak_alias( getopt_long, _getopt_long )
 __weak_alias( getopt_long_only, _getopt_long_only )
 #endif
 
-/* $RCSfile: getopt.c,v $Revision: 1.9 $: end of file */
+/* $RCSfile: getopt.c,v $Revision: 1.10 $: end of file */

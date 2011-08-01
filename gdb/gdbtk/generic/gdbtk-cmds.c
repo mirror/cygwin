@@ -224,7 +224,6 @@ static int gdb_disassemble_driver (CORE_ADDR low, CORE_ADDR high,
 							      struct
 							      disassemble_info
 							      *));
-char *get_prompt (void);
 static int perror_with_name_wrapper (PTR args);
 static int wrapped_call (PTR opaque_args);
 static int hex2bin (const char *hex, char *bin, int count);
@@ -794,7 +793,7 @@ static int
 gdb_prompt_command (ClientData clientData, Tcl_Interp *interp,
 		    int objc, Tcl_Obj *CONST objv[])
 {
-  Tcl_SetStringObj (result_ptr->obj_ptr, get_prompt (), -1);
+  Tcl_SetStringObj (result_ptr->obj_ptr, get_prompt (0), -1);
   return TCL_OK;
 }
 

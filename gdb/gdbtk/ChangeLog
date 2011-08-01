@@ -1,3 +1,14 @@
+2011-08-01  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-bp.c (BREAKPOINT_IS_WATCHPOINT): Remove.
+	(gdb_get_breakpoint_info): Update with recent GDB API changes.
+	(gdb_actions_command): Likewise.
+	(gdb_get_tracepoint_info): Likewise.
+	(breakpoint_notify): Use get_breakpoint.
+
+	* generic/gdbtk-cmds.c (gdb_prompt_command): Update with recent
+	GDB API changes.
+
 2011-05-12  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-hooks.c (gdbtk_create_breakpoint): Change

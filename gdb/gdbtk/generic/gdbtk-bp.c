@@ -73,13 +73,6 @@ char *bpdisp[] =
  || (bp)->type == bp_read_watchpoint     \
  || (bp)->type == bp_access_watchpoint)
 
-/* Is this breakpoint a watchpoint?  */
-#define BREAKPOINT_IS_WATCHPOINT(bp)					      \
-((bp)->type == bp_watchpoint						      \
- || (bp)->type == bp_hardware_watchpoint				      \
- || (bp)->type == bp_read_watchpoint					      \
- || (bp)->type == bp_access_watchpoint)
-
 /*
  * Forward declarations
  */
@@ -287,6 +280,7 @@ gdb_get_breakpoint_info (ClientData clientData, Tcl_Interp *interp, int objc,
   struct symtab_and_line sal;
   int bpnum;
   struct breakpoint *b;
+  struct watchpoint *w;
   char *funcname, *filename;
   int isPending = 0;
 
@@ -304,16 +298,14 @@ gdb_get_breakpoint_info (ClientData clientData, Tcl_Interp *interp, int objc,
       return TCL_ERROR;
     }
 
-  ALL_BREAKPOINTS (b)
-  {
-    if (b->number == bpnum)
-      break;
-  }
+  b = get_breakpoint (bpnum);
   if (!b || b->type != bp_breakpoint)
     {
       gdbtk_set_result (interp, "Breakpoint #%d does not exist.", bpnum);
       return TCL_ERROR;
     }
+
+  w = (is_watchpoint (b)) ? (struct watchpoint *) b : NULL;
 
   isPending = (b->loc == NULL);
   Tcl_SetListObj (result_ptr->obj_ptr, 0, NULL);
@@ -371,8 +363,7 @@ gdb_get_breakpoint_info (ClientData clientData, Tcl_Interp *interp, int objc,
 			    Tcl_NewIntObj (b->hit_count));
 
   Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
-			    Tcl_NewStringObj (BREAKPOINT_IS_WATCHPOINT (b)
-					      ? b->exp_string
+			    Tcl_NewStringObj (w ? w->exp_string
 					      : b->addr_string, -1));
 
   return TCL_OK;
@@ -604,11 +595,7 @@ breakpoint_notify (int num, const char *action)
   char *buf;
   struct breakpoint *b;
 
-  ALL_BREAKPOINTS (b)
-  {
-    if (num == b->number)
-      break;
-  }
+  b = get_breakpoint (num);
 
   if (b->number < 0
       /* FIXME: should not be so restrictive... */
@@ -642,8 +629,8 @@ static int
 gdb_actions_command (ClientData clientData, Tcl_Interp *interp,
 		     int objc, Tcl_Obj *CONST objv[])
 {
-  char *number;
-  struct breakpoint *tp;
+  int tpnum;
+  struct tracepoint *tp;
   struct command_line *commands;
 
   if (objc != 3)
@@ -652,12 +639,17 @@ gdb_actions_command (ClientData clientData, Tcl_Interp *interp,
       return TCL_ERROR;
     }
 
-  number = Tcl_GetStringFromObj (objv[1], NULL);
-  tp = get_tracepoint_by_number (&number, 0, 0);
+  if (Tcl_GetIntFromObj (NULL, objv[1], &tpnum) != TCL_OK)
+    {
+      result_ptr->flags |= GDBTK_IN_TCL_RESULT;
+      return TCL_ERROR;
+    }
+
+  tp = get_tracepoint (tpnum);
+
   if (tp == NULL)
     {
-      Tcl_AppendStringsToObj (result_ptr->obj_ptr, "Tracepoint \"",
-			      number, "\" does not exist", NULL);
+      gdbtk_set_result (interp, "Tracepoint #%d does not exist", tpnum);
       return TCL_ERROR;
     }
 
@@ -668,7 +660,7 @@ gdb_actions_command (ClientData clientData, Tcl_Interp *interp,
   commands = read_command_lines_1 (gdbtk_read_next_line, 1,
 				   check_tracepoint_command, tp);  
 
-  breakpoint_set_commands (tp, commands);
+  breakpoint_set_commands ((struct breakpoint *) tp, commands);
   return TCL_OK;
 }
 
@@ -693,7 +685,8 @@ gdb_get_tracepoint_info (ClientData clientData, Tcl_Interp *interp,
 {
   struct symtab_and_line sal;
   int tpnum;
-  struct breakpoint *tp;
+  struct tracepoint *tp;
+  struct breakpoint *bp;
   struct command_line *cl;
   Tcl_Obj *action_list;
   char *filename, *funcname;
@@ -711,7 +704,7 @@ gdb_get_tracepoint_info (ClientData clientData, Tcl_Interp *interp,
     }
 
   tp = get_tracepoint (tpnum);
-
+  bp = (struct breakpoint *) tp;
   if (tp == NULL)
     {
       gdbtk_set_result (interp, "Tracepoint #%d does not exist", tpnum);
@@ -719,37 +712,37 @@ gdb_get_tracepoint_info (ClientData clientData, Tcl_Interp *interp,
     }
 
   Tcl_SetListObj (result_ptr->obj_ptr, 0, NULL);
-  sal = find_pc_line (tp->loc->address, 0);
+  sal = find_pc_line (bp->loc->address, 0);
   filename = symtab_to_filename (sal.symtab);
   if (filename == NULL)
     filename = "N/A";
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
 			    Tcl_NewStringObj (filename, -1));
 
-  funcname = pc_function_name (tp->loc->address);
+  funcname = pc_function_name (bp->loc->address);
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr, Tcl_NewStringObj
 			    (funcname, -1));
 
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
 			    Tcl_NewIntObj (sal.line));
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
-			    Tcl_NewStringObj (core_addr_to_string (tp->loc->address), -1));
+			    Tcl_NewStringObj (core_addr_to_string (bp->loc->address), -1));
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
-			    Tcl_NewIntObj (tp->enable_state == bp_enabled));
+			    Tcl_NewIntObj (bp->enable_state == bp_enabled));
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
 			    Tcl_NewIntObj (tp->pass_count));
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
 			    Tcl_NewIntObj (tp->step_count));
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
-			    Tcl_NewIntObj (tp->thread));
+			    Tcl_NewIntObj (bp->thread));
   Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
-			    Tcl_NewIntObj (tp->hit_count));
+			    Tcl_NewIntObj (bp->hit_count));
 
   /* Append a list of actions */
   action_list = Tcl_NewObj ();
-  if (tp->commands != NULL)
+  if (bp->commands != NULL)
     {
-      for (cl = breakpoint_commands (tp); cl != NULL; cl = cl->next)
+      for (cl = breakpoint_commands (bp); cl != NULL; cl = cl->next)
 	{
 	  Tcl_ListObjAppendElement (interp, action_list,
 				    Tcl_NewStringObj (cl->line, -1));

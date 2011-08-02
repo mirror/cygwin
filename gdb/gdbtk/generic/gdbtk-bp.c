@@ -540,7 +540,7 @@ gdb_set_bp (ClientData clientData, Tcl_Interp *interp,
 			 bp_breakpoint /* type wanted */,
 			 ignore_count,
 			 (pending ? AUTO_BOOLEAN_TRUE : AUTO_BOOLEAN_FALSE),
-			 NULL	/* breakpoint ops */,
+			 &bkpt_breakpoint_ops,
 			 0	/* from_tty */,
 			 enabled, 0);
     }

@@ -1,3 +1,27 @@
+2011-08-22  Nick Clifton  <nickc@redhat.com>
+
+	* cpu/fr30.cpu: Delete.  Move to top level cpu directory.
+	* cpu/fr30.opc: Likewise.
+	* cpu/ip2k.cpu: Likewise.
+	* cpu/ip2k.opc: Likewise.
+	* cpu/mep-avc.cpu: Likewise.
+	* cpu/mep-avc2.cpu: Likewise.
+	* cpu/mep-c5.cpu: Likewise.
+	* cpu/mep-core.cpu: Likewise.
+	* cpu/mep-default.cpu: Likewise.
+	* cpu/mep-ext-cop.cpu: Likewise.
+	* cpu/mep-fmax.cpu: Likewise.
+	* cpu/mep-h1.cpu: Likewise.
+	* cpu/mep-ivc2.cpu: Likewise.
+	* cpu/mep-rhcop.cpu: Likewise.
+	* cpu/mep-sample-ucidsp.cpu: Likewise.
+	* cpu/mep.cpu: Likewise.
+	* cpu/mep.opc: Likewise.
+	* cpu/openrisc.cpu: Likewise.
+	* cpu/openrisc.opc: Likewise.
+	* cpu/xstormy16.cpu: Likewise.
+	* cpu/xstormy16.opc: Likewise.
+
 2010-10-28  Nick Clifton<nickc@redhat.com>
 
 	* cpu/xstormy16.cpu (alignfix-mem-far): New macro.  Like

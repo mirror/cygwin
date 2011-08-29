@@ -1095,7 +1095,7 @@
    (if (op:setter op)
        (let ((args (car (op:setter op)))
 	     (expr (cadr (op:setter op))))
-	 (rtl-c 'VOID
+	 (rtl-c VOID
 		(obj-isa-list op)
 		(if (= (length args) 0)
 		    (list (list 'newval mode "opval"))

@@ -1,0 +1,13 @@
+2011-09-04  Joel Brobecker  <brobecker@adacore.com>
+
+	* cris.cpu, frv.cpu, iq10.cpu, iq2000.cpu, iq2000m.cpu, lm32.cpu,
+	m32c.cpu, m32r.cpu, mt.cpu, sh.cpu, sh64-compact.cpu,
+	sh64-media.cpu, xc16x.cpu: New file, copied from cgen/cpu.
+
+
+Local Variables:
+mode: change-log
+left-margin: 8
+fill-column: 74
+version-control: never
+End:

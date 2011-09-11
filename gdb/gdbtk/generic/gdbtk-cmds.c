@@ -793,7 +793,7 @@ static int
 gdb_prompt_command (ClientData clientData, Tcl_Interp *interp,
 		    int objc, Tcl_Obj *CONST objv[])
 {
-  Tcl_SetStringObj (result_ptr->obj_ptr, get_prompt (0), -1);
+  Tcl_SetStringObj (result_ptr->obj_ptr, get_prompt (), -1);
   return TCL_OK;
 }
 

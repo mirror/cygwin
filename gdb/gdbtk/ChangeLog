@@ -1,3 +1,15 @@
+2011-11-02  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-interp.c (struct gdbtk_interp_data)
+	<uiout>: New member.
+	(gdbtk_data): Remove global.
+	(gdbtk_interpreter_init): Update with GDB API changes.
+	Allocate private intepreter data.
+	(gdbtk_interpreter_ui_out): New function.
+	(_initialize_gdbtk_interp): Add gdbtk_interpreter_ui_out to
+	PROCS.
+	Remove gdbtk_data and related allocation/initialization.
+
 2011-09-11  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-cmds.c (gdb_prompt_command): get_prompt now

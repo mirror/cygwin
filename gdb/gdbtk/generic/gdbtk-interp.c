@@ -1,7 +1,7 @@
 /* Insight Definitions for GDB, the GNU debugger.
    Written by Keith Seitz <kseitz@sources.redhat.com>
 
-   Copyright (C) 2003, 2004, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2008, 2011 Free Software Foundation, Inc.
 
    This file is part of Insight.
 
@@ -50,9 +50,8 @@ struct gdbtk_interp_data
   struct ui_file *_stdlog;
   struct ui_file *_stdtarg;
   struct ui_file *_stdtargin;
+  struct ui_out *uiout;
 };
-
-static struct gdbtk_interp_data *gdbtk_data;
 
 /* See note in gdbtk_interpreter_init */
 static void
@@ -62,12 +61,21 @@ hack_disable_interpreter_exec (char *args, int from_tty)
 }
 
 static void *
-gdbtk_interpreter_init (int top_level)
+gdbtk_interpreter_init (struct interp *interp, int top_level)
 {
   /* Disable interpreter-exec. It causes us big trouble right now. */
   struct cmd_list_element *cmd = NULL;
   struct cmd_list_element *alias = NULL;
   struct cmd_list_element *prefix = NULL;
+  struct gdbtk_interp_data *data;
+
+  data = XZALLOC (struct gdbtk_interp_data);
+  data->_stdout = gdbtk_fileopen ();
+  data->_stderr = gdbtk_fileopen ();
+  data->_stdlog = gdbtk_fileopen ();
+  data->_stdtarg = gdbtk_fileopen ();
+  data->_stdtargin = gdbtk_fileopenin ();
+  data->uiout = cli_out_new (data->_stdout),
 
   gdbtk_init ();
 
@@ -76,7 +84,7 @@ gdbtk_interpreter_init (int top_level)
       set_cmd_cfunc (cmd, hack_disable_interpreter_exec);
     }
 
-  return gdbtk_data;
+  return data;
 }
 
 static int
@@ -161,6 +169,14 @@ gdbtk_command_loop (void)
   Tk_MainLoop ();
 }
 
+static struct ui_out *
+gdbtk_interpreter_ui_out (struct interp *interp)
+{
+  struct gdbtk_interp_data *data = interp_data (interp);
+
+  return data->uiout;
+}
+
 void
 _initialize_gdbtk_interp (void)
 {
@@ -169,19 +185,8 @@ _initialize_gdbtk_interp (void)
     gdbtk_interpreter_resume,           /* resume_proc */
     gdbtk_interpreter_suspend,	        /* suspend_proc */
     gdbtk_interpreter_exec,             /* exec_proc */
-    gdbtk_interpreter_display_prompt_p  /* prompt_proc_p */
+    gdbtk_interpreter_display_prompt_p, /* prompt_proc_p */
+    gdbtk_interpreter_ui_out		/* ui_out_proc */
   };
-  struct interp *gdbtk_interp;
-
-  gdbtk_data = 
-    (struct gdbtk_interp_data *) xmalloc (sizeof (struct gdbtk_interp_data));
-  memset (gdbtk_data, 0, sizeof (struct gdbtk_interp_data));
-  gdbtk_data->_stdout = gdbtk_fileopen ();
-  gdbtk_data->_stderr = gdbtk_fileopen ();
-  gdbtk_data->_stdlog = gdbtk_fileopen ();
-  gdbtk_data->_stdtarg = gdbtk_fileopen ();
-  gdbtk_data->_stdtargin = gdbtk_fileopenin ();
-  gdbtk_interp = interp_new ("insight", gdbtk_data, cli_out_new (gdbtk_data->_stdout),
-			     &procs);
-  interp_add (gdbtk_interp);
+  interp_add (interp_new ("insight", &procs));
 }

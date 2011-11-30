@@ -49,6 +49,7 @@
 int thread_db_noisy = 0;
 
 #define ALWAYS_UPDATE_THREAD_LIST 0
+#define TID_MAY_BE_REUSED 1
 
 /*
  * A tiny local symbol table.
@@ -1426,11 +1427,25 @@ find_new_threads_callback (const td_thrhandle_t *thandle, void *data)
 
   /* Enter the thread into a local list
      (unless it is TD_THR_UNKNOWN, which means its defunct). */
-  if ((thread = thread_list_lookup_by_tid (ti.ti_tid)) == NULL)
+  if ((thread = thread_list_lookup_by_tid (ti.ti_tid)) == NULL
+#if TID_MAY_BE_REUSED
+      || thread->ti.ti_lid != ti.ti_lid
+#endif
+      )
     {
       if (ti.ti_state != TD_THR_UNKNOWN)
 	{
-	  thread = add_thread_to_list (&ti);
+	  if (thread)
+	    {
+	      /* Thread is being reused.  What has happened here is that
+	         one thread has died and another was created using the
+		 same thread identifier.  */
+	      if (thread_db_noisy)
+		fprintf (stderr, "(thread deletion / reuse: %s)\n", thread_debug_name (thread));
+	      thread->ti = ti;
+	    }
+	  else
+	    thread = add_thread_to_list (&ti);
 
 	  if (thread_db_noisy)
 	    fprintf (stderr, "(new thread %s)\n", thread_debug_name (thread));

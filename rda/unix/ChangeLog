@@ -1,3 +1,8 @@
+2011-11-30  Kevin Buettner  <kevinb@redhat.com>
+
+	* thread-db.c (TID_MAY_BE_REUSED): Define.
+	(find_new_threads_callback): Detect thread id reuse.
+
 2010-10-14  Kevin Buettner  <kevinb@redhat.com>
 
 	* lwp-pool.c (hash_find): Initialize `do_step' in the newly allocated

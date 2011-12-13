@@ -7,13 +7,12 @@
 
 struct foo *foop;
 extern struct foo *getfoo ();
+#ifdef PROTOTYPES
+extern void putfoo (struct foo *foop);
+#endif
 
 int main ()
 {
-#ifdef usestubs
-    set_debug_traps();
-    breakpoint();
-#endif
     foop = getfoo ();
     putfoo (foop);
     return 0;

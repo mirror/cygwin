@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 1983, 1987, 1989
  *    The Regents of the University of California.  All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -17,7 +17,7 @@
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -50,7 +50,7 @@
 
 /*
  *	@(#)resolv.h	8.1 (Berkeley) 6/2/93
- *	$Id: resolv.h,v 1.3 2008/12/09 16:09:46 corinna Exp $
+ *	$Id: resolv.h,v 1.4 2011/12/17 23:39:47 cgf Exp $
  */
 
 #ifndef _RESOLV_H_
@@ -315,7 +315,7 @@ __END_DECLS
 #if !defined(SHARED_LIBBIND) || defined(LIB)
 /*
  * If libbind is a shared object (well, DLL anyway)
- * these externs break the linker when resolv.h is 
+ * these externs break the linker when resolv.h is
  * included by a lib client (like named)
  * Make them go away if a client is including this
  *

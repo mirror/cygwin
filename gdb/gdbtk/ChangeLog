@@ -1,3 +1,15 @@
+2011-12-17  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-cmds.c (gdb_listfiles): Update API changes
+	for map_partial_symbol_filenames.
+	(gdb_get_line_command): Update API changes for decode_line_1 in gdb.
+	(gdb_get_file_command): Likewise.
+	(gdb_get_function_command): Likewise.
+	* generic/gdbtk-stack.c (gdb_get_vars_command): Likewise.
+	* generic/gdbtk-bp.c (tracepoint_exists): Likewise.
+	(gdb_find_bp_at_line, gdb_get_breakpoint_info): Update breakpoint
+	API changes in gdb.
+
 2011-11-02  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-interp.c (struct gdbtk_interp_data)

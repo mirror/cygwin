@@ -254,7 +254,8 @@ gdb_find_bp_at_line (ClientData clientData, Tcl_Interp *interp,
   Tcl_SetListObj (result_ptr->obj_ptr, 0, NULL);
   ALL_BREAKPOINTS (b)
   {
-    if (b->line_number == line && !strcmp (b->source_file, s->filename))
+    if (b->loc->line_number == line
+	&& !strcmp (b->loc->source_file, s->filename))
       {
 	Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
 				  Tcl_NewIntObj (b->number));
@@ -336,7 +337,7 @@ gdb_get_breakpoint_info (ClientData clientData, Tcl_Interp *interp, int objc,
       Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
                                 Tcl_NewStringObj (funcname, -1));
       Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
-                                Tcl_NewIntObj (b->line_number));
+                                Tcl_NewIntObj (b->loc->line_number));
       Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
                                 Tcl_NewStringObj (core_addr_to_string
                                (b->loc->address), -1));
@@ -801,7 +802,7 @@ tracepoint_exists (char *args)
   char *file = NULL;
   int result = -1;
 
-  sals = decode_line_1 (&args, 1, NULL, 0, NULL);
+  sals = decode_line_1 (&args, DECODE_LINE_FUNFIRSTLINE, NULL, 0);
   if (sals.nelts == 1)
     {
       resolve_sal_pc (&sals.sals[0]);

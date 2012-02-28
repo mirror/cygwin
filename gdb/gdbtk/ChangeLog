@@ -1,3 +1,15 @@
+2012-02-28  Kevin Buettner  <kevinb@redhat.com>
+
+	* generic/gdbtk-cmds.h (pc_function_name): Make return type
+	const.
+	* generic/gdbtk-bp.c (gdb_get_breakpoint_info)
+	(gdb_get_tracepoint_info): Make char * variables const to match
+	recent GDB API changes.
+	* generic/gdbtk-stack.c (get_frame_name): Likewise.
+	* generic/gdbtk-cmds.c (gdb_get_function_command, gdb_listfuncs)
+	(gdb_loc, perror_with_name_wrapper): Likewise.
+	(pc_function_name): Likewise, plus change return type to be const.
+
 2012-02-28  Keith Seitz  <keiths@redhat.com>
 
 	From Jeffrey Armstrong  <jeffrey.armstrong@approximatrix.com>:

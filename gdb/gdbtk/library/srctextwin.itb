@@ -1759,7 +1759,7 @@ itcl::body SrcTextWin::lookup_line {win y} {
       set set_cmd [list gdb_set_bp "*$addr"]
     }
     src {
-      set set_cmd [list gdb_set_bp "$current(filename):$addr"]
+      set set_cmd [list gdb_set_bp "\"$current(filename)\":$addr"]
     }
   }
 

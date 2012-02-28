@@ -523,7 +523,7 @@ get_frame_name (Tcl_Interp *interp, Tcl_Obj *list, struct frame_info *fi)
 {
   struct symtab_and_line sal;
   struct symbol *func = NULL;
-  register char *funname = 0;
+  const char *funname = 0;
   enum language funlang = language_unknown;
   Tcl_Obj *objv[1];
 

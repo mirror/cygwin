@@ -40,7 +40,7 @@ extern int gdbtk_call_wrapper (ClientData, Tcl_Interp *, int, Tcl_Obj * CONST[])
 
 /* Returns the source (demangled) name for a function at PC. Returns empty string
    if not found. Memory is owned by gdb. Do not free it. */
-extern char *pc_function_name (CORE_ADDR pc);
+extern const char *pc_function_name (CORE_ADDR pc);
 
 /* Convenience function to sprintf something(s) into a new element in
    a Tcl list object. */

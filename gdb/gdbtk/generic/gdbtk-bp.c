@@ -282,7 +282,7 @@ gdb_get_breakpoint_info (ClientData clientData, Tcl_Interp *interp, int objc,
   int bpnum;
   struct breakpoint *b;
   struct watchpoint *w;
-  char *funcname, *filename;
+  const char *funcname, *filename;
   int isPending = 0;
 
   Tcl_Obj *new_obj;
@@ -690,7 +690,7 @@ gdb_get_tracepoint_info (ClientData clientData, Tcl_Interp *interp,
   struct breakpoint *bp;
   struct command_line *cl;
   Tcl_Obj *action_list;
-  char *filename, *funcname;
+  const char *filename, *funcname;
 
   if (objc != 2)
     {

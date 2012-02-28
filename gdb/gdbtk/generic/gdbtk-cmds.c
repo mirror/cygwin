@@ -1021,7 +1021,7 @@ static int
 gdb_get_function_command (ClientData clientData, Tcl_Interp *interp,
 			  int objc, Tcl_Obj *CONST objv[])
 {
-  char *function;
+  const char *function;
   struct symtabs_and_lines sals;
   char *args;
 
@@ -1513,7 +1513,7 @@ gdb_listfuncs (clientData, interp, objc, objv)
 	  if (SYMBOL_CLASS (sym) == LOC_BLOCK)
 	    {
 
-	      char *name = SYMBOL_DEMANGLED_NAME (sym);
+	      const char *name = SYMBOL_DEMANGLED_NAME (sym);
 
 	      if (name)
 		{
@@ -2159,7 +2159,7 @@ gdb_loc (ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST obj
 {
   char *filename;
   struct symtab_and_line sal;
-  char *fname;
+  const char *fname;
   CORE_ADDR pc;
 
   if (objc == 1)
@@ -2919,11 +2919,11 @@ perror_with_name_wrapper (PTR args)
 
    If no symbol is found, it returns an empty string. In either
    case, memory is owned by gdb. Do not attempt to free it. */
-char *
+const char *
 pc_function_name (CORE_ADDR pc)
 {
   struct symbol *sym;
-  char *funcname = NULL;
+  const char *funcname = NULL;
 
   /* First lookup the address in the symbol table... */
   sym = find_pc_function (pc);

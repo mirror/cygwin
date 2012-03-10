@@ -1,3 +1,8 @@
+2012-03-10  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-interp.c (_initialize_gdbtk_interp): Add
+	missing prototype to appease -Wmissing-prototypes.
+
 2012-02-28  Kevin Buettner  <kevinb@redhat.com>
 
 	* generic/gdbtk-cmds.h (pc_function_name): Make return type

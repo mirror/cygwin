@@ -1,7 +1,7 @@
 /* Insight Definitions for GDB, the GNU debugger.
    Written by Keith Seitz <kseitz@sources.redhat.com>
 
-   Copyright (C) 2003, 2004, 2008, 2011 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2008, 2011, 2012 Free Software Foundation, Inc.
 
    This file is part of Insight.
 
@@ -42,6 +42,7 @@
 
 static void gdbtk_command_loop (void);
 static void hack_disable_interpreter_exec (char *, int);
+void _initialize_gdbtk_interp (void);
 
 struct gdbtk_interp_data
 {

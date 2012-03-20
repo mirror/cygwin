@@ -1,3 +1,8 @@
+2012-03-14  Roland Schwingel  <roland.schwingel@onevision.com>
+
+	* generic/gdbtk-bp.c (gdb_set_bp): Adjust parameters
+	of create_breakpoint() to match recent change.
+
 2012-03-10  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-interp.c (_initialize_gdbtk_interp): Add

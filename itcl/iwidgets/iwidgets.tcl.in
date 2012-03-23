@@ -25,7 +25,13 @@ namespace eval ::iwidgets {
     variable version @VERSION@
 }
 
+set cvsSrcDir [file join $iwidgets::library .. .. .. src itcl iwidgets]
+set gitSrcDir [file join $iwidgets::library .. .. .. gdb itcl iwidgets]
 lappend auto_path $iwidgets::library \
 		  [file join $iwidgets::library generic] \
-		  [file join $iwidgets::library scripts]
+		  [file join $iwidgets::library scripts] \
+		  [file join $cvsSrcDir generic] \
+		  [file join $cvsSrcDir scripts] \
+		  [file join $gitSrcDir generic] \
+		  [file join $gitSrcDir scripts]
 package provide Iwidgets $iwidgets::version

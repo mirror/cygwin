@@ -1,3 +1,12 @@
+2012-03-28  Roland Schwingel  <roland.schwingel@onevision.com>
+
+	* generic/gdbtk.c (gdbtk_init,tk_command): Replace deprecated access
+	to tcl interpreter result string with Tcl_GetStringResult().
+   * generic/gdbtk-hooks.c (gdbtk_read,gdbtk_readline,gdbtk_load_hash)
+   (gdbtk_query): Likewise. 
+	(gdbtk_read): Simplified error handling in case "gdbtk_console_read"
+   fails. Some reformatting.
+
 2012-03-14  Roland Schwingel  <roland.schwingel@onevision.com>
 
 	* generic/gdbtk-bp.c (gdb_set_bp): Adjust parameters

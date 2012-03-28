@@ -251,20 +251,25 @@ gdbtk_read (struct ui_file *stream, char *buf, long sizeof_buf)
     {
       result = Tcl_Eval (gdbtk_interp, "gdbtk_console_read");
       if (result != TCL_OK)
-	{
-	  report_error ();
-	  actual_len = 0;
-	}
+        {
+          report_error ();
+          actual_len = 0;
+          buf[0] = '\0';
+          return 0;
+        }
       else
-        actual_len = strlen (gdbtk_interp->result);
+        {
+          const char *tclResult = Tcl_GetStringResult (gdbtk_interp);
+          actual_len = strlen (tclResult);
 
-      /* Truncate the string if it is too big for the caller's buffer.  */
-      if (actual_len >= sizeof_buf)
-	actual_len = sizeof_buf - 1;
-      
-      memcpy (buf, gdbtk_interp->result, actual_len);
-      buf[actual_len] = '\0';
-      return actual_len;
+          /* Truncate the string if it is too big for the caller's buffer.  */
+          if (actual_len >= sizeof_buf)
+            actual_len = sizeof_buf - 1;
+
+          memcpy (buf, tclResult, actual_len);
+          buf[actual_len] = '\0';
+          return actual_len;
+        }
     }
   else
     {
@@ -507,11 +512,11 @@ gdbtk_readline (char *prompt)
 
   if (result == TCL_OK)
     {
-      return (xstrdup (gdbtk_interp->result));
+      return (xstrdup (Tcl_GetStringResult (gdbtk_interp)));
     }
   else
     {
-      gdbtk_fputs (gdbtk_interp->result, gdb_stdout);
+      gdbtk_fputs (Tcl_GetStringResult (gdbtk_interp), gdb_stdout);
       gdbtk_fputs ("\n", gdb_stdout);
       return (NULL);
     }
@@ -635,7 +640,7 @@ gdbtk_load_hash (const char *section, unsigned long num)
     report_error ();
   free(buf);
 
-  return atoi (gdbtk_interp->result);
+  return atoi (Tcl_GetStringResult (gdbtk_interp));
 }
 
 
@@ -689,7 +694,7 @@ gdbtk_query (const char *query, va_list args)
   gdbtk_two_elem_cmd ("gdbtk_tcl_query", buf);
   free(buf);
 
-  val = atol (gdbtk_interp->result);
+  val = atol (Tcl_GetStringResult (gdbtk_interp));
   return val;
 }
 

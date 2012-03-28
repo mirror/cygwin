@@ -492,17 +492,17 @@ gdbtk_init (void)
   make_final_cleanup (gdbtk_cleanup, NULL);
 
   if (Tcl_Init (gdbtk_interp) != TCL_OK)
-    error ("Tcl_Init failed: %s", gdbtk_interp->result);
+    error ("Tcl_Init failed: %s", Tcl_GetStringResult (gdbtk_interp));
 
   /* Initialize the Paths variable.  */
   if (ide_initialize_paths (gdbtk_interp, "") != TCL_OK)
-    error ("ide_initialize_paths failed: %s", gdbtk_interp->result);
+    error ("ide_initialize_paths failed: %s", Tcl_GetStringResult (gdbtk_interp));
 
   if (Tk_Init (gdbtk_interp) != TCL_OK)
-    error ("Tk_Init failed: %s", gdbtk_interp->result);
+    error ("Tk_Init failed: %s", Tcl_GetStringResult (gdbtk_interp));
 
   if (Tktable_Init (gdbtk_interp) != TCL_OK)
-    error ("Tktable_Init failed: %s", gdbtk_interp->result);
+    error ("Tktable_Init failed: %s", Tcl_GetStringResult (gdbtk_interp));
 
   Tcl_StaticPackage (gdbtk_interp, "Tktable", Tktable_Init,
 		     (Tcl_PackageInitProc *) NULL);
@@ -558,7 +558,7 @@ gdbtk_init (void)
 
   if (Gdbtk_Init (gdbtk_interp) != TCL_OK)
     {
-      error ("Gdbtk_Init failed: %s", gdbtk_interp->result);
+      error ("Gdbtk_Init failed: %s", Tcl_GetStringResult (gdbtk_interp));
     }
 
   Tcl_StaticPackage (gdbtk_interp, "Insight", Gdbtk_Init, NULL);
@@ -738,7 +738,7 @@ tk_command (char *cmd, int from_tty)
 
   retval = Tcl_Eval (gdbtk_interp, cmd);
 
-  result = xstrdup (gdbtk_interp->result);
+  result = xstrdup (Tcl_GetStringResult (gdbtk_interp));
 
   old_chain = make_cleanup (free, result);
 

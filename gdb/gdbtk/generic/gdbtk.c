@@ -1,6 +1,5 @@
 /* Startup code for Insight
-   Copyright (C) 1994, 1995, 1996, 1997, 1998, 2001, 2002, 2003, 2004, 2006, 2008
-   Free Software Foundation, Inc.
+   Copyright (C) 1994-2012 Free Software Foundation, Inc.
 
    Written by Stu Grossman <grossman@cygnus.com> of Cygnus Support.
 
@@ -538,13 +537,13 @@ gdbtk_init (void)
     error ("windows print code initialization failed");
   if (ide_create_win_grab_command (gdbtk_interp) != TCL_OK)
     error ("grab support command initialization failed");
+  if (ide_create_shell_execute_command (gdbtk_interp) != TCL_OK)
+    error ("cygwin shell execute command initialization failed");
 #endif
 #ifdef __CYGWIN32__
   /* Path conversion functions.  */
   if (ide_create_cygwin_path_command (gdbtk_interp) != TCL_OK)
     error ("cygwin path command initialization failed");
-  if (ide_create_shell_execute_command (gdbtk_interp) != TCL_OK)
-    error ("cygwin shell execute command initialization failed");
 #endif
 
   /* Only for testing -- and only when it can't be done any

@@ -165,7 +165,7 @@ extern int gdbtk_disable_fputs;
 extern ptid_t gdbtk_get_ptid (void);
 
 #ifdef _WIN32
-extern void close_bfds ();
+extern void close_bfds (void);
 #endif /* _WIN32 */
 
 extern void

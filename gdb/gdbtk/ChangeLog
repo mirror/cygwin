@@ -1,3 +1,7 @@
+2012-03-30  Pierre Muller  <muller@ics.u-strasbg.fr>
+
+	* generic/gdbtk.h (close_bfds): Fix prototype.
+
 2012-03-30  Roland Schwingel  <roland.schwingel@onevision.com>
 
 	* library/globalpref.itb: Updated Copyright to 1997-2012 Red Hat, Inc.

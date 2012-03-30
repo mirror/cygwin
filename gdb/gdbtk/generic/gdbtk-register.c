@@ -1,6 +1,5 @@
 /* Tcl/Tk command definitions for Insight - Registers
-   Copyright (C) 2001, 2002, 2004, 2007, 2010, 2011
-   Free Software Foundation, Inc.
+   Copyright (C) 2001-2012 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -240,7 +239,7 @@ get_register_types (int regnum, map_arg arg)
 	{
 	  Tcl_Obj *ar[3], *list;
 	  char *buff;
-	  buff = xstrprintf ("%lx", (long)TYPE_FIELD_TYPE (reg_vtype, i));
+	  buff = xstrprintf ("%lx", (size_t)TYPE_FIELD_TYPE (reg_vtype, i));
 	  ar[0] = Tcl_NewStringObj (TYPE_FIELD_NAME (reg_vtype, i), -1);
 	  ar[1] = Tcl_NewStringObj (buff, -1);
 	  if (TYPE_CODE (TYPE_FIELD_TYPE (reg_vtype, i)) == TYPE_CODE_FLT)
@@ -256,7 +255,7 @@ get_register_types (int regnum, map_arg arg)
     {
       Tcl_Obj *ar[3], *list;
       char *buff;
-      buff = xstrprintf ("%lx", (long)reg_vtype);
+      buff = xstrprintf ("%lx", (size_t)reg_vtype);
       ar[0] = Tcl_NewStringObj (TYPE_NAME(reg_vtype), -1);
       ar[1] = Tcl_NewStringObj (buff, -1);
       if (TYPE_CODE (reg_vtype) == TYPE_CODE_FLT)
@@ -497,7 +496,11 @@ gdb_regformat (ClientData clientData, Tcl_Interp *interp,
   if (Tcl_GetIntFromObj (interp, objv[0], &regno) != TCL_OK)
     return TCL_ERROR;
 
+  #ifdef _WIN64
+  type = (struct type *)strtoll (Tcl_GetStringFromObj (objv[1], NULL), NULL, 16);  
+  #else
   type = (struct type *)strtol (Tcl_GetStringFromObj (objv[1], NULL), NULL, 16);  
+  #endif
   fm = (int)*(Tcl_GetStringFromObj (objv[2], NULL));
 
   numregs = (gdbarch_num_regs (get_current_arch ())

@@ -1,7 +1,5 @@
 /* Tcl/Tk command definitions for Insight.
-   Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2001, 2002, 2003, 2004,
-   2007, 2008, 2010, 2011
-   Free Software Foundation, Inc.
+   Copyright (C) 1994-2012 Free Software Foundation, Inc.
 
    Written by Stu Grossman <grossman@cygnus.com> of Cygnus Support.
    Substantially augmented by Martin Hunt, Keith Seitz & Jim Ingham of
@@ -32,7 +30,6 @@
 #include "gdbcore.h"
 #include "demangle.h"
 #include "linespec.h"
-#include "tui/tui-file.h"
 #include "top.h"
 #include "annotate.h"
 #include "block.h"

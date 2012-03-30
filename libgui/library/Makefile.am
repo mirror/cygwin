@@ -3,7 +3,7 @@
 AUTOMAKE_OPTIONS = cygnus
 
 ## Convenience variables.
-TCL = advice.tcl balloon.tcl bbox.tcl bgerror.tcl bindings.tcl \
+TCL = advice.tcl balloon.tcl bbox.tcl bindings.tcl \
 canvas.tcl cframe.tcl center.tcl debug.tcl def.tcl internet.tcl	\
 font.tcl gensym.tcl gettext.tcl hooks.tcl lframe.tcl list.tcl \
 looknfeel.tcl menu.tcl mono.tcl multibox.tcl parse_args.tcl path.tcl \

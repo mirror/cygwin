@@ -1,3 +1,10 @@
+2012-03-30  Roland Schwingel  <roland.schwingel@onevision.com>
+
+	* library/Makefile.in: Remove reference to bgerror.tcl.
+	* library/Makefile.am: Ditto.
+	* library/tclIndex: Ditto.
+	* library/bgerror.tcl: Removed file.
+
 2009-10-09  Keith Seitz  <keiths@redhat.com>
 
 	* aclocal.m4: Regenerate.

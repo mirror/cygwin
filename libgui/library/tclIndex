@@ -18,7 +18,6 @@ set auto_index(BALLOON_command_withdraw) [list source [file join $dir balloon.tc
 set auto_index(BALLOON_command_variable) [list source [file join $dir balloon.tcl]]
 set auto_index(balloon) [list source [file join $dir balloon.tcl]]
 set auto_index(standard_button_box) [list source [file join $dir bbox.tcl]]
-set auto_index(bgerror) [list source [file join $dir bgerror.tcl]]
 set auto_index(bind_widget_after_tag) [list source [file join $dir bindings.tcl]]
 set auto_index(bind_widget_after_class) [list source [file join $dir bindings.tcl]]
 set auto_index(bind_plain_key) [list source [file join $dir bindings.tcl]]

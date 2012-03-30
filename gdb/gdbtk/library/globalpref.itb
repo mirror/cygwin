@@ -1,5 +1,5 @@
 # Global preference class implementation for Insight.
-# Copyright (C) 1997, 1998, 1999, 2002, 2003, 2004, 2008 Red Hat
+# Copyright (C) 1997-2012 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License (GPL) as published by
@@ -77,14 +77,13 @@ itcl::body GlobalPref::destructor {} {
 # ------------------------------------------------------------------
 itcl::body GlobalPref::_build_win {} {
   global gdbtk_platform GDBTK_LIBRARY
-  debug
   frame $itk_interior.f
   frame $itk_interior.x
   set frame $itk_interior.f
   
   # Icons
   frame $frame.icons
-  label $frame.icons.lab -text "Icons "
+  label $frame.icons.lab -text "Icons: "
   combobox::combobox $frame.icons.cb -editable 0 -maxheight 10\
     -command [code $this _change_icons] -bg $::Colors(textbg)
   
@@ -132,6 +131,7 @@ itcl::body GlobalPref::_build_win {} {
   # can be saved in the init file. A way should be provided
   # to rescan the font list, without deleting the entry from the
   # init file.
+
   set font_cache [pref get gdb/font_cache]
 
   # get list of fonts, removing some that typically
@@ -186,7 +186,6 @@ itcl::body GlobalPref::_build_win {} {
 
   _make_font_item $f default "Default Font:" $fam
   _make_font_item $f status  "Status Bar Font:" $fam
-
 
   iwidgets::Labeledframe $frame.misc -labelpos nw -labeltext "Misc"
   set f [$frame.misc childsite]
@@ -249,11 +248,11 @@ itcl::body GlobalPref::_build_win {} {
   }
 
   # make buttons
-  button $itk_interior.x.ok -text OK -underline 0 -width 7 -command [code $this _ok]
+  button $itk_interior.x.ok -text OK -width 7 -underline 0 -command [code $this _ok]
   button $itk_interior.x.apply -text Apply -width 7 -underline 0 -command [code $this _apply]
   button $itk_interior.x.cancel -text Cancel -width 7 -underline 0 -command [code $this _cancel]
-  pack $itk_interior.x.ok $itk_interior.x.apply $itk_interior.x.cancel -side left
   standard_button_box $itk_interior.x
+  pack $itk_interior.x -side left
 
   pack $itk_interior.x -fill x -padx 5 -pady 5 -side bottom
   pack $itk_interior.f -fill both -expand yes -padx 5 -pady 5
@@ -268,7 +267,6 @@ itcl::body GlobalPref::_build_win {} {
 
   _resize_font_item_height
   pack propagate $itk_interior.f 0
-
 }
 # ------------------------------------------------------------------
 #  PRIVATE METHOD:  _make_font_item

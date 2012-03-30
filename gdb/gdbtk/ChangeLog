@@ -1,5 +1,10 @@
 2012-03-30  Roland Schwingel  <roland.schwingel@onevision.com>
 
+	* generic/gdbtk-cmds.c: Updated Copyright year to 1994-2012.
+	Remove unneeded include.
+
+2012-03-30  Roland Schwingel  <roland.schwingel@onevision.com>
+
 	* generic/gdbtk.c: Updated Copyright year to 1994-2012.
 	(gdbtk_init): Move call to ide_create_shell_execute_command
 	to generic windows section.

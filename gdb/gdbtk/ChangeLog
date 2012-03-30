@@ -1,5 +1,11 @@
 2012-03-30  Roland Schwingel  <roland.schwingel@onevision.com>
 
+	* library/globalpref.itb: Updated Copyright to 1997-2012 Red Hat, Inc.
+	(_build_win): Remove unneeded debug call. Fix packing of 
+	OK/Apply/Cancel buttons for newer tk versions. Small reformatting.
+
+2012-03-30  Roland Schwingel  <roland.schwingel@onevision.com>
+
 	* generic/gdbtk-register.c: Updated Copyright year to 2001-2012.
 	(get_register_types): Cast result of TYPE_FIELD_TYPE to size_t 
 	instead of long.

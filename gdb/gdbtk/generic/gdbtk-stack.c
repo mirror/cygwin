@@ -1,6 +1,5 @@
 /* Tcl/Tk command definitions for Insight - Stack.
-   Copyright (C) 2001, 2002, 2003, 2008, 2011
-   Free Software Foundation, Inc.
+   Copyright (C) 2001-2012 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -289,7 +288,7 @@ gdb_get_vars_command (ClientData clientData, Tcl_Interp *interp,
       return TCL_ERROR;
     }
 
-  arguments = (long) clientData;
+  arguments = clientData != NULL ? 1 : 0;
 
   /* Initialize the result pointer to an empty list. */
 

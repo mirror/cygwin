@@ -1,5 +1,15 @@
 2012-03-30  Roland Schwingel  <roland.schwingel@onevision.com>
 
+	* generic/gdbtk-register.c: Updated Copyright year to 2001-2012.
+	(get_register_types): Cast result of TYPE_FIELD_TYPE to size_t 
+	instead of long.
+	(gdb_regformat): on windows 64bit use strtoll instead of strtol.
+	* generic/gdbtk-stack.c: Updated Copyright year to 2001-2012.
+	(gdb_get_vars_command): Don't cast clientData to long. Here 
+	checking of non NULL clientData is enough.
+
+2012-03-30  Roland Schwingel  <roland.schwingel@onevision.com>
+
 	* generic/gdbtk-cmds.c: Updated Copyright year to 1994-2012.
 	Remove unneeded include.
 

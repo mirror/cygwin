@@ -1,5 +1,5 @@
 # looknfeel.tcl - Standard look and feel decisions.
-# Copyright (C) 1997 Cygnus Solutions.
+# Copyright (C) 1997-2012 Red Hat, Inc.
 # Written by Tom Tromey <tromey@cygnus.com>.
 
 # Run this once just after Tk is initialized.  It will do whatever
@@ -22,11 +22,11 @@ proc standard_look_and_feel {} {
   # The fixed font is guaranteed not to be proportional.
   # The status font should be used in status bars and tooltips.
   if {$tcl_platform(platform) == "windows"} then {
-    define_font global/default -family windows-message
+    define_font global/default -family "Tahoma" -size 10
     # FIXME: this isn't actually a bold font...
     define_font global/bold -family windows-caption
-    define_font global/fixed -family fixedsys
-    define_font global/status -family windows-status
+    define_font global/fixed -family "Lucida Console" -size 9
+    define_font global/status -family "Tahoma" -size 10
     # FIXME: we'd like this font to update automatically as well.  But
     # for now we can't.
     array set actual [font actual windows-message]

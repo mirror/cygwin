@@ -1,5 +1,12 @@
 2012-03-30  Roland Schwingel  <roland.schwingel@onevision.com>
 
+	* library/looknfeel.tcl: Update copyright to 1997-2012 Red Hat, Inc.
+	(standard_look_and_feel): Change default fonts on windows. 
+	Default and status font is now Tahoma size 10.
+	Source font is now Lucida Console size 9.
+
+2012-03-30  Roland Schwingel  <roland.schwingel@onevision.com>
+
 	* library/Makefile.in: Remove reference to bgerror.tcl.
 	* library/Makefile.am: Ditto.
 	* library/tclIndex: Ditto.

@@ -1,3 +1,9 @@
+2012-04-13  Pierre Muller  <muller@ics.u-strasbg.fr>
+
+	* generic/gdbtk-register.c (get_register_types): Use
+	host_address_to_string function to avoid use of "%lx" and
+	typecasts.
+
 2012-03-30  Pierre Muller  <muller@ics.u-strasbg.fr>
 
 	* generic/gdbtk.h (close_bfds): Fix prototype.

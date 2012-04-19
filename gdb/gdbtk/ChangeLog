@@ -1,3 +1,9 @@
+2012-04-19  Roland Schwingel  <roland.schwingel@onevision.com>
+
+	* generic/gdbtk-bp.c: Updated copyright.
+	(gdb_find_bp_at_line): Don't access location struct
+	of breakpoint if it is NULL. 
+
 2012-04-13  Pierre Muller  <muller@ics.u-strasbg.fr>
 
 	* generic/gdbtk-register.c (get_register_types): Use

@@ -1,3 +1,9 @@
+2012-04-19  Keith Seitz  <keiths@redhat.com>
+
+	From Patrick Monnerat  <pm@datasphere.ch>:
+	* generic/gdbtk-hooks.c (gdbtk_annotate_signal): Avoid
+	dereferencing a null (i.e.: dead) process/thread.
+
 2012-04-19  Roland Schwingel  <roland.schwingel@onevision.com>
 
 	* generic/gdbtk-bp.c: Updated copyright.

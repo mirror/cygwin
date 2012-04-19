@@ -1,6 +1,5 @@
 /* Tcl/Tk command definitions for Insight - Breakpoints.
-   Copyright (C) 2001, 2002, 2008, 2009, 2010, 2011
-   Free Software Foundation, Inc.
+   Copyright (C) 2001-2012 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -254,7 +253,7 @@ gdb_find_bp_at_line (ClientData clientData, Tcl_Interp *interp,
   Tcl_SetListObj (result_ptr->obj_ptr, 0, NULL);
   ALL_BREAKPOINTS (b)
   {
-    if (b->loc->line_number == line
+    if (b->loc && b->loc->line_number == line
 	&& !strcmp (b->loc->source_file, s->filename))
       {
 	Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,

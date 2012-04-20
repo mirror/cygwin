@@ -215,6 +215,7 @@ class ds1742: public ds1642
 {
 public:
   ds1742();
+  ~ds1742() throw () { }
 
 private:
   bus::status read_7f8(host_int_4 addr, host_int_1& data);

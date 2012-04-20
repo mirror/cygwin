@@ -1,3 +1,7 @@
+2012-04-20  Aurelien Buhrig <aurelien.buhrig.gcc@gmail.com>
+
+	* components.h (ds1742): Declare throw-nothing destructor.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

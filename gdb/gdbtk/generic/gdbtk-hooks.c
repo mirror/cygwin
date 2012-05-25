@@ -818,8 +818,8 @@ gdbtk_annotate_signal (void)
   tp = inferior_thread ();
 
   buf = xstrprintf ("gdbtk_signal %s {%s}",
-	     target_signal_to_name (tp->suspend.stop_signal),
-	     target_signal_to_string (tp->suspend.stop_signal));
+	     gdb_signal_to_name (tp->suspend.stop_signal),
+	     gdb_signal_to_string (tp->suspend.stop_signal));
   if (Tcl_Eval (gdbtk_interp, buf) != TCL_OK)
     report_error ();
   free(buf);

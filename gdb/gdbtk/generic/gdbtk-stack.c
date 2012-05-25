@@ -90,7 +90,7 @@ gdb_block_vars (ClientData clientData, Tcl_Interp *interp,
 		int objc, Tcl_Obj *CONST objv[])
 {
   struct block *block;
-  struct dict_iterator iter;
+  struct block_iterator iter;
   struct symbol *sym;
   CORE_ADDR start, end;
 
@@ -160,7 +160,7 @@ gdb_get_blocks (ClientData clientData, Tcl_Interp *interp,
 		int objc, Tcl_Obj *CONST objv[])
 {
   struct block *block;
-  struct dict_iterator iter;
+  struct block_iterator iter;
   int junk;
   struct symbol *sym;
   CORE_ADDR pc;
@@ -280,7 +280,7 @@ gdb_get_vars_command (ClientData clientData, Tcl_Interp *interp,
   struct symbol *sym;
   struct block *block;
   char *args;
-  struct dict_iterator iter;
+  struct block_iterator iter;
   int i, arguments;
 
   if (objc > 2)

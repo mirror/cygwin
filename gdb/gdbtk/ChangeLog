@@ -1,5 +1,26 @@
 2012-05-25  Roland Schwingel  <roland.schwingel@onevision.com>
 
+	* library/locals.tcl: Updated copyright.
+	(reconfig): New method for getting prefs updates.
+	* library/prefs.tcl: Updated copyright.
+	(pref_read): Moved comment. Take color for changed
+	fields from gdb/src/PC_TAG prefs value.
+	(pref_set_defaults): Change default of
+	PC_TAG color to a somewhat darker green.
+	(pref_set_colors): Call pref_load_default in central place.
+	(pref_set_option_db): Remove hard wired old color for
+	changed values.
+	* library/regwin.itb: Update copyright.
+	(reconfig): Update highlight color of register table.
+	* library/srcpref.itb: Update copyright.
+	(_build_win): Change text of PC color chooser.
+	(_apply): Update global changed fields color from PC_TAG color.
+	* library/vartree.itb (update_var): use changed field color from
+	global colors list.
+	(_init_data): Remove local copy of changed vars color.
+
+2012-05-25  Roland Schwingel  <roland.schwingel@onevision.com>
+
 	* generic/gdbtk-stack.c: Updated copyright informations.
 	include "stack.h" and "solib.h" (when needed).
 	(gdb_stack): Some reformatting.

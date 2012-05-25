@@ -1,5 +1,5 @@
 # Local preferences functions for Insight.
-# Copyright (C) 1997, 1998, 1999, 2002, 2003, 2004, 2008 Red Hat
+# Copyright (C) 1997-2012 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License (GPL) as published by
@@ -146,14 +146,18 @@ proc pref_read {} {
   if {[pref get gdb/use_color_schemes] != "1"} {
     pref_set_colors $home
   } else {
-    global Colors
     # These colors are the same for all schemes
+    global Colors
     set Colors(textfg) black
     set Colors(fg) black
     set Colors(sbg) \#4c59a5
     set Colors(sfg) white
     set_bg_colors
   }
+
+  # Set color for changes.
+  global Colors
+  set Colors(change) [pref get gdb/src/PC_TAG]
 }
 
 # ------------------------------------------------------------------
@@ -333,12 +337,12 @@ proc pref_set_defaults {} {
   pref define gdb/console/wrap            0
   pref define gdb/console/prompt_fg       DarkGreen
   pref define gdb/console/error_fg        red
-  pref define gdb/console/log_fg          green 
+  pref define gdb/console/log_fg          \#00b300
   pref define gdb/console/target_fg       blue
   pref define gdb/console/font            global/fixed
 
   # Source window defaults
-  pref define gdb/src/PC_TAG              green
+  pref define gdb/src/PC_TAG              \#00b300
   pref define gdb/src/STACK_TAG           gold
   pref define gdb/src/BROWSE_TAG          \#9595e2
   pref define gdb/src/handlebg            red
@@ -490,6 +494,7 @@ proc pref_set_colors {home} {
   # then Insight won't be able to display sources and highlight things properly.
   # Therefore we will not change the textfg and textbg.
 
+  pref_load_default
   switch [pref get gdb/compat] {
 
     "Windows" {
@@ -508,7 +513,6 @@ proc pref_set_colors {home} {
     "KDE" {
       debug "loading OS colors for KDE"
 
-      pref_load_default
       # try loading "~/.gtkrc-kde"
       if {[pref_load_gnome $home [list .gtkrc-kde]]} {
 	debug "loaded gnome file"
@@ -550,13 +554,11 @@ proc pref_set_colors {home} {
     }
     
     "GNOME" {
-      pref_load_default
       pref_load_gnome $home
       pref_set_option_db 0
     }
 
     "default" {
-      pref_load_default
       pref_set_option_db 1
     }
   }
@@ -718,11 +720,6 @@ proc load_gnome_file {fd} {
 # load the colors into the tcl option database
 proc pref_set_option_db {makebg} {
   global Colors
-
-  # The color of text that indicates changed items
-  # We standardize on one color here so that changed
-  # items don't blend into any OS color scheme
-  set Colors(change) "green"
 
   option add *background $Colors(bg)
   option add *buttonBackground $Colors(bg)

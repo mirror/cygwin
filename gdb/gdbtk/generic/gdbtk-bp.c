@@ -535,6 +535,7 @@ gdb_set_bp (ClientData clientData, Tcl_Interp *interp,
   TRY_CATCH (e, RETURN_MASK_ALL)
     {
       create_breakpoint (get_current_arch (), address, condition, thread,
+			 NULL,
 			 0	/* condition and thread are valid */,
 			 temp,
 			 bp_breakpoint /* type wanted */,

@@ -1,5 +1,5 @@
 # Source preferences dialog for Insight.
-# Copyright (C) 1998, 1999, 2002, 2003, 2008 Red Hat
+# Copyright (C) 1998-2012 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License (GPL) as published by
@@ -54,7 +54,7 @@ itcl::body SrcPref::_build_win {} {
   set w [$f.colors get_frame]
 
   set color [pref get gdb/src/PC_TAG]
-  label $w.pcl -text {PC}
+  label $w.pcl -text {Highlight}
   button $w.pcb -text {     } -activebackground $color -bg $color \
     -command [code $this _pick $color $w.pcb PC_TAG]
   
@@ -212,6 +212,10 @@ itcl::body SrcPref::_apply {} {
       #debug "$var = $_new($var)"
       pref set $var $_new($var)
     }
+    
+    # Update color for changed values.
+    global Colors
+    set Colors(change) [pref get gdb/src/PC_TAG]
   }
   if {$_new_disassembly_flavor != ""} {
     gdb_cmd "set disassembly-flavor $_new_disassembly_flavor"

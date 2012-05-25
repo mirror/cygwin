@@ -135,7 +135,7 @@ itcl::body  VarTree::update_var {var enabled check} {
     if {[catch {$var value} value]} {
       set color $colors(error)      
     } elseif {[$c itemcget $val -text] != $value} {
-      set color $colors(change)
+      set color $::Colors(change)
     } else {
       set color $colors(value)
     }
@@ -404,7 +404,6 @@ itcl::body  VarTree::_init_data {} {
   set colors(type) "red"
   set colors(error) "red"
   set colors(value) "black"
-  set colors(change) $::Colors(change)
   set colors(disabled) "gray50"
   set colors(line) "gray50"
 

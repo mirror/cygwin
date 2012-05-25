@@ -1,5 +1,5 @@
 # Local Variable Window for Insight.
-# Copyright (C) 2002, 2003, 2006 Red Hat
+# Copyright (C) 2002-2012 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License (GPL) as published by
@@ -43,6 +43,14 @@ itcl::class LocalsWin {
   method busy {event} {
     debug
     cursor watch
+  }
+
+  # ------------------------------------------------------------------
+  #  PUBLIC METHOD:  reconfig - used when preferences change
+  # ------------------------------------------------------------------
+  method reconfig {} {
+    debug
+    $tree update
   }
 
   # Re-enable the UI

@@ -1,5 +1,5 @@
 # Stack window for Insight.
-# Copyright (C) 1997, 1998, 1999, 2002, 2003, 2008 Red Hat
+# Copyright (C) 1997-2012 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License (GPL) as published by
@@ -68,20 +68,14 @@ itcl::body StackWin::update {event} {
       set frames {}
     }
 
+    $itk_component(slb) delete 0 end
     if {[llength $frames] == 0} {
-      $itk_component(slb) delete 0 end
       $itk_component(slb) insert end {NO STACK}
       return
     }
     
-    $itk_component(slb) delete 0 end
     set levels 0
     foreach frame $frames {
-      set len [string length $frame]
-
-      if {$len > $maxwidth} {
-	set maxwidth $len
-      }
       $itk_component(slb) insert end $frame
       incr levels
     }

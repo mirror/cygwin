@@ -1,5 +1,19 @@
 2012-05-25  Roland Schwingel  <roland.schwingel@onevision.com>
 
+	* generic/gdbtk-bp.c (gdb_set_bp): Add new NULL param
+	to call to create_breakpoint() due to changes in gdb.
+	* generic/gdbtk-cmds.c (gdb_listfuncs): Iterator param
+	in call to ALL_BLOCK_SYMBOLS() now is a pointer to
+	struct block_iterator instead of struct dict_iterator.
+	* generic/gdbtk-stack.c (gdb_block_vars,gdb_get_blocks)
+	(gdb_get_vars_command): Likewise.
+	* generic/gdbtk-hooks.c (gdbtk_annotate_signal): Change
+	function calls: target_signal_to_name -> gdb_signal_to_name
+	target_signal_to_string -> gdb_signal_to_string due to
+	recent changes in gdb.
+
+2012-05-25  Roland Schwingel  <roland.schwingel@onevision.com>
+
 	* library/locals.tcl: Updated copyright.
 	(reconfig): New method for getting prefs updates.
 	* library/prefs.tcl: Updated copyright.

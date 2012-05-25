@@ -1474,7 +1474,7 @@ gdb_listfuncs (clientData, interp, objc, objv)
   struct block *b;
   struct symbol *sym;
   int i;
-  struct dict_iterator iter;
+  struct block_iterator iter;
   Tcl_Obj *funcVals[2];
 
   if (objc != 2)

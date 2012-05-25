@@ -1,3 +1,14 @@
+2012-05-25  Roland Schwingel  <roland.schwingel@onevision.com>
+
+	* generic/gdbtk-stack.c: Updated copyright informations.
+	include "stack.h" and "solib.h" (when needed).
+	(gdb_stack): Some reformatting.
+	(get_frame_name): Updated usage of gdb api for
+	backtrace generation. Some reformatting. Removed
+	dead code. Also handle frame type ARCH_FRAME now.
+	* library/stackwin.it[bh]: Remove dead instance
+	variable maxwidth. Updated copyright informations.
+
 2012-04-19  Keith Seitz  <keiths@redhat.com>
 
 	From Patrick Monnerat  <pm@datasphere.ch>:

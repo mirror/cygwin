@@ -26,6 +26,8 @@
 #include "dictionary.h"
 #include "varobj.h"
 #include "arch-utils.h"
+#include "stack.h"
+#include "solib.h"
 
 #include <tcl.h>
 #include "gdbtk.h"
@@ -475,24 +477,24 @@ gdb_stack (ClientData clientData, Tcl_Interp *interp,
       /* Find the outermost frame */
       r  = GDB_get_current_frame (&fi);
       if (r != GDB_OK)
-	return TCL_ERROR;
+        return TCL_ERROR;
 
       while (fi != NULL)
         {
           top = fi;
-	  r = GDB_get_prev_frame (fi, &fi);
-	  if (r != GDB_OK)
-	    fi = NULL;
+          r = GDB_get_prev_frame (fi, &fi);
+          if (r != GDB_OK)
+            fi = NULL;
         }
+
+      result_ptr->obj_ptr = Tcl_NewListObj (0, NULL);
 
       /* top now points to the top (outermost frame) of the
          stack, so point it to the requested start */
       start = -start;
       r = GDB_find_relative_frame (top, &start, &top);
-      
-      result_ptr->obj_ptr = Tcl_NewListObj (0, NULL);
       if (r != GDB_OK)
-	return TCL_OK;
+        return TCL_OK;
 
       /* If start != 0, then we have asked to start outputting
          frames beyond the innermost stack frame */
@@ -503,8 +505,8 @@ gdb_stack (ClientData clientData, Tcl_Interp *interp,
             {
               get_frame_name (interp, result_ptr->obj_ptr, fi);
               r = GDB_get_next_frame (fi, &fi);
-	      if (r != GDB_OK)
-		break;
+              if (r != GDB_OK)
+                break;
             }
         }
     }
@@ -515,14 +517,14 @@ gdb_stack (ClientData clientData, Tcl_Interp *interp,
 /* A helper function for get_stack which adds information about
  * the stack frame FI to the caller's LIST.
  *
- * This is stolen from print_frame_info in stack.c.
+ * This is stolen from print_frame_info/print_frame in stack.c.
  */
+
 static void
 get_frame_name (Tcl_Interp *interp, Tcl_Obj *list, struct frame_info *fi)
 {
-  struct symtab_and_line sal;
   struct symbol *func = NULL;
-  const char *funname = 0;
+  const char *funname = NULL;
   enum language funlang = language_unknown;
   Tcl_Obj *objv[1];
 
@@ -532,75 +534,39 @@ get_frame_name (Tcl_Interp *interp, Tcl_Obj *list, struct frame_info *fi)
       Tcl_ListObjAppendElement (interp, list, objv[0]);
       return;
     }
-  if ((get_frame_type (fi) == SIGTRAMP_FRAME))
+  if (get_frame_type (fi) == SIGTRAMP_FRAME)
     {
       objv[0] = Tcl_NewStringObj ("<signal handler called>", -1);
       Tcl_ListObjAppendElement (interp, list, objv[0]);
       return;
     }
-
-  sal =
-    find_pc_line (get_frame_pc (fi),
-		  get_next_frame (fi) != NULL
-		  && !(get_frame_type (fi) == SIGTRAMP_FRAME)
-		  && !(get_frame_type (fi) == DUMMY_FRAME));
-
-  func = find_pc_function (get_frame_pc (fi));
-  if (func)
+  if (get_frame_type (fi) == ARCH_FRAME)
     {
-      struct minimal_symbol *msymbol = lookup_minimal_symbol_by_pc (get_frame_pc (fi));
-      if (msymbol != NULL
-	  && (SYMBOL_VALUE_ADDRESS (msymbol)
-	      > BLOCK_START (SYMBOL_BLOCK_VALUE (func))))
-	{
-	  func = 0;
-	  funname = GDBTK_SYMBOL_SOURCE_NAME (msymbol);
-	  funlang = SYMBOL_LANGUAGE (msymbol);
-	}
-      else
-	{
-	  funname = GDBTK_SYMBOL_SOURCE_NAME (func);
-	  funlang = SYMBOL_LANGUAGE (func);
-	}
-    }
-  else
-    {
-      struct minimal_symbol *msymbol = lookup_minimal_symbol_by_pc (get_frame_pc (fi));
-      if (msymbol != NULL)
-	{
-	  funname = GDBTK_SYMBOL_SOURCE_NAME (msymbol);
-	  funlang = SYMBOL_LANGUAGE (msymbol);
-	}
+      objv[0] = Tcl_NewStringObj ("<cross-architecture call>", -1);
+      Tcl_ListObjAppendElement (interp, list, objv[0]);
+      return;
     }
 
-  if (sal.symtab)
+  find_frame_funname (fi, &funname, &funlang, &func);
+
+  if (funname)
     {
       objv[0] = Tcl_NewStringObj (funname, -1);
       Tcl_ListObjAppendElement (interp, list, objv[0]);
     }
   else
     {
-#if 0
-      /* we have no convenient way to deal with this yet... */
-      if (fi->pc != sal.pc || !sal.symtab)
-	{
-	  deprecated_print_address_numeric (fi->pc, 1, gdb_stdout);
-	  printf_filtered (" in ");
-	}
-      printf_symbol_filtered (gdb_stdout, funname ? funname : "??", funlang,
-			      DMGL_ANSI);
-#endif
-      objv[0] = Tcl_NewStringObj (funname != NULL ? funname : "??", -1);
+      char *lib = NULL;
+      objv[0] = Tcl_NewStringObj (funname ? funname : "??", -1);
 #ifdef PC_SOLIB
-      if (!funname)
-	{
-	  char *lib = PC_SOLIB (get_frame_pc (fi));
-	  if (lib)
-	    {
-	      Tcl_AppendStringsToObj (objv[0], " from ", lib, (char *) NULL);
-	    }
-	}
+      lib = PC_SOLIB (get_frame_pc (fi));
+#else
+      lib = solib_name_from_address (get_frame_program_space (fi),
+                                     get_frame_pc (fi));
 #endif
+      if (lib)
+        Tcl_AppendStringsToObj (objv[0], " from ", lib, (char *) NULL);
+
       Tcl_ListObjAppendElement (interp, list, objv[0]);
     }
 }

@@ -1,3 +1,29 @@
+2012-06-14  Kevin Buettner  <kevinb@redhat.com>
+
+	* lwp-pool.c (struct lwp): Add new field `disabled'.
+	(empty_lwp_slot): New static global.
+	(hash_empty_slot, resize_hash, lwp_pool_stop_all)
+	(lwp_pool_continue_all, clear_all_do_step_flags)
+	(hash_find): Rename to hash_find_1.  Add parameter `create_p'.
+	Initialize `disabled' field.
+	(hash_find, hash_find_no_create, lwp_pool_disable_lwp)
+	(lwp_pool_enable_lwp): New functions.
+	(hash_delete): Revise method used for deleting a slot from
+	the hash table.
+	(lwp_pool_continue_all): Don't continue disabled LWPs.
+	(lwp_pool_continue_lwp): Print a warning instead of an error, and
+	then only when LWP Pool diagnostics are enabled when attempting
+	to continue a LWP with the state of
+	lwp_state_stopped_stop_pending_interesting.
+	* lwp-pool.h (lwp_pool_disable_lwp, lwp_pool_enable_lwp): Declare.
+	* thread-db.c (find_new_threads_callback): Adjust thread
+	deletion / reuse message.
+	(update_thread_list): Disable continuation of zombie threads.
+	(thread_db_break_program): Enable diagnostic message for "monitor
+	thread-db-noisy".  Use kill_lwp() instead of kill().
+	(thread_db_check_child_state): Don't stop on signals from zombie
+	threads.
+
 2011-11-30  Kevin Buettner  <kevinb@redhat.com>
 
 	* thread-db.c (TID_MAY_BE_REUSED): Define.

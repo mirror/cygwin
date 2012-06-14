@@ -1441,7 +1441,7 @@ find_new_threads_callback (const td_thrhandle_t *thandle, void *data)
 	         one thread has died and another was created using the
 		 same thread identifier.  */
 	      if (thread_db_noisy)
-		fprintf (stderr, "(thread deletion / reuse: %s)\n", thread_debug_name (thread));
+		fprintf (stderr, "(thread deletion / reuse: %s; state: %d new lwp: %d)\n", thread_debug_name (thread), thread->ti.ti_state, ti.ti_lid);
 	      thread->ti = ti;
 	    }
 	  else
@@ -1521,6 +1521,16 @@ update_thread_list (struct child_process *process)
 	      delete_thread_from_list (thread);
 	    }
 	}
+    }
+
+  /* Disable zombie threads.  */
+  for (thread = first_thread_in_list ();
+       thread;
+       thread = next_thread_in_list (thread))
+    {
+      /* Don't allow zombie threads to continue.  */
+      if (thread->ti.ti_state == TD_THR_ZOMBIE)
+	lwp_pool_disable_lwp (thread->ti.ti_lid);
     }
 }
 
@@ -2100,23 +2110,23 @@ thread_db_break_program (struct gdbserv *serv)
 
   if (process->interrupt_with_SIGSTOP)
     {
-      if (process->debug_backend)
+      if (process->debug_backend || thread_db_noisy)
 	fprintf (stderr, " -- send SIGSTOP to child %d\n", proc_handle.pid);
 
       /* Tell the GDB user that SIGSTOP has been sent to the inferior.  */
       print_sigstop_message (serv);
 
-      kill (proc_handle.pid, SIGSTOP);
+      kill_lwp (proc_handle.pid, SIGSTOP);
     }
   else
     {
-      if (process->debug_backend)
+      if (process->debug_backend || thread_db_noisy)
 	fprintf (stderr, " -- send SIGINT to child %d\n", proc_handle.pid);
 
       /* Tell the GDB user that SIGINT has been sent to the inferior.  */
       print_sigint_message (serv);
 
-      kill (proc_handle.pid, SIGINT);
+      kill_lwp (proc_handle.pid, SIGINT);
     }
 }
 
@@ -2258,6 +2268,26 @@ thread_db_check_child_state (struct child_process *process)
 
 	      /* Continue the program.  */
 	      process->signal_to_send = process->stop_signal;
+	      currentvec->continue_program (serv);
+	      return 0;
+	    }
+
+	  /* Continue on if the thread in question is now a zombie.  */
+	  if (process->event_thread
+              && process->event_thread->ti.ti_state == TD_THR_ZOMBIE)
+	    {
+	      if (thread_db_noisy)
+		fprintf (stderr,
+			 "\n<check_child_state: Ignoring %d - it's a zombie.>\n", 
+			 process->pid);
+	      /* Updating the thread list will disable this zombie, plus any others.  */
+	      update_thread_list (process);
+	      /* Continue the main thread; not the zombie.  */
+	      process->event_thread = NULL;
+	      process->pid = proc_handle.pid;
+	      /* No signal.  */
+	      process->signal_to_send = 0;
+	      /* Continue.  */
 	      currentvec->continue_program (serv);
 	      return 0;
 	    }

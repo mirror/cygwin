@@ -326,6 +326,10 @@ struct lwp
      signals prior to a step actually occuring.  Receipt of a SIGTRAP is
      sufficient to clear this flag.  */
   int do_step;
+
+  /* Indicates whether the lwp should be considered when continuing or
+     stepping.  */
+  int disabled;
 };
  
   
@@ -359,6 +363,11 @@ struct lwp
 static size_t hash_size, hash_population;
 static struct lwp **hash;
 
+/* We put the address of empty_lwp_slot into the hash table to
+   represent deleted entries.  We do this so that we will not
+   perturb the hash table while iterating through it.  */
+static struct lwp empty_lwp_slot;
+
 /* The minimum size for the hash table.  Small for testing.  */
 enum { minimum_hash_size = 8 };
 
@@ -389,7 +398,7 @@ hash_empty_slot (pid_t pid)
 
   /* Since hash_next_slot will eventually visit every slot, and we
      know the table isn't full, this loop will terminate.  */
-  while (hash[slot])
+  while (hash[slot] && hash[slot] != &empty_lwp_slot)
     slot = hash_next_slot (slot, hash_size);
 
   return slot;
@@ -438,7 +447,7 @@ resize_hash (void)
 
   /* Re-insert all the old lwp's in the new table.  */
   for (i = 0; i < hash_size; i++)
-    if (hash[i])
+    if (hash[i] && hash[i] != &empty_lwp_slot)
       {
 	struct lwp *l = hash[i];
 	int new_slot = hash_slot (l->pid, new_hash_size);
@@ -464,7 +473,7 @@ resize_hash (void)
 /* Find an existing hash table entry for LWP.  If there is none,
    create one in state lwp_state_uninitialized.  */
 static struct lwp *
-hash_find (pid_t lwp)
+hash_find_1 (pid_t lwp, int create_p)
 {
   int slot;
   struct lwp *l;
@@ -483,6 +492,9 @@ hash_find (pid_t lwp)
     if (hash[slot]->pid == lwp)
       return hash[slot];
 
+  if (!create_p)
+    return NULL;
+
   /* There is no entry for this lwp.  Create one.  */
   l = malloc (sizeof (*l));
   l->pid = lwp;
@@ -490,7 +502,9 @@ hash_find (pid_t lwp)
   l->next = l->prev = NULL;
   l->status = 42;
   l->do_step = 0;
+  l->disabled = 0;
 
+  slot = hash_empty_slot (lwp);
   hash[slot] = l;
   hash_population++;
 
@@ -501,6 +515,17 @@ hash_find (pid_t lwp)
   return l;
 }
 
+static struct lwp *
+hash_find (pid_t lwp)
+{
+  return hash_find_1 (lwp, 1);
+}
+
+static struct lwp *
+hash_find_no_create (pid_t lwp)
+{
+  return hash_find_1 (lwp, 0);
+}
 
 /* Remove the LWP L from the pool.  This does not free L itself.  */
 static void
@@ -521,6 +546,7 @@ hash_delete (struct lwp *l)
   /* There should be only one 'struct lwp' with a given PID.  */
   assert (hash[slot] == l);
 
+#if 0
   /* Deleting from this kind of hash table is interesting, because of
      the way we handle collisions.
 
@@ -573,6 +599,21 @@ hash_delete (struct lwp *l)
 	hash[slot] = NULL;
 	hash[hash_empty_slot (refugee->pid)] = refugee;
       }
+#else
+  /* The problem with the above (disabled) code above is that
+     we may perturb the order of the entries when we rehash.  This
+     is a serious problem when we're attempting to iterate through
+     the hash table at the same time.
+
+     The approach take here is to simply place the address of
+     `empty_lwp_slot' into the deleted slot.  This slot will
+     be reclaimed either when the hash table is resized or when
+     it is encountered on insertion by traversing the collision
+     chain.  */
+
+  hash[slot] = &empty_lwp_slot;
+  hash_population--;
+#endif
 }
 
 
@@ -1131,7 +1172,7 @@ lwp_pool_stop_all (struct gdbserv *serv)
     {
       struct lwp *l = hash[i];
 
-      if (l)
+      if (l && l != &empty_lwp_slot)
 	{
 	  enum lwp_state old_state = l->state;
 
@@ -1205,7 +1246,7 @@ lwp_pool_stop_all (struct gdbserv *serv)
   for (i = 0; i < hash_size; i++)
     {
       struct lwp *l = hash[i];
-      if (l)
+      if (l && l != &empty_lwp_slot)
 	switch (l->state)
 	  {
 	  case lwp_state_uninitialized:
@@ -1262,7 +1303,7 @@ lwp_pool_continue_all (struct gdbserv *serv)
     {
       struct lwp *l = hash[i];
 
-      if (l)
+      if (l && l != &empty_lwp_slot && !l->disabled)
 	{
 	  enum lwp_state old_state = l->state;
 
@@ -1351,9 +1392,14 @@ lwp_pool_continue_lwp (struct gdbserv *serv, pid_t pid, int signal)
     case lwp_state_stopped_interesting:
     case lwp_state_dead_interesting:
     case lwp_state_running_stop_pending:
-    case lwp_state_stopped_stop_pending_interesting:
       fprintf (stderr, "ERROR: continuing LWP %d in unwaited state: %s\n",
                (int) l->pid, lwp_state_str (l->state));
+      break;
+
+    case lwp_state_stopped_stop_pending_interesting:
+      if (debug_lwp_pool)
+	fprintf (stderr, "WARNING: continuing LWP %d in unwaited state: %s\n",
+		 (int) l->pid, lwp_state_str (l->state));
       break;
 
     case lwp_state_stopped:
@@ -1407,7 +1453,7 @@ clear_all_do_step_flags (void)
     {
       struct lwp *l = hash[i];
 
-      if (l)
+      if (l && l != &empty_lwp_slot)
 	l->do_step = 0;
     }
 }
@@ -1550,4 +1596,42 @@ lwp_pool_attach (struct gdbserv *serv, pid_t pid)
     }
      
   return 0;
+}
+
+void
+lwp_pool_disable_lwp (pid_t pid)
+{
+  struct lwp *l = hash_find_no_create (pid);
+
+  if (l)
+    {
+      l->disabled = 1;
+
+      if (debug_lwp_pool)
+	fprintf (stderr, "lwp_pool_disable_lwp: disabling %d\n", pid);
+    }
+  else
+    {
+      if (debug_lwp_pool)
+	fprintf (stderr, "lwp_pool_disable_lwp: pid %d not in pool\n", pid);
+    }
+}
+
+void
+lwp_pool_enable_lwp (pid_t pid)
+{
+  struct lwp *l = hash_find_no_create (pid);
+
+  if (l)
+    {
+      l->disabled = 0;
+
+      if (debug_lwp_pool)
+	fprintf (stderr, "lwp_pool_enable_lwp: disabling %d\n", pid);
+    }
+  else
+    {
+      if (debug_lwp_pool)
+	fprintf (stderr, "lwp_pool_enable_lwp: pid %d not in pool\n", pid);
+    }
 }

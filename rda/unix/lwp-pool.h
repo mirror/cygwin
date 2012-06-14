@@ -113,5 +113,11 @@ int lwp_pool_continue_lwp (struct gdbserv *serv, pid_t pid, int signal);
    been completed.  */
 int lwp_pool_singlestep_lwp (struct gdbserv *serv, pid_t pid, int signal);
 
+/* Disable the LWP denoted by PID.  */
+void lwp_pool_disable_lwp (pid_t pid);
+
+/* Enable the LWP denoted by PID.  */
+void lwp_pool_enable_lwp (pid_t pid);
+
 
 #endif /* RDA_UNIX_LWP_POOL_H */

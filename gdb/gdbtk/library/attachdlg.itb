@@ -1,5 +1,5 @@
 # Attach Dialog for Insight.
-# Copyright (C) 1999, 2002, 2003, 2008 Red Hat, Inc.
+# Copyright (C) 1999-2012 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License (GPL) as published by
@@ -150,53 +150,66 @@ itcl::body AttachDlg::choose_symbol_file {} {
   }
 }
 
-
 # ------------------------------------------------------------------
-#  METHOD:  list_pids - List the available processes.  Right now,
-#           this just spawns ps, which means we have to deal with
-#           all the different ps flags & output formats.  At some
-#           point we should steal some C code to do it by hand.
+#  METHOD:  list_pids - List the available processes.
+#           Right now on *nix systems this just spawns ps,
+#           which means we have to deal with all the different
+#           ps flags & output formats.  At some point we should
+#           steal some C code to do it by hand.
 # ------------------------------------------------------------------
 
 itcl::body AttachDlg::list_pids {{pattern *}} {
   global gdbtk_platform
 
-  switch $gdbtk_platform(os) {
-    Linux {
-      set ps_cmd "ps axw"
-    }
-    default {
-      set ps_cmd "ps w"
-    }
-  }
-  if {[catch {::open "|$ps_cmd" r} psH]} {
-    set errTxt "Could not exec ps: $psH
-You will have to enter the PID by hand."
-    ManagedWin::open WarningDlg -message [list $errTxt]
-    return
-  }
-  gets $psH header
-
-  set nfields [llength $header]
-  set nfields_m_1 [expr {$nfields - 1}]
-  set regexp {^ *([^ ]*) +}
-  for {set i 1} {$i < $nfields_m_1} {incr i} {
-    append regexp {[^ ]* +}
-  }
-  append regexp {(.*)$}
-  
   $itk_component(choose_pid) clear
   set pid_list {}
 
-  while {[gets $psH line] >= 0} {
-    regexp $regexp $line dummy PID COMMAND
-    if {[string match $pattern $COMMAND]} {
-      lappend pid_list [list $PID $COMMAND]
-      $itk_component(choose_pid) insert end $COMMAND
+  set processes [gdb_list_processes]
+  if {[llength $processes] > 0} {
+    foreach entry $processes {
+      set executable [lindex $entry 1]
+      if {[string match $pattern $executable]} {
+        lappend pid_list $entry
+        $itk_component(choose_pid) insert end $executable
+      }
     }
+  } else {
+    switch $gdbtk_platform(os) {
+      Linux {
+        set ps_cmd "ps axw"
+      }
+      default {
+        set ps_cmd "ps w"
+      }
+    }
+
+    if {[catch {::open "|$ps_cmd" r} psH]} {
+      set errTxt "Could not exec ps: $psH
+You will have to enter the PID by hand."
+      ManagedWin::open WarningDlg -message [list $errTxt]
+      return
+    }
+    gets $psH header
+
+    set nfields [llength $header]
+    set nfields_m_1 [expr {$nfields - 1}]
+    set regexp {^ *([^ ]*) +}
+    for {set i 1} {$i < $nfields_m_1} {incr i} {
+      append regexp {[^ ]* +}
+    }
+    append regexp {(.*)$}
+
+    while {[gets $psH line] >= 0} {
+      regexp $regexp $line dummy PID COMMAND
+      if {[string match $pattern $COMMAND]} {
+        lappend pid_list [list $PID $COMMAND]
+        $itk_component(choose_pid) insert end $COMMAND
+      }
+    }
+
+    close $psH
   }
 
-  close $psH
   $itk_component(choose_pid) selection set 0
   select_pid
 }

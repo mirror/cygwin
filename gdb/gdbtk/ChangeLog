@@ -1,3 +1,19 @@
+2012-06-25  Roland Schwingel  <roland.schwingel@onevision.com>
+
+	* generic/gdbtk-cmds.c: On windows include
+	windows.h/tlhelp32.h. Declare new
+	function gdb_list_processes().
+	(Gdbtk_Init): Register new tcl function
+	"gdb_list_processes".
+	(gdb_list_processes): New function.
+	* library/attachdlg.itb: Updated copyright.
+	(list_pids): Use gdb_list_processes for
+	getting the process list. Fallback to
+	ps if empty list is returned. Adapt method comment.
+	* library/srcbar.itcl: Updated copyright.
+	(create_run_menu): Allow "Attach to process" on
+	windows, too.
+
 2012-05-25  Roland Schwingel  <roland.schwingel@onevision.com>
 
 	* generic/gdbtk-bp.c (gdb_set_bp): Add new NULL param

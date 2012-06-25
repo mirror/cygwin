@@ -1,5 +1,5 @@
 # SrcBar
-# Copyright (C) 2001, 2002, 2004, 2008 Red Hat, Inc.
+# Copyright (C) 2001-2012 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License (GPL) as published by
@@ -230,16 +230,10 @@ itcl::class SrcBar {
     
     set is_native [TargetSelection::native_debugging]
 
-    # If we are on a Unix target, put in the attach options.  "ps" doesn't
-    # give me the Windows PID yet, and the attach also seems flakey, so 
-    # I will hold off on the Windows implementation for now.
-
     if {$is_native} {
-      if {[string compare $::gdbtk_platform(platform) windows] != 0} {
 	$Menu add command Attach "Attach to process" \
 	  [code $this do_attach $run_menu] \
 	  -underline 0 -accelerator "Ctrl+A"
-      }
     } else {
       $Menu add command Other "Connect to target" \
 	"$this do_connect $run_menu" -underline 0

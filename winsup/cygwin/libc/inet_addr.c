@@ -66,14 +66,13 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static const char sccsid[] = "@(#)inet_addr.c	8.1 (Berkeley) 6/17/93";
-static const char rcsid[] = "$Id: inet_addr.c,v 1.4 2011/12/17 23:39:47 cgf Exp $";
+static const char rcsid[] = "$Id: inet_addr.c,v 1.5 2012/07/06 13:52:18 corinna Exp $";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
 #ifndef __CYGWIN__
 __FBSDID("$FreeBSD$");
 #else
-#define __INSIDE_CYGWIN__
-#define  __INSIDE_CYGWIN_NET__
+#include "winsup.h"
 #endif
 
 #ifndef __CYGWIN__

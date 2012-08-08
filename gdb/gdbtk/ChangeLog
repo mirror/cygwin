@@ -1,3 +1,16 @@
+2012-08-08  Roland Schwingel  <roland.schwingel@onevision.com>
+
+	* generic/gdbtk-cmds.c (gdb_load_info): Replace call to
+	make_cleanup_bfd_close with make_cleanup_bfd_unref due
+	to changes in gdb.
+	(gdb_loc): Replace call to decode_line_spec with call to
+	decode_line_with_current_source due to changes in gdb.
+	* generic/gdbtk-wrapper.c: Comment unused functions
+	GDB_parse_exp_1 and wrap_parse_exp_1 as parse_exp_1 has
+	changed its interface and the code appears to be unused
+	anyway.
+	* generic/gdbtk-wrapper.h: ditto
+
 2012-06-25  Roland Schwingel  <roland.schwingel@onevision.com>
 
 	* generic/gdbtk-cmds.c: On windows include

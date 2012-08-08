@@ -45,8 +45,10 @@ gdb_result GDB_val_print (struct type *type, char *valaddr,
 
 gdb_result GDB_value_equal (value_ptr, value_ptr, int *);
 
+/*
 gdb_result GDB_parse_exp_1 (char **stringptr, struct block *block, int comma,
 			    struct expression **result);
+*/
 
 gdb_result GDB_evaluate_type (struct expression *exp, value_ptr * result);
 
@@ -103,7 +105,9 @@ static int wrap_val_print (char *);
 
 static int wrap_value_equal (char *);
 
+/*
 static int wrap_parse_exp_1 (char *opaque_arg);
+*/
 
 static int wrap_evaluate_type (char *opaque_arg);
 
@@ -299,6 +303,7 @@ wrap_value_equal (char *a)
   return 1;
 }
 
+/*
 gdb_result
 GDB_parse_exp_1 (char **stringptr, struct block *block,
 		 int comma, struct expression **result)
@@ -333,6 +338,7 @@ wrap_parse_exp_1 (char *opaque_arg)
   (*args)->result.ptr = parse_exp_1 (stringptr, block, comma);
   return 1;
 }
+*/
 
 gdb_result
 GDB_evaluate_type (struct expression *exp, value_ptr *result)

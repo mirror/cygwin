@@ -34,7 +34,7 @@ subcommand_deleted (ClientData cd)
    table.  */
 static int
 subcommand_implementation (ClientData cd, Tcl_Interp *interp,
-			   int argc, char *argv[])
+			   int argc, CONST84 char *argv[])
 {
   struct subcommand_clientdata *data = (struct subcommand_clientdata *) cd;
   const struct ide_subcommand_table *commands = data->commands;
@@ -90,7 +90,7 @@ subcommand_implementation (ClientData cd, Tcl_Interp *interp,
 
 /* Define a command with subcommands.  */
 int
-ide_create_command_with_subcommands (Tcl_Interp *interp, char *name,
+ide_create_command_with_subcommands (Tcl_Interp *interp, const char *name,
 				     const struct ide_subcommand_table *table,
 				     ClientData subdata,
 				     Tcl_CmdDeleteProc *delete)

@@ -24,11 +24,12 @@
 *	
 *
 * ---------------------------------------------------------------------------*/
-#include "tk.h"
 #ifdef _WIN32
 #include <windows.h>
 #include <winuser.h>
 #endif
+
+#include "tk.h"
 
 int
 WarpPointer (clientData, interp, objc, objv)
@@ -39,7 +40,6 @@ WarpPointer (clientData, interp, objc, objv)
 {
     Tk_Window tkwin;
     int x, y;
-    char *str;
 
     if (objc != 4) {
       Tcl_WrongNumArgs(interp, 1, objv, "widgetId x y");

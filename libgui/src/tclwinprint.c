@@ -136,7 +136,7 @@ winprint_command_deleted (ClientData cd)
 
 static int
 winprint_page_setup_command (ClientData cd, Tcl_Interp *interp, int argc,
-			     char **argv)
+			     CONST84 char **argv)
 {
   struct winprint_data *wd = (struct winprint_data *) cd;
   Tk_Window parent;
@@ -258,13 +258,13 @@ struct print_text_options
   /* Whether to use the print dialog.  */
   int dialog;
   /* The parent window.  */
-  char *parent;
+  const char *parent;
   /* The document name.  */
-  char *name;
+  const char *name;
   /* The page procedure.  */
-  char *pageproc;
+  const char *pageproc;
   /* The init procedure. This is called once before printing. */
-  char *initproc;
+  const char *initproc;
   /* Print using PostScript? */
   int postscript;
 };
@@ -273,7 +273,7 @@ struct print_text_options
 
 static int
 winprint_print_text_options (struct winprint_data *wd, Tcl_Interp *interp,
-			     int argc, char **argv,
+			     int argc, const char **argv,
 			     struct print_text_options *pto)
 {
   int i;
@@ -458,7 +458,7 @@ static int
 winprint_start (struct winprint_data *wd, Tcl_Interp *interp, PRINTDLG *pd,
 		const struct print_text_options *pto, int *cancelled)
 {
-  DOCINFO di;
+  DOCINFOA di;
 
   *cancelled = 0;
 
@@ -479,7 +479,7 @@ winprint_start (struct winprint_data *wd, Tcl_Interp *interp, PRINTDLG *pd,
   di.lpszDatatype = NULL;
   di.fwType = 0;
 
-  if (StartDoc (pd->hDC, &di) <= 0)
+  if (StartDocA (pd->hDC, &di) <= 0)
     {
       if (GetLastError () == ERROR_CANCELLED)
 	*cancelled = 1;
@@ -527,7 +527,7 @@ enum winprint_query { Q_CONTINUE, Q_NEWPAGE, Q_DONE };
 /* Invoke the query or page procedure for ide_winprint print_text.  */
 
 static int
-winprint_print_text_invoke (Tcl_Interp *interp, char *proc, const char *name,
+winprint_print_text_invoke (Tcl_Interp *interp, const char *proc, const char *name,
 			    enum winprint_query *result)
 {
   char *q;
@@ -557,11 +557,11 @@ winprint_print_text_invoke (Tcl_Interp *interp, char *proc, const char *name,
 /* Implement ide_winprint print_text.  */
 static int
 winprint_print_command (ClientData cd, Tcl_Interp *interp, int argc,
-			     char **argv)
+			     CONST84 char **argv)
 {
   struct winprint_data *wd = (struct winprint_data *) cd;
-  char *queryproc;
-  char *textproc;
+  const char *queryproc;
+  const char *textproc;
   struct print_text_options pto;
   PRINTDLG pd;
   int cancelled;
@@ -829,7 +829,7 @@ winprint_print_command (ClientData cd, Tcl_Interp *interp, int argc,
 	      
 	      l = Tcl_GetStringFromObj (Tcl_GetObjResult (interp), &len);
 	      
-	      TextOut (pd.hDC, left, y, l, len);
+	      TextOutA (pd.hDC, left, y, l, len);
 	      y += lineheight;
 	      
 	      if (y >= bottom)
@@ -890,7 +890,7 @@ winprint_print_command (ClientData cd, Tcl_Interp *interp, int argc,
 
 static int
 winprint_abort_command (ClientData cd, Tcl_Interp *interp, int argc,
-			char **argv)
+			CONST84 char **argv)
 {
   struct winprint_data *wd = (struct winprint_data *) cd;
 

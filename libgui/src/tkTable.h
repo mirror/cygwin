@@ -15,9 +15,26 @@
 #ifndef _TKTABLE_H_
 #define _TKTABLE_H_
 
+#ifdef WIN32
+#   define WIN32_LEAN_AND_MEAN
+#   include <windows.h>
+#   undef WIN32_LEAN_AND_MEAN
+/* VC++ has an entry point called DllMain instead of DllEntryPoint */
+#   if defined(_MSC_VER)
+#	define DllEntryPoint DllMain
+#   endif
+#endif
+
+
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <tk.h>
+
+#ifndef CONST86
+#      define CONST86 CONST84
+#endif
+
 #ifdef MAC_TCL
 # include <Xatom.h>
 #else
@@ -44,16 +61,6 @@
 # define TCL_STORAGE_CLASS DLLEXPORT
 #else
 # define TCL_STORAGE_CLASS DLLIMPORT
-#endif
-
-#ifdef WIN32
-#   define WIN32_LEAN_AND_MEAN
-#   include <windows.h>
-#   undef WIN32_LEAN_AND_MEAN
-/* VC++ has an entry point called DllMain instead of DllEntryPoint */
-#   if defined(_MSC_VER)
-#	define DllEntryPoint DllMain
-#   endif
 #endif
 
 #if defined(WIN32) || defined(MAC_TCL)
@@ -506,17 +513,17 @@ extern int	Table_TagCmd _ANSI_ARGS_((ClientData clientData,
 
 extern int	TableOptionBdSet _ANSI_ARGS_((ClientData clientData,
 			Tcl_Interp *interp, Tk_Window tkwin,
-			char *value, char *widgRec, int offset));
-extern char *	TableOptionBdGet _ANSI_ARGS_((ClientData clientData,
+			CONST84 char *value, char *widgRec, int offset));
+extern CONST86 char *	TableOptionBdGet _ANSI_ARGS_((ClientData clientData,
 			Tk_Window tkwin, char *widgRec, int offset,
 			Tcl_FreeProc **freeProcPtr));
 extern int	TableTagConfigureBd _ANSI_ARGS_((Table *tablePtr,
 			TableTag *tagPtr, char *oldValue, int nullOK));
 extern int	Cmd_OptionSet _ANSI_ARGS_((ClientData clientData,
 					   Tcl_Interp *interp,
-					   Tk_Window unused, char *value,
+					   Tk_Window unused, CONST84 char *value,
 					   char *widgRec, int offset));
-extern char *	Cmd_OptionGet _ANSI_ARGS_((ClientData clientData,
+extern CONST86 char *	Cmd_OptionGet _ANSI_ARGS_((ClientData clientData,
 					   Tk_Window unused, char *widgRec,
 					   int offset,
 					   Tcl_FreeProc **freeProcPtr));
@@ -629,6 +636,31 @@ extern void	TableAddFlash _ANSI_ARGS_((Table *tablePtr, int row, int col));
 		Tk_Width((tablePtr)->tkwin)-(tablePtr)->highlightWidth-1,\
 		Tk_Height((tablePtr)->tkwin)-(tablePtr)->highlightWidth-1,\
 		(rowPtr), (colPtr))
+
+/*
+ * Macros used to cast between pointers and integers (e.g. when storing an int
+ * in ClientData), on 64-bit architectures they avoid gcc warning about "cast
+ * to/from pointer from/to integer of different size".
+ */
+
+#if !defined(INT2PTR) && !defined(PTR2INT)
+#   if defined(HAVE_INTPTR_T) || defined(intptr_t)
+#  define INT2PTR(p) ((void *)(intptr_t)(p))
+#  define PTR2INT(p) ((int)(intptr_t)(p))
+#   else
+#  define INT2PTR(p) ((void *)(p))
+#  define PTR2INT(p) ((int)(p))
+#   endif
+#endif
+#if !defined(UINT2PTR) && !defined(PTR2UINT)
+#   if defined(HAVE_UINTPTR_T) || defined(uintptr_t)
+#  define UINT2PTR(p) ((void *)(uintptr_t)(p))
+#  define PTR2UINT(p) ((unsigned int)(uintptr_t)(p))
+#   else
+#  define UINT2PTR(p) ((void *)(p))
+#  define PTR2UINT(p) ((unsigned int)(p))
+#   endif
+#endif
 
 /*
  * end of header

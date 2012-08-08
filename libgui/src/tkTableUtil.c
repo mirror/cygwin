@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkTableUtil.c,v 1.3 2001/09/08 22:34:48 irox Exp $
+ * RCS: @(#) $Id: tkTableUtil.c,v 1.4 2012/08/08 13:34:56 rosch Exp $
  */
 
 #include "tkTable.h"
@@ -41,16 +41,16 @@ TableOptionBdSet(clientData, interp, tkwin, value, widgRec, offset)
     ClientData clientData;		/* Type of struct being set. */
     Tcl_Interp *interp;			/* Used for reporting errors. */
     Tk_Window tkwin;			/* Window containing table widget. */
-    char *value;			/* Value of option. */
+    CONST84 char *value;			/* Value of option. */
     char *widgRec;			/* Pointer to record for item. */
     int offset;				/* Offset into item. */
 {
     char **borderStr;
     int *bordersPtr, *bdPtr;
-    int type	= (int) clientData;
+    int type	= PTR2INT(clientData);
     int result	= TCL_OK;
     int argc;
-    char **argv;
+    CONST84 char **argv;
 
 
     if ((type == BD_TABLE) && (value[0] == '\0')) {
@@ -137,7 +137,7 @@ TableOptionBdSet(clientData, interp, tkwin, value, widgRec, offset)
  *----------------------------------------------------------------------
  */
 
-char *
+CONST86 char *
 TableOptionBdGet(clientData, tkwin, widgRec, offset, freeProcPtr)
     ClientData clientData;		/* Type of struct being set. */
     Tk_Window tkwin;			/* Window containing canvas widget. */
@@ -147,7 +147,7 @@ TableOptionBdGet(clientData, tkwin, widgRec, offset, freeProcPtr)
 					 * information about how to reclaim
 					 * storage for return string. */
 {
-    register int type	= (int) clientData;
+    register int type	= PTR2INT(clientData);
 
     if (type == BD_TABLE) {
 	return ((TableTag *) (widgRec + offset))->borderStr;
@@ -183,7 +183,7 @@ TableTagConfigureBd(Table *tablePtr, TableTag *tagPtr,
 	char *oldValue, int nullOK)
 {
     int i, argc, result = TCL_OK;
-    char **argv;
+    CONST84 char **argv;
 
     /*
      * First check to see if the value really changed.
@@ -270,7 +270,7 @@ TableTagConfigureBd(Table *tablePtr, TableTag *tagPtr,
 
 int
 Cmd_OptionSet(ClientData clientData, Tcl_Interp *interp,
-	      Tk_Window unused, char *value, char *widgRec, int offset)
+	      Tk_Window unused, CONST84 char *value, char *widgRec, int offset)
 {
   Cmd_Struct *p = (Cmd_Struct *)clientData;
   int mode = Cmd_GetValue(p,value);
@@ -297,7 +297,7 @@ Cmd_OptionSet(ClientData clientData, Tcl_Interp *interp,
  *----------------------------------------------------------------------
  */
 
-char *
+CONST86 char *
 Cmd_OptionGet(ClientData clientData, Tk_Window unused,
 	      char *widgRec, int offset, Tcl_FreeProc **freeProcPtr)
 {

@@ -28,7 +28,7 @@ static struct pair values[] =
 
 static int
 seterrormode_command (ClientData cd, Tcl_Interp *interp,
-		      int argc, char *argv[])
+		      int argc, CONST84 char *argv[])
 {
 #ifdef __CYGWIN32__
   int len, i;

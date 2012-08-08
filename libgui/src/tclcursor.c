@@ -25,7 +25,7 @@
 #include "subcommand.h"
 
 static int
-get_cursor_size (ClientData cd, Tcl_Interp *interp, int argc, char *argv[])
+get_cursor_size (ClientData cd, Tcl_Interp *interp, int argc, CONST84 char *argv[])
 {
   char buf[30];
 
@@ -38,7 +38,7 @@ get_cursor_size (ClientData cd, Tcl_Interp *interp, int argc, char *argv[])
 }
 
 static int
-get_cursor_position (ClientData cd, Tcl_Interp *interp, int argc, char *argv[])
+get_cursor_position (ClientData cd, Tcl_Interp *interp, int argc, CONST84 char *argv[])
 {
   POINT where;
   char buf[30];

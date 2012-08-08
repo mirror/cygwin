@@ -52,7 +52,7 @@ PrintCanvasCmd(clientData, interp, argc, argv)
     int tiles_wide,tiles_high;
     int tile_y, tile_x;
     int screenX1, screenX2, screenY1, screenY2, width, height;
-    DOCINFO *lpdi = (DOCINFO *) ckalloc(sizeof(DOCINFO));
+    DOCINFOA *lpdi = (DOCINFOA *) ckalloc(sizeof(DOCINFOA));
 
     if (argc < 2) {
 	Tcl_AppendResult(interp, "wrong # args: should be \"",
@@ -75,7 +75,7 @@ PrintCanvasCmd(clientData, interp, argc, argv)
     memset(lpdi,0,sizeof(DOCINFO));
     lpdi->cbSize=sizeof(DOCINFO);
     lpdi->lpszDocName= (LPCSTR) ckalloc(255);
-    sprintf((char*)lpdi->lpszDocName,"SN - Printing\0");
+    strcpy((char *)lpdi->lpszDocName,"SN - Printing");
     lpdi->lpszOutput=NULL;
 
     canvasPtr = (TkCanvas *)(canvCmd.clientData);
@@ -144,7 +144,7 @@ PrintCanvasCmd(clientData, interp, argc, argv)
     tiles_high = ( widget_Y_size / page_Y_size ); /* start at zero */
     tiles_wide = ( widget_X_size / page_X_size ); /* start at zero */
 
-    StartDoc(pd.hDC,lpdi);
+    StartDocA(pd.hDC,lpdi);
 
     for (tile_x = 0; tile_x <= tiles_wide;tile_x++) {
     for (tile_y = 0; tile_y <= tiles_high;tile_y++) {
@@ -154,7 +154,7 @@ PrintCanvasCmd(clientData, interp, argc, argv)
  	for (itemPtr = canvasPtr->firstItemPtr; itemPtr != NULL;
 		itemPtr = itemPtr->nextPtr) {
 	    (*itemPtr->typePtr->displayProc)((Tk_Canvas) canvasPtr, itemPtr,
-		    canvasPtr->display, (unsigned long) PrinterDrawable/*pixmap*/, screenX1, screenY1, width,
+		    canvasPtr->display, (Drawable) PrinterDrawable/*pixmap*/, screenX1, screenY1, width,
 		    height);
 	}
     

@@ -24,20 +24,16 @@
 
 #include "tkTable.h"
 
-#ifdef DEBUG
-#include "dprint.h"
-#endif
-
 static char **	StringifyObjects _ANSI_ARGS_((int objc,
-			Tcl_Obj *CONST objv[]));
+			Tcl_Obj *const objv[]));
 
 static int	Tk_TableObjCmd _ANSI_ARGS_((ClientData clientData,
-			Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));
+			Tcl_Interp *interp, int objc, Tcl_Obj *const objv[]));
 
 static int	TableWidgetObjCmd _ANSI_ARGS_((ClientData clientData,
-			Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));
+			Tcl_Interp *interp, int objc, Tcl_Obj *const objv[]));
 static int	TableConfigure _ANSI_ARGS_((Tcl_Interp *interp,
-			Table *tablePtr, int objc, Tcl_Obj *CONST objv[],
+			Table *tablePtr, int objc, Tcl_Obj *const objv[],
 			int flags, int forceUpdate));
 static void	TableDestroy _ANSI_ARGS_((ClientData clientdata));
 static void	TableEventProc _ANSI_ARGS_((ClientData clientData,
@@ -65,7 +61,7 @@ static Tk_RestrictAction TableRestrictProc _ANSI_ARGS_((ClientData arg,
  * enumerated types used to dispatch the widget command.
  */
 
-static char *selCmdNames[] = {
+static const char *selCmdNames[] = {
     "anchor", "clear", "includes", "present", "set", (char *)NULL
 };
 enum selCommand {
@@ -73,7 +69,7 @@ enum selCommand {
     CMD_SEL_SET
 };
 
-static char *commandNames[] = {
+static const char *commandNames[] = {
     "activate", "bbox", "border", "cget", "clear", "configure",
     "curselection", "curvalue", "delete", "get", "height",
     "hidden", "icursor", "index", "insert",
@@ -328,7 +324,7 @@ Tk_ConfigSpec tableSpecs[] = {
  * Keep this in sync with the above values.
  */
 
-static char *updateOpts[] = {
+static const char *updateOpts[] = {
     "-anchor",		"-background",	"-bg",		"-bd",	
     "-borderwidth",	"-cache",	"-command",	"-colorigin",
     "-cols",		"-colstretchmode",		"-coltagcommand",
@@ -1041,7 +1037,7 @@ TableConfigure(interp, tablePtr, objc, objv, flags, forceUpdate)
     /* Do the configuration */
     argv = StringifyObjects(objc, objv);
     result = Tk_ConfigureWidget(interp, tablePtr->tkwin, tableSpecs,
-	    objc, argv, (char *) tablePtr, flags);
+	    objc, (CONST84 char **) argv, (char *) tablePtr, flags);
     ckfree((char *) argv);
     if (result != TCL_OK) {
 	return TCL_ERROR;
@@ -1678,12 +1674,6 @@ TableDisplay(ClientData clientdata)
     TableWhatCell(tablePtr, invalidX+invalidWidth-1,
 	    invalidY+invalidHeight-1, &rowTo, &colTo);
     tablePtr->flags &= ~AVOID_SPANS;
-
-#ifdef DEBUG
-    tcl_dprintf(tablePtr->interp, "%d,%d => %d,%d",
-	    rowFrom+tablePtr->rowOffset, colFrom+tablePtr->colOffset,
-	    rowTo+tablePtr->rowOffset, colTo+tablePtr->colOffset);
-#endif
 
     /* 
      * Initialize colTagsCache hash table to cache column tag names.
@@ -3377,7 +3367,7 @@ TableFetchSelection(clientData, offset, buffer, maxBytes)
     Tcl_HashSearch search;
     int length, count, lastrow=0, needcs=0, r, c, listArgc, rslen=0, cslen=0;
     int numcols, numrows;
-    char **listArgv;
+    CONST84 char **listArgv;
 
     /* if we are not exporting the selection ||
      * we have no data source, return */

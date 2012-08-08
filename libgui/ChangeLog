@@ -1,3 +1,49 @@
+2012-08-08  Roland Schwingel <roland.schwingel@onevision.com>
+
+	* src/subcommand.c,src/subcommand.h
+	(subcommand_implementation,ide_create_command_with_subcommands):
+	Make some params const to match tcl/tk changes.
+	* src/tclcursor.c (get_cursor_size,get_cursor_position): Ditto.
+	* src/tclmsgbox.c: Include windows.h early.
+	(msgbox_init,msgbox_exit): Take care about encodings to windows functions.
+	(msgbox_thread): Use correct api call here.
+	(msgbox_internal,msgbox): Make CONST84 where needed.
+	* src/tclwinmode.c (seterrormode_command): Ditto.
+	* src/tclshellexe.c (shell_execute_command): Ditto. Plus correct cast return
+	value to shut up 64bit gcc.
+	* src/tclwinfont.c (win_choose_font): Make CONST84 where needed and
+	use dedicated windows api.
+	* src/tclwinprint.c (winprint_page_setup_command): Make const/CONST84 where needed.
+	(winprint_print_text_options,winprint_print_text_invoke,winprint_print_command): Ditto.
+	(winprint_print_text_invoke,): Ditto.
+	(winprint_start,winprint_print_commandwinprint_abort_command): use dedicated windows structs/api.
+	* src/tkTable.c: Obsolete old dprint stuff.
+	(StringifyObjects,Tk_TableObjCmd,TableWidgetObjCmd,TableConfigure,TableFetchSelection): adjust const.
+	(selCmdNames,commandNames,updateOpts): make const.
+	* src/tkTable.h: Adjust windows includes. include stdint.h. define CONST86 if missing. Deine
+	PTR2INT/INT2PTR taken from tcl if missing. Make some functions const.
+	* src/tkTableCmds.c: Make bdCmdNames and clearnames CONST84.
+	* src/tkTableEdit.c: Make modCmdNamesand rcCmdNames CONST84.
+	* src/tkTableTag.c: Make tagCmdNames CONST84.
+	(TableTagGetEntry): Make param argcv CONST84.
+	(TableInitTags): Make some internal strings CONST84.
+	(FindRowColTag): Ditto.
+ 	(Table_TagCmd): Ditto.
+	* src/tkTableUtil.c (TableOptionBdSet):Ditto.
+	(TableOptionBdGet): Make retval CONST86. Fix ptr/int arithmetics.
+	(Cmd_OptionSet): Make param value CONST84.
+	(Cmd_OptionGet): Make retval CONST86.
+	* src/tkTableWin.c (StickyPrintProc): Ditto. Make some internal strings CONST84.
+	(StickyParseProc): Make param value CONST84.
+	* src/tkWarpPointer.c: Include windows.h ahead of tk.h.
+	(WarpPointer): Remove unused var.
+	* src/tkWinPrintCanvas.c (PrintCanvasCmd): use dedicated windows structs/api.
+	Fix casting.
+	* src/tkWinPrintText.c (PrintTextCmd): Add #if case for compiling against tcl 8.5 and up.
+	use dedicated windows structs/api.
+	(ide_delete_print_text_command): Delete unused static function.
+	(DisplayDLineToDrawable): Add #if case for compiling against tcl 8.5 and up. Fix casting.
+
 2012-03-30  Roland Schwingel  <roland.schwingel@onevision.com>
 
 	* library/looknfeel.tcl: Update copyright to 1997-2012 Red Hat, Inc.

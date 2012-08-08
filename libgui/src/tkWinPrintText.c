@@ -243,13 +243,11 @@ PrintTextCmd(clientData, interp, argc, argv)
     DLine *dlPtr;
     TkWinDrawable *PrinterDrawable;
     Tk_Window tkwin;
-    Tk_Item *itemPtr;
     int maxHeight;
     DLine *prevPtr;
     Pixmap pixmap;
-    int bottomY = 0;		/* Initialization needed only to stop
-				 * compiler warnings. */
-    DOCINFO *lpdi = (DOCINFO *) ckalloc(sizeof(DOCINFO));
+
+    DOCINFOA *lpdi = (DOCINFOA *) ckalloc(sizeof(DOCINFOA));
     TkTextIndex first, last;
     int numLines;
     HDC hDCpixmap;
@@ -292,7 +290,7 @@ PrintTextCmd(clientData, interp, argc, argv)
     memset(lpdi,0,sizeof(DOCINFO));
     lpdi->cbSize=sizeof(DOCINFO);
     lpdi->lpszDocName = (LPCSTR) ckalloc(255);
-    sprintf((char*)lpdi->lpszDocName,"SN - Printing\0");
+    strcpy((char*)lpdi->lpszDocName,"SN - Printing\0");
     lpdi->lpszOutput=NULL;
 
     textPtr = (TkText *)(textCmd.clientData);
@@ -358,16 +356,22 @@ PrintTextCmd(clientData, interp, argc, argv)
     /* Make the text widget big enough for all the
     text to be seen. */
 
+#if (TCL_MAJOR_VERSION >= 8) && (TCL_MINOR_VERSION >= 5)
+    numLines = TkBTreeNumLines(textPtr->sharedTextPtr->tree,textPtr);
+    TkTextMakeByteIndex(textPtr->sharedTextPtr->tree, textPtr, 0, 0, &first);
+    TkTextMakeByteIndex(textPtr->sharedTextPtr->tree, textPtr, numLines, 100, &last);	 
+    TkTextChanged(textPtr->sharedTextPtr, textPtr, &first, &last);
+#elif (TCL_MAJOR_VERSION >= 8) && (TCL_MINOR_VERSION >= 1)
     numLines = TkBTreeNumLines(textPtr->tree);
-#if (TCL_MAJOR_VERSION >= 8) && (TCL_MINOR_VERSION >= 1)
     TkTextMakeByteIndex(textPtr->tree, 0, 0, &first);
     TkTextMakeByteIndex(textPtr->tree, numLines, 100, &last);
+    TkTextChanged(textPtr, &first, &last);
 #else
+    numLines = TkBTreeNumLines(textPtr->tree);
     TkTextMakeIndex(textPtr->tree, 0, 0, &first);
     TkTextMakeIndex(textPtr->tree, numLines, 100, &last);
-#endif
     TkTextChanged(textPtr, &first, &last);
-
+#endif
     /*
      * Set the display info flag to out-of-date.
      */
@@ -403,7 +407,7 @@ PrintTextCmd(clientData, interp, argc, argv)
 
     tiles_high = ( maxHeight / page_Y_size ); /* start at page zero */
 
-    StartDoc(pd.hDC,lpdi);
+    StartDocA(pd.hDC,lpdi);
     for (tile_y = 0; tile_y <= tiles_high;tile_y++) {
 	SetViewportOrgEx(pd.hDC,0,-(tile_y*Ptr_pixY),NULL);
 
@@ -437,8 +441,11 @@ PrintTextCmd(clientData, interp, argc, argv)
     /*
      * Pitch the info again.
      */
+    #if (TCL_MAJOR_VERSION >= 8) && (TCL_MINOR_VERSION >= 5)
+    TkTextChanged(textPtr->sharedTextPtr,textPtr, &first, &last);
+    #else
     TkTextChanged(textPtr, &first, &last);
-
+    #endif
     /*
      * Display info not valid anymore.
      */
@@ -453,14 +460,6 @@ error:
     ckfree ((char*) lpdi->lpszDocName);
     ckfree ((char*) lpdi);
     return TCL_ERROR;
-}
-
-
-
-static void 
-ide_delete_print_text_command(ClientData clientData)
-{
-  /* destructor code here.*/
 }
 
 int
@@ -498,7 +497,7 @@ DisplayDLineToDrawable(textPtr, dlPtr, prevPtr, drawable)
     register TkTextDispChunk *chunkPtr;
     TextDInfo *dInfoPtr = textPtr->dInfoPtr;
     Display *display;
-    int height, x;
+    int x;
 
     /*
      * First, clear the area of the line to the background color for the
@@ -518,21 +517,36 @@ DisplayDLineToDrawable(textPtr, dlPtr, prevPtr, drawable)
 	    continue;
 	} else {
 	    x = chunkPtr->x + dInfoPtr->x - dInfoPtr->curPixelOffset;
+       #if (TCL_MAJOR_VERSION >= 8) && (TCL_MINOR_VERSION >= 5)
+	    if ((x + chunkPtr->width <= 0) || (x >= dInfoPtr->maxX)) {
+	        (*chunkPtr->displayProc)(textPtr, chunkPtr, -chunkPtr->width,
+		    dlPtr->y,
+		    dlPtr->height - dlPtr->spaceAbove - dlPtr->spaceBelow,
+		    dlPtr->baseline - dlPtr->spaceAbove, display, (Drawable)drawable,
+		    dlPtr->y + dlPtr->spaceAbove);
+	    } else {
+	        (*chunkPtr->displayProc)(textPtr, chunkPtr, x, dlPtr->y,
+		    dlPtr->height - dlPtr->spaceAbove - dlPtr->spaceBelow,
+		    dlPtr->baseline - dlPtr->spaceAbove, display, (Drawable)drawable,
+		    dlPtr->y + dlPtr->spaceAbove);
+	    }
+	    #else
 	    if ((x + chunkPtr->width <= 0) || (x >= dInfoPtr->maxX)) {
 	        (*chunkPtr->displayProc)(chunkPtr, -chunkPtr->width,
 		    dlPtr->y,
 		    dlPtr->height - dlPtr->spaceAbove - dlPtr->spaceBelow,
-		    dlPtr->baseline - dlPtr->spaceAbove, display, (unsigned long)drawable,
+		    dlPtr->baseline - dlPtr->spaceAbove, display, (Drawable)drawable,
 		    dlPtr->y + dlPtr->spaceAbove);
 	    } else {
 	        (*chunkPtr->displayProc)(chunkPtr, x, dlPtr->y,
 		    dlPtr->height - dlPtr->spaceAbove - dlPtr->spaceBelow,
-		    dlPtr->baseline - dlPtr->spaceAbove, display, (unsigned long)drawable,
+		    dlPtr->baseline - dlPtr->spaceAbove, display, (Drawable)drawable,
 		    dlPtr->y + dlPtr->spaceAbove);
 	    }
+	    #endif
 	}
     }
 
 }
 
-#endif /* _WIN */
+#endif /* _WIN32 */

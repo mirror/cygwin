@@ -16,12 +16,12 @@
 
 static int
 shell_execute_command (ClientData clientData, Tcl_Interp *interp,
-		       int argc, char *argv[])
+		       int argc, CONST84 char *argv[])
 {
-  char	*operation;
-  char	*file;
-  char	*param;
-  char	*dir;
+  CONST84 char	*operation;
+  CONST84 char	*file;
+  CONST84 char	*param;
+  CONST84 char	*dir;
   int	ret;
 
   if (argc < 3 || argc > 5)
@@ -55,7 +55,7 @@ shell_execute_command (ClientData clientData, Tcl_Interp *interp,
   else
     dir = NULL;
 
-  ret = (int)ShellExecute(NULL, operation, file, param, dir, SW_SHOWNORMAL);
+  ret = (int)(ssize_t)ShellExecuteA(NULL, operation, file, param, dir, SW_SHOWNORMAL);
   if (ret <= 32)
     {
       Tcl_AppendResult(interp, strerror(ret), NULL);

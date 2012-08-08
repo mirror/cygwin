@@ -21,7 +21,7 @@ struct ide_subcommand_table
 
 /* Define a command with subcommands.  */
 int ide_create_command_with_subcommands
-  (Tcl_Interp *interp, char *name, const struct ide_subcommand_table *table,
+  (Tcl_Interp *interp, const char *name, const struct ide_subcommand_table *table,
    ClientData, Tcl_CmdDeleteProc *);
 
 #ifdef __cplusplus

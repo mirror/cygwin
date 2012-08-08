@@ -968,7 +968,7 @@ gdb_load_info (ClientData clientData, Tcl_Interp *interp,
       gdbtk_set_result (interp, "Open of %s failed", filename);
       return TCL_ERROR;
     }
-  old_cleanups = make_cleanup_bfd_close (loadfile_bfd);
+  old_cleanups = make_cleanup_bfd_unref (loadfile_bfd);
 
   if (!bfd_check_format (loadfile_bfd, bfd_object))
     {
@@ -2270,7 +2270,7 @@ gdb_loc (ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST obj
       struct symtabs_and_lines sals;
       int nelts;
 
-      sals = decode_line_spec (Tcl_GetStringFromObj (objv[1], NULL), 1);
+      sals = decode_line_with_current_source (Tcl_GetStringFromObj (objv[1], NULL), 1);
 
       nelts = sals.nelts;
       sal = sals.sals[0];

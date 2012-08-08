@@ -64,8 +64,10 @@ extern gdb_result GDB_val_print (struct type *type, char *valaddr,
 extern gdb_result GDB_value_fetch_lazy (value_ptr value);
 extern gdb_result GDB_value_equal (value_ptr val1, value_ptr val2,
 				   int *result);
+/*
 extern gdb_result GDB_parse_exp_1 (char **stringptr, struct block *block,
 				   int comma, struct expression **result);
+*/
 extern gdb_result GDB_evaluate_type (struct expression *exp,
 				     value_ptr * result);
 extern gdb_result GDB_block_for_pc (CORE_ADDR pc, struct block **result);

@@ -598,7 +598,7 @@ gdb_stop (ClientData clientData, Tcl_Interp *interp,
       if (target_ignore != (void (*) (void)) current_target.to_stop)
 	target_stop (gdbtk_get_ptid ());
       else
-	quit_flag = 1;		/* hope something sees this */
+	set_quit_flag ();		/* hope something sees this */
     }
 
   return TCL_OK;

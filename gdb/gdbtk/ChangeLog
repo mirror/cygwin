@@ -1,3 +1,10 @@
+2012-10-10  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-hooks.c (gdbtk_memory_changed): Change LEN
+	from int to ssize_t to match changes in the API.
+	(x_event): Use set_quit_flag to set the quit_flag.
+	* generic/gdbtk-cmds.c (gdb_stop): Likewise.
+
 2012-08-08  Roland Schwingel  <roland.schwingel@onevision.com>
 
 	* generic/gdbtk-cmds.c (gdb_load_info): Replace call to

@@ -15,7 +15,7 @@
  *  OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
  *  SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  *
- *  $Id: features.h,v 1.27 2011/07/20 19:41:15 yselkowitz Exp $
+ *  $Id: features.h,v 1.28 2012/10/16 18:45:23 corinna Exp $
  */
 
 #ifndef _SYS_FEATURES_H
@@ -24,6 +24,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* Macro to test version of GCC.  Returns 0 for non-GCC or too old GCC. */
+#ifndef __GNUC_PREREQ
+# if defined __GNUC__ && defined __GNUC_MINOR__
+#  define __GNUC_PREREQ(maj, min) \
+	((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
+# else
+#  define __GNUC_PREREQ(maj, min) 0
+# endif
+#endif /* __GNUC_PREREQ */
 
 /* RTEMS adheres to POSIX -- 1003.1b with some features from annexes.  */
 

@@ -1,5 +1,5 @@
 /*
- *  $Id: _default_types.h,v 1.2 2008/06/11 22:14:54 jjohnstn Exp $
+ *  $Id: _default_types.h,v 1.3 2012/10/16 18:45:23 corinna Exp $
  */
 
 #ifndef _MACHINE__DEFAULT_TYPES_H
@@ -12,8 +12,7 @@ extern "C" {
 /*
  * Guess on types by examining *_MIN / *_MAX defines.
  */
-#if defined(__GNUC__) && ((__GNUC__ >= 4) || (__GNUC__ >= 3 ) \
-  && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ > 2 ))
+#if __GNUC_PREREQ (3, 3)
 /* GCC >= 3.3.0 has __<val>__ implicitly defined. */
 #define __EXP(x) __##x##__
 #else

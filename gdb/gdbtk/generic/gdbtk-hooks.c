@@ -94,8 +94,8 @@ static void gdbtk_pre_add_symbol (const char *);
 static void gdbtk_print_frame_info (struct symtab *, int, int, int);
 static void gdbtk_post_add_symbol (void);
 static void gdbtk_register_changed (int regno);
-static void gdbtk_memory_changed (CORE_ADDR addr, ssize_t len,
-				  const bfd_byte *data);
+static void gdbtk_memory_changed (struct inferior *inferior, CORE_ADDR addr,
+				  ssize_t len, const bfd_byte *data);
 static void gdbtk_selected_frame_changed (int);
 static void gdbtk_context_change (int);
 static void gdbtk_error_begin (void);
@@ -399,7 +399,8 @@ gdbtk_register_changed (int regno)
 }
 
 static void
-gdbtk_memory_changed (CORE_ADDR addr, ssize_t len, const bfd_byte *data)
+gdbtk_memory_changed (struct inferior *inferior, CORE_ADDR addr,
+		      ssize_t len, const bfd_byte *data)
 {
   if (Tcl_Eval (gdbtk_interp, "gdbtk_memory_changed") != TCL_OK)
     report_error ();

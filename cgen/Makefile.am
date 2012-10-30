@@ -29,6 +29,9 @@ srcroot = $(srcdir)/..
 
 all-local: stamp-cgen
 
+install-pdf:
+install-html:
+
 stamp-cgen: $(CGENFILES)
 	rm -f stamp-cgen
 	echo timestamp > stamp-cgen

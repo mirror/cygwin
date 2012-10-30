@@ -1,3 +1,8 @@
+2012-10-29  Mike Stump  <mikestump@comcast.net>
+
+	* Makefile.am: Add install-html and install-pdf.
+	* Makefile.in: Regenerate.
+
 2011-08-22  Nick Clifton  <nickc@redhat.com>
 
 	* cpu/fr30.cpu: Delete.  Move to top level cpu directory.

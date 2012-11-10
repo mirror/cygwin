@@ -109,11 +109,7 @@ static int tracepoint_exists (char *args);
 void gdbtk_create_breakpoint (struct breakpoint *);
 void gdbtk_delete_breakpoint (struct breakpoint *);
 void gdbtk_modify_breakpoint (struct breakpoint *);
-void gdbtk_create_tracepoint (int);
-void gdbtk_delete_tracepoint (int);
-void gdbtk_modify_tracepoint (int);
 static void breakpoint_notify (int, const char *);
-static void tracepoint_notify (int, const char *);
 
 int
 Gdbtk_Breakpoint_Init (Tcl_Interp *interp)
@@ -586,7 +582,7 @@ gdbtk_modify_breakpoint (struct breakpoint *b)
 
 /* This is the generic function for handling changes in
  * a breakpoint.  It routes the information to the Tcl
- * command "gdbtk_tcl_breakpoint" in the form:
+ * command "gdbtk_tcl_breakpoint" (or "gdbtk_tcl_tracepoint") in the form:
  *   gdbtk_tcl_breakpoint action b_number b_address b_line b_file
  * On error, the error string is written to gdb_stdout.
  */
@@ -597,15 +593,29 @@ breakpoint_notify (int num, const char *action)
   struct breakpoint *b;
 
   b = get_breakpoint (num);
+  if (b == NULL)
+    {
+      struct tracepoint *tp;
+
+      tp = get_tracepoint (num);
+      if (tp == NULL)
+	return;
+      b = &tp->base;
+    }
 
   if (b->number < 0
       /* FIXME: should not be so restrictive... */
-      || b->type != bp_breakpoint)
+      && b->type != bp_breakpoint
+      && b->type != bp_tracepoint
+      && b->type != bp_fast_tracepoint)
     return;
 
   /* We ensure that ACTION contains no special Tcl characters, so we
      can do this.  */
-  buf = xstrprintf ("gdbtk_tcl_breakpoint %s %d", action, b->number);
+  if (b->type == bp_breakpoint)
+    buf = xstrprintf ("gdbtk_tcl_breakpoint %s %d", action, b->number);
+  else
+    buf = xstrprintf ("gdbtk_tcl_tracepoint %s %d", action, b->number);
 
   if (Tcl_Eval (gdbtk_interp, buf) != TCL_OK)
     report_error ();
@@ -853,41 +863,4 @@ gdb_tracepoint_exists_command (ClientData clientData,
 
   Tcl_SetIntObj (result_ptr->obj_ptr, tracepoint_exists (args));
   return TCL_OK;
-}
-
-/*
- * This section contains functions which deal with tracepoint
- * events from gdb.
- */
-
-void
-gdbtk_create_tracepoint (int num)
-{
-  tracepoint_notify (num, "create");
-}
-
-void
-gdbtk_delete_tracepoint (int num)
-{
-  tracepoint_notify (num, "delete");
-}
-
-void
-gdbtk_modify_tracepoint (int num)
-{
-  tracepoint_notify (num, "modify");
-}
-
-static void
-tracepoint_notify (int num, const char *action)
-{
-  char *buf;
-
-  /* We ensure that ACTION contains no special Tcl characters, so we
-     can do this.  */
-  buf = xstrprintf ("gdbtk_tcl_tracepoint %s %d", action, num);
-
-  if (Tcl_Eval (gdbtk_interp, buf) != TCL_OK)
-    report_error ();
-  free(buf); 
 }

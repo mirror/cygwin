@@ -1,5 +1,10 @@
 2012-11-10  Keith Seitz  <keiths@redhat.com>
 
+	* generic/gdbtk-bp.c (breakpoint_notify): Fix logic error
+	when detecting breakpoint types to be handled.
+
+2012-11-10  Keith Seitz  <keiths@redhat.com>
+
 	* generic/gdbtk-bp.c (breakpoint_notify): Handle tracepoints, too.
 	(tracepoint_notify): Remove.
 	(gdbtk_create_tracepoint): Remove.

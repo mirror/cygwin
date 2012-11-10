@@ -605,9 +605,9 @@ breakpoint_notify (int num, const char *action)
 
   if (b->number < 0
       /* FIXME: should not be so restrictive... */
-      && b->type != bp_breakpoint
-      && b->type != bp_tracepoint
-      && b->type != bp_fast_tracepoint)
+      || (b->type != bp_breakpoint
+	  && b->type != bp_tracepoint
+	  && b->type != bp_fast_tracepoint))
     return;
 
   /* We ensure that ACTION contains no special Tcl characters, so we

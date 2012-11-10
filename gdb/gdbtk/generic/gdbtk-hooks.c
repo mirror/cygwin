@@ -71,9 +71,6 @@ int gdbtk_force_detach = 0;
 extern void gdbtk_create_breakpoint (struct breakpoint *);
 extern void gdbtk_delete_breakpoint (struct breakpoint *);
 extern void gdbtk_modify_breakpoint (struct breakpoint *);
-extern void gdbtk_create_tracepoint (int);
-extern void gdbtk_delete_tracepoint (int);
-extern void gdbtk_modify_tracepoint (int);
 
 static void gdbtk_architecture_changed (struct gdbarch *);
 static void gdbtk_trace_find (char *arg, int from_tty);
@@ -126,9 +123,6 @@ gdbtk_add_hooks (void)
   observer_attach_breakpoint_created (gdbtk_create_breakpoint);
   observer_attach_breakpoint_modified (gdbtk_modify_breakpoint);
   observer_attach_breakpoint_deleted (gdbtk_delete_breakpoint);
-  observer_attach_tracepoint_created (gdbtk_create_tracepoint);
-  observer_attach_tracepoint_modified (gdbtk_modify_tracepoint);
-  observer_attach_tracepoint_deleted (gdbtk_delete_tracepoint);
   observer_attach_architecture_changed (gdbtk_architecture_changed);
   observer_attach_memory_changed (gdbtk_memory_changed);
 

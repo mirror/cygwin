@@ -1,3 +1,13 @@
+2012-11-10  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-bp.c (breakpoint_notify): Handle tracepoints, too.
+	(tracepoint_notify): Remove.
+	(gdbtk_create_tracepoint): Remove.
+	(gdbtk_delete_tracepoint): Remove.
+	(gdbtk_modify_tracepoint): Remove.
+	* generic/gdbtk-hooks.c: Remove deleted function extern declarations.
+	(gdbtk_add_hooks): Remove tracepoint observers.
+
 2012-10-24  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-hooks.c (gdbtk_memory_changed): Update for

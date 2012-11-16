@@ -1,3 +1,10 @@
+2012-11-16  Keith Seitz  <keiths@redhat.com>
+
+	From Pierre Muller  <muller@sourceware.org>
+	Adapt to change in gdb/configure.ac
+	Don't check for ctype.h, time.h.
+	* generic/gdbtk-cmds.c: Don't use HAVE_CTYPE_H.
+
 2012-11-10  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-bp.c (breakpoint_notify): Fix logic error

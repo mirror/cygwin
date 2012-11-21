@@ -445,7 +445,8 @@ register_changed_p (int regnum, map_arg arg)
   char raw_buffer[MAX_REGISTER_SIZE];
 
   if (!target_has_registers
-      || !frame_register_read (get_selected_frame (NULL), regnum, raw_buffer))
+      || !deprecated_frame_register_read (get_selected_frame (NULL), regnum,
+					  raw_buffer))
     return;
 
   if (memcmp (&old_regs[regnum * MAX_REGISTER_SIZE], raw_buffer,

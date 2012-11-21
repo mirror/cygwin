@@ -1,3 +1,9 @@
+2012-11-21  Pierre Muller  <muller@sourceware.org>
+
+	* generic/gdbtk-register.c (register_changed_p): Adapt to
+	function name change from frame_register_read to
+	deprecated_frame_register_read.
+
 2012-11-16  Keith Seitz  <keiths@redhat.com>
 
 	From Pierre Muller  <muller@sourceware.org>

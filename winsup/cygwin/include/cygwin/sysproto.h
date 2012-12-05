@@ -1,0 +1,96 @@
+/* cygwin/sysproto.h
+
+   Copyright 2003, 2012 Red Hat, Inc.
+
+This file is part of Cygwin.
+
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
+
+/* cygwin/sysproto.h header file for Cygwin.  */
+
+#ifndef _CYGWIN_SYSPROTO_H
+#define _CYGWIN_SYSPROTO_H
+#define _SYS_SYSPROTO_H_ /* Keep it, used by BSD files */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <sys/types.h>
+
+#pragma pack (push, 4)
+struct msgctl_args {
+  int     msqid;
+  int     cmd;
+  _TYPE64 (struct msqid_ds *, buf);
+};
+
+struct msgget_args {
+  key_t   key;
+  int     msgflg;
+};
+
+struct msgrcv_args {
+  int     msqid;
+  int     msgflg;
+  _TYPE64 (void *, msgp);
+  _TYPE64 (size_t, msgsz);
+  _TYPE64 (long, msgtyp);
+};
+
+struct msgsnd_args {
+  int     msqid;
+  int     msgflg;
+  _TYPE64 (const void *, msgp);
+  _TYPE64 (size_t, msgsz);
+};
+
+struct semctl_args {
+  int     semid;
+  int     semnum;
+  int     cmd;
+  union   semun *arg;
+};
+
+struct semget_args {
+  key_t   key;
+  int     nsems;
+  int     semflg;
+};
+
+struct semop_args {
+  int     semid;
+  struct  sembuf *sops;
+  size_t  nsops;
+};
+
+struct shmat_args {
+  int     shmid;
+  const void *shmaddr;
+  int     shmflg;
+};
+
+struct shmctl_args {
+  int     shmid;
+  int     cmd;
+  struct shmid_ds *buf;
+};
+
+struct shmdt_args {
+  const void *shmaddr;
+};
+
+struct shmget_args {
+  key_t   key;
+  size_t  size;
+  int     shmflg;
+};
+#pragma pack (pop)
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _CYGWIN_SYSPROTO_H */

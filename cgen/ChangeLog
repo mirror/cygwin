@@ -8521,3 +8521,16 @@ Tue Jul 21 10:51:42 1998  Doug Evans  <devans@seba.cygnus.com>
 
 	* Version 0.6.0.
 	Clean up pass over everything, so starting fresh.
+
+Copyright (C) 1998-2012 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Local Variables:
+mode: change-log
+left-margin: 8
+fill-column: 74
+version-control: never
+End:

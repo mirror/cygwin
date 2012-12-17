@@ -48,3 +48,9 @@ generators. A handful of CPU descriptions are also included:
 	* Fujitsu FR-30
 	* Mitsubishi M32R/D
 	* SPARC [incomplete]
+
+Copyright (C) 2012 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.

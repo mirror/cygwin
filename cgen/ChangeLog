@@ -1,3 +1,25 @@
+2012-12-17  Nick Clifton  <nickc@redhat.com>
+
+	* AUTHORS: Add copyright notice.
+	* INSTALL: Likewise.
+	* Makefile.am: Likewise.
+	* NEWS: Likewise.
+	* co-for-gen-all: Likewise.
+	* configure.in: Likewise.
+	* gen-all: Likewise.
+	* gen-all-desc: Likewise.
+	* gen-all-doc: Likewise.
+	* gen-all-intrinsics: Likewise.
+	* gen-all-opcodes: Likewise.
+	* gen-all-sid: Likewise.
+	* gen-all-sim: Likewise.
+	* doc/Makefile.am: Likewise.
+	* testsuite/Makefile.am: Likewise.
+	* Makefile.in: Regenerate.
+	* configure: Regenerate.
+	* doc/Makefile.in: Regenerate.
+	* testsuite/Makefile.in: Regenerate.
+
 2012-10-29  Mike Stump  <mikestump@comcast.net>
 
 	* Makefile.am: Add install-html and install-pdf.

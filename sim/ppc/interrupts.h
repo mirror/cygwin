@@ -4,7 +4,7 @@
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
+    the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
     This program is distributed in the hope that it will be useful,
@@ -94,9 +94,7 @@ typedef enum {
   privileged_instruction_program_interrupt,
   trap_program_interrupt,
   optional_instruction_program_interrupt, /* subset of illegal instruction */
-#ifdef WITH_OPTION_MPC860C0
   mpc860c0_instruction_program_interrupt, /* fwd br, taken but not predicted, near EO page */
-#endif // WITH_OPTION_MPC860C0
   nr_program_interrupt_reasons
 } program_interrupt_reasons;
 

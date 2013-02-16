@@ -1,3 +1,8 @@
+2013-02-16  Keith Seitz  <keiths@redhat.com>
+
+	* rhabout.c (extra_text): Use Tcl_SetObjResult instead
+	of setting the interpreter's result directly.
+
 2004-12-08  Keith Seitz  <kseitz@sources.redhat.com>
 
 	From Ben Elliston (bje@gnu.org):

@@ -22,7 +22,8 @@ extra_text (ClientData clientData,
                 Tcl_Interp *interp,
                 int objc, Tcl_Obj *CONST objv[])
 {
-  interp->result = "\nThis is a sample plug-in\n";
+  Tcl_SetObjResult (interp,
+		    Tcl_NewStringObj ("\nThis is a sample plug-in\n", -1));
   return TCL_OK;
 }
 

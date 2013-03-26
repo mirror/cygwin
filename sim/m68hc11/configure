@@ -601,10 +601,8 @@ ac_includes_default="\
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 cgen_breaks
+m68hc11_extra_objs
 SIM_DV_SOCKSER_O
-cgen
-cgendir
-CGEN_MAINT
 REPORT_BUGS_TEXI
 REPORT_BUGS_TO
 PKGVERSION
@@ -761,14 +759,12 @@ enable_sim_trace
 enable_sim_profile
 with_pkgversion
 with_bugurl
-enable_sim_endian
+enable_sim_inline
 enable_sim_alignment
 enable_sim_hostendian
-enable_sim_scache
-enable_sim_default_model
-enable_sim_environment
-enable_sim_inline
-enable_cgen_maint
+enable_werror
+enable_build_warnings
+enable_sim_build_warnings
 enable_sim_hardware
 '
       ac_precious_vars='build_alias
@@ -1411,14 +1407,14 @@ Optional Features:
   --enable-sim-stdio			Specify whether to use stdio for console input/output.
   --enable-sim-trace=opts		Enable tracing flags
   --enable-sim-profile=opts		Enable profiling flags
-  --enable-sim-endian=endian		Specify target byte endian orientation.
+  --enable-sim-inline=inlines		Specify which functions should be inlined.
   --enable-sim-alignment=align		Specify strict,  nonstrict or forced alignment of memory accesses.
   --enable-sim-hostendian=end		Specify host byte endian orientation.
-  --enable-sim-scache=size		Specify simulator execution cache size.
-  --enable-sim-default-model=model	Specify default model to simulate.
-  --enable-sim-environment=environment	Specify mixed, user, virtual or operating environment.
-  --enable-sim-inline=inlines		Specify which functions should be inlined.
-  --enable-cgen-maint=DIR    build cgen generated files
+  --enable-werror         treat compile warnings as errors
+  --enable-build-warnings enable build-time compiler warnings if gcc is used
+  --enable-sim-build-warnings
+                          enable SIM specific build-time compiler warnings if
+                          gcc is used
   --enable-sim-hardware=LIST
                           Specify the hardware to be included in the build.
 
@@ -12277,7 +12273,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12280 "configure"
+#line 12276 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12383,7 +12379,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12386 "configure"
+#line 12382 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12874,51 +12870,50 @@ sim_link_links="${sim_link_links} targ-vals.def"
 
 
 
-wire_endian=""
-default_endian="BIG_ENDIAN"
-# Check whether --enable-sim-endian was given.
-if test "${enable_sim_endian+set}" = set; then :
-  enableval=$enable_sim_endian; case "${enableval}" in
-  b*|B*) sim_endian="-DWITH_TARGET_BYTE_ORDER=BIG_ENDIAN";;
-  l*|L*) sim_endian="-DWITH_TARGET_BYTE_ORDER=LITTLE_ENDIAN";;
-  yes)	 if test x"$wire_endian" != x; then
-	   sim_endian="-DWITH_TARGET_BYTE_ORDER=${wire_endian}"
-	 else
-           if test x"$default_endian" != x; then
-	     sim_endian="-DWITH_TARGET_BYTE_ORDER=${default_endian}"
-	   else
-	     echo "No hard-wired endian for target $target" 1>&6
-	     sim_endian="-DWITH_TARGET_BYTE_ORDER=0"
-	   fi
-	 fi;;
-  no)	 if test x"$default_endian" != x; then
-	   sim_endian="-DWITH_DEFAULT_TARGET_BYTE_ORDER=${default_endian}"
-	 else
-	   if test x"$wire_endian" != x; then
-	     sim_endian="-DWITH_DEFAULT_TARGET_BYTE_ORDER=${wire_endian}"
-	   else
-	     echo "No default endian for target $target" 1>&6
-	     sim_endian="-DWITH_DEFAULT_TARGET_BYTE_ORDER=0"
-	   fi
-	 fi;;
-  *)	 as_fn_error "\"Unknown value $enableval for --enable-sim-endian\"" "$LINENO" 5; sim_endian="";;
+default_sim_inline=""
+# Check whether --enable-sim-inline was given.
+if test "${enable_sim_inline+set}" = set; then :
+  enableval=$enable_sim_inline; sim_inline=""
+case "$enableval" in
+  no)		sim_inline="-DDEFAULT_INLINE=0";;
+  0)		sim_inline="-DDEFAULT_INLINE=0";;
+  yes | 2)	sim_inline="-DDEFAULT_INLINE=ALL_C_INLINE";;
+  1)		sim_inline="-DDEFAULT_INLINE=INLINE_LOCALS";;
+  *) for x in `echo "$enableval" | sed -e "s/,/ /g"`; do
+       new_flag=""
+       case "$x" in
+	 *_INLINE=*)	new_flag="-D$x";;
+	 *=*)		new_flag=`echo "$x" | sed -e "s/=/_INLINE=/" -e "s/^/-D/"`;;
+	 *_INLINE)	new_flag="-D$x=ALL_C_INLINE";;
+	 *)		new_flag="-D$x""_INLINE=ALL_C_INLINE";;
+       esac
+       if test x"$sim_inline" = x""; then
+	 sim_inline="$new_flag"
+       else
+	 sim_inline="$sim_inline $new_flag"
+       fi
+     done;;
 esac
-if test x"$silent" != x"yes" && test x"$sim_endian" != x""; then
-  echo "Setting endian flags = $sim_endian" 6>&1
+if test x"$silent" != x"yes" && test x"$sim_inline" != x""; then
+  echo "Setting inline flags = $sim_inline" 6>&1
 fi
 else
-  if test x"$default_endian" != x; then
-  sim_endian="-DWITH_DEFAULT_TARGET_BYTE_ORDER=${default_endian}"
-else
-  if test x"$wire_endian" != x; then
-    sim_endian="-DWITH_TARGET_BYTE_ORDER=${wire_endian}"
+
+if test "x$cross_compiling" = "xno"; then
+  if test x"$GCC" != "x" -a x"${default_sim_inline}" != "x" ; then
+    sim_inline="${default_sim_inline}"
+    if test x"$silent" != x"yes"; then
+      echo "Setting inline flags = $sim_inline" 6>&1
+    fi
   else
-    sim_endian=
+    sim_inline=""
   fi
+else
+  sim_inline="-DDEFAULT_INLINE=0"
 fi
 fi
 
-wire_alignment="STRICT_ALIGNMENT"
+wire_alignment="NONSTRICT_ALIGNMENT"
 default_alignment=""
 
 # Check whether --enable-sim-alignment was given.
@@ -13214,143 +13209,137 @@ fi
 fi
 
 
-default_sim_scache="16384"
-# Check whether --enable-sim-scache was given.
-if test "${enable_sim_scache+set}" = set; then :
-  enableval=$enable_sim_scache; case "${enableval}" in
-  yes)	sim_scache="-DWITH_SCACHE=${default_sim_scache}";;
-  no)	sim_scache="-DWITH_SCACHE=0" ;;
-  [0-9]*) sim_scache="-DWITH_SCACHE=${enableval}";;
-  *)	as_fn_error "\"Bad value $enableval passed to --enable-sim-scache\"" "$LINENO" 5;
-	sim_scache="";;
+# Check whether --enable-werror was given.
+if test "${enable_werror+set}" = set; then :
+  enableval=$enable_werror; case "${enableval}" in
+     yes | y) ERROR_ON_WARNING="yes" ;;
+     no | n)  ERROR_ON_WARNING="no" ;;
+     *) as_fn_error "bad value ${enableval} for --enable-werror" "$LINENO" 5 ;;
+   esac
+fi
+
+
+# Enable -Werror by default when using gcc
+if test "${GCC}" = yes -a -z "${ERROR_ON_WARNING}" ; then
+    ERROR_ON_WARNING=yes
+fi
+
+WERROR_CFLAGS=""
+if test "${ERROR_ON_WARNING}" = yes ; then
+# NOTE: Disabled in the sim dir due to most sims generating warnings.
+#    WERROR_CFLAGS="-Werror"
+     true
+fi
+
+# The entries after -Wno-pointer-sign are disabled warnings which may
+# be enabled in the future, which can not currently be used to build
+# GDB.
+# NOTE: If you change this list, remember to update
+# gdb/doc/gdbint.texinfo.
+build_warnings="-Wall -Wdeclaration-after-statement -Wpointer-arith \
+-Wformat-nonliteral -Wno-pointer-sign \
+-Wno-unused -Wunused-value -Wunused-function \
+-Wno-switch -Wno-char-subscripts -Wmissing-prototypes"
+
+# Enable -Wno-format by default when using gcc on mingw since many
+# GCC versions complain about %I64.
+case "${host}" in
+  *-*-mingw32*) build_warnings="$build_warnings -Wno-format" ;;
 esac
-if test x"$silent" != x"yes" && test x"$sim_scache" != x""; then
-  echo "Setting scache size = $sim_scache" 6>&1
-fi
-else
-  sim_scache="-DWITH_SCACHE=${default_sim_scache}"
-fi
 
-
-
-default_sim_default_model="sh5"
-# Check whether --enable-sim-default-model was given.
-if test "${enable_sim_default_model+set}" = set; then :
-  enableval=$enable_sim_default_model; case "${enableval}" in
-  yes|no) as_fn_error "\"Missing argument to --enable-sim-default-model\"" "$LINENO" 5;;
-  *)	sim_default_model="-DWITH_DEFAULT_MODEL='\"${enableval}\"'";;
+# Check whether --enable-build-warnings was given.
+if test "${enable_build_warnings+set}" = set; then :
+  enableval=$enable_build_warnings; case "${enableval}" in
+  yes)	;;
+  no)	build_warnings="-w";;
+  ,*)   t=`echo "${enableval}" | sed -e "s/,/ /g"`
+        build_warnings="${build_warnings} ${t}";;
+  *,)   t=`echo "${enableval}" | sed -e "s/,/ /g"`
+        build_warnings="${t} ${build_warnings}";;
+  *)    build_warnings=`echo "${enableval}" | sed -e "s/,/ /g"`;;
 esac
-if test x"$silent" != x"yes" && test x"$sim_default_model" != x""; then
-  echo "Setting default model = $sim_default_model" 6>&1
+if test x"$silent" != x"yes" && test x"$build_warnings" != x""; then
+  echo "Setting compiler warning flags = $build_warnings" 6>&1
 fi
-else
-  sim_default_model="-DWITH_DEFAULT_MODEL='\"${default_sim_default_model}\"'"
 fi
-
-
-
-# Check whether --enable-sim-environment was given.
-if test "${enable_sim_environment+set}" = set; then :
-  enableval=$enable_sim_environment; case "${enableval}" in
-  all | ALL)             sim_environment="-DWITH_ENVIRONMENT=ALL_ENVIRONMENT";;
-  user | USER)           sim_environment="-DWITH_ENVIRONMENT=USER_ENVIRONMENT";;
-  virtual | VIRTUAL)     sim_environment="-DWITH_ENVIRONMENT=VIRTUAL_ENVIRONMENT";;
-  operating | OPERATING) sim_environment="-DWITH_ENVIRONMENT=OPERATING_ENVIRONMENT";;
-  *)   as_fn_error "\"Unknown value $enableval passed to --enable-sim-environment\"" "$LINENO" 5;
-       sim_environment="";;
+# Check whether --enable-sim-build-warnings was given.
+if test "${enable_sim_build_warnings+set}" = set; then :
+  enableval=$enable_sim_build_warnings; case "${enableval}" in
+  yes)	;;
+  no)	build_warnings="-w";;
+  ,*)   t=`echo "${enableval}" | sed -e "s/,/ /g"`
+        build_warnings="${build_warnings} ${t}";;
+  *,)   t=`echo "${enableval}" | sed -e "s/,/ /g"`
+        build_warnings="${t} ${build_warnings}";;
+  *)    build_warnings=`echo "${enableval}" | sed -e "s/,/ /g"`;;
 esac
-if test x"$silent" != x"yes" && test x"$sim_environment" != x""; then
-  echo "Setting sim environment = $sim_environment" 6>&1
+if test x"$silent" != x"yes" && test x"$build_warnings" != x""; then
+  echo "Setting GDB specific compiler warning flags = $build_warnings" 6>&1
 fi
-else
-  sim_environment="-DWITH_ENVIRONMENT=ALL_ENVIRONMENT"
 fi
+WARN_CFLAGS=""
+if test "x${build_warnings}" != x -a "x$GCC" = xyes
+then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking compiler warning flags" >&5
+$as_echo_n "checking compiler warning flags... " >&6; }
+    # Separate out the -Werror flag as some files just cannot be
+    # compiled with it enabled.
+    for w in ${build_warnings}; do
+	case $w in
+	-Werr*) WERROR_CFLAGS=-Werror ;;
+	*) # Check that GCC accepts it
+	    saved_CFLAGS="$CFLAGS"
+	    CFLAGS="$CFLAGS $w"
+	    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
 
+int
+main ()
+{
 
-default_sim_inline=""
-# Check whether --enable-sim-inline was given.
-if test "${enable_sim_inline+set}" = set; then :
-  enableval=$enable_sim_inline; sim_inline=""
-case "$enableval" in
-  no)		sim_inline="-DDEFAULT_INLINE=0";;
-  0)		sim_inline="-DDEFAULT_INLINE=0";;
-  yes | 2)	sim_inline="-DDEFAULT_INLINE=ALL_C_INLINE";;
-  1)		sim_inline="-DDEFAULT_INLINE=INLINE_LOCALS";;
-  *) for x in `echo "$enableval" | sed -e "s/,/ /g"`; do
-       new_flag=""
-       case "$x" in
-	 *_INLINE=*)	new_flag="-D$x";;
-	 *=*)		new_flag=`echo "$x" | sed -e "s/=/_INLINE=/" -e "s/^/-D/"`;;
-	 *_INLINE)	new_flag="-D$x=ALL_C_INLINE";;
-	 *)		new_flag="-D$x""_INLINE=ALL_C_INLINE";;
-       esac
-       if test x"$sim_inline" = x""; then
-	 sim_inline="$new_flag"
-       else
-	 sim_inline="$sim_inline $new_flag"
-       fi
-     done;;
-esac
-if test x"$silent" != x"yes" && test x"$sim_inline" != x""; then
-  echo "Setting inline flags = $sim_inline" 6>&1
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  WARN_CFLAGS="${WARN_CFLAGS} $w"
 fi
-else
-
-if test "x$cross_compiling" = "xno"; then
-  if test x"$GCC" != "x" -a x"${default_sim_inline}" != "x" ; then
-    sim_inline="${default_sim_inline}"
-    if test x"$silent" != x"yes"; then
-      echo "Setting inline flags = $sim_inline" 6>&1
-    fi
-  else
-    sim_inline=""
-  fi
-else
-  sim_inline="-DDEFAULT_INLINE=0"
-fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+	    CFLAGS="$saved_CFLAGS"
+	esac
+    done
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${WARN_CFLAGS} ${WERROR_CFLAGS}" >&5
+$as_echo "${WARN_CFLAGS} ${WERROR_CFLAGS}" >&6; }
 fi
 
 
-cgen_maint=no
-cgen=guile
-cgendir='$(srcdir)/../../cgen'
-# Check whether --enable-cgen-maint was given.
-if test "${enable_cgen_maint+set}" = set; then :
-  enableval=$enable_cgen_maint; case "${enableval}" in
-  yes)	cgen_maint=yes ;;
-  no)	cgen_maint=no ;;
+#
+# Add simulated hardware devices
+#
+hw_enabled=no
+case "${target}" in
+  m68hc11-*-*|m6811-*-*)
+	hw_enabled=yes
+	hw_extra_devices="m68hc11 m68hc11sio m68hc11eepr m68hc11tim m68hc11spi nvram"
+	SIM_SUBTARGET="$SIM_SUBTARGET -DTARGET_M68HC11=1"
+	;;
   *)
-	# argument is cgen install directory (not implemented yet).
-	# Having a `share' directory might be more appropriate for the .scm,
-	# .cpu, etc. files.
-	cgendir=${cgen_maint}/lib/cgen
-	cgen=guile
+	m68hc11_extra_objs=""
 	;;
 esac
-fi
-if test x${cgen_maint} != xno ; then
-  CGEN_MAINT=''
-else
-  CGEN_MAINT='#'
-fi
 
-
-
-
-
-
-if test x"always" != x"no"; then
+if test x"$hw_enabled" != x"no"; then
   enable_sim_hardware=yes
 else
   enable_sim_hardware=no
 fi
 
-if test """"; then
-  hardware=""""
+if test "$hw_devices"; then
+  hardware="$hw_devices"
 else
   hardware="cfi core pal glue"
 fi
-hardware="$hardware """
+hardware="$hardware $hw_extra_devices"
 
 sim_hw_cflags="-DWITH_HW=1"
 sim_hw="$hardware"
@@ -13370,7 +13359,7 @@ case ${enable_sim_hardware} in
 esac
 
 if test "$sim_hw_p" != yes; then
-  if test "always" = "always"; then
+  if test "$hw_enabled" = "always"; then
     as_fn_error "Sorry, but this simulator requires that hardware support
 be enabled. Please configure without --disable-hw-support." "$LINENO" 5
   fi
@@ -13454,11 +13443,23 @@ fi
 fi
 
 
-if test -z "$SIM_DV_SOCKSER_O"; then
-	as_fn_error "Sorry, but hardware support in this simulator
-unconditionally relies on dv-sockser.o which is unavailable for your host.
-Please fix this simulator." "$LINENO" 5
+for ac_header in string.h strings.h stdlib.h stdlib.h fcntl.h
+do :
+  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
+eval as_val=\$$as_ac_Header
+   if test "x$as_val" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
 fi
+
+done
+
+
+m68hc11_extra_objs="$SIM_DV_SOCKSER_O"
+
 
 
 ac_sources="$sim_link_files"
@@ -15719,6 +15720,5 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unrecognized options: $ac_unrecognized_opts" >&5
 $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
-
 
 

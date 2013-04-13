@@ -2993,11 +2993,11 @@ pc_function_name (CORE_ADDR pc)
   else
     {
       /* ... if that fails, look it up in the minimal symbols. */
-      struct minimal_symbol *msym = NULL;
+      struct bound_minimal_symbol msym;
 
       msym = lookup_minimal_symbol_by_pc (pc);
-      if (msym != NULL)
-	funcname = GDBTK_SYMBOL_SOURCE_NAME (msym);
+      if (msym.minsym != NULL)
+	funcname = GDBTK_SYMBOL_SOURCE_NAME (msym.minsym);
     }
 
   if (funcname == NULL)

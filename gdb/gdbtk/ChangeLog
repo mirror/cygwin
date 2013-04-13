@@ -1,3 +1,9 @@
+2013-04-13  Kevin Buettner  <kevinb@redhat.com>
+
+	* generic/gdbtk-cmds.c (pc_function_name): Adjust type of
+	`msym' to account for change in return type of
+	lookup_minimal_symbol_by_pc().
+
 2013-02-15  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-bp.c (gdb_find_bp_at_line): Update struct

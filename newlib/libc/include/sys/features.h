@@ -15,7 +15,7 @@
  *  OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
  *  SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  *
- *  $Id: features.h,v 1.27.2.2 2013/03/27 11:15:02 corinna Exp $
+ *  $Id: features.h,v 1.27.2.3 2013/04/22 10:34:02 corinna Exp $
  */
 
 #ifndef _SYS_FEATURES_H
@@ -34,6 +34,8 @@ extern "C" {
 #  define __GNUC_PREREQ(maj, min) 0
 # endif
 #endif /* __GNUC_PREREQ */
+/* Version with trailing underscores for BSD compatibility. */
+#define __GNUC_PREREQ__(ma, mi) __GNUC_PREREQ(ma, mi)
 
 /* RTEMS adheres to POSIX -- 1003.1b with some features from annexes.  */
 

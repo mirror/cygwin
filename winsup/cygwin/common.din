@@ -1,42 +1,100 @@
-LIBRARY "cygwin1.dll" BASE=0x180040000
-
-EXPORTS
+# Exported variables
 __argc DATA
 __argv DATA
-_check_for_executable DATA
 __check_rhosts_file DATA
-_ctype_ DATA
 __ctype_ptr__ DATA
-environ = __cygwin_environ DATA
 __cygwin_user_data DATA
+__mb_cur_max DATA
+__progname DATA
+__rcmd_errstr DATA
+_check_for_executable DATA
+_ctype_ DATA
 _daylight DATA
+_impure_ptr DATA
+_sys_errlist DATA
+_sys_nerr DATA
+_timezone DATA
+_tzname DATA
 error_message_count DATA
 error_one_per_line DATA
 error_print_progname DATA
 h_errno DATA
-_impure_ptr DATA
 in6addr_any DATA
 in6addr_loopback DATA
-__mb_cur_max DATA
 optarg DATA
 opterr DATA
 optind DATA
 optopt DATA
 optreset DATA
-__progname DATA
 program_invocation_name DATA
 program_invocation_short_name DATA
-__rcmd_errstr DATA
 reent_data DATA
 sys_errlist = _sys_errlist DATA
-_sys_errlist DATA
 sys_nerr = _sys_nerr DATA
-_sys_nerr DATA
 sys_sigabbrev DATA
 sys_siglist DATA
-_timezone DATA
-_tzname DATA
+
+# Exported functions
 _Exit SIGFE
+__assert NOSIGFE
+__assert_func NOSIGFE
+__assertfail NOSIGFE
+__dn_comp SIGFE
+__dn_expand SIGFE
+__dn_skipname SIGFE
+__eprintf SIGFE
+__errno NOSIGFE
+__fpclassifyd NOSIGFE
+__fpclassifyf NOSIGFE
+__fpurge SIGFE
+__getreent NOSIGFE
+__infinity NOSIGFE
+__isinfd NOSIGFE
+__isinff NOSIGFE
+__isnand NOSIGFE
+__isnanf NOSIGFE
+__locale_mb_cur_max NOSIGFE
+__main NOSIGFE
+__opendir_with_d_ino SIGFE
+__res_close SIGFE
+__res_init SIGFE
+__res_mkquery SIGFE
+__res_nclose SIGFE
+__res_ninit SIGFE
+__res_nmkquery SIGFE
+__res_nquery SIGFE
+__res_nquerydomain SIGFE
+__res_nsearch SIGFE
+__res_nsend SIGFE
+__res_query SIGFE
+__res_querydomain SIGFE
+__res_search SIGFE
+__res_send SIGFE
+__res_state SIGFE
+__signbitd NOSIGFE
+__signbitf NOSIGFE
+__signgam NOSIGFE
+__srget SIGFE
+__srget_r SIGFE
+__swbuf SIGFE
+__swbuf_r SIGFE
+__wrap__ZdaPv NOSIGFE               # void operator delete[](void *p) throw()
+__wrap__ZdaPvRKSt9nothrow_t NOSIGFE # void operator delete[](void *p, const std::nothrow_t &nt) throw()
+__wrap__ZdlPv NOSIGFE               # void operator delete(void *p) throw()
+__wrap__ZdlPvRKSt9nothrow_t NOSIGFE # void operator delete(void *p, const std::nothrow_t &nt) throw()
+__xdrrec_getrec SIGFE
+__xdrrec_setnonblock SIGFE
+__xpg_strerror_r SIGFE
+_exit SIGFE
+_feinitialise NOSIGFE
+_fscanf_r SIGFE
+_get_osfhandle SIGFE
+_longjmp = longjmp NOSIGFE
+_pipe SIGFE
+_pthread_cleanup_pop SIGFE
+_pthread_cleanup_push SIGFE
+_setjmp = setjmp NOSIGFE
+_setmode = cygwin_setmode SIGFE
 a64l NOSIGFE
 abort NOSIGFE
 abs NOSIGFE
@@ -57,7 +115,6 @@ acosf NOSIGFE
 acosh NOSIGFE
 acoshf NOSIGFE
 alarm SIGFE
-_alloca = __alloca NOSIGFE
 alphasort NOSIGFE
 argz_add SIGFE
 argz_add_sep SIGFE
@@ -79,9 +136,6 @@ asinh NOSIGFE
 asinhf NOSIGFE
 asnprintf SIGFE
 asprintf SIGFE
-__assert NOSIGFE
-__assert_func NOSIGFE
-__assertfail NOSIGFE
 atan NOSIGFE
 atan2 NOSIGFE
 atan2f NOSIGFE
@@ -211,18 +265,13 @@ div NOSIGFE
 dlclose SIGFE
 dlerror NOSIGFE
 dlfork NOSIGFE
-_dll_crt0 NOSIGFE
 dll_crt0__FP11per_process NOSIGFE # dll_crt0(per_process *)
 dll_dllcrt0 NOSIGFE
-dll_entry NOSIGFE
 dlopen SIGFE
 dlsym SIGFE
 dn_comp = __dn_comp SIGFE
-__dn_comp SIGFE
 dn_expand = __dn_expand SIGFE
-__dn_expand SIGFE
 dn_skipname = __dn_skipname SIGFE
-__dn_skipname SIGFE
 dprintf SIGFE
 drand48 NOSIGFE
 drem NOSIGFE
@@ -249,14 +298,12 @@ envz_get NOSIGFE
 envz_merge SIGFE
 envz_remove SIGFE
 envz_strip SIGFE
-__eprintf SIGFE
 erand48 NOSIGFE
 erf NOSIGFE
 erfc NOSIGFE
 erfcf NOSIGFE
 erff NOSIGFE
 err SIGFE
-__errno NOSIGFE
 error SIGFE
 error_at_line SIGFE
 errx SIGFE
@@ -269,7 +316,6 @@ execve SIGFE
 execvp SIGFE
 execvpe SIGFE
 exit = cygwin_exit SIGFE
-_exit SIGFE
 exp NOSIGFE
 exp10 NOSIGFE
 exp10f NOSIGFE
@@ -307,7 +353,6 @@ fegetexceptflag NOSIGFE
 fegetprec NOSIGFE
 fegetround NOSIGFE
 feholdexcept SIGFE
-_feinitialise NOSIGFE
 feof SIGFE
 feraiseexcept SIGFE
 ferror SIGFE
@@ -350,11 +395,8 @@ fopencookie SIGFE
 fork SIGFE
 forkpty SIGFE
 fpathconf SIGFE
-__fpclassifyd NOSIGFE
-__fpclassifyf NOSIGFE
 fprintf SIGFE
 fpurge SIGFE
-__fpurge SIGFE
 fputc SIGFE
 fputs SIGFE
 fputwc SIGFE
@@ -368,7 +410,6 @@ freopen SIGFE
 frexp NOSIGFE
 frexpf NOSIGFE
 fscanf SIGFE
-_fscanf_r SIGFE
 fseek SIGFE
 fseeko SIGFE
 fsetpos SIGFE
@@ -413,7 +454,6 @@ get_avphys_pages SIGFE
 get_current_dir_name SIGFE
 get_nprocs SIGFE
 get_nprocs_conf SIGFE
-_get_osfhandle SIGFE
 get_phys_pages SIGFE
 getaddrinfo = cygwin_getaddrinfo SIGFE
 getc SIGFE
@@ -471,7 +511,6 @@ getpwnam SIGFE
 getpwnam_r SIGFE
 getpwuid SIGFE
 getpwuid_r SIGFE
-__getreent NOSIGFE
 getrlimit SIGFE
 getrusage SIGFE
 gets SIGFE
@@ -532,7 +571,6 @@ inet_ntoa = cygwin_inet_ntoa SIGFE
 inet_ntop = cygwin_inet_ntop SIGFE
 inet_pton = cygwin_inet_pton SIGFE
 infinity NOSIGFE
-__infinity NOSIGFE
 infinityf NOSIGFE
 initgroups SIGFE
 initstate NOSIGFE
@@ -550,14 +588,10 @@ iscntrl NOSIGFE
 isdigit NOSIGFE
 isgraph NOSIGFE
 isinf NOSIGFE
-__isinfd NOSIGFE
 isinff NOSIGFE
-__isinff NOSIGFE
 islower NOSIGFE
 isnan NOSIGFE
-__isnand NOSIGFE
 isnanf NOSIGFE
-__isnanf NOSIGFE
 isprint NOSIGFE
 ispunct NOSIGFE
 isspace NOSIGFE
@@ -605,11 +639,8 @@ listxattr SIGFE
 llabs NOSIGFE
 lldiv NOSIGFE
 llistxattr SIGFE
-llrint NOSIGFE
-llrintf NOSIGFE
 llround NOSIGFE
 llroundf NOSIGFE
-__locale_mb_cur_max NOSIGFE
 localeconv NOSIGFE
 localtime SIGFE
 localtime_r SIGFE
@@ -629,11 +660,8 @@ login_tty SIGFE
 logout SIGFE
 logwtmp SIGFE
 longjmp NOSIGFE
-_longjmp = longjmp NOSIGFE
 lrand48 NOSIGFE
 lremovexattr SIGFE
-lrint NOSIGFE
-lrintf NOSIGFE
 lround NOSIGFE
 lroundf NOSIGFE
 lsearch NOSIGFE
@@ -641,7 +669,6 @@ lseek SIGFE
 lsetxattr SIGFE
 lstat SIGFE
 lutimes SIGFE
-__main NOSIGFE
 madvise = posix_madvise SIGFE
 mallinfo SIGFE
 malloc SIGFE
@@ -724,7 +751,6 @@ open_memstream SIGFE
 open_wmemstream SIGFE
 openat SIGFE
 opendir SIGFE
-__opendir_with_d_ino SIGFE
 openlog SIGFE
 openpty SIGFE
 pathconf SIGFE
@@ -732,7 +758,6 @@ pause SIGFE
 pclose SIGFE
 perror SIGFE
 pipe SIGFE
-_pipe SIGFE
 pipe2 SIGFE
 poll SIGFE
 popen SIGFE
@@ -773,8 +798,6 @@ pthread_attr_setstack SIGFE
 pthread_attr_setstackaddr SIGFE
 pthread_attr_setstacksize SIGFE
 pthread_cancel SIGFE
-_pthread_cleanup_pop SIGFE
-_pthread_cleanup_push SIGFE
 pthread_cond_broadcast SIGFE
 pthread_cond_destroy SIGFE
 pthread_cond_init SIGFE
@@ -840,12 +863,12 @@ pthread_setschedprio SIGFE
 pthread_setspecific SIGFE
 pthread_sigmask SIGFE
 pthread_sigqueue SIGFE
-pthread_suspend SIGFE
 pthread_spin_destroy SIGFE
 pthread_spin_init SIGFE
 pthread_spin_lock SIGFE
 pthread_spin_trylock SIGFE
 pthread_spin_unlock SIGFE
+pthread_suspend SIGFE
 pthread_testcancel SIGFE
 pthread_yield = sched_yield SIGFE
 ptsname SIGFE
@@ -895,41 +918,24 @@ remquof NOSIGFE
 rename SIGFE
 renameat SIGFE
 res_close = __res_close SIGFE
-__res_close SIGFE
 res_init = __res_init SIGFE
-__res_init SIGFE
 res_mkquery = __res_mkquery SIGFE
-__res_mkquery SIGFE
 res_nclose = __res_nclose SIGFE
-__res_nclose SIGFE
 res_ninit = __res_ninit SIGFE
-__res_ninit SIGFE
 res_nmkquery = __res_nmkquery SIGFE
-__res_nmkquery SIGFE
 res_nquery = __res_nquery SIGFE
-__res_nquery SIGFE
 res_nquerydomain = __res_nquerydomain SIGFE
-__res_nquerydomain SIGFE
 res_nsearch = __res_nsearch SIGFE
-__res_nsearch SIGFE
 res_nsend = __res_nsend SIGFE
-__res_nsend SIGFE
 res_query = __res_query SIGFE
-__res_query SIGFE
 res_querydomain = __res_querydomain SIGFE
-__res_querydomain SIGFE
 res_search = __res_search SIGFE
-__res_search SIGFE
 res_send = __res_send SIGFE
-__res_send SIGFE
-__res_state SIGFE
 revoke SIGFE
 rewind SIGFE
 rewinddir SIGFE
 rexec = cygwin_rexec SIGFE
 rindex NOSIGFE
-rint NOSIGFE
-rintf NOSIGFE
 rmdir SIGFE
 round NOSIGFE
 roundf NOSIGFE
@@ -985,12 +991,10 @@ setgroups SIGFE
 sethostent NOSIGFE
 setitimer SIGFE
 setjmp NOSIGFE
-_setjmp = setjmp NOSIGFE
 setlinebuf SIGFE
 setlocale NOSIGFE
 setlogmask NOSIGFE
 setmntent SIGFE
-_setmode = cygwin_setmode SIGFE
 setpassent NOSIGFE
 setpgid SIGFE
 setpgrp SIGFE
@@ -1029,9 +1033,6 @@ sigignore SIGFE
 siginterrupt SIGFE
 sigismember SIGFE
 signal SIGFE
-__signbitd NOSIGFE
-__signbitf NOSIGFE
-__signgam NOSIGFE
 significand NOSIGFE
 significandf NOSIGFE
 sigpause SIGFE
@@ -1068,8 +1069,6 @@ sqrtf NOSIGFE
 srand NOSIGFE
 srand48 NOSIGFE
 srandom NOSIGFE
-__srget SIGFE
-__srget_r SIGFE
 sscanf SIGFE
 stat SIGFE
 statfs SIGFE
@@ -1113,7 +1112,6 @@ strtoimax = strtoll NOSIGFE
 strtok NOSIGFE
 strtok_r NOSIGFE
 strtol NOSIGFE
-strtold = _strtold SIGFE
 strtoll NOSIGFE
 strtosigno NOSIGFE
 strtoul NOSIGFE
@@ -1122,8 +1120,6 @@ strtoumax = strtoull NOSIGFE
 strupr NOSIGFE
 strxfrm NOSIGFE
 swab NOSIGFE
-__swbuf SIGFE
-__swbuf_r SIGFE
 swprintf SIGFE
 swscanf SIGFE
 symlink SIGFE
@@ -1328,21 +1324,10 @@ xdrrec_create SIGFE
 xdrrec_endofrecord SIGFE
 xdrrec_eof SIGFE
 xdrrec_skiprecord SIGFE
-__xdrrec_getrec SIGFE
-__xdrrec_setnonblock SIGFE
 xdrstdio_create SIGFE
-__xpg_strerror_r SIGFE
 y0 NOSIGFE
 y0f NOSIGFE
 y1 NOSIGFE
 y1f NOSIGFE
 yn NOSIGFE
 ynf NOSIGFE
-__wrap__ZdaPv NOSIGFE               # void operator delete[](void *p) throw()
-__wrap__ZdaPvRKSt9nothrow_t NOSIGFE # void operator delete[](void *p, const std::nothrow_t &nt) throw()
-__wrap__ZdlPv NOSIGFE               # void operator delete(void *p) throw()
-__wrap__ZdlPvRKSt9nothrow_t NOSIGFE # void operator delete(void *p, const std::nothrow_t &nt) throw()
-__wrap__Znam NOSIGFE                # void *operator new[](std::size_t sz) throw (std::bad_alloc)
-__wrap__ZnamRKSt9nothrow_t NOSIGFE  # void *operator new[](std::size_t sz, const std::nothrow_t &nt) throw()
-__wrap__Znwm NOSIGFE                # void *operator new(std::size_t sz) throw (std::bad_alloc)
-__wrap__ZnwmRKSt9nothrow_t NOSIGFE  # void *operator new(std::size_t sz, const std::nothrow_t &nt) throw()

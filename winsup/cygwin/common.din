@@ -39,6 +39,8 @@ _Exit SIGFE
 __assert NOSIGFE
 __assert_func NOSIGFE
 __assertfail NOSIGFE
+__b64_ntop NOSIGFE
+__b64_pton NOSIGFE
 __dn_comp SIGFE
 __dn_expand SIGFE
 __dn_skipname SIGFE
@@ -116,6 +118,11 @@ acosh NOSIGFE
 acoshf NOSIGFE
 alarm SIGFE
 alphasort NOSIGFE
+arc4random NOSIGFE
+arc4random_addrandom NOSIGFE
+arc4random_buf NOSIGFE
+arc4random_stir NOSIGFE
+arc4random_uniform NOSIGFE
 argz_add SIGFE
 argz_add_sep SIGFE
 argz_append SIGFE

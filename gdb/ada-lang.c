@@ -4726,17 +4726,20 @@ static int
 old_renaming_is_invisible (const struct symbol *sym, const char *function_name)
 {
   char *scope;
+  struct cleanup *old_chain;
 
   if (SYMBOL_CLASS (sym) != LOC_TYPEDEF)
     return 0;
 
   scope = xget_renaming_scope (SYMBOL_TYPE (sym));
-
-  make_cleanup (xfree, scope);
+  old_chain = make_cleanup (xfree, scope);
 
   /* If the rename has been defined in a package, then it is visible.  */
   if (is_package_name (scope))
-    return 0;
+    {
+      do_cleanups (old_chain);
+      return 0;
+    }
 
   /* Check that the rename is in the current function scope by checking
      that its name starts with SCOPE.  */
@@ -4748,7 +4751,12 @@ old_renaming_is_invisible (const struct symbol *sym, const char *function_name)
   if (strncmp (function_name, "_ada_", 5) == 0)
     function_name += 5;
 
-  return (strncmp (function_name, scope, strlen (scope)) != 0);
+  {
+    int is_invisible = strncmp (function_name, scope, strlen (scope)) != 0;
+
+    do_cleanups (old_chain);
+    return is_invisible;
+  }
 }
 
 /* Remove entries from SYMS that corresponds to a renaming entity that
@@ -11105,7 +11113,7 @@ static int
 is_known_support_routine (struct frame_info *frame)
 {
   struct symtab_and_line sal;
-  const char *func_name;
+  char *func_name;
   enum language func_lang;
   int i;
   const char *fullname;
@@ -11152,9 +11160,13 @@ is_known_support_routine (struct frame_info *frame)
     {
       re_comp (known_auxiliary_function_name_patterns[i]);
       if (re_exec (func_name))
-        return 1;
+	{
+	  xfree (func_name);
+	  return 1;
+	}
     }
 
+  xfree (func_name);
   return 0;
 }
 
@@ -11198,6 +11210,7 @@ ada_unhandled_exception_name_addr_from_raise (void)
   int frame_level;
   struct frame_info *fi;
   struct ada_inferior_data *data = get_ada_inferior_data (current_inferior ());
+  struct cleanup *old_chain;
 
   /* To determine the name of this exception, we need to select
      the frame corresponding to RAISE_SYM_NAME.  This frame is
@@ -11208,17 +11221,24 @@ ada_unhandled_exception_name_addr_from_raise (void)
     if (fi != NULL)
       fi = get_prev_frame (fi); 
 
+  old_chain = make_cleanup (null_cleanup, NULL);
   while (fi != NULL)
     {
-      const char *func_name;
+      char *func_name;
       enum language func_lang;
 
       find_frame_funname (fi, &func_name, &func_lang, NULL);
-      if (func_name != NULL
-          && strcmp (func_name, data->exception_info->catch_exception_sym) == 0)
-        break; /* We found the frame we were looking for...  */
-      fi = get_prev_frame (fi);
+      if (func_name != NULL)
+	{
+	  make_cleanup (xfree, func_name);
+
+          if (strcmp (func_name,
+		      data->exception_info->catch_exception_sym) == 0)
+	    break; /* We found the frame we were looking for...  */
+	  fi = get_prev_frame (fi);
+	}
     }
+  do_cleanups (old_chain);
 
   if (fi == NULL)
     return 0;

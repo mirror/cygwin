@@ -56,6 +56,7 @@ enum winsym_t
   WSYM_sysfile = 0,
   WSYM_lnk,
   WSYM_native,
+  WSYM_nativestrict,
   WSYM_nfs
 };
 
@@ -74,6 +75,13 @@ bool pipe_byte = false;
 bool detect_bloda = false;
 
 bool NO_COPY in_forkee;
+
+/* Taken from BSD libc:
+   This variable is zero until a process has created a pthread.  It is used
+   to avoid calling locking functions in libc when they are not required.
+   Note that this is moderately dangerous.  Do not rely on it if the public
+   API is also used from a non-pthread thread like the signal thread. */
+int NO_COPY __isthreaded = 0;
 
 int __argc_safe;
 int __argc;

@@ -41,6 +41,10 @@ set debug nios2
 show debug nios2
   Control display of debugging messages related to Nios II targets.
 
+set range-stepping
+show range-stepping
+  Control whether target-assisted range stepping is enabled.
+
 * You can now use a literal value 'unlimited' for options that
   interpret 0 or -1 as meaning "unlimited".  E.g., "set
   trace-buffer-size unlimited" is now an alias for "set
@@ -69,6 +73,32 @@ show debug nios2
 
   ** The -trace-save MI command can optionally save trace buffer in Common
      Trace Format now.
+
+  ** The new command -dprintf-insert sets a dynamic printf breakpoint.
+
+* New system-wide configuration scripts
+  A GDB installation now provides scripts suitable for use as system-wide
+  configuration scripts for the following systems:
+    ** ElinOS
+    ** Wind River Linux
+
+* GDB now supports target-assigned range stepping with remote targets.
+  This improves the performance of stepping source lines by reducing
+  the number of control packets from/to GDB.  See "New remote packets"
+  below.
+
+* New remote packets
+
+vCont;r
+
+  The vCont packet supports a new 'r' action, that tells the remote
+  stub to step through an address range itself, without GDB
+  involvemement at each single-step.
+
+* New features in the GDB remote stub, GDBserver
+
+  ** GDBserver now supports target-assisted range stepping.  Currently
+     enabled on x86/x86_64 GNU/Linux targets.
 
 *** Changes in GDB 7.6
 

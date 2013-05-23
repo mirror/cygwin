@@ -1,3 +1,32 @@
+2013-05-23  Warren Young  <warren@etr-usa.com>
+
+	* xidepend: New script, generates Makefile.dep from top-level XML
+	* .cvsignore: Ignoring Makefile.dep output
+	* Makefile: Creating Makefile.dep if it doesn't exist, including it
+	if it does, and removing it on 'make clean'
+	* Wishlist: Knocked autodependency generation off the list
+
+2013-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.xml (cygwinenv-implemented-options): Explain new
+	winsymliks:nativestrict option.  Strip out description of symlink types
+	and refer to new pathnames-symlinks section.
+	* highlights.xml (ov-hi-files): Rip out most of symlink description and
+	refer to new pathnames-symlinks section instead.
+	* new-features.xml (ov-new1.7.19): Add CYGWIN=winsymlinks:nativestrict.
+	* pathnames.xml (pathnames-symlinks): New section describing symbolic
+	link handling.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.19): Add arc4random,
+	arc4random_addrandom, arc4random_buf, arc4random_stir and
+	arc4random_uniform.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.19): Add __b64_ntop and __b64_pton.
+
 2013-05-13  Warren Young  <warren@etr-usa.com>
 
 	* cygwin-ug.xml setup.xml: Removed; unused.

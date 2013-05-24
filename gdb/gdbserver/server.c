@@ -2042,7 +2042,11 @@ handle_v_cont (char *own_buf)
     {
       p++;
 
+      memset (&resume_info[i], 0, sizeof resume_info[i]);
+
       if (p[0] == 's' || p[0] == 'S')
+	resume_info[i].kind = resume_step;
+      else if (p[0] == 'r')
 	resume_info[i].kind = resume_step;
       else if (p[0] == 'c' || p[0] == 'C')
 	resume_info[i].kind = resume_continue;
@@ -2063,9 +2067,21 @@ handle_v_cont (char *own_buf)
 	    goto err;
 	  resume_info[i].sig = gdb_signal_to_host (sig);
 	}
+      else if (p[0] == 'r')
+	{
+	  ULONGEST addr;
+
+	  p = unpack_varlen_hex (p + 1, &addr);
+	  resume_info[i].step_range_start = addr;
+
+	  if (*p != ',')
+	    goto err;
+
+	  p = unpack_varlen_hex (p + 1, &addr);
+	  resume_info[i].step_range_end = addr;
+	}
       else
 	{
-	  resume_info[i].sig = 0;
 	  p = p + 1;
 	}
 
@@ -2311,6 +2327,11 @@ handle_v_requests (char *own_buf, int packet_len, int *new_packet_len)
       if (strncmp (own_buf, "vCont?", 6) == 0)
 	{
 	  strcpy (own_buf, "vCont;c;C;s;S;t");
+	  if (target_supports_range_stepping ())
+	    {
+	      own_buf = own_buf + strlen (own_buf);
+	      strcpy (own_buf, ";r");
+	    }
 	  return;
 	}
     }

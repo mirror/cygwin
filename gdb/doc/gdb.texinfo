@@ -5219,6 +5219,38 @@ Execute one machine instruction, but if it is a function call,
 proceed until the function returns.
 
 An argument is a repeat count, as in @code{next}.
+
+@end table
+
+@anchor{range stepping}
+@cindex range stepping
+@cindex target-assisted range stepping
+By default, and if available, @value{GDBN} makes use of
+target-assisted @dfn{range stepping}.  In other words, whenever you
+use a stepping command (e.g., @code{step}, @code{next}), @value{GDBN}
+tells the target to step the corresponding range of instruction
+addresses instead of issuing multiple single-steps.  This speeds up
+line stepping, particularly for remote targets.  Ideally, there should
+be no reason you would want to turn range stepping off.  However, it's
+possible that a bug in the debug info, a bug in the remote stub (for
+remote targets), or even a bug in @value{GDBN} could make line
+stepping behave incorrectly when target-assisted range stepping is
+enabled.  You can use the following command to turn off range stepping
+if necessary:
+
+@table @code
+@kindex set range-stepping
+@kindex show range-stepping
+@item set range-stepping
+@itemx show range-stepping
+Control whether range stepping is enabled.
+
+If @code{on}, and the target supports it, @value{GDBN} tells the
+target to step a range of addresses itself, instead of issuing
+multiple single-steps.  If @code{off}, @value{GDBN} always issues
+single-steps, even if range stepping is supported by the target.  The
+default is @code{on}.
+
 @end table
 
 @node Skipping Over Functions and Files
@@ -29789,6 +29821,84 @@ times="0"@}]@}
 @c (gdb)
 @end smallexample
 
+@subheading The @code{-dprintf-insert} Command
+@findex -dprintf-insert
+
+@subsubheading Synopsis
+
+@smallexample
+ -dprintf-insert [ -t ] [ -f ] [ -d ]
+    [ -c @var{condition} ] [ -i @var{ignore-count} ]
+    [ -p @var{thread-id} ] [ @var{location} ] [ @var{format} ]
+    [ @var{argument} ]
+@end smallexample
+
+@noindent
+If specified, @var{location}, can be one of:
+
+@itemize @bullet
+@item @var{function}
+@c @item +offset
+@c @item -offset
+@c @item @var{linenum}
+@item @var{filename}:@var{linenum}
+@item @var{filename}:function
+@item *@var{address}
+@end itemize
+
+The possible optional parameters of this command are:
+
+@table @samp
+@item -t
+Insert a temporary breakpoint.
+@item -f
+If @var{location} cannot be parsed (for example, if it
+refers to unknown files or functions), create a pending
+breakpoint.  Without this flag, @value{GDBN} will report
+an error, and won't create a breakpoint, if @var{location}
+cannot be parsed.
+@item -d
+Create a disabled breakpoint.
+@item -c @var{condition}
+Make the breakpoint conditional on @var{condition}.
+@item -i @var{ignore-count}
+Set the ignore count of the breakpoint (@pxref{Conditions, ignore count})
+to @var{ignore-count}.
+@item -p @var{thread-id}
+Restrict the breakpoint to the specified @var{thread-id}.
+@end table
+
+@subsubheading Result
+
+@xref{GDB/MI Breakpoint Information}, for details on the format of the
+resulting breakpoint.
+
+@c An out-of-band breakpoint instead of part of the result?
+
+@subsubheading @value{GDBN} Command
+
+The corresponding @value{GDBN} command is @samp{dprintf}.
+
+@subsubheading Example
+
+@smallexample
+(gdb)
+4-dprintf-insert foo "At foo entry\n"
+4^done,bkpt=@{number="1",type="dprintf",disp="keep",enabled="y",
+addr="0x000000000040061b",func="foo",file="mi-dprintf.c",
+fullname="mi-dprintf.c",line="25",thread-groups=["i1"],
+times="0",script=@{"printf \"At foo entry\\n\"","continue"@},
+original-location="foo"@}
+(gdb)
+5-dprintf-insert 26 "arg=%d, g=%d\n" arg g
+5^done,bkpt=@{number="2",type="dprintf",disp="keep",enabled="y",
+addr="0x000000000040062a",func="foo",file="mi-dprintf.c",
+fullname="mi-dprintf.c",line="26",thread-groups=["i1"],
+times="0",script=@{"printf \"arg=%d, g=%d\\n\", arg, g","continue"@},
+original-location="mi-dprintf.c:26"@}
+(gdb)
+@end smallexample
+
 @subheading The @code{-break-list} Command
 @findex -break-list
 
@@ -36254,6 +36364,42 @@ initialization.  If the data-directory is changed after @value{GDBN} has
 started with the @code{set data-directory} command, the file will not be
 reread.
 
+@menu
+* System-wide Configuration Scripts::  Installed System-wide Configuration Scripts
+@end menu
+
+@node System-wide Configuration Scripts
+@subsection Installed System-wide Configuration Scripts
+@cindex system-wide configuration scripts
+
+The @file{system-gdbinit} directory, located inside the data-directory
+(as specified by @option{--with-gdb-datadir} at configure time) contains
+a number of scripts which can be used as system-wide init files.  To
+automatically source those scripts at startup, @value{GDBN} should be
+configured with @option{--with-system-gdbinit}.  Otherwise, any user
+should be able to source them by hand as needed.
+
+The following scripts are currently available:
+@itemize @bullet
+
+@item @file{elinos.py}
+@pindex elinos.py
+@cindex ELinOS system-wide configuration script
+This script is useful when debugging a program on an ELinOS target.
+It takes advantage of the environment variables defined in a standard
+ELinOS environment in order to determine the location of the system
+shared libraries, and then sets the @samp{solib-absolute-prefix}
+and @samp{solib-search-path} variables appropriately.
+
+@item @file{wrs-linux.py}
+@pindex wrs-linux.py
+@cindex Wind River Linux system-wide configuration script
+This script is useful when debugging a program on a target running
+Wind River Linux.  It expects the @env{ENV_PREFIX} to be set to
+the host-side sysroot used by the target system.
+
+@end itemize
+
 @node Maintenance Commands
 @appendix Maintenance Commands
 @cindex maintenance commands
@@ -37401,6 +37547,22 @@ Step.
 Step with signal @var{sig}.  The signal @var{sig} should be two hex digits.
 @item t
 Stop.
+@item r @var{start},@var{end}
+Step once, and then keep stepping as long as the thread stops at
+addresses between @var{start} (inclusive) and @var{end} (exclusive).
+The remote stub reports a stop reply when either the thread goes out
+of the range or is stopped due to an unrelated reason, such as hitting
+a breakpoint.  @xref{range stepping}.
+
+If the range is empty (@var{start} == @var{end}), then the action
+becomes equivalent to the @samp{s} action.  In other words,
+single-step once, and report the stop (even if the stepped instruction
+jumps to @var{start}).
+
+(A stop reply may be sent at any point even if the PC is still within
+the stepping range; for example, it is valid to implement this packet
+in a degenerate way as a single instruction step operation.)
+
 @end table
 
 The optional argument @var{addr} normally associated with the 

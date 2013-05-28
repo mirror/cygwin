@@ -2389,7 +2389,7 @@ static struct reloc_table_entry reloc_table[] = {
 
   /* Get to the page containing GOT TLS entry for a symbol */
   {"tlsdesc", 0,
-   BFD_RELOC_AARCH64_TLSDESC_ADR_PAGE,
+   BFD_RELOC_AARCH64_TLSDESC_ADR_PAGE21,
    0,
    0,
    0},
@@ -6341,14 +6341,14 @@ md_apply_fix (fixS * fixP, valueT * valP, segT seg)
       break;
 
     case BFD_RELOC_AARCH64_LD_LO19_PCREL:
-      if (value & 3)
-	as_bad_where (fixP->fx_file, fixP->fx_line,
-		      _("pc-relative load offset not word aligned"));
-      if (signed_overflow (value, 21))
-	as_bad_where (fixP->fx_file, fixP->fx_line,
-		      _("pc-relative load offset out of range"));
       if (fixP->fx_done || !seg->use_rela_p)
 	{
+	  if (value & 3)
+	    as_bad_where (fixP->fx_file, fixP->fx_line,
+			  _("pc-relative load offset not word aligned"));
+	  if (signed_overflow (value, 21))
+	    as_bad_where (fixP->fx_file, fixP->fx_line,
+			  _("pc-relative load offset out of range"));
 	  insn = get_aarch64_insn (buf);
 	  insn |= encode_ld_lit_ofs_19 (value >> 2);
 	  put_aarch64_insn (buf, insn);
@@ -6356,11 +6356,11 @@ md_apply_fix (fixS * fixP, valueT * valP, segT seg)
       break;
 
     case BFD_RELOC_AARCH64_ADR_LO21_PCREL:
-      if (signed_overflow (value, 21))
-	as_bad_where (fixP->fx_file, fixP->fx_line,
-		      _("pc-relative address offset out of range"));
       if (fixP->fx_done || !seg->use_rela_p)
 	{
+	  if (signed_overflow (value, 21))
+	    as_bad_where (fixP->fx_file, fixP->fx_line,
+			  _("pc-relative address offset out of range"));
 	  insn = get_aarch64_insn (buf);
 	  insn |= encode_adr_imm (value);
 	  put_aarch64_insn (buf, insn);
@@ -6368,14 +6368,14 @@ md_apply_fix (fixS * fixP, valueT * valP, segT seg)
       break;
 
     case BFD_RELOC_AARCH64_BRANCH19:
-      if (value & 3)
-	as_bad_where (fixP->fx_file, fixP->fx_line,
-		      _("conditional branch target not word aligned"));
-      if (signed_overflow (value, 21))
-	as_bad_where (fixP->fx_file, fixP->fx_line,
-		      _("conditional branch out of range"));
       if (fixP->fx_done || !seg->use_rela_p)
 	{
+	  if (value & 3)
+	    as_bad_where (fixP->fx_file, fixP->fx_line,
+			  _("conditional branch target not word aligned"));
+	  if (signed_overflow (value, 21))
+	    as_bad_where (fixP->fx_file, fixP->fx_line,
+			  _("conditional branch out of range"));
 	  insn = get_aarch64_insn (buf);
 	  insn |= encode_cond_branch_ofs_19 (value >> 2);
 	  put_aarch64_insn (buf, insn);
@@ -6383,14 +6383,14 @@ md_apply_fix (fixS * fixP, valueT * valP, segT seg)
       break;
 
     case BFD_RELOC_AARCH64_TSTBR14:
-      if (value & 3)
-	as_bad_where (fixP->fx_file, fixP->fx_line,
-		      _("conditional branch target not word aligned"));
-      if (signed_overflow (value, 16))
-	as_bad_where (fixP->fx_file, fixP->fx_line,
-		      _("conditional branch out of range"));
       if (fixP->fx_done || !seg->use_rela_p)
 	{
+	  if (value & 3)
+	    as_bad_where (fixP->fx_file, fixP->fx_line,
+			  _("conditional branch target not word aligned"));
+	  if (signed_overflow (value, 16))
+	    as_bad_where (fixP->fx_file, fixP->fx_line,
+			  _("conditional branch out of range"));
 	  insn = get_aarch64_insn (buf);
 	  insn |= encode_tst_branch_ofs_14 (value >> 2);
 	  put_aarch64_insn (buf, insn);
@@ -6399,13 +6399,14 @@ md_apply_fix (fixS * fixP, valueT * valP, segT seg)
 
     case BFD_RELOC_AARCH64_JUMP26:
     case BFD_RELOC_AARCH64_CALL26:
-      if (value & 3)
-	as_bad_where (fixP->fx_file, fixP->fx_line,
-		      _("branch target not word aligned"));
-      if (signed_overflow (value, 28))
-	as_bad_where (fixP->fx_file, fixP->fx_line, _("branch out of range"));
       if (fixP->fx_done || !seg->use_rela_p)
 	{
+	  if (value & 3)
+	    as_bad_where (fixP->fx_file, fixP->fx_line,
+			  _("branch target not word aligned"));
+	  if (signed_overflow (value, 28))
+	    as_bad_where (fixP->fx_file, fixP->fx_line,
+			  _("branch out of range"));
 	  insn = get_aarch64_insn (buf);
 	  insn |= encode_branch_ofs_26 (value >> 2);
 	  put_aarch64_insn (buf, insn);
@@ -6499,7 +6500,7 @@ md_apply_fix (fixS * fixP, valueT * valP, segT seg)
     case BFD_RELOC_AARCH64_TLSLE_MOVW_TPREL_G1_NC:
     case BFD_RELOC_AARCH64_TLSLE_MOVW_TPREL_G0:
     case BFD_RELOC_AARCH64_TLSLE_MOVW_TPREL_G0_NC:
-    case BFD_RELOC_AARCH64_TLSDESC_ADR_PAGE:
+    case BFD_RELOC_AARCH64_TLSDESC_ADR_PAGE21:
     case BFD_RELOC_AARCH64_TLSDESC_ADD_LO12_NC:
     case BFD_RELOC_AARCH64_TLSDESC_LD64_LO12_NC:
       S_SET_THREAD_LOCAL (fixP->fx_addsy);
@@ -6662,7 +6663,7 @@ aarch64_force_relocation (struct fix *fixp)
     case BFD_RELOC_AARCH64_TLSLE_MOVW_TPREL_G1_NC:
     case BFD_RELOC_AARCH64_TLSLE_MOVW_TPREL_G0:
     case BFD_RELOC_AARCH64_TLSLE_MOVW_TPREL_G0_NC:
-    case BFD_RELOC_AARCH64_TLSDESC_ADR_PAGE:
+    case BFD_RELOC_AARCH64_TLSDESC_ADR_PAGE21:
     case BFD_RELOC_AARCH64_TLSDESC_ADD_LO12_NC:
     case BFD_RELOC_AARCH64_TLSDESC_LD64_LO12_NC:
     case BFD_RELOC_AARCH64_ADR_GOT_PAGE:

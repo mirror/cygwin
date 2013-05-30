@@ -219,7 +219,7 @@ static int remote_upload_trace_state_variables (struct uploaded_tsv **utsvp);
   
 static void remote_query_supported (void);
 
-static void remote_check_symbols (struct objfile *objfile);
+static void remote_check_symbols (void);
 
 void _initialize_remote (void);
 
@@ -250,6 +250,24 @@ static struct cmd_list_element *remote_cmdlist;
 
 static struct cmd_list_element *remote_set_cmdlist;
 static struct cmd_list_element *remote_show_cmdlist;
+
+/* Stub vCont actions support.
+
+   Each field is a boolean flag indicating whether the stub reports
+   support for the corresponding action.  */
+
+struct vCont_action_support
+{
+  /* vCont;t */
+  int t;
+
+  /* vCont;r */
+  int r;
+};
+
+/* Controls whether GDB is willing to use range stepping.  */
+
+static int use_range_stepping = 1;
 
 /* Description of the remote protocol state for the currently
    connected target.  This is per-target state, and independent of the
@@ -308,8 +326,8 @@ struct remote_state
   /* True if the stub reports support for non-stop mode.  */
   int non_stop_aware;
 
-  /* True if the stub reports support for vCont;t.  */
-  int support_vCont_t;
+  /* The status of the stub support for the various vCont actions.  */
+  struct vCont_action_support supports_vCont;
 
   /* True if the stub reports support for conditional tracepoints.  */
   int cond_tracepoints;
@@ -3559,7 +3577,7 @@ remote_start_remote (int from_tty, struct target_ops *target, int extended_p)
   if (target_has_execution)
     {
       if (exec_bfd) 	/* No use without an exec file.  */
-	remote_check_symbols (symfile_objfile);
+	remote_check_symbols ();
     }
 
   /* Possibly the target has been engaged in a trace run started
@@ -3628,7 +3646,7 @@ init_all_packet_configs (void)
 /* Symbol look-up.  */
 
 static void
-remote_check_symbols (struct objfile *objfile)
+remote_check_symbols (void)
 {
   struct remote_state *rs = get_remote_state ();
   char *msg, *reply, *tmp;
@@ -4641,7 +4659,8 @@ remote_vcont_probe (struct remote_state *rs)
       support_S = 0;
       support_c = 0;
       support_C = 0;
-      rs->support_vCont_t = 0;
+      rs->supports_vCont.t = 0;
+      rs->supports_vCont.r = 0;
       while (p && *p == ';')
 	{
 	  p++;
@@ -4654,7 +4673,9 @@ remote_vcont_probe (struct remote_state *rs)
 	  else if (*p == 'C' && (*(p + 1) == ';' || *(p + 1) == 0))
 	    support_C = 1;
 	  else if (*p == 't' && (*(p + 1) == ';' || *(p + 1) == 0))
-	    rs->support_vCont_t = 1;
+	    rs->supports_vCont.t = 1;
+	  else if (*p == 'r' && (*(p + 1) == ';' || *(p + 1) == 0))
+	    rs->supports_vCont.r = 1;
 
 	  p = strchr (p, ';');
 	}
@@ -4686,6 +4707,42 @@ append_resumption (char *p, char *endp,
 
   if (step && siggnal != GDB_SIGNAL_0)
     p += xsnprintf (p, endp - p, ";S%02x", siggnal);
+  else if (step
+	   /* GDB is willing to range step.  */
+	   && use_range_stepping
+	   /* Target supports range stepping.  */
+	   && rs->supports_vCont.r
+	   /* We don't currently support range stepping multiple
+	      threads with a wildcard (though the protocol allows it,
+	      so stubs shouldn't make an active effort to forbid
+	      it).  */
+	   && !(remote_multi_process_p (rs) && ptid_is_pid (ptid)))
+    {
+      struct thread_info *tp;
+
+      if (ptid_equal (ptid, minus_one_ptid))
+	{
+	  /* If we don't know about the target thread's tid, then
+	     we're resuming magic_null_ptid (see caller).  */
+	  tp = find_thread_ptid (magic_null_ptid);
+	}
+      else
+	tp = find_thread_ptid (ptid);
+      gdb_assert (tp != NULL);
+
+      if (tp->control.may_range_step)
+	{
+	  int addr_size = gdbarch_addr_bit (target_gdbarch ()) / 8;
+
+	  p += xsnprintf (p, endp - p, ";r%s,%s",
+			  phex_nz (tp->control.step_range_start,
+				   addr_size),
+			  phex_nz (tp->control.step_range_end,
+				   addr_size));
+	}
+      else
+	p += xsnprintf (p, endp - p, ";s");
+    }
   else if (step)
     p += xsnprintf (p, endp - p, ";s");
   else if (siggnal != GDB_SIGNAL_0)
@@ -5003,7 +5060,7 @@ remote_stop_ns (ptid_t ptid)
   if (remote_protocol_packets[PACKET_vCont].support == PACKET_SUPPORT_UNKNOWN)
     remote_vcont_probe (rs);
 
-  if (!rs->support_vCont_t)
+  if (!rs->supports_vCont.t)
     error (_("Remote server does not support stopping threads"));
 
   if (ptid_equal (ptid, minus_one_ptid)
@@ -8096,6 +8153,11 @@ remote_insert_breakpoint (struct gdbarch *gdbarch,
       int bpsize;
       struct condition_list *cond = NULL;
 
+      /* Make sure the remote is pointing at the right process, if
+	 necessary.  */
+      if (!gdbarch_has_global_breakpoints (target_gdbarch ()))
+	set_general_process ();
+
       gdbarch_remote_breakpoint_from_pc (gdbarch, &addr, &bpsize);
 
       rs = get_remote_state ();
@@ -8146,6 +8208,11 @@ remote_remove_breakpoint (struct gdbarch *gdbarch,
       char *p = rs->buf;
       char *endbuf = rs->buf + get_remote_packet_size ();
 
+      /* Make sure the remote is pointing at the right process, if
+	 necessary.  */
+      if (!gdbarch_has_global_breakpoints (target_gdbarch ()))
+	set_general_process ();
+
       *(p++) = 'z';
       *(p++) = '0';
       *(p++) = ',';
@@ -8195,6 +8262,11 @@ remote_insert_watchpoint (CORE_ADDR addr, int len, int type,
   if (remote_protocol_packets[PACKET_Z0 + packet].support == PACKET_DISABLE)
     return 1;
 
+  /* Make sure the remote is pointing at the right process, if
+     necessary.  */
+  if (!gdbarch_has_global_breakpoints (target_gdbarch ()))
+    set_general_process ();
+
   xsnprintf (rs->buf, endbuf - rs->buf, "Z%x,", packet);
   p = strchr (rs->buf, '\0');
   addr = remote_address_masked (addr);
@@ -8238,6 +8310,11 @@ remote_remove_watchpoint (CORE_ADDR addr, int len, int type,
 
   if (remote_protocol_packets[PACKET_Z0 + packet].support == PACKET_DISABLE)
     return -1;
+
+  /* Make sure the remote is pointing at the right process, if
+     necessary.  */
+  if (!gdbarch_has_global_breakpoints (target_gdbarch ()))
+    set_general_process ();
 
   xsnprintf (rs->buf, endbuf - rs->buf, "z%x,", packet);
   p = strchr (rs->buf, '\0');
@@ -8342,6 +8419,11 @@ remote_insert_hw_breakpoint (struct gdbarch *gdbarch,
   if (remote_protocol_packets[PACKET_Z1].support == PACKET_DISABLE)
     return -1;
 
+  /* Make sure the remote is pointing at the right process, if
+     necessary.  */
+  if (!gdbarch_has_global_breakpoints (target_gdbarch ()))
+    set_general_process ();
+
   rs = get_remote_state ();
   p = rs->buf;
   endbuf = rs->buf + get_remote_packet_size ();
@@ -8394,6 +8476,11 @@ remote_remove_hw_breakpoint (struct gdbarch *gdbarch,
 
   if (remote_protocol_packets[PACKET_Z1].support == PACKET_DISABLE)
     return -1;
+
+  /* Make sure the remote is pointing at the right process, if
+     necessary.  */
+  if (!gdbarch_has_global_breakpoints (target_gdbarch ()))
+    set_general_process ();
 
   *(p++) = 'z';
   *(p++) = '1';
@@ -8458,6 +8545,9 @@ remote_verify_memory (struct target_ops *ops,
   unsigned long host_crc, target_crc;
   char *tmp;
 
+  /* Make sure the remote is pointing at the right process.  */
+  set_general_process ();
+
   /* FIXME: assumes lma can fit into long.  */
   xsnprintf (rs->buf, get_remote_packet_size (), "qCRC:%lx,%lx",
 	     (long) lma, (long) size);
@@ -8501,6 +8591,9 @@ compare_sections_command (char *args, int from_tty)
 
   if (!exec_bfd)
     error (_("command cannot be used without an exec file"));
+
+  /* Make sure the remote is pointing at the right process.  */
+  set_general_process ();
 
   for (s = exec_bfd->sections; s; s = s->next)
     {
@@ -8927,6 +9020,9 @@ remote_search_memory (struct target_ops* ops,
       return simple_search_memory (ops, start_addr, search_space_len,
 				   pattern, pattern_len, found_addrp);
     }
+
+  /* Make sure the remote is pointing at the right process.  */
+  set_general_process ();
 
   /* Insert header.  */
   i = snprintf (rs->buf, max_size, 
@@ -10410,7 +10506,7 @@ remote_download_tracepoint (struct bp_location *loc)
   struct breakpoint *b = loc->owner;
   struct tracepoint *t = (struct tracepoint *) b;
 
-  encode_actions (loc->owner, loc, &tdp_actions, &stepping_actions);
+  encode_actions (loc, &tdp_actions, &stepping_actions);
   old_chain = make_cleanup (free_actions_list_cleanup_wrapper,
 			    tdp_actions);
   (void) make_cleanup (free_actions_list_cleanup_wrapper,
@@ -11598,7 +11694,7 @@ static void
 remote_new_objfile (struct objfile *objfile)
 {
   if (remote_desc != 0)		/* Have a remote connection.  */
-    remote_check_symbols (objfile);
+    remote_check_symbols ();
 }
 
 /* Pull all the tracepoints defined on the target and create local
@@ -11646,6 +11742,44 @@ remote_upload_trace_state_variables (struct uploaded_tsv **utsvp)
       p = rs->buf;
     }
   return 0;
+}
+
+/* The "set/show range-stepping" show hook.  */
+
+static void
+show_range_stepping (struct ui_file *file, int from_tty,
+		     struct cmd_list_element *c,
+		     const char *value)
+{
+  fprintf_filtered (file,
+		    _("Debugger's willingness to use range stepping "
+		      "is %s.\n"), value);
+}
+
+/* The "set/show range-stepping" set hook.  */
+
+static void
+set_range_stepping (char *ignore_args, int from_tty,
+		    struct cmd_list_element *c)
+{
+  /* Whene enabling, check whether range stepping is actually
+     supported by the target, and warn if not.  */
+  if (use_range_stepping)
+    {
+      if (remote_desc != NULL)
+	{
+	  struct remote_state *rs = get_remote_state ();
+
+	  if (remote_protocol_packets[PACKET_vCont].support == PACKET_SUPPORT_UNKNOWN)
+	    remote_vcont_probe (rs);
+
+	  if (remote_protocol_packets[PACKET_vCont].support == PACKET_ENABLE
+	      && rs->supports_vCont.r)
+	    return;
+	}
+
+      warning (_("Range stepping is not supported by the current target"));
+    }
 }
 
 void
@@ -12044,6 +12178,20 @@ Transfer files to and from the remote target system."),
 Set the remote pathname for \"run\""), _("\
 Show the remote pathname for \"run\""), NULL, NULL, NULL,
 				   &remote_set_cmdlist, &remote_show_cmdlist);
+
+  add_setshow_boolean_cmd ("range-stepping", class_run,
+			   &use_range_stepping, _("\
+Enable or disable range stepping."), _("\
+Show whether target-assisted range stepping is enabled."), _("\
+If on, and the target supports it, when stepping a source line, GDB\n\
+tells the target to step the corresponding range of addresses itself instead\n\
+of issuing multiple single-steps.  This speeds up source level\n\
+stepping.  If off, GDB always issues single-steps, even if range\n\
+stepping is supported by the target.  The default is on."),
+			   set_range_stepping,
+			   show_range_stepping,
+			   &setlist,
+			   &showlist);
 
   /* Eventually initialize fileio.  See fileio.c */
   initialize_remote_fileio (remote_set_cmdlist, remote_show_cmdlist);

@@ -1,3 +1,95 @@
+2013-05-30  Yao Qi  <yao@codesourcery.com>
+
+	* gdb.mi/mi-cmd-param-changed.exp (test_command_param_changed):
+	Add a test that no MI notification is emitted when executing
+	-exec-arguments.
+
+2013-05-24  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	PR testsuite/12649
+	* gdb.mi/mi-dprintf.exp (mi_continue_dprintf) (mi 2nd dprintf): Replace
+	$mi_gdb_prompt expectation by mi_expect_stop.
+	(mi 1st dprintf, agent, mi 2nd dprintf, agent)
+	(mi info dprintf second time): Replace them by mi_send_resuming_command
+	and mi_expect_stop.
+
+2013-05-24  Gary Benson  <gbenson@redhat.com>
+
+	* gdb.base/solib-disc.exp (exec_opts): Remove unnecesary
+	backslash.
+	* gdb.base/unload.exp (exec_opts): Remove two unnecessary
+	backslashes.
+	* gdb.base/watchpoint-solib.exp (exec_opts): Remove unnecesary
+	backslash.
+
+2013-05-24  Yao Qi  <yao@codesourcery.com>
+
+	* gdb.trace/tfile.exp: Test inferior and thread.
+
+2013-05-24  Yao Qi  <yao@codesourcery.com>
+	    Pedro Alves  <palves@redhat.com>
+
+	* gdb.base/range-stepping.exp: Skip the rest of tests if the
+	test fails.
+	* lib/range-stepping-support.exp (exec_cmd_expect_vCont_count):
+	Return 0 if the test passes, otherwise return 1.
+
+2013-05-23  Doug Evans  <dje@google.com>
+
+	* boards/fission-dwp.exp: New file.
+
+2013-05-23  Yao Qi  <yao@codesourcery.com>
+	    Pedro Alves  <palves@redhat.com>
+
+	* gdb.base/range-stepping.c: New file.
+	* gdb.base/range-stepping.exp: New file.
+	* gdb.trace/range-stepping.c: New file.
+	* gdb.trace/range-stepping.exp: New file.
+	* lib/range-stepping-support.exp: New file.
+
+2013-05-22  Tom Tromey  <tromey@redhat.com>
+
+	* gdb.cp/class2.cc (main): New local 'aref'.
+	* gdb.cp/class2.exp: Check printing of 'aref'.
+
+2013-05-22  Doug Evans  <dje@google.com>
+
+	* gdb.threads/wp-replication.c (main): Insert some code at the start
+	to ensure the breakpoint on main is only hit once.  Fix comment.
+
+2013-05-21  Keith Seitz  <keiths@redhat.com>
+	    Pedro Alves  <palves@redhat.com>
+
+	* gdb.base/filesym.exp: Use gdb_test_multiple instead of
+	gdb_expect.
+	Add test to flush the remaining input buffer so that this
+	file passes testsuite/12649.
+
+2013-05-21  Philippe Waroquiers  <philippe.waroquiers@skynet.be>
+
+	* gdb.base/catch-signal-fork.exp: New file.
+	* gdb.base/catch-signal-fork.c: New file.
+
+2013-05-21  Sterling Augustine  <saugustine@google.com>
+
+	* boards/remote-stdio-gdbserver.exp: New file.
+
+2013-05-21  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	PR testsuite/12649
+	* gdb.mi/mi-dprintf.exp (mi_continue_dprintf): Fix expect strings for
+	racy matches.
+
+2013-05-21  Christian Groessler  <chris@groessler.org>
+
+	* gdb.dwarf2/dw2-dir-file-name.exp: Don't use brace expansion,
+	since it's not supported in all shells.
+
+2013-05-21  Hui Zhu  <hui@codesourcery.com>
+
+	* gdb.mi/Makefile.in (PROGS): Add "mi-dprintf".
+	* gdb.mi/mi-dprintf.exp, gdb.mi/mi-dprintf.c: New.
+
 2013-05-20  Doug Evans  <dje@google.com>
 
 	* lib/dwarf.exp (Dwarf): New variable _abbrev_section.
@@ -40,6 +132,11 @@
 
 	* gdb.ada/complete.exp: Add test verifying completion using
 	the "tab" key.
+
+2013-05-15  Keith Seitz  <keiths@redhat.com>
+
+	* gdb.base/filesym.exp: New completer test.
+	* gdb.base/filesym.c: New file.
 
 2013-05-15  Pedro Alves  <palves@redhat.com>
 

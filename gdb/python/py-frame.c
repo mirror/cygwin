@@ -122,7 +122,7 @@ static PyObject *
 frapy_name (PyObject *self, PyObject *args)
 {
   struct frame_info *frame;
-  const char *name;
+  char *name = NULL;
   enum language lang;
   PyObject *result;
   volatile struct gdb_exception except;
@@ -133,10 +133,17 @@ frapy_name (PyObject *self, PyObject *args)
 
       find_frame_funname (frame, &name, &lang, NULL);
     }
+
+  if (except.reason < 0)
+    xfree (name);
+
   GDB_PY_HANDLE_EXCEPTION (except);
 
   if (name)
-    result = PyUnicode_Decode (name, strlen (name), host_charset (), NULL);
+    {
+      result = PyUnicode_Decode (name, strlen (name), host_charset (), NULL);
+      xfree (name);
+    }
   else
     {
       result = Py_None;
@@ -454,6 +461,7 @@ frapy_read_var (PyObject *self, PyObject *args)
 	    {
 	      PyErr_SetString (PyExc_RuntimeError,
 			       _("Second argument must be block."));
+	      do_cleanups (cleanup);
 	      return NULL;
 	    }
 	}
@@ -466,7 +474,12 @@ frapy_read_var (PyObject *self, PyObject *args)
 	    block = get_frame_block (frame, NULL);
 	  var = lookup_symbol (var_name, block, VAR_DOMAIN, NULL);
 	}
-      GDB_PY_HANDLE_EXCEPTION (except);
+      if (except.reason < 0)
+	{
+	  do_cleanups (cleanup);
+	  gdbpy_convert_exception (except);
+	  return NULL;
+	}
 
       if (!var)
 	{

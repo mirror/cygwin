@@ -1051,7 +1051,11 @@ unsigned long bfd_calc_gnu_debuglink_crc32
 
 char *bfd_get_debug_link_info (bfd *abfd, unsigned long *crc32_out);
 
+char *bfd_get_alt_debug_link_info (bfd *abfd, unsigned long *crc32_out);
+
 char *bfd_follow_gnu_debuglink (bfd *abfd, const char *dir);
+
+char *bfd_follow_gnu_debugaltlink (bfd *abfd, const char *dir);
 
 struct bfd_section *bfd_create_gnu_debuglink_section
    (bfd *abfd, const char *filename);
@@ -2933,6 +2937,7 @@ to compensate for the borrow when the low bits are added.  */
   BFD_RELOC_MICROMIPS_TLS_TPREL_HI16,
   BFD_RELOC_MIPS_TLS_TPREL_LO16,
   BFD_RELOC_MICROMIPS_TLS_TPREL_LO16,
+  BFD_RELOC_MIPS_EH,
 
 
 /* MIPS ELF relocations (VxWorks and PLT extensions).  */
@@ -5350,7 +5355,7 @@ of a signed or unsigned address/value.  */
   BFD_RELOC_AARCH64_TLSDESC_ADD_LO12_NC,
 
 /* AArch64 TLS DESC relocation.  */
-  BFD_RELOC_AARCH64_TLSDESC_ADR_PAGE,
+  BFD_RELOC_AARCH64_TLSDESC_ADR_PAGE21,
 
 /* AArch64 TLS DESC relocation.  */
   BFD_RELOC_AARCH64_TLSDESC_ADR_PREL21,
@@ -5362,7 +5367,7 @@ of a signed or unsigned address/value.  */
   BFD_RELOC_AARCH64_TLSDESC_LD64_LO12_NC,
 
 /* AArch64 TLS DESC relocation.  */
-  BFD_RELOC_AARCH64_TLSDESC_LD64_PREL19,
+  BFD_RELOC_AARCH64_TLSDESC_LD_PREL19,
 
 /* AArch64 TLS DESC relocation.  */
   BFD_RELOC_AARCH64_TLSDESC_LDR,

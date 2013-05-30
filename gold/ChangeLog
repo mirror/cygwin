@@ -1,3 +1,40 @@
+2013-05-30  Alexander Ivchenko  <alexander.ivchenko@intel.com>
+	    Sriraman Tallam  <tmsriram@google.com>
+
+	* options.h (sort_section): New option.
+	* output.h (Input_section_sort_section_prefix_special_ordering_compare):
+	Rename from Input_section_sort_section_name_special_ordering_compare.
+	(Input_section_sort_section_name_compare): New struct.
+	* output.cc (Output_section::Input_section_sort_section_name_compare::
+	operator()): New function.
+	(Output_section::sort_attached_input_sections): Use new sort function
+	for .text if --sort-section=name is specified.
+	* layout.cc (Layout::make_output_section):
+	Add sorting by name when --sort-section=name is specified.
+	* testsuite/Makefile.am (text_section_grouping): Test option
+	--sort-section=name.
+	* testsuite/Makefile.in: Regenerate.
+	* testsuite/section_sorting_name.cc: New file.
+	* testsuite/section_sorting_name.sh: New file.
+
+2013-05-21  Cary Coutant  <ccoutant@google.com>
+
+	* symtab.h (Symbol::is_cxx_vtable): New function.
+	* target-reloc.h (relocate_section): Check for vtable symbol.
+	* testsuite/Makefile.am (missing_key_func.sh): New test case.
+	* testsuite/Makefile.in: Regenerate.
+	* testsuite/missing_key_func.cc: New test source.
+	* testsuite/missing_key_func.sh: New test script.
+
+2013-05-21  Cary Coutant  <ccoutant@google.com>
+
+    	* object.cc (Sized_relobj_file::get_symbol_location_info): Set
+    	type of enclosing symbol.
+    	(Relocate_info::location): Check symbol type when describing symbol.
+    	* object.h (Symbol_location_info): Remove unused line_number;
+    	add enclosing_symbol_type.
+    	* testsuite/debug_msg.sh: Adjust expected output.
+
 2013-05-13  Cary Coutant  <ccoutant@google.com>
 
     	* configure.ac: Export DEFAULT_TARGET.

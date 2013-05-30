@@ -1428,7 +1428,10 @@ find_separate_debug_file (const char *dir,
       strcat (debugfile, debuglink);
 
       if (separate_debug_file_exists (debugfile, crc32, objfile))
-	return debugfile;
+	{
+	  do_cleanups (back_to);
+	  return debugfile;
+	}
 
       /* If the file is in the sysroot, try using its base path in the
 	 global debugfile directory.  */
@@ -1443,7 +1446,10 @@ find_separate_debug_file (const char *dir,
 	  strcat (debugfile, debuglink);
 
 	  if (separate_debug_file_exists (debugfile, crc32, objfile))
-	    return debugfile;
+	    {
+	      do_cleanups (back_to);
+	      return debugfile;
+	    }
 	}
     }
 
@@ -1772,6 +1778,8 @@ find_sym_fns (bfd *abfd)
 static void
 load_command (char *arg, int from_tty)
 {
+  struct cleanup *cleanup = make_cleanup (null_cleanup, NULL);
+
   dont_repeat ();
 
   /* The user might be reloading because the binary has changed.  Take
@@ -1821,6 +1829,8 @@ load_command (char *arg, int from_tty)
   /* After re-loading the executable, we don't really know which
      overlays are mapped any more.  */
   overlay_cache_invalid = 1;
+
+  do_cleanups (cleanup);
 }
 
 /* This version of "load" should be usable for any target.  Currently

@@ -1,3 +1,129 @@
+2013-05-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/socket.h: Move SHUT_xx definitoins from here...
+	* include/cygwin/socket.h: ...to here.
+
+2013-05-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/if.h: Include cygwin/socket.h rather than sys/socket.h
+	to avoid circular dependency resulting in bogus compile time warnings.
+
+2013-05-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_procsys.cc (fhandler_procsys::read): Just call
+	fhandler_base::raw_read from here.  Drop comment.
+	(fhandler_procsys::write): Drop comment.
+
+2013-05-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dll_init.cc (dll_list::topsort): Fix early-return condition to
+	accommodate process with all runtime loaded DLLs already dlclosed
+	at fork time.
+	* gendef (_sigfe_maybe): Fix code handling early return if we don't
+	have a tls, broken on 2013-05-21.
+
+2013-05-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DEFS): Unused, remove.
+	(COMPILE.cc): Move -mno-use-libstdc-wrappers flag from here...
+	($(TEST_DLL_NAME)): ...to here since it's a link time flag.
+
+2013-05-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pinfo.cc (pinfo::status_exit): Enhance comment.
+
+2013-05-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (win_env::add_cache): Set the Windows environment variable
+	using wide chars to make sure native chars don't get scrambled.
+	* environ.h (build_env): Fix formatting in declaration.
+	* pinfo.cc (pinfo::status_exit): Handle STATUS_NO_MEMORY.  Explain why.
+
+2013-05-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fork.cc (frok::parent): Always set CREATE_UNICODE_ENVIRONMENT flag.
+	Explain why.
+
+2013-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fork.cc (frok::parent): Call CreateProcessW with command line set
+	to the parent command line.  Change comment to explain why.
+
+2013-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (child_info_fork::alloc_stack_hard_way): Fix datatype of
+	stacksize to SIZE_T.  Cast to SIZE_T in pointer arithmetic.  Slightly
+	enhance output in case of a fatal error.
+	* fork.cc (frok::parent): Always set ch.stackaddr to DeallocationStack
+	value of current thread to help stack reservation in
+	child_info_fork::alloc_stack_hard_way along.  Simplify subsequent code
+	storing stack values in ch.  Print guardsize in hex, too.
+
+2013-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (set_winsymlinks): Handle "winsymlinks:nativestrict"
+	option.  On pre-Vista warn the user if the "winsymlinks:native*" option
+	is set.
+	* globals.cc (enum winsym_t): Add WSYM_nativestrict.
+	* path.cc (symlink_native): Don't create native symlink if target
+	does not exist.  Explain why.  Improve comments.
+	(symlink_worker): Change AFS symlink handling to WSYM_nativestrict.
+	Handle WSYM_nativestrict throughout.  Change condition for bail out
+	to wsym_type == WSYM_nativestrict.  Add comment.  Fix formatting.
+	* shared_info.h (CURR_USER_MAGIC): Change to reflect change in
+	class user_info.
+	(class user_info): Add member warned_nonativesyms.
+
+2013-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* spinlock.h (ULONG): Replace LONG operator with ULONG to accommodate
+	the fact that CURR_SHARED_MAGIC and USER_SHARED_MAGIC are unsigned
+	values.
+	* shared.cc (shared_info::initialize): Drop explicit cast here.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add arc4random.o.
+	* common.din: Export arc4random, arc4random_addrandom, arc4random_buf,
+	arc4random_stir and arc4random_uniform.
+	* mktemp.cc (arc4random): Remove static replacement function.
+	* posix.sgml (std-bsd): Add arc4random functions.
+	* include/cygwin/stdlib.h: Declare arc4random functions.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* libc/arc4random.cc: New file implementing arc4random functions taken
+	from FreeBSD.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* globals.cc (__isthreaded): New global variable.  Explain what it's
+	used for.
+	* miscfuncs.cc (thread_wrapper): Set __isthreaded to 1 here.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_dev_random): Change type of pseudo to
+	uint32_t to make sure it's 32 bit on all supported platforms.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	x86_64 only:
+	* gendef (_sigfe_maybe): Drop pushing %r12, use %r10 instead since we
+	don't call yield anymore.
+	(_sigfe): Ditto.
+	(_sigbe): Ditto.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/base64.c: New file.
+	* Makefile.in (DLL_OFILES): Add base64.o.
+	* common.din: Export __b64_ntop and __b64_pton.
+	* posix.sgml (std-bsd): Add __b64_ntop and __b64_pton.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (open): Only return ENOTDIR if file exists.
+
 2013-05-16  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* sigproc.cc (sig_hold): Delete.

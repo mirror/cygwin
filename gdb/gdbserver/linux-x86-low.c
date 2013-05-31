@@ -196,7 +196,8 @@ ps_get_thread_area (const struct ps_prochandle *ph,
 		(void *) (intptr_t) idx, (unsigned long) &desc) < 0)
       return PS_ERR;
 
-    *(int *)base = desc[1];
+    /* Ensure we properly extend the value to 64-bits for x86_64.  */
+    *base = (void *) (uintptr_t) desc[1];
     return PS_OK;
   }
 }
@@ -3175,6 +3176,12 @@ x86_emit_ops (void)
     return &i386_emit_ops;
 }
 
+static int
+x86_supports_range_stepping (void)
+{
+  return 1;
+}
+
 /* This is initialized assuming an amd64 target.
    x86_arch_setup will correct it for i386 or amd64 targets.  */
 
@@ -3214,4 +3221,5 @@ struct linux_target_ops the_low_target =
   x86_install_fast_tracepoint_jump_pad,
   x86_emit_ops,
   x86_get_min_fast_tracepoint_insn_len,
+  x86_supports_range_stepping,
 };

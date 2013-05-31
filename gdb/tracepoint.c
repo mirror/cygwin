@@ -82,8 +82,6 @@
    large.  (400 - 31)/2 == 184 */
 #define MAX_AGENT_EXPR_LEN	184
 
-#define TFILE_PID (1)
-
 /* A hook used to notify the UI of tracepoint operations.  */
 
 void (*deprecated_trace_find_hook) (char *arg, int from_tty);
@@ -206,6 +204,8 @@ static void add_register (struct collection_list *collection,
 static void free_uploaded_tps (struct uploaded_tp **utpp);
 static void free_uploaded_tsvs (struct uploaded_tsv **utsvp);
 
+static struct command_line *
+  all_tracepoint_actions_and_cleanup (struct breakpoint *t);
 
 extern void _initialize_tracepoint (void);
 
@@ -1243,7 +1243,7 @@ clear_collection_list (struct collection_list *list)
 
 /* Reduce a collection list to string form (for gdb protocol).  */
 static char **
-stringify_collection_list (struct collection_list *list, char *string)
+stringify_collection_list (struct collection_list *list)
 {
   char temp_buf[2048];
   char tmp2[40];
@@ -1366,7 +1366,6 @@ stringify_collection_list (struct collection_list *list, char *string)
 
 static void
 encode_actions_1 (struct command_line *action,
-		  struct breakpoint *t,
 		  struct bp_location *tloc,
 		  int frame_reg,
 		  LONGEST frame_offset,
@@ -1599,7 +1598,7 @@ encode_actions_1 (struct command_line *action,
 	     here.  */
 	  gdb_assert (stepping_list);
 
-	  encode_actions_1 (action->body_list[0], t, tloc, frame_reg,
+	  encode_actions_1 (action->body_list[0], tloc, frame_reg,
 			    frame_offset, stepping_list, NULL);
 	}
       else
@@ -1610,10 +1609,9 @@ encode_actions_1 (struct command_line *action,
 /* Render all actions into gdb protocol.  */
 
 void
-encode_actions (struct breakpoint *t, struct bp_location *tloc,
-		char ***tdp_actions, char ***stepping_actions)
+encode_actions (struct bp_location *tloc, char ***tdp_actions,
+		char ***stepping_actions)
 {
-  static char tdp_buff[2048], step_buff[2048];
   char *default_collect_line = NULL;
   struct command_line *actions;
   struct command_line *default_collect_action = NULL;
@@ -1632,36 +1630,16 @@ encode_actions (struct breakpoint *t, struct bp_location *tloc,
   gdbarch_virtual_frame_pointer (tloc->gdbarch,
 				 tloc->address, &frame_reg, &frame_offset);
 
-  actions = breakpoint_commands (t);
+  actions = all_tracepoint_actions_and_cleanup (tloc->owner);
 
-  /* If there are default expressions to collect, make up a collect
-     action and prepend to the action list to encode.  Note that since
-     validation is per-tracepoint (local var "xyz" might be valid for
-     one tracepoint and not another, etc), we make up the action on
-     the fly, and don't cache it.  */
-  if (*default_collect)
-    {
-      default_collect_line =  xstrprintf ("collect %s", default_collect);
-      make_cleanup (xfree, default_collect_line);
-
-      validate_actionline (default_collect_line, t);
-
-      default_collect_action = xmalloc (sizeof (struct command_line));
-      make_cleanup (xfree, default_collect_action);
-      default_collect_action->next = actions;
-      default_collect_action->line = default_collect_line;
-      actions = default_collect_action;
-    }
-  encode_actions_1 (actions, t, tloc, frame_reg, frame_offset,
+  encode_actions_1 (actions, tloc, frame_reg, frame_offset,
 		    &tracepoint_list, &stepping_list);
 
   memrange_sortmerge (&tracepoint_list);
   memrange_sortmerge (&stepping_list);
 
-  *tdp_actions = stringify_collection_list (&tracepoint_list,
-					    tdp_buff);
-  *stepping_actions = stringify_collection_list (&stepping_list,
-						 step_buff);
+  *tdp_actions = stringify_collection_list (&tracepoint_list);
+  *stepping_actions = stringify_collection_list (&stepping_list);
 
   do_cleanups (back_to);
 }
@@ -2918,6 +2896,41 @@ trace_dump_actions (struct command_line *action,
     }
 }
 
+/* Return all the actions, including default collect, of a tracepoint
+   T.  It constructs cleanups into the chain, and leaves the caller to
+   handle them (call do_cleanups).  */
+
+static struct command_line *
+all_tracepoint_actions_and_cleanup (struct breakpoint *t)
+{
+  struct command_line *actions;
+
+  actions = breakpoint_commands (t);
+
+  /* If there are default expressions to collect, make up a collect
+     action and prepend to the action list to encode.  Note that since
+     validation is per-tracepoint (local var "xyz" might be valid for
+     one tracepoint and not another, etc), we make up the action on
+     the fly, and don't cache it.  */
+  if (*default_collect)
+    {
+      struct command_line *default_collect_action;
+      char *default_collect_line;
+
+      default_collect_line = xstrprintf ("collect %s", default_collect);
+      make_cleanup (xfree, default_collect_line);
+
+      validate_actionline (default_collect_line, t);
+      default_collect_action = xmalloc (sizeof (struct command_line));
+      make_cleanup (xfree, default_collect_action);
+      default_collect_action->next = actions;
+      default_collect_action->line = default_collect_line;
+      actions = default_collect_action;
+    }
+
+  return actions;
+}
+
 /* The tdump command.  */
 
 static void
@@ -2929,7 +2942,7 @@ trace_dump_command (char *args, int from_tty)
   struct bp_location *loc;
   char *default_collect_line = NULL;
   struct command_line *actions, *default_collect_action = NULL;
-  struct cleanup *old_chain = NULL;
+  struct cleanup *old_chain;
 
   if (tracepoint_number == -1)
     {
@@ -2937,6 +2950,7 @@ trace_dump_command (char *args, int from_tty)
       return;
     }
 
+  old_chain = make_cleanup (null_cleanup, NULL);
   t = get_tracepoint (tracepoint_number);
 
   if (t == NULL)
@@ -2961,28 +2975,11 @@ trace_dump_command (char *args, int from_tty)
     if (loc->address == regcache_read_pc (regcache))
       stepping_frame = 0;
 
-  actions = breakpoint_commands (&t->base);
-
-  /* If there is a default-collect list, make up a collect command,
-     prepend to the tracepoint's commands, and pass the whole mess to
-     the trace dump scanner.  We need to validate because
-     default-collect might have been junked since the trace run.  */
-  if (*default_collect)
-    {
-      default_collect_line = xstrprintf ("collect %s", default_collect);
-      old_chain = make_cleanup (xfree, default_collect_line);
-      validate_actionline (default_collect_line, &t->base);
-      default_collect_action = xmalloc (sizeof (struct command_line));
-      make_cleanup (xfree, default_collect_action);
-      default_collect_action->next = actions;
-      default_collect_action->line = default_collect_line;
-      actions = default_collect_action;
-    }
+  actions = all_tracepoint_actions_and_cleanup (&t->base);
 
   trace_dump_actions (actions, 0, stepping_frame, from_tty);
 
-  if (*default_collect)
-    do_cleanups (old_chain);
+  do_cleanups (old_chain);
 }
 
 /* Encode a piece of a tracepoint's source-level definition in a form
@@ -4274,10 +4271,6 @@ tfile_open (char *filename, int from_tty)
       throw_exception (ex);
     }
 
-  inferior_appeared (current_inferior (), TFILE_PID);
-  inferior_ptid = pid_to_ptid (TFILE_PID);
-  add_thread_silent (inferior_ptid);
-
   if (ts->traceframe_count <= 0)
     warning (_("No traceframes present in this file."));
 
@@ -4288,8 +4281,6 @@ tfile_open (char *filename, int from_tty)
   merge_uploaded_trace_state_variables (&uploaded_tsvs);
 
   merge_uploaded_tracepoints (&uploaded_tps);
-
-  post_create_inferior (&tfile_ops, from_tty);
 }
 
 /* Interpret the given line from the definitions part of the trace
@@ -4661,10 +4652,6 @@ tfile_close (void)
 
   if (trace_fd < 0)
     return;
-
-  pid = ptid_get_pid (inferior_ptid);
-  inferior_ptid = null_ptid;	/* Avoid confusion from thread stuff.  */
-  exit_inferior_silent (pid);
 
   close (trace_fd);
   trace_fd = -1;
@@ -5150,12 +5137,6 @@ tfile_has_registers (struct target_ops *ops)
   return traceframe_number != -1;
 }
 
-static int
-tfile_thread_alive (struct target_ops *ops, ptid_t ptid)
-{
-  return 1;
-}
-
 /* Callback for traceframe_walk_blocks.  Builds a traceframe_info
    object for the tfile target's current traceframe.  */
 
@@ -5236,7 +5217,6 @@ init_tfile_ops (void)
   tfile_ops.to_has_stack = tfile_has_stack;
   tfile_ops.to_has_registers = tfile_has_registers;
   tfile_ops.to_traceframe_info = tfile_traceframe_info;
-  tfile_ops.to_thread_alive = tfile_thread_alive;
   tfile_ops.to_magic = OPS_MAGIC;
 }
 

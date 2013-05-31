@@ -1,3 +1,56 @@
+2013-05-31  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* config/tc-i386.c (md_begin): Don't align text/data/bss sections
+	for ELF.
+
+2013-05-31  Paul Brook  <paul@codesourcery.com>
+
+	gas/
+	* config/tc-mips.c (s_ehword): New.
+
+2013-05-30  Paul Brook  <paul@codesourcery.com>
+
+	* config/tc-mips.c (md_apply_fix): Support BFD_RELOC_MIPS_EH.
+
+2013-05-29  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* write.c (resolve_reloc_expr_symbols): On REL targets don't
+	convert relocs who have no relocatable field either.  Rephrase
+	the conditional so that the PC-relative check is only applied
+	for REL targets.
+
+2013-05-28  Chao-ying Fu  <Chao-ying.Fu@imgtec.com>
+
+	* config/tc-mips.c (macro) <ld>: Don't use $zero for address
+	calculation.
+
+2013-05-28  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* config/tc-aarch64.c (reloc_table): Update to use
+	BFD_RELOC_AARCH64_TLSDESC_ADR_PAGE21 instead of 
+	BFD_RELOC_AARCH64_TLSDESC_ADR_PAGE.
+	(md_apply_fix): Likewise.
+	(aarch64_force_relocation): Likewise.
+
+2013-05-28  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/tc-arm.c (it_fsm_post_encode): Improve
+	warning messages about deprecated IT block formats.
+
+2013-05-28  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	* config/tc-aarch64.c (md_apply_fix): Move value range checking
+	inside fx_done condition.
+
+2013-05-22  Jürgen Urban  <JuergenUrban@gmx.de>
+
+	* config/tc-mips.c (macro): Handle M_LQC2_AB and M_SQC2_AB.
+
+2013-05-20  Peter Bergner <bergner@vnet.ibm.com>
+
+	* config/tc-ppc.c (ppc_setup_opcodes): Use new_seg to fix error
+	and clean up warning when using PRINT_OPCODE_TABLE.
+
 2013-05-20  Alan Modra  <amodra@gmail.com>
 
 	* config/tc-ppc.c (md_apply_fix): Hoist code common to insn

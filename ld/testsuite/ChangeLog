@@ -1,3 +1,41 @@
+2013-05-31  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* ld-i386/pr12718.d: Updated for text/data/bss section alignment
+	change.
+	* ld-i386/tlsbindesc.dd: Likewise.
+	* ld-i386/tlsbindesc.rd: Likewise.
+	* ld-i386/tlsnopic.dd: Likewise.
+	* ld-i386/tlspic.dd: Likewise.
+	* ld-x86-64/ilp32-4.d: Likewise.
+	* ld-x86-64/pr12718.d: Likewise.
+	* ld-x86-64/split-by-file.rd: Likewise.
+	* ld-x86-64/tlsbin.dd: Likewise.
+	* ld-x86-64/tlsbin.rd: Likewise.
+	* ld-x86-64/tlsbindesc.dd: Likewise.
+	* ld-x86-64/tlsbindesc.rd: Likewise.
+	* ld-x86-64/tlsdesc.dd: Likewise.
+	* ld-x86-64/tlsdesc.rd: Likewise.
+	* ld-x86-64/tlspic.dd: Likewise.
+	* ld-x86-64/tlspic.rd: Likewise.
+
+2013-05-29  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* ld-mips-elf/jalr3.dd: New test.
+	* ld-mips-elf/jalr3.ld: New test linker script.
+	* ld-mips-elf/mips-elf.exp: Run the new test.
+
+2013-05-21  Alan Modra  <amodra@gmail.com>
+
+	PR ld/12982
+	* ld-plugin/pr12982.d: Fail if RWE GNU_STACK present.
+
+2013-05-21  Alan Modra  <amodra@gmail.com>
+
+	* ld-powerpc/export-class.exp (supports_ppc64): Delete.
+	(powerpc_export_class_test): Add "endian" param.
+	(abis): Add little-endian targets and test.
+	* ld-powerpc/powerpc-64-export-class.xd: Update for little-endian.
+
 2013-05-10  Joel Brobecker  <brobecker@adacore.com>
 
 	* ld-powerpc/aix-core-sec-1.hd, ld-powerpc/aix-core-sec-2.hd,

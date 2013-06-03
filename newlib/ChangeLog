@@ -1,3 +1,54 @@
+2013-06-03  Joey Ye  <joey.ye@arm.com>
+
+	* libc/machine/arm/Makefile.am (MEMCPY_DEP): New define.
+	($(lpfx)memcpy.o, $(lpfx)memcpy.obj): Depend on MEMCPY_DEP.
+	* libc/machine/arm/Makefile.in: Regenerated.
+	* newlib/libc/machine/arm/memcpy-stub.c: Exclude armv7-m/armv7e-m.
+	* newlib/libc/machine/arm/memcpy-armv7m.S: New.
+	* newlib/libc/machine/arm/memcpy.S: Replace with wrapper code.  Old
+	code moved to ...
+	* newlib/libc/machine/arm/memcpy-armv7a.S: ... here.  Remove 
+	redundant architecture check.
+
+2013-05-30  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/machine/powerpc/times.c: Moved to libgloss/rs6000.
+	* libc/machine/powerpc/Makefile.am: Remove times.c.
+	* libc/machine/powerpc/Makefile.in: Regenerated.
+
+2013-05-29  Joey Ye  <joey.ye@arm.com>
+            Bin Cheng  <bin.cheng@arm.com>
+
+	* configure.in (--enable-newlib-nano-malloc): New option.
+	* configure: Regenerated.
+	* libc/configure.in (--enable-newlib-nano-malloc): New option.
+	* libc/configure: Regenerated.
+	* libc/stdlib/Makefile.am (NEWLIB_NANO_MALLOC): Use.
+	* libc/stdlib/Makefile.in: Regenerated.
+	* libc/stdlib/nano-mallocr.c: New file, implementing nano
+	version malloc family functions.
+
+2013-05-28  Richard Earnshaw  <rearnsha@arm.com>
+
+	* libc/macine/arm/strcpy.S: Explicitly set build attributes when
+	building for thumb1 targets.
+
+2013-05-22  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/ctype/isalnum.c: Correct domain of definition to SUSv4 wording.
+	* libc/ctype/isalpha.c: Ditto.
+	* libc/ctype/isblank.c: Ditto.
+	* libc/ctype/iscntrl.c: Ditto.
+	* libc/ctype/isdigit.c: Ditto.
+	* libc/ctype/islower.c: Ditto.
+	* libc/ctype/isprint.c: Ditto.
+	* libc/ctype/ispunct.c: Ditto.
+	* libc/ctype/isxdigit.c: Ditto.
+
+2013-05-22  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/cdefs.h (_Static_assert): Accommodate gcc >= 4.6.
+
 2013-05-16  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/reent/reent.c (_wrapup_reent): Remove.

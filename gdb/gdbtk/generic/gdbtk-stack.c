@@ -1,5 +1,5 @@
 /* Tcl/Tk command definitions for Insight - Stack.
-   Copyright (C) 2001-2012 Free Software Foundation, Inc.
+   Copyright (C) 2001-2013 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -524,7 +524,7 @@ static void
 get_frame_name (Tcl_Interp *interp, Tcl_Obj *list, struct frame_info *fi)
 {
   struct symbol *func = NULL;
-  const char *funname = NULL;
+  char *funname = NULL;
   enum language funlang = language_unknown;
   Tcl_Obj *objv[1];
 
@@ -553,6 +553,7 @@ get_frame_name (Tcl_Interp *interp, Tcl_Obj *list, struct frame_info *fi)
     {
       objv[0] = Tcl_NewStringObj (funname, -1);
       Tcl_ListObjAppendElement (interp, list, objv[0]);
+      xfree (funname);
     }
   else
     {

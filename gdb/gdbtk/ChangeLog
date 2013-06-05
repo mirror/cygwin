@@ -1,5 +1,13 @@
 2013-06-05  Keith Seitz  <keiths@redhat.com>
 
+	* generic/gdbtk-stack.c (get_frame_name): Change type of 'funname'
+	to char * to follow recent API updates in gdb.
+	Free 'funname' after appending it to the list.
+	Remove check for NULL funname in a branch where it could only
+	ever be NULL.
+
+2013-06-05  Keith Seitz  <keiths@redhat.com>
+
 	* generic/gdbtk-register.c (map_arg_registers): Change type of
 	raw_buffer to gdb_byte to follow recent API changes in gdb.
 	* generic/gdbtk-cmds.c (gdb_update_mem): Likewise for ' mbfu',

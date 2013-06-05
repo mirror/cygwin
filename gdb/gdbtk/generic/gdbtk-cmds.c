@@ -2477,7 +2477,8 @@ gdb_update_mem (ClientData clientData, Tcl_Interp *interp,
   int max_ascii_len, max_val_len, max_label_len;
   char format, aschar;
   char *data, *tmp;
-  char buff[128], *mbuf, *mptr, *cptr, *bptr;
+  char buff[128], *bptr;
+  gdb_byte *mbuf, *mptr, *cptr;
   struct ui_file *stb;
   struct type *val_type;
   struct cleanup *old_chain;
@@ -2535,7 +2536,7 @@ gdb_update_mem (ClientData clientData, Tcl_Interp *interp,
   addr = string_to_core_addr (tmp);
 
   format = *(Tcl_GetStringFromObj (objv[3], NULL));
-  mbuf = (char *) xmalloc (nbytes + 32);
+  mbuf = (gdb_byte *) xmalloc (nbytes + 32);
   if (!mbuf)
     {
       gdbtk_set_result (interp, "Out of memory.");

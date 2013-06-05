@@ -1,5 +1,12 @@
 2013-06-05  Keith Seitz  <keiths@redhat.com>
 
+	* generic/gdbtk-register.c (map_arg_registers): Change type of
+	raw_buffer to gdb_byte to follow recent API changes in gdb.
+	* generic/gdbtk-cmds.c (gdb_update_mem): Likewise for ' mbfu',
+	'mptr', and 'cptr'.
+
+2013-06-05  Keith Seitz  <keiths@redhat.com>
+
 	* generic/gdbtk.c (tk_command): Use xfree instead of free.
 	* generic/gdbtk-hooks.c (gdbtk_call_command): Remove unused
 	cleanup.

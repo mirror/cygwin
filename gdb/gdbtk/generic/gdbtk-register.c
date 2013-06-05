@@ -1,5 +1,5 @@
 /* Tcl/Tk command definitions for Insight - Registers
-   Copyright (C) 2001-2012 Free Software Foundation, Inc.
+   Copyright (C) 2001-2013 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -442,7 +442,7 @@ map_arg_registers (Tcl_Interp *interp, int objc, Tcl_Obj **objv,
 static void
 register_changed_p (int regnum, map_arg arg)
 {
-  char raw_buffer[MAX_REGISTER_SIZE];
+  gdb_byte raw_buffer[MAX_REGISTER_SIZE];
 
   if (!target_has_registers
       || !deprecated_frame_register_read (get_selected_frame (NULL), regnum,

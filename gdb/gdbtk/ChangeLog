@@ -1,3 +1,11 @@
+2013-06-05  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk.c (tk_command): Use xfree instead of free.
+	* generic/gdbtk-hooks.c (gdbtk_call_command): Remove unused
+	cleanup.
+	* generic/gdbtk-cmds.c (gdb_load_info): If bfd_check_format
+	fails, run the cleanup.
+
 2013-04-13  Kevin Buettner  <kevinb@redhat.com>
 
 	* generic/gdbtk-cmds.c (pc_function_name): Adjust type of

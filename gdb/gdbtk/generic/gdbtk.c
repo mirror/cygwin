@@ -1,5 +1,5 @@
 /* Startup code for Insight
-   Copyright (C) 1994-2012 Free Software Foundation, Inc.
+   Copyright (C) 1994-2013 Free Software Foundation, Inc.
 
    Written by Stu Grossman <grossman@cygnus.com> of Cygnus Support.
 
@@ -739,7 +739,7 @@ tk_command (char *cmd, int from_tty)
 
   result = xstrdup (Tcl_GetStringResult (gdbtk_interp));
 
-  old_chain = make_cleanup (free, result);
+  old_chain = make_cleanup (xfree, result);
 
   if (retval != TCL_OK)
     error ("%s", result);

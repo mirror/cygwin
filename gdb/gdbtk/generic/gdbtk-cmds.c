@@ -1,5 +1,5 @@
 /* Tcl/Tk command definitions for Insight.
-   Copyright (C) 1994-2012 Free Software Foundation, Inc.
+   Copyright (C) 1994-2013 Free Software Foundation, Inc.
 
    Written by Stu Grossman <grossman@cygnus.com> of Cygnus Support.
    Substantially augmented by Martin Hunt, Keith Seitz & Jim Ingham of
@@ -969,6 +969,7 @@ gdb_load_info (ClientData clientData, Tcl_Interp *interp,
 
   if (!bfd_check_format (loadfile_bfd, bfd_object))
     {
+      do_cleanups (old_cleanups);
       gdbtk_set_result (interp, "Bad Object File");
       return TCL_ERROR;
     }

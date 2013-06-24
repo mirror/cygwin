@@ -53,7 +53,6 @@
 #include "vec.h"
 
 #include "features/aarch64.c"
-#include "features/aarch64-without-fpu.c"
 
 /* Pseudo register base numbers.  */
 #define AARCH64_Q0_REGNUM 0
@@ -1095,7 +1094,7 @@ aarch64_stub_unwind_sniffer (const struct frame_unwind *self,
   gdb_byte dummy[4];
 
   addr_in_block = get_frame_address_in_block (this_frame);
-  if (in_plt_section (addr_in_block, NULL)
+  if (in_plt_section (addr_in_block)
       /* We also use the stub winder if the target memory is unreadable
 	 to avoid having the prologue unwinder trying to read it.  */
       || target_read_memory (get_frame_pc (this_frame), dummy, 4) != 0)
@@ -2718,7 +2717,6 @@ _initialize_aarch64_tdep (void)
 		    aarch64_dump_tdep);
 
   initialize_tdesc_aarch64 ();
-  initialize_tdesc_aarch64_without_fpu ();
 
   /* Debug this file's internals.  */
   add_setshow_boolean_cmd ("aarch64", class_maintenance, &aarch64_debug, _("\

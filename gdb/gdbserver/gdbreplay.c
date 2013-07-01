@@ -19,6 +19,7 @@
 
 #include "config.h"
 #include "build-gnulib-gdbserver/config.h"
+#include "version.h"
 
 #include <stdio.h>
 #if HAVE_SYS_FILE_H
@@ -40,9 +41,7 @@
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
@@ -71,10 +70,6 @@ typedef int socklen_t;
 
 /* Sort of a hack... */
 #define EOL (EOF - 1)
-
-/* Version information, from version.c.  */
-extern const char version[];
-extern const char host_name[];
 
 static int remote_desc;
 

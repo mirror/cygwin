@@ -1,3 +1,17 @@
+2013-07-02  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-cmds.c (gdb_listfuncs): Update declaration.
+	* generic/gdbtk-hooks.c (gdb_two_elem_cmd): Likewise.
+	(report_error): Likewise.
+	(gdbtk_readline_end, gdbtk_post_add_symbol, gdbtk_error_begin,
+	gdbtk_attach): Likewise.
+	* generic/gdbtk/gdbtk-register.c (setup_architecture_data):
+	Likewise.
+	* generic/gdbtk-wrapper.c (GDB_equal_value, GDB_reinit_frame_cache,
+	GDB_value-coerce_array): Likewise.
+	* generic/gdbtk.c (gdbtk_interactive, gdbtk_start_timer,
+	gdbtk_stop_timer, _initialize_gdbtk): Likewise.
+
 2013-06-05  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-stack.c (get_frame_name): Change type of 'funname'

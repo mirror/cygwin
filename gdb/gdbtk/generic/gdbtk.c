@@ -250,14 +250,14 @@ cleanup_init (void *ignore)
    via the QUIT macro.  */
 
 void
-gdbtk_interactive ()
+gdbtk_interactive (void)
 {
   /* Tk_DoOneEvent (TK_DONT_WAIT|TK_IDLE_EVENTS); */
 }
 
 /* Start a timer which will keep the GUI alive while in target_wait. */
 void
-gdbtk_start_timer ()
+gdbtk_start_timer (void)
 {
   static int first = 1;
 
@@ -304,7 +304,7 @@ gdbtk_start_timer ()
 
 /* Stop the timer if it is running. */
 void
-gdbtk_stop_timer ()
+gdbtk_stop_timer (void)
 {
   if (gdbtk_timer_going)
     {
@@ -688,7 +688,7 @@ gdbtk_test (char *filename)
 /* Come here during initialize_all_files () */
 
 void
-_initialize_gdbtk ()
+_initialize_gdbtk (void)
 {
   /* Current_interpreter not set yet, so we must check
      if "interpreter_p" is set to "insight" to know if

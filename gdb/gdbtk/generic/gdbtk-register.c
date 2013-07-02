@@ -462,7 +462,7 @@ register_changed_p (int regnum, map_arg arg)
 }
 
 static void
-setup_architecture_data ()
+setup_architecture_data (void)
 {
   int numregs;
 

@@ -1,5 +1,5 @@
 /* longjmp-free interface between gdb and gdbtk.
-   Copyright (C) 1999, 2000, 2002, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2002, 2008, 2013 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -271,10 +271,7 @@ wrap_evaluate_expression (char *a)
 }
 
 gdb_result
-GDB_value_equal (val1, val2, result)
-     value_ptr val1;
-     value_ptr val2;
-     int *result;
+GDB_value_equal (value_ptr val1, value_ptr val2, int *result)
 {
   struct gdb_wrapper_arguments args;
   gdb_result r;
@@ -422,7 +419,7 @@ wrap_block_innermost_frame (char *opaque_arg)
 }
 
 gdb_result
-GDB_reinit_frame_cache ()
+GDB_reinit_frame_cache (void)
 {
   gdb_result r;
 
@@ -500,9 +497,7 @@ wrap_value_slice (char *opaque_arg)
 }
 
 gdb_result
-GDB_value_coerce_array (val, rval)
-     value_ptr val;
-     value_ptr *rval;
+GDB_value_coerce_array (value_ptr val, value_ptr *rval)
 {
   struct gdb_wrapper_arguments args;
   gdb_result r;

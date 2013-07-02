@@ -1528,11 +1528,8 @@ gdb_search (ClientData clientData, Tcl_Interp *interp,
 */
 
 static int
-gdb_listfuncs (clientData, interp, objc, objv)
-     ClientData clientData;
-     Tcl_Interp *interp;
-     int objc;
-     Tcl_Obj *CONST objv[];
+gdb_listfuncs (ClientData clientData, Tcl_Interp *interp,
+	       int objc, Tcl_Obj *CONST objv[])
 {
   struct symtab *symtab;
   struct blockvector *bv;

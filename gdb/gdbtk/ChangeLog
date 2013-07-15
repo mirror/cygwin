@@ -1,3 +1,12 @@
+2013-07-15  Roland Schwingel  <roland.schwingel@onevision.com>
+
+	* generic/gdbtk-register.c (get_register): Update
+	to reflect changes from upstream gdb. Prettyprinting
+	becomes prettyformatting now.
+	* generic/gdbtk-wrapper.c (GDB_val_print,wrap_val_print):
+	Likewise.
+	* generic/gdbtk-wrapper.h (GDB_val_print): Likewise.
+
 2013-07-02  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-cmds.c (gdb_listfuncs): Update declaration.

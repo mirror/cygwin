@@ -165,7 +165,7 @@ TclpFree (char *ptr)
  */
 
 void
-close_bfds ()
+close_bfds (void)
 {
   struct objfile *o;
   

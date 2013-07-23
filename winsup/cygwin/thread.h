@@ -92,7 +92,7 @@ class pinfo;
 
 #define MUTEX_OWNER_ANONYMOUS ((pthread_t) -1)
 
-typedef unsigned long thread_magic_t;
+typedef uint32_t thread_magic_t;
 
 /* verifyable_object should not be defined here - it's a general purpose class */
 
@@ -496,8 +496,8 @@ public:
   int shared;
   clockid_t clock_id;
 
-  unsigned long waiting;
-  unsigned long pending;
+  LONG waiting;
+  LONG pending;
   HANDLE sem_wait;
 
   pthread_mutex mtx_in;
@@ -547,14 +547,14 @@ public:
 
   int shared;
 
-  unsigned long waiting_readers;
-  unsigned long waiting_writers;
+  uint32_t waiting_readers;
+  uint32_t waiting_writers;
   pthread_t writer;
   struct RWLOCK_READER
   {
     struct RWLOCK_READER *next;
     pthread_t thread;
-    unsigned long n;
+    uint32_t n;
     RWLOCK_READER (): next (NULL), thread (pthread::self ()), n (0) {}
   } *readers;
   fast_mutex readers_mx;
@@ -637,7 +637,8 @@ public:
 
   HANDLE win32_obj_id;
   int shared;
-  long currentvalue;
+  LONG currentvalue;
+  LONG startvalue;
   int fd;
   unsigned long long hash;
   LUID luid;
@@ -648,6 +649,10 @@ public:
   ~semaphore ();
 
   class semaphore * next;
+  static void fixup_before_fork ()
+  {
+    semaphores.for_each (&semaphore::_fixup_before_fork);
+  }
   static void fixup_after_fork ()
   {
     semaphores.fixup_after_fork ();
@@ -666,6 +671,7 @@ private:
   int _trywait ();
   int _timedwait (const struct timespec *abstime);
 
+  void _fixup_before_fork ();
   void _fixup_after_fork ();
   void _terminate ();
 

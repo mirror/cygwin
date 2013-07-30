@@ -1,3 +1,8 @@
+2013-07-30  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-cmds.c (gdb_clear_file): Remove use of pop_target,
+	which was recently removed from gdb.
+
 2013-07-23  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk.c (close_bfds): Update declaration.

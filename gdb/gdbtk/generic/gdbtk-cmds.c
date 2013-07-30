@@ -487,9 +487,6 @@ gdb_clear_file (ClientData clientData, Tcl_Interp *interp,
 	target_kill ();
     }
 
-  if (target_has_execution)
-    pop_target ();
-
   delete_command (NULL, 0);
   exec_file_clear (0);
   symbol_file_clear (0);

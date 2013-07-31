@@ -27,6 +27,7 @@
 #include "ntdll.h"
 #include <unistd.h>
 #include <wchar.h>
+#include <sys/param.h>
 
 static mini_cygheap NO_COPY cygheap_dummy =
 {
@@ -60,13 +61,11 @@ public:
 };
 
 muto NO_COPY tls_sentry::lock;
-static NO_COPY size_t nthreads;
+static NO_COPY uint32_t nthreads;
 
 #define THREADLIST_CHUNK 256
 
-#define NBUCKETS (sizeof (cygheap->buckets) / sizeof (cygheap->buckets[0]))
-#define N0 ((_cmalloc_entry *) NULL)
-#define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - (unsigned) (N0->data)))
+#define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - offsetof (_cmalloc_entry, data)))
 
 #define CFMAP_OPTIONS (SEC_RESERVE | PAGE_READWRITE)
 #define MVMAP_OPTIONS (FILE_MAP_WRITE)
@@ -114,47 +113,6 @@ init_cygheap::close_ctty ()
   debug_printf ("closing cygheap->ctty %p", cygheap->ctty);
   cygheap->ctty->close_with_arch ();
   cygheap->ctty = NULL;
-}
-
-#define nextpage(x) ((char *) (((DWORD) ((char *) x + granmask)) & ~granmask))
-#define allocsize(x) ((DWORD) nextpage (x))
-#ifdef DEBUGGING
-#define somekinda_printf debug_printf
-#else
-#define somekinda_printf malloc_printf
-#endif
-
-static void *__stdcall
-_csbrk (int sbs)
-{
-  void *prebrk = cygheap_max;
-  size_t granmask = wincap.allocation_granularity () - 1;
-  char *newbase = nextpage (prebrk);
-  cygheap_max = (char *) cygheap_max + sbs;
-  if (!sbs || (newbase >= cygheap_max) || (cygheap_max <= _cygheap_end))
-    /* nothing to do */;
-  else
-    {
-      if (prebrk <= _cygheap_end)
-	newbase = _cygheap_end;
-
-      DWORD adjsbs = allocsize ((char *) cygheap_max - newbase);
-      if (adjsbs && !VirtualAlloc (newbase, adjsbs, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE))
-	{
-	  MEMORY_BASIC_INFORMATION m;
-	  if (!VirtualQuery (newbase, &m, sizeof m))
-	    system_printf ("couldn't get memory info, %E");
-	  somekinda_printf ("Couldn't reserve/commit %d bytes of space for cygwin's heap, %E",
-			    adjsbs);
-	  somekinda_printf ("AllocationBase %p, BaseAddress %p, RegionSize %p, State %p\n",
-			    m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
-	  __seterrno ();
-	  cygheap_max = (char *) cygheap_max - sbs;
-	  return NULL;
-	}
-    }
-
-  return prebrk;
 }
 
 /* Use absolute path of cygwin1.dll to derive the Win32 dir which
@@ -261,6 +219,21 @@ cygheap_init ()
 					 sizeof (*cygheap));
       cygheap_max = cygheap;
       _csbrk (sizeof (*cygheap));
+      /* Initialize bucket_val.  The value is the max size of a block
+         fitting into the bucket.  The values are powers of two and their
+	 medians: 12, 16, 24, 32, 48, 64, ...  On 64 bit, start with 24 to
+	 accommodate bigger size of struct cygheap_entry.
+	 With NBUCKETS == 40, the maximum block size is 6291456/12582912.
+	 The idea is to have better matching bucket sizes (not wasting
+	 space) without trading in performance compared to the old powers
+	 of 2 method. */
+#ifdef __x86_64__
+      unsigned sz[2] = { 16, 24 };	/* sizeof cygheap_entry == 16 */
+#else
+      unsigned sz[2] = { 8, 12 };	/* sizeof cygheap_entry == 8 */
+#endif
+      for (unsigned b = 1; b < NBUCKETS; b++, sz[b & 1] <<= 1)
+	cygheap->bucket_val[b] = sz[b & 1];
       /* Default locale settings. */
       cygheap->locale.mbtowc = __utf8_mbtowc;
       cygheap->locale.wctomb = __utf8_wctomb;
@@ -276,6 +249,47 @@ cygheap_init ()
   cygheap->init_tls_list ();
 }
 
+#define nextpage(x) ((char *) roundup2 ((uintptr_t) (x), \
+					wincap.allocation_granularity ()))
+#define allocsize(x) ((SIZE_T) nextpage (x))
+#ifdef DEBUGGING
+#define somekinda_printf debug_printf
+#else
+#define somekinda_printf malloc_printf
+#endif
+
+static void *__stdcall
+_csbrk (int sbs)
+{
+  void *prebrk = cygheap_max;
+  char *newbase = nextpage (prebrk);
+  cygheap_max = (char *) cygheap_max + sbs;
+  if (!sbs || (newbase >= cygheap_max) || (cygheap_max <= _cygheap_end))
+    /* nothing to do */;
+  else
+    {
+      if (prebrk <= _cygheap_end)
+	newbase = _cygheap_end;
+
+      SIZE_T adjsbs = allocsize ((char *) cygheap_max - newbase);
+      if (adjsbs && !VirtualAlloc (newbase, adjsbs, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE))
+	{
+	  MEMORY_BASIC_INFORMATION m;
+	  if (!VirtualQuery (newbase, &m, sizeof m))
+	    system_printf ("couldn't get memory info, %E");
+	  somekinda_printf ("Couldn't reserve/commit %ld bytes of space for cygwin's heap, %E",
+			    adjsbs);
+	  somekinda_printf ("AllocationBase %p, BaseAddress %p, RegionSize %lx, State %x\n",
+			    m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
+	  __seterrno ();
+	  cygheap_max = (char *) cygheap_max - sbs;
+	  return NULL;
+	}
+    }
+
+  return prebrk;
+}
+
 /* Copyright (C) 1997, 2000 DJ Delorie */
 
 static void *__reg1 _cmalloc (unsigned size);
@@ -285,11 +299,13 @@ static void *__reg1
 _cmalloc (unsigned size)
 {
   _cmalloc_entry *rvc;
-  unsigned b, sz;
+  unsigned b;
 
-  /* Calculate "bit bucket" and size as a power of two. */
-  for (b = 3, sz = 8; sz && sz < size; b++, sz <<= 1)
+  /* Calculate "bit bucket". */
+  for (b = 1; b < NBUCKETS && cygheap->bucket_val[b] < size; b++)
     continue;
+  if (b >= NBUCKETS)
+    return NULL;
 
   cygheap_protect.acquire ();
   if (cygheap->buckets[b])
@@ -300,7 +316,8 @@ _cmalloc (unsigned size)
     }
   else
     {
-      rvc = (_cmalloc_entry *) _csbrk (sz + sizeof (_cmalloc_entry));
+      rvc = (_cmalloc_entry *) _csbrk (cygheap->bucket_val[b]
+				       + sizeof (_cmalloc_entry));
       if (!rvc)
 	{
 	  cygheap_protect.release ();
@@ -320,7 +337,7 @@ _cfree (void *ptr)
 {
   cygheap_protect.acquire ();
   _cmalloc_entry *rvc = to_cmalloc (ptr);
-  DWORD b = rvc->b;
+  unsigned b = rvc->b;
   rvc->ptr = cygheap->buckets[b];
   cygheap->buckets[b] = (char *) rvc;
   cygheap_protect.release ();
@@ -334,7 +351,7 @@ _crealloc (void *ptr, unsigned size)
     newptr = _cmalloc (size);
   else
     {
-      unsigned oldsize = 1 << to_cmalloc (ptr)->b;
+      unsigned oldsize = cygheap->bucket_val[to_cmalloc (ptr)->b];
       if (size <= oldsize)
 	return ptr;
       newptr = _cmalloc (size);
@@ -351,8 +368,7 @@ _crealloc (void *ptr, unsigned size)
 
 #define sizeof_cygheap(n) ((n) + sizeof (cygheap_entry))
 
-#define N ((cygheap_entry *) NULL)
-#define tocygheap(s) ((cygheap_entry *) (((char *) (s)) - (int) (N->data)))
+#define tocygheap(s) ((cygheap_entry *) (((char *) (s)) - offsetof (cygheap_entry, data)))
 
 inline static void *
 creturn (cygheap_types x, cygheap_entry * c, unsigned len, const char *fn = NULL)
@@ -375,7 +391,7 @@ creturn (cygheap_types x, cygheap_entry * c, unsigned len, const char *fn = NULL
 }
 
 inline static void *
-cmalloc (cygheap_types x, DWORD n, const char *fn)
+cmalloc (cygheap_types x, size_t n, const char *fn)
 {
   cygheap_entry *c;
   MALLOC_CHECK;
@@ -384,19 +400,19 @@ cmalloc (cygheap_types x, DWORD n, const char *fn)
 }
 
 extern "C" void *
-cmalloc (cygheap_types x, DWORD n)
+cmalloc (cygheap_types x, size_t n)
 {
   return cmalloc (x, n, NULL);
 }
 
 extern "C" void *
-cmalloc_abort (cygheap_types x, DWORD n)
+cmalloc_abort (cygheap_types x, size_t n)
 {
   return cmalloc (x, n, "cmalloc");
 }
 
 inline static void *
-crealloc (void *s, DWORD n, const char *fn)
+crealloc (void *s, size_t n, const char *fn)
 {
   MALLOC_CHECK;
   if (s == NULL)
@@ -410,13 +426,13 @@ crealloc (void *s, DWORD n, const char *fn)
 }
 
 extern "C" void *__reg2
-crealloc (void *s, DWORD n)
+crealloc (void *s, size_t n)
 {
   return crealloc (s, n, NULL);
 }
 
 extern "C" void *__reg2
-crealloc_abort (void *s, DWORD n)
+crealloc_abort (void *s, size_t n)
 {
   return crealloc (s, n, "crealloc");
 }
@@ -438,7 +454,7 @@ cfree_and_set (char *&s, char *what)
 }
 
 inline static void *
-ccalloc (cygheap_types x, DWORD n, DWORD size, const char *fn)
+ccalloc (cygheap_types x, size_t n, size_t size, const char *fn)
 {
   cygheap_entry *c;
   MALLOC_CHECK;
@@ -450,13 +466,13 @@ ccalloc (cygheap_types x, DWORD n, DWORD size, const char *fn)
 }
 
 extern "C" void *__reg3
-ccalloc (cygheap_types x, DWORD n, DWORD size)
+ccalloc (cygheap_types x, size_t n, size_t size)
 {
   return ccalloc (x, n, size, NULL);
 }
 
 extern "C" void *__reg3
-ccalloc_abort (cygheap_types x, DWORD n, DWORD size)
+ccalloc_abort (cygheap_types x, size_t n, size_t size)
 {
   return ccalloc (x, n, size, "ccalloc");
 }
@@ -600,12 +616,12 @@ init_cygheap::remove_tls (_cygtls *t, DWORD wait)
   tls_sentry here (wait);
   if (here.acquired ())
     {
-      for (size_t i = 0; i < nthreads; i++)
+      for (uint32_t i = 0; i < nthreads; i++)
 	if (t == threadlist[i])
 	  {
 	    if (i < --nthreads)
 	      threadlist[i] = threadlist[nthreads];
-	    debug_only_printf ("removed %p element %d", this, i);
+	    debug_only_printf ("removed %p element %u", this, i);
 	    break;
 	  }
     }

@@ -1461,7 +1461,7 @@ gdb_search (ClientData clientData, Tcl_Interp *interp,
 
   search_symbols (regexp, space, nfiles, files, &ss);
   if (ss != NULL)
-    old_chain = make_cleanup_free_search_symbols (ss);
+    old_chain = make_cleanup_free_search_symbols (&ss);
 
   Tcl_SetListObj (result_ptr->obj_ptr, 0, NULL);
 
@@ -1477,16 +1477,16 @@ gdb_search (ClientData clientData, Tcl_Interp *interp,
       if ((p->symbol != NULL
 	   && strncmp (SYMBOL_LINKAGE_NAME (p->symbol), "__tf", 4) != 0
 	   && strncmp (SYMBOL_LINKAGE_NAME (p->symbol), "_GLOBAL_", 8) != 0)
-	  || p->msymbol != NULL)
+	  || p->msymbol.minsym != NULL)
 	{
 	  elem = Tcl_NewListObj (0, NULL);
 
-	  if (p->msymbol == NULL)
+	  if (p->msymbol.minsym == NULL)
 	    Tcl_ListObjAppendElement (interp, elem,
 				      Tcl_NewStringObj (SYMBOL_PRINT_NAME (p->symbol), -1));
 	  else
 	    Tcl_ListObjAppendElement (interp, elem,
-				      Tcl_NewStringObj (SYMBOL_PRINT_NAME (p->msymbol), -1));
+				      Tcl_NewStringObj (SYMBOL_PRINT_NAME (p->msymbol.minsym), -1));
 
 	  if (show_files)
 	    {

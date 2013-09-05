@@ -43,11 +43,6 @@ typedef union
 /* Type of our mapping functions */
 typedef void (*map_func)(int, map_arg);
 
-/* This contains the previous values of the registers, since the last call to
-   gdb_changed_register_list.
-
-   It is an array of (NUM_REGS+NUM_PSEUDO_REGS)*MAX_REGISTER_RAW_SIZE bytes. */
-
 static int gdb_register_info (ClientData, Tcl_Interp *, int, Tcl_Obj **);
 static void get_register (int, map_arg);
 static void get_register_name (int, map_arg);
@@ -61,6 +56,11 @@ static int gdb_reggroup (ClientData, Tcl_Interp *, int, Tcl_Obj **);
 static int gdb_reggrouplist (ClientData, Tcl_Interp *, int, Tcl_Obj **);
 
 static void get_register_types (int regnum, map_arg);
+
+/* This contains the previous values of the registers, since the last call to
+   gdb_changed_register_list.
+
+   It is an array of (NUM_REGS+NUM_PSEUDO_REGS)*MAX_REGISTER_RAW_SIZE bytes. */
 
 static char *old_regs = NULL;
 static int *regformat = (int *)NULL;

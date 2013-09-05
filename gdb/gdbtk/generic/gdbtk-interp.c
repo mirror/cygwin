@@ -40,7 +40,7 @@
 #endif
 
 
-static void gdbtk_command_loop (void);
+static void gdbtk_command_loop (void *);
 static void hack_disable_interpreter_exec (char *, int);
 void _initialize_gdbtk_interp (void);
 
@@ -101,8 +101,6 @@ gdbtk_interpreter_resume (void *data)
   gdb_stdtarg = d->_stdtarg;
   gdb_stdtargin = d->_stdtargin;
 
-  deprecated_command_loop_hook = gdbtk_command_loop;
-
   /* 2003-02-11 keiths: We cannot actually source our main Tcl file in
      our interpreter's init function because any errors that may
      get generated will go to the wrong gdb_stderr. Instead of hacking
@@ -138,10 +136,11 @@ gdbtk_interpreter_exec (void *data, const char *command_str)
 
 /* This function is called instead of gdb's internal command loop.  This is the
    last chance to do anything before entering the main Tk event loop. 
-   At the end of the command, we enter the main loop. */
+   At the end of the command, we enter the main loop.
+   DATA is the interpreter cookie, currently unused.  */
 
 static void
-gdbtk_command_loop (void)
+gdbtk_command_loop (void *data)
 {
   extern FILE *instream;
 
@@ -187,7 +186,9 @@ _initialize_gdbtk_interp (void)
     gdbtk_interpreter_suspend,	        /* suspend_proc */
     gdbtk_interpreter_exec,             /* exec_proc */
     gdbtk_interpreter_display_prompt_p, /* prompt_proc_p */
-    gdbtk_interpreter_ui_out		/* ui_out_proc */
+    gdbtk_interpreter_ui_out,		/* ui_out_proc */
+    NULL,                               /* set_logging_proc */
+    gdbtk_command_loop                  /* command_loop_proc */
   };
   interp_add (interp_new ("insight", &procs));
 }

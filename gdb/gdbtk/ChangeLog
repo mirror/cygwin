@@ -1,3 +1,12 @@
+2013-08-22  Andrew Burgess  <aburgess@broadcom.com>
+
+	* generic/gdbtk-interp.c (gdbtk_command_loop): Change signature to
+	take interpreter cookie (ignored), mention parameter in comment.
+	(gdb_interpreter_resume): Remove use of
+	deprecated_command_loop_hook.
+	(_initialize_gdbtk_interp): Fill in logging proc and command loop
+	proc pointers.
+
 2013-08-15  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-cmds.c (gdb_search): Update for symbol

@@ -1,5 +1,11 @@
 2013-09-05  Andrew Burgess  <aburgess@broadcom.com>
 
+	* generic/gdbk-register.c (old_regs_count): New variable.
+	(register_changed_p): Add new assert.
+	(setup_architecture_data): Initialise old_regs_count.
+
+2013-09-05  Andrew Burgess  <aburgess@broadcom.com>
+
 	* generic/gdbk-register.c (old_regs): Move the comment about this
 	variable next to the definition.
 

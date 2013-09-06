@@ -63,6 +63,7 @@ static void get_register_types (int regnum, map_arg);
    It is an array of (NUM_REGS+NUM_PSEUDO_REGS)*MAX_REGISTER_RAW_SIZE bytes. */
 
 static char *old_regs = NULL;
+static int old_regs_count = 0;
 static int *regformat = (int *)NULL;
 static struct type **regtype = (struct type **)NULL;
 
@@ -443,6 +444,7 @@ static void
 register_changed_p (int regnum, map_arg arg)
 {
   gdb_byte raw_buffer[MAX_REGISTER_SIZE];
+  gdb_assert (regnum < old_regs_count);
 
   if (!target_has_registers
       || !deprecated_frame_register_read (get_selected_frame (NULL), regnum,
@@ -472,6 +474,7 @@ setup_architecture_data (void)
 
   numregs = (gdbarch_num_regs (get_current_arch ())
 	     + gdbarch_num_pseudo_regs (get_current_arch ()));
+  old_regs_count = numregs;
   old_regs = xcalloc (1, numregs * MAX_REGISTER_SIZE + 1);
   regformat = (int *)xcalloc (numregs, sizeof(int));
   regtype = (struct type **)xcalloc (numregs, sizeof(struct type **));

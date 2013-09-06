@@ -1,4 +1,4 @@
-2013-09-05  Andrew Burgess  <aburgess@broadcom.com>
+2013-09-06  Andrew Burgess  <aburgess@broadcom.com>
 
 	* generic/gdbk-register.c (old_regs_count): New variable.
 	(register_changed_p): Add new assert.

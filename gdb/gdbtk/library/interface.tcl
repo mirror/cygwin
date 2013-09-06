@@ -1815,6 +1815,9 @@ proc initialize_gdbtk {} {
 # The architecture changed. Inform the UI.
 proc gdbtk_tcl_architecture_changed {} {
   set e [ArchChangedEvent \#auto]
+  # First perform global actions as a result of the architecture change.
+  gdb_reg_arch_changed $e 
+  # Now dispatch to all the other event handlers.
   GDBEventHandler::dispatch $e
   delete object $e
 }

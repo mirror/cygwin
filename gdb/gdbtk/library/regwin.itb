@@ -932,9 +932,6 @@ itcl::body RegWin::_select_group {} {
 # ------------------------------------------------------------------
 itcl::body RegWin::arch_changed {event} {
 
-  # Update internal register caches
-  gdb_reg_arch_changed
-
   # Relayout the table
   _layout_table
 

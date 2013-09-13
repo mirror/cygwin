@@ -30,7 +30,7 @@
 # in the GDB repository.  To generate C files:
 #   make GDB=/path/to/gdb XMLTOC="xml files" cfiles
 
-WHICH = aarch64 aarch64-without-fpu \
+WHICH = aarch64 \
 	arm-with-iwmmxt arm-with-vfpv2 arm-with-vfpv3 arm-with-neon \
 	arm-with-m arm-with-m-fpa-layout arm-with-m-vfp-d16 \
 	i386/i386 i386/i386-linux \
@@ -50,6 +50,7 @@ WHICH = aarch64 aarch64-without-fpu \
 	s390-linux32 s390-linux64 s390x-linux64 \
 	s390-linux32v1 s390-linux64v1 s390x-linux64v1 \
 	s390-linux32v2 s390-linux64v2 s390x-linux64v2 \
+	s390-te-linux64 s390x-te-linux64 \
 	tic6x-c64xp tic6x-c64x tic6x-c62x \
 	tic6x-c64xp-linux tic6x-c64x-linux tic6x-c62x-linux
 
@@ -84,9 +85,11 @@ s390-linux32v2-expedite = r14,r15,pswa
 s390-linux64-expedite = r14l,r15l,pswa
 s390-linux64v1-expedite = r14l,r15l,pswa
 s390-linux64v2-expedite = r14l,r15l,pswa
+s390-te-linux64-expedite = r14,r15,pswa
 s390x-linux64-expedite = r14,r15,pswa
 s390x-linux64v1-expedite = r14,r15,pswa
 s390x-linux64v2-expedite = r14,r15,pswa
+s390x-te-linux64-expedite = r14,r15,pswa
 tic6x-c64xp-expedite = A15,PC
 tic6x-c64x-expedite = A15,PC
 tic6x-c62x-expedite = A15,PC

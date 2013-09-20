@@ -443,21 +443,25 @@ map_arg_registers (Tcl_Interp *interp, int objc, Tcl_Obj **objv,
 static void
 register_changed_p (int regnum, map_arg arg)
 {
-  gdb_byte raw_buffer[MAX_REGISTER_SIZE];
+  struct value *val;
   gdb_assert (regnum < old_regs_count);
 
-  if (!target_has_registers
-      || !deprecated_frame_register_read (get_selected_frame (NULL), regnum,
-					  raw_buffer))
+  if (!target_has_registers)
     return;
 
-  if (memcmp (&old_regs[regnum * MAX_REGISTER_SIZE], raw_buffer,
+  val = get_frame_register_value (get_selected_frame (NULL), regnum);
+  if (value_optimized_out (val) || !value_entirely_available (val))
+    return;
+
+  if (memcmp (&old_regs[regnum * MAX_REGISTER_SIZE],
+	      value_contents_all (val),
 	      register_size (get_current_arch (), regnum)) == 0)
     return;
 
   /* Found a changed register.  Save new value and return its number. */
 
-  memcpy (&old_regs[regnum * MAX_REGISTER_SIZE], raw_buffer,
+  memcpy (&old_regs[regnum * MAX_REGISTER_SIZE],
+	  value_contents_all (val),
 	  register_size (get_current_arch (), regnum));
 
   Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr, Tcl_NewIntObj (regnum));

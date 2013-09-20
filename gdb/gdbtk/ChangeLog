@@ -1,5 +1,10 @@
 2013-09-20  Andrew Burgess  <aburgess@broadcom.com>
 
+	* generic/gdbtk-register.c (register_changed_p): Replace use of
+	deprecated_frame_register_read with get_frame_register_value.
+
+2013-09-20  Andrew Burgess  <aburgess@broadcom.com>
+
 	* generic/gdbtk.c: Add include of "main.h".
 	(gdbtk_init_1): Remove.
 	(argv0): Remove.

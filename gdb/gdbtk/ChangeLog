@@ -1,3 +1,11 @@
+2013-09-20  Andrew Burgess  <aburgess@broadcom.com>
+
+	* generic/gdbtk.c: Add include of "main.h".
+	(gdbtk_init_1): Remove.
+	(argv0): Remove.
+	(_initialize_gdbtk): No longer set deprecated_init_ui_hook.
+	(gdbtk_init): Use get_gdb_program_name function from main.h.
+
 2013-09-06  Andrew Burgess  <aburgess@broadcom.com>
 
 	* library/interface.tcl (gdbtk_tcl_architecture_changed): Add call

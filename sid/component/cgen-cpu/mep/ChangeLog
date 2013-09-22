@@ -1,3 +1,9 @@
+2013-09-22  Alan Modra  <amodra@gmail.com>
+
+	* mep.h (mep_cpu_cgen::~mep_cpu_cgen): New.
+	* mep_basic.h (mep_basic_cpu::~mep_basic_cpu): New.
+	* mep_ext1.h (mep_ext1_cpu::~mep_ext1_cpu): New.
+
 2010-02-12  Doug Evans  <dje@sebabeach.org>
 
 	* mep-core1-decode.cxx, * mep-decode.cxx: Regenerate.
@@ -187,7 +193,7 @@
 	(step_one_insn): Likewise.
 
 2009-04-17  DJ Delorie  <dj@redhat.com>
-	
+
 	* mep-core1-decode.cxx: Regenerate.
 	* mep-core1-decode.h: Regenerate.
 	* mep-decode.cxx: Regenerate.
@@ -228,7 +234,7 @@
 	* mep-decode.cxx: Likewise.
 	* mep-desc.h: Likewise.
 	* mep.h: Likewise.
-	
+
 2007-08-13  Frank Ch. Eigler  <fche@redhat.com>
 
 	* common_model.h: Change #include guard name.
@@ -445,7 +451,7 @@
 
 	2005-04-12  Dave Brolley  <brolley@redhat.com>
 
-	* Makefile.am (mep-core1, mep-cop1-16, mep-cop1-32, mep-cop1-48) 
+	* Makefile.am (mep-core1, mep-cop1-16, mep-cop1-32, mep-cop1-48)
 	(mep-cop1-64): Remove unnecessary \ from before $(cgendir).
 	* Makefile.in: Regenerated
 	* mep.cxx (fp.h): #include it.
@@ -634,13 +640,13 @@
 	(do_stcb): Ditto. Also rn.
 	(do_cache_prefetch): New method.
 	(CORE_H1): New static constant.
-	(cache_prefetch_pin, data_cache_invalidate_all_pin, 
+	(cache_prefetch_pin, data_cache_invalidate_all_pin,
 	insn_cache_invalidate_all_pin): New pins.
 	(mep_cpu::disassemble): Pass machine_name () and machine () to
 	cgen_bi_endian_cpu::disassemble.
 	* Makefile.am (CGEN_MACH): New variable.
 	(mep-core1): Pass CGEN_MACH to CGEN.sh.
-	(mep-cop1-16, mep-cop1-32, mep-cop1-48, mep-cop1-64, mep-cpudesc) 
+	(mep-cop1-16, mep-cop1-32, mep-cop1-48, mep-cop1-64, mep-cpudesc)
 	(mep-decsemdefs): Ditto.
 	* Makefile.in: Regenerated.
 
@@ -946,18 +952,18 @@
 	(multiply_busy): Ditto.
 	(ldcb_busy): Ditto.
 	(ctrl_reg_busy): Ditto.
-	(model_u_ldcb_before, model_u_divide_before, model_u_multiply_before) 
-	(model_u_use_ctrl_reg_before, model_u_multiply_after) 
-	(model_u_stcb_after, model_u_divide_after) 
+	(model_u_ldcb_before, model_u_divide_before, model_u_multiply_before)
+	(model_u_use_ctrl_reg_before, model_u_multiply_after)
+	(model_u_stcb_after, model_u_divide_after)
 	(model_u_ldcb_gpr_after): New methods of mep_common_model..
 	(set_ctrl_reg_busy, set_divide_busy, set_multiply_busy)
 	(set_ldcb_busy, set_current_stall, u_exec_cycles): New methods of
 	mep_common_model..
 	(CTRL_HI, CTRL_LO, num_ctrl_reg): New constants.
 	* common_model.cxx (model_u_ldcb_before): New method.
-	(model_u_divide_before, model_u_multiply_before) 
-	(model_u_use_ctrl_reg_before, model_u_multiply_after) 
-	(model_u_stcb_after, model_u_divide_after) 
+	(model_u_divide_before, model_u_multiply_before)
+	(model_u_use_ctrl_reg_before, model_u_multiply_after)
+	(model_u_stcb_after, model_u_divide_after)
 	(model_u_ldcb_gpr_after): New methods.
 	(all methods): Use set_current_stall. Use u_exec_cycles to get
 	the insns execution cycles.
@@ -968,14 +974,14 @@
 
 	* mep.cxx (ri_exception): Zero PSW.IEC and PSW.UMP before ORing in the
 	new value.
-	(hw_int_exception, swi_exception, break_exception) 
+	(hw_int_exception, swi_exception, break_exception)
 	(zdiv_exception, cop_exception, dsp_exception): Ditto.
 
 2003-04-22  Dave Brolley  <brolley@redhat.com>
 
-        * mep.h (step_one_insn): Call model_insn_{before,after} only for the
-        core model using information from the core and coprocessor models.
-        Don't call model_before at all.
+	* mep.h (step_one_insn): Call model_insn_{before,after} only for the
+	core model using information from the core and coprocessor models.
+	Don't call model_before at all.
 
 2003-04-16  Dave Brolley  <brolley@redhat.com>
 
@@ -1316,7 +1322,7 @@
 	* Makefile.in: Regenerated.
 	* mep.cxx (step_insns): Cleaned up tracing a bit.  Fixed error in
 	instruction execution logic.
-	(mep_cpu::mep_cpu): Added initializations for scache engines for 
+	(mep_cpu::mep_cpu): Added initializations for scache engines for
 	ISAs involving 32-bit insns in coprocessors 2 through 7.  Left
 	commented out since support is not complete.
 	(mep_cpu::flush_icache): Flush 32-bit engines for coprocessors 2
@@ -1324,14 +1330,14 @@
 	* mep.h (mep_cpu): Added scache engines for ISAs involving 32-bit
 	insns in coprocessors 2 through 7.  Also left commented out for now.
 	* mep-cop1-64-decode.cxx, mep-cop1-64-decode.h, mep-cop1-64-sem.cxx:
-        Regenerated
+	Regenerated
 
 2001-11-13  Ben Elliston  <bje@redhat.com>
- 
- 	* mep.cxx (ri_exception, hw_int_exception, break_exception,
- 	zdiv_exception, cop_exception): Fix thinko when moving PSW.UMC to
- 	PSW.UMP. Tidy trace output.
- 
+
+	* mep.cxx (ri_exception, hw_int_exception, break_exception,
+	zdiv_exception, cop_exception): Fix thinko when moving PSW.UMC to
+	PSW.UMP. Tidy trace output.
+
 2001-11-08  Frank Ch. Eigler  <fche@redhat.com>
 
 	* mep-*: Regenerated.
@@ -1349,29 +1355,29 @@
 
 2001-11-01  John Healy  <jhealy@redhat.com>
 
-        * Makefile.am: Added new targets to generate cop1-specific files .
-        * Makefile.in: Regenerated.
-        * mep-cop1-16-decode.cxx: New file.
-        * mep-cop1-16-decode.h: Ditto.
-        * mep-cop1-16-defs.h: Ditto.
-        * mep-cop1-16-sem.cxx: Ditto.
-        * mep-cop1-32-decode.cxx: Ditto.
-        * mep-cop1-32-decode.h: Ditto.
-        * mep-cop1-32-defs.h: Ditto.
-        * mep-cop1-32-sem.cxx: Ditto.
-        * mep-cop1-48-decode.cxx: Ditto.
-        * mep-cop1-48-decode.h: Ditto.
-        * mep-cop1-48-defs.h: Ditto.
-        * mep-cop1-48-sem.cxx: Ditto.
-        * mep-cop1-64-decode.cxx: Ditto.
-        * mep-cop1-64-decode.h: Ditto.
-        * mep-cop1-64-defs.h: Ditto.
-        * mep-cop1-64-sem.cxx: Ditto.
-        * mep.h: Regenerated.
+	* Makefile.am: Added new targets to generate cop1-specific files .
+	* Makefile.in: Regenerated.
+	* mep-cop1-16-decode.cxx: New file.
+	* mep-cop1-16-decode.h: Ditto.
+	* mep-cop1-16-defs.h: Ditto.
+	* mep-cop1-16-sem.cxx: Ditto.
+	* mep-cop1-32-decode.cxx: Ditto.
+	* mep-cop1-32-decode.h: Ditto.
+	* mep-cop1-32-defs.h: Ditto.
+	* mep-cop1-32-sem.cxx: Ditto.
+	* mep-cop1-48-decode.cxx: Ditto.
+	* mep-cop1-48-decode.h: Ditto.
+	* mep-cop1-48-defs.h: Ditto.
+	* mep-cop1-48-sem.cxx: Ditto.
+	* mep-cop1-64-decode.cxx: Ditto.
+	* mep-cop1-64-decode.h: Ditto.
+	* mep-cop1-64-defs.h: Ditto.
+	* mep-cop1-64-sem.cxx: Ditto.
+	* mep.h: Regenerated.
 
 2001-10-30  John Healy  <jhealy@redhat.com>
 
-        * mep-decode.cxx, mep-desc.h: Regenerated.
+	* mep-decode.cxx, mep-desc.h: Regenerated.
 
 2001-10-29  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -1384,12 +1390,12 @@
 	* mep.cxx (ri_exception): Use correct exception vector.
 
 2001-10-25  John Healy  <jhealy@redhat.com>
-	
+
 	* mep.cxx (mep_cpu::ri_exception): Added vliw handling.
 	(mep_cpu::nmi_exception): Added vliw handling.
 	(mep_cpu::hw_int_exception): Added vliw handling.
 	(mep_cpu::swi_exception): Added vliw handling.
-	(mep_cpu::break_exception): Added vliw handling. 
+	(mep_cpu::break_exception): Added vliw handling.
 	(mep_cpu::zdiv_exception): Added vliw handling.
 	(mep_cpu::cop_exception): New routine.
 	* mep.h (mep_cpu): Added cop_exception member function.
@@ -1594,7 +1600,7 @@
 	* mep-decode.cxx: Regenerate.
 	* mep-desc.h: Likewise.
 	* mep-sem.cxx: Likewise.
-	
+
 2001-07-04  graydon hoare  <graydon@redhat.com>
 
 	* configure.in: Add maintainer-mode doc building configury.
@@ -1638,7 +1644,7 @@
 	* mep-decode.h: Likewise.
 	* mep-defs.h: Likewise.
 	* mep-sem.cxx: Likewise.
-	
+
 	* Makefile.am (pkgdata_DATA): Add hw-cpu-mep.txt.
 	(cgen-mep): Generate write.cxx.
 
@@ -1769,14 +1775,14 @@
 	(mep_cpu::syscall_error): Likewise.
 	(mep_cpu::syscall_result): Likewise.
 	(mep_cpu::syscall_trap_num): Likewise.
-	
+
 2001-05-25  Ben Elliston  <bje@redhat.com>
 
 	* mep.h (mep_cpu::do_swi): Rename from this ..
 	(mep_cpu::do_syscall): .. to this.
 	* mep.cxx: Likewise.
 	* mep-decode.cxx, mep-decode.h, mep-sem.cxx: Regenerate.
-	
+
 	* mep.h	(mep_cpu::check_option): New method.
 	(mep_cpu::check_option_abs): Likewise.
 	(mep_cpu::check_option_ave): Likewise.
@@ -1897,7 +1903,7 @@
 	* Makefile.in: Regenerate.
 	* mep-cpu.h, mep-decode.cxx, mep-decode.h: New files.
 	* mep-defs.h, mep-desc.h, mep-sem.cxx: Likewise.
-	
+
 	* Makefile.am: Disable most targets for now.
 	* Makefile.in: Regenerate.
 

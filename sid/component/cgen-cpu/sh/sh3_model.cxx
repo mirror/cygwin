@@ -88,7 +88,7 @@ sh3_model<BASE, CPU, IDESC>::model_u_macw_after (CPU *cpu, const IDESC *idesc, i
   UINT extra_cycle = this->model_mac_after (cpu, 3);
 
   // Basic execution cycles for this insn.
-  UINT cycles = unit_cycles (idesc, BASE::UNIT_U_MACW);
+  UINT cycles = this->unit_cycles (idesc, BASE::UNIT_U_MACW);
 
   return cycles + extra_cycle;
 }
@@ -101,7 +101,7 @@ sh3_model<BASE, CPU, IDESC>::model_u_macl_after (CPU *cpu, const IDESC *idesc, i
   UINT extra_cycle = this->model_mac_after (cpu, 3);
 
   // Basic execution cycles for this insn.
-  UINT cycles = unit_cycles (idesc, BASE::UNIT_U_MACL);
+  UINT cycles = this->unit_cycles (idesc, BASE::UNIT_U_MACL);
 
   return cycles + extra_cycle;
 }
@@ -111,10 +111,10 @@ UINT
 sh3_model<BASE, CPU, IDESC>::model_u_dmul_after (CPU *cpu, const IDESC *idesc, int unit_num, unsigned long long referenced)
 {
   // MAC model with multiply latency of 3.
-  UINT extra_cycle = model_mac_after (cpu, 3);
+  UINT extra_cycle = this->model_mac_after (cpu, 3);
 
   // Basic execution cycles for this insn.
-  UINT cycles = unit_cycles (idesc, BASE::UNIT_U_DMUL);
+  UINT cycles = this->unit_cycles (idesc, BASE::UNIT_U_DMUL);
 
   return cycles + extra_cycle;
 }
@@ -124,10 +124,10 @@ UINT
 sh3_model<BASE, CPU, IDESC>::model_u_mull_after (CPU *cpu, const IDESC *idesc, int unit_num, unsigned long long referenced)
 {
   // MAC model with multiply latency of 3.
-  UINT extra_cycle = model_mac_after (cpu, 3);
+  UINT extra_cycle = this->model_mac_after (cpu, 3);
 
   // Basic execution cycles for this insn.
-  UINT cycles = unit_cycles (idesc, BASE::UNIT_U_MULL);
+  UINT cycles = this->unit_cycles (idesc, BASE::UNIT_U_MULL);
 
   return cycles + extra_cycle;
 }

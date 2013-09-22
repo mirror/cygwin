@@ -91,6 +91,9 @@ namespace mep
 	: cr64_queuelen(0),
 	  ccr_queuelen(0)
         { }
+
+      ~mep_cpu_cgen() throw ()
+        { }
     };
 
   class debugger_bus_with_control_bus_vision :

@@ -120,9 +120,9 @@ sh2a_model<BASE, CPU, IDESC>::model_u_use_multiply_result_before (CPU *cpu, cons
       // LDS.L has a longer pipeline and can execute 1 cycle
       // earlier than other insns.
       if (insn_is_ldsl_mac (idesc) && this->multiply_busy >= 2)
-	set_current_stall (this->multiply_busy - 2);
+	this->set_current_stall (this->multiply_busy - 2);
       else
-	set_current_stall (this->multiply_busy - 1);
+	this->set_current_stall (this->multiply_busy - 1);
     }
 
   return 0;
@@ -134,7 +134,7 @@ sh2a_model<BASE, CPU, IDESC>::model_u_write_back_before (CPU *cpu, const IDESC *
 {
   // Only used by STS and STS.L. Stall until the multiply unit is completely free.
   if (write_back_busy)
-    set_current_stall (this->multiply_busy);
+    this->set_current_stall (this->multiply_busy);
 
   return 0;
 }

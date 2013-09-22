@@ -36,6 +36,7 @@ namespace mep_ext1 {
       my_cop48_model (this),
       my_cop64_model (this)
     {}
+    ~mep_ext1_cpu() throw() {}
 
     void core_model_insn_before (bool first_p = true) { my_core_model.model_insn_before (first_p); }
     void core_model_step_latency (sid::host_int_4 cycles = 0) { my_core_model.step_latency (cycles); }

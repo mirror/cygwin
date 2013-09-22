@@ -32,25 +32,25 @@ template <class CPU, class CGEN_CPU, class IDESC, class SCACHE, class MODEL>
 void
 sh4_cpu_base<CPU,CGEN_CPU,IDESC,SCACHE,MODEL>::sh64_ftrv (unsigned n)
 {
-  SF result = sh64_fmuls (this->h_xf_get (0), this->h_frc_get (n));
-  result = sh64_fadds (result, sh64_fmuls (this->h_xf_get (4),  this->h_frc_get (n + 1)));
-  result = sh64_fadds (result, sh64_fmuls (this->h_xf_get (8),  this->h_frc_get (n + 2)));
-  result = sh64_fadds (result, sh64_fmuls (this->h_xf_get (12), this->h_frc_get (n + 3)));
+  SF result = this->sh64_fmuls (this->h_xf_get (0), this->h_frc_get (n));
+  result = this->sh64_fadds (result, this->sh64_fmuls (this->h_xf_get (4),  this->h_frc_get (n + 1)));
+  result = this->sh64_fadds (result, this->sh64_fmuls (this->h_xf_get (8),  this->h_frc_get (n + 2)));
+  result = this->sh64_fadds (result, this->sh64_fmuls (this->h_xf_get (12), this->h_frc_get (n + 3)));
   this->h_frc_set (n, result);
-  result = sh64_fmuls (this->h_xf_get (1), this->h_frc_get (n));
-  result = sh64_fadds (result, sh64_fmuls (this->h_xf_get (5),  this->h_frc_get (n + 1)));
-  result = sh64_fadds (result, sh64_fmuls (this->h_xf_get (9),  this->h_frc_get (n + 2)));
-  result = sh64_fadds (result, sh64_fmuls (this->h_xf_get (13), this->h_frc_get (n + 3)));
+  result = this->sh64_fmuls (this->h_xf_get (1), this->h_frc_get (n));
+  result = this->sh64_fadds (result, this->sh64_fmuls (this->h_xf_get (5),  this->h_frc_get (n + 1)));
+  result = this->sh64_fadds (result, this->sh64_fmuls (this->h_xf_get (9),  this->h_frc_get (n + 2)));
+  result = this->sh64_fadds (result, this->sh64_fmuls (this->h_xf_get (13), this->h_frc_get (n + 3)));
   this->h_frc_set (n + 1, result);
-  result = sh64_fmuls (this->h_xf_get (2), this->h_frc_get (n));
-  result = sh64_fadds (result, sh64_fmuls (this->h_xf_get (6),  this->h_frc_get (n + 1)));
-  result = sh64_fadds (result, sh64_fmuls (this->h_xf_get (10), this->h_frc_get (n + 2)));
-  result = sh64_fadds (result, sh64_fmuls (this->h_xf_get (14), this->h_frc_get (n + 3)));
+  result = this->sh64_fmuls (this->h_xf_get (2), this->h_frc_get (n));
+  result = this->sh64_fadds (result, this->sh64_fmuls (this->h_xf_get (6),  this->h_frc_get (n + 1)));
+  result = this->sh64_fadds (result, this->sh64_fmuls (this->h_xf_get (10), this->h_frc_get (n + 2)));
+  result = this->sh64_fadds (result, this->sh64_fmuls (this->h_xf_get (14), this->h_frc_get (n + 3)));
   this->h_frc_set (n + 2, result);
-  result = sh64_fmuls (this->h_xf_get (3), this->h_frc_get (n));
-  result = sh64_fadds (result, sh64_fmuls (this->h_xf_get (7),  this->h_frc_get (n + 1)));
-  result = sh64_fadds (result, sh64_fmuls (this->h_xf_get (11), this->h_frc_get (n + 2)));
-  result = sh64_fadds (result, sh64_fmuls (this->h_xf_get (15), this->h_frc_get (n + 3)));
+  result = this->sh64_fmuls (this->h_xf_get (3), this->h_frc_get (n));
+  result = this->sh64_fadds (result, this->sh64_fmuls (this->h_xf_get (7),  this->h_frc_get (n + 1)));
+  result = this->sh64_fadds (result, this->sh64_fmuls (this->h_xf_get (11), this->h_frc_get (n + 2)));
+  result = this->sh64_fadds (result, this->sh64_fmuls (this->h_xf_get (15), this->h_frc_get (n + 3)));
   this->h_frc_set (n + 3, result);
 }
 

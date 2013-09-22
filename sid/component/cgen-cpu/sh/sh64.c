@@ -8,8 +8,8 @@
 /* These C functions are not used but needed for static linking.
    We need to refer to the ELF header structure.  */
 
-#include "dis-asm.h"
 #include "sysdep.h"
+#include "dis-asm.h"
 #include "sh64-opc.h"
 #include "libiberty.h"
 #include "elf-bfd.h"

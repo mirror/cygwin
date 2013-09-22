@@ -1,3 +1,9 @@
+2013-09-22  Alan Modra  <amodra@gmail.com>
+
+	* angel.h (arm_angel::~arm_angel): New.
+	* m32r.h (m32r_libgloss::~m32r_libgloss): New.
+	* mips.h (mips32_idt::~mips32_idt): New.
+
 2007-11-07  Dave Brolley  <brolley@redhat.com>
 
 	* libgloss.h (libgloss::SYS_reconfig): Value to changed to match the new

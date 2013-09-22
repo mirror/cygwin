@@ -1,3 +1,12 @@
+2013-09-22  Alan Modra  <amodra@gmail.com>
+
+	* sh.h (sh_cpu_impl::~sh_cpu_impl): New.
+	* sh2a_model.cxx (model_u_use_multiply_result_before): Specify
+	dependent base class function with 'this->'.
+	* sh3_model.cxx: Likewise.
+	* sh4.cxx: Likewise.
+	* sh64.c: Include sysdep.h first.
+
 2010-02-12  Doug Evans  <dje@sebabeach.org>
 
 	* sh5-media-decode.cxx: Regenerate.

@@ -392,14 +392,14 @@ ostream& operator<< (ostream& op, const armRemapPause& obj)
      << " num-relocs " << static_cast<unsigned int> (obj.num_relocations)
      << " relocs ";
 
-  for (armRemapPause::entry_t::const_iterator it = obj.entries.begin();
-       it != obj.entries.end();
-       it++)
+  for (armRemapPause::entry_t::const_iterator ie = obj.entries.begin();
+       ie != obj.entries.end();
+       ie++)
     {
-      op << make_attribute(it->second.first) << ",";    // start address
-      op << make_attribute(it->second.second) << ",";   // end address
+      op << make_attribute(ie->second.first) << ",";    // start address
+      op << make_attribute(ie->second.second) << ",";   // end address
       
-      host_int_4 start_addr = it->second.first;
+      host_int_4 start_addr = ie->second.first;
       armRemapPause::translation_t::const_iterator it = obj.translations.find(start_addr);
       assert(it != obj.translations.end());
       op << it->second << " ";                          // relocated address

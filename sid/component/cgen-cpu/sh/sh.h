@@ -315,6 +315,7 @@ namespace sh
   class sh_cpu_impl: public sh_cpu<CGEN_CPU>
     {
     public:
+      ~sh_cpu_impl() throw() { }
       PCADDR get_fetched_insn_pc () { return this->fetched_insn_pc; }
 
     protected:

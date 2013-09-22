@@ -15,6 +15,7 @@ class m32r_libgloss: public gloss32
 public:
 
   m32r_libgloss();
+  ~m32r_libgloss() throw() { }
 
 private:
 

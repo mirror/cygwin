@@ -18,6 +18,7 @@ class mips32_idt: public gloss32
 public:
 
   mips32_idt();
+  ~mips32_idt() throw() { }
 
 private:
 

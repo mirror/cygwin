@@ -35,6 +35,7 @@ class arm_angel: public gloss32
 public:
 
   arm_angel();
+  ~arm_angel() throw() { }
 
 private:
 

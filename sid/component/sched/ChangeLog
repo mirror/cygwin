@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2008-06-17  Dave Brolley  <brolley@redhat.com>
 
 	* compSched.cxx (deliver_regular): Drive rnext->when.
@@ -73,7 +77,7 @@
 2002-03-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* compSched.cxx (host_time_keeper_base ctor): On Cygwin, call
-	timeBeginPeriod to shrink scheduling granularity.  Keep more 
+	timeBeginPeriod to shrink scheduling granularity.  Keep more
 	statistics.  Initialize more variables.
 	(yield): Rewrite.
 	(operator <<): Print extra stats.
@@ -188,7 +192,7 @@
 
 2000-01-18  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* compSched.cxx (scheduler_component_base): Add recursion_limited 
+	* compSched.cxx (scheduler_component_base): Add recursion_limited
 	base class.
 	(scheduler_component_base ctor): Initialize it.
 	(scheduler_component advance): Prevent harmful recursion.
@@ -210,7 +214,7 @@
 1999-12-21  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compSched.cxx (scheduler_client::set_time): Round time up if
- 	scale is too small.
+	scale is too small.
 
 1999-12-09  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -224,7 +228,7 @@
 1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* Makefile.in: Regenerated.
-	
+
 1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sid-sched.txt: New file.  Renamed from
@@ -292,7 +296,7 @@
 1999-09-08  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compSched.cxx (system_now): Move out-of-line for debuggability.
- 	(generic_scheduler::next_event): New function.
+	(generic_scheduler::next_event): New function.
 	(generic_scheduler::advance_any): Dispatch all due/overdue events.
 	Limit iteration to detect hopeless overload.
 
@@ -318,7 +322,7 @@
 	(accurate_host_time_keeper): New class with no dilution at all.
 	(generic_scheduler::yield): Simplify logic.
 	(create): Use accurate_host_time_keeper for sid-sched-host-accurate.
-	
+
 1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* Makefile.in: Regenerated.
@@ -333,14 +337,14 @@
 	(scheduler_component_ctor_2): New function.
 	(scheduler_component_ctor_3): New function.
 	(scheduler_component ctor): Move guts into above functions.  Call them.
-	
+
 1999-08-12  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compSched.cxx (list_types, create): Rename component type
 	"sid-scheduler-host-precise" -> "...-accurate".
 	(scheduler_component ctor): Add attributes for target view access.
 	(get_time, set_time): New functions.
-	(host_time_keeper::yield): Test but don't assert forward flow of time. 
+	(host_time_keeper::yield): Test but don't assert forward flow of time.
 	* README: New documentation file.
 	* README.old: Renamed copy of old README.
 
@@ -369,7 +373,7 @@
 	(scheduler_component ctor): Associate new "yield" pin with function.
 	Rename "yield?" attribute to "yield-host-time?".
 	* README: Document changes.
-	
+
 	* Makefile.am (DEJAGNUFLAGS): New macro.
 	(checkme): New target.
 
@@ -389,7 +393,7 @@
 
 	* compSched.cxx (host_time_keeper::get_now): Move out-of-line.
 	(refill_regular_events_table): Ditto.
-	
+
 1999-06-18  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compSched.cxx (tick_t): Change back to compiler_int_8.
@@ -397,26 +401,26 @@
 	(now): Deleted functions.  Pointed callers to get_now instead.
 
 	(generic_scheduler): Use plain value vectors for regular_events and
- 	irregular_events.  Adjust all users.  Effect is to avoid heap
- 	allocation during scheduler operation.
+	irregular_events.  Adjust all users.  Effect is to avoid heap
+	allocation during scheduler operation.
 	(ctor): Enumerate members to be initialized.
-	
+
 	(advance_any): New function; combined form of previous advance_*.
 	(advance_both, advance_*regular, advance_nop): Removed function.
 	(reset_advance_function): Removed function.  Updated callers.
 	(advance_function): Removed function pointer.
 
 	(set_control): Cancel existing scheduled events on new request.
-	
+
 1999-06-16  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compSched.cxx (tick_t): Change typedef to host_int_8, as a
- 	compiler bug workaround attempt.
+	compiler bug workaround attempt.
 	(host_time_keeper): Change types of adaptive counters to
- 	compiler_int_4.
+	compiler_int_4.
 	(refill_regular_events_table): Use tick_t for next_tick_index.
 	(generic_scheduler operator >>): Read into tick_t, not clock_t.
-	
+
 1999-06-09  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compSched.cxx (do_delete): New function.
@@ -433,7 +437,7 @@
 1999-06-01  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compSched.cxx (host_time_keeper): Support template-specified
- 	dilution for reducing accuracy by cutting system call use rate.
+	dilution for reducing accuracy by cutting system call use rate.
 	(list_types): Export "host-time-scheduler" with 25-ms dilution,
 	and "host-time-scheduler-precise" with 1-ms (nil) dilution.
 	Remove previous "XXX-time-schedule" type aliases.
@@ -454,13 +458,13 @@
 
 1999-05-28  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* compSched.cxx (generic_scheduler::operator<<,>>): Add 
- 	functional state save/restore code.
+	* compSched.cxx (generic_scheduler::operator<<,>>): Add
+	functional state save/restore code.
 	(clear_pin_mappings): New function.
 	(add_pin_mapping): New function.
 	(scheduler_component::operator<<,>>): Store client data.
 	(state_save): Return a value, duh.
-	
+
 1999-05-26  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compSched.cxx (generic_scheduler): Add stub state save/restore
@@ -521,9 +525,9 @@
 	(configure.in): Look for usleep function.
 	(configure): Regenerated.
 	(config.in): Regenerated.
-	
+
 	(list_types, create): Add more intuitive aliases for component
- 	type names.
+	type names.
 
 1999-04-14  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -535,8 +539,8 @@
 	* compSched.cxx (set_control): Interpret top bit of driven value as
 	"regular vs. irregular" mode selection.
 	(refill_regular_events_table): Don't crash if last regular event
- 	is deleted.
-	
+	is deleted.
+
 1999-04-01  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compSched.cxx (*): Adapt to renamed fixed_attribute_map functions.
@@ -552,7 +556,7 @@
 	(refill_regular_events_table): Correct timetable init logic.
 	(set_control): Remove old cancel detection logic.
 	(advance_both): Renamed version of `advance_generic'.
-	
+
 	* README: Added step-cycle-limit attribute docs.
 
 1999-03-26  Frank Ch. Eigler  <fche@cygnus.com>

@@ -1,3 +1,12 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir and -I libltdl.
+	* Makefile.in, aclocal.m4, config.in, configure: Regenerate.
+	* libltdl/acinclude.m4: (_LT_ENABLE_LOCK <ld -m flags>): Remove
+	non-canonical ppc host match.  Support little-endian powerpc linux.
+	* libltdl/configure: Regenerate.
+
 2007-01-24  Dave Brolley  <brolley@redhat.com>
 
 	* libltdl/ltdl.c (lt_dlexit): Make sure that 'cur' is not NULL before
@@ -181,7 +190,7 @@
 	* configure.in (--enable-timebomb): Remove.
 	* configure: Regenerate.
 	* config.in: Likewise.
-	
+
 2001-03-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* compConfig.cxx (configure): Use find_sid_data_file to locate
@@ -219,11 +228,11 @@
 
 2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * libltdl/ltdl.c [_WIN32]: Added check for not __CYGWIN__ since
-        wll logic should not be used on Cygwin.
-        [HAVE_LIBDL]: Removed check for not __CYGWIN__.
-        (sys_wll_open): Added fix so NULL filename would not be input
-        to string functions.
+	* libltdl/ltdl.c [_WIN32]: Added check for not __CYGWIN__ since
+	wll logic should not be used on Cygwin.
+	[HAVE_LIBDL]: Removed check for not __CYGWIN__.
+	(sys_wll_open): Added fix so NULL filename would not be input
+	to string functions.
 
 2000-11-14  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -248,9 +257,9 @@
 
 2000-05-23  Jeff Johnston  <jjohnstn@cygnus.com>
 
-        * Makefile.in: Regenerated.
-        * libltdl/Makefile.in: Ditto.
-        * libltdl/aclocal.m4: Ditto.
+	* Makefile.in: Regenerated.
+	* libltdl/Makefile.in: Ditto.
+	* libltdl/aclocal.m4: Ditto.
 
 2000-05-23  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -300,7 +309,7 @@
 2000-01-18  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compConfig.cxx (cfgroot_component): Inherit from
- 	recursion_limited.  Add "activity_count" member.
+	recursion_limited.  Add "activity_count" member.
 	(cfgroot_component ctor): Export "activity-count" r/o attribute.
 	(run): Prevent harmful recursion.
 	* sid-control-cfgroot.txt: Document new attribute and recursion
@@ -339,7 +348,7 @@
 	(configure, configure_line): Update it.
 	(cfgroot_component ctor): Export it as "config-file-history".
 	(instantiate-component): Use "auto-print" as category name instead of
- 	"autoprint".
+	"autoprint".
 	* sid-control-cfgroot.txt: Document new attribute and auto-print
 	rename.  Mention "unrelate" command.
 
@@ -441,7 +450,7 @@
 
 1999-11-08  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* compConfig.cxx (cfgroot_component ctor): Define new "config-file" 
+	* compConfig.cxx (cfgroot_component ctor): Define new "config-file"
 	attribute.
 	* README: Document it.
 
@@ -472,7 +481,7 @@
 	* compConfig.cxx (cfgroot_component::emit_error): Implement.
 	(cfgroot_component::*): Use it.
 	(cfgroot_component::parse_command): Emit errors when EOF is
-	encountered unexpectedly. 
+	encountered unexpectedly.
 	(cfgroot_component::parse_command): Test for valid arrow
 	operators. Fix for CR 101408.
 	(cfgroot_component::consume_token): Discard non-printable
@@ -500,7 +509,7 @@
 1999-10-08  Frank Ch. Eigler  <fche@toenail.to.cygnus.com>
 
 	* compConfig.cxx (register_dso): Check that component library
-	supplies all three factory functions.  Later, assert 
+	supplies all three factory functions.  Later, assert
 	list_component_types hook.
 	(instantiate_component): Assert create_component hook.
 	(cfgroot_component dtor): Assert delete_component hook.
@@ -563,7 +572,7 @@
 	* configure.in: Don't look for strerror.
 	* configure: Regenerated.
 	* config.in: Regenerated.
- 
+
 1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compConfig.cxx (operator >>): Use ANSI setstate() instead of setf().
@@ -610,20 +619,20 @@
 1999-07-21  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compConfig.cxx (cfgroot_component ctor): Remove "gdb-cpu" and
- 	"gloss" pseudo-relations.  Update new component_type_map member.
+	"gloss" pseudo-relations.  Update new component_type_map member.
 	(resume): Removed.
 	(instantiate_component): Track component type names.
 	(listRelationships): Support only selected fixed relations.
 	(setRelatedComponents): Ditto.
 	(getRelatedComponents): Ditto.
 	(inform_catalog_map_informees): New function.  Inform external
- 	components about component catalog.
+	components about component catalog.
 	(run): Call it.
 	* compConfig.h (cfgroot_component): Match declarations to changes.
 
 1999-06-23  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* configure.in (AC_DISABLE_SHARED): By default, disable shared build. 
+	* configure.in (AC_DISABLE_SHARED): By default, disable shared build.
 	(AC_LIBTOOL_WIN32_DLL): Remove temptation.
 	* libltdl/configure.in: Ditto.
 	* configure: Regenerated.
@@ -651,10 +660,10 @@
 
 	Remove mutable members.
 	* compConfig.h: Remove "mutable" from all maps.
-	* compConfig.cxx: (cfgroot_component::listRelationships, 
-	  getRelatedComponents): Fix const problems.  Replace uses of 
-	  iterator with const_interator.  Change map["abc"] to 
-          map.find("abc")->second.
+	* compConfig.cxx: (cfgroot_component::listRelationships,
+	getRelatedComponents): Fix const problems.  Replace uses of
+	iterator with const_interator.  Change map["abc"] to
+	map.find("abc")->second.
 
 	Add destructor which deletes allocated components.
 	* compConfig.h: (cfgroot_component) Add destructor.
@@ -700,17 +709,17 @@
 	Rename "<<run>>" pin to "run!".
 	(last_config_file_name): New function.
 	(configure): Return sid::component::status value.
-	(run): Do nothing on empty component list. 	
+	(run): Do nothing on empty component list.
 	* compConfig.h (config_component): Matching declaration changes.
 	Make configure() protected:.
 	(restore_state): Return sid::component::status.
-	
+
 1999-05-18  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compConfig.h (setRelatedComponents): Declare return type.
 	* compConfig.cxx (setRelatedComponents): Return "not_found".
 	(set_relation): Check success of setRelatedComponents
-	call. 
+	call.
 
 1999-05-13  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -743,11 +752,11 @@
 1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compConfig.cxx: (register_dso) Use libltdl as OS-independent .la
- 	loader.  Be more verbose.
+	loader.  Be more verbose.
 	(register_la): Removed.
 	(parse_command): Call only register_dso.
 	(ctor): Add "verbose?" attribute alias.
-	
+
 	(config_component_library): DLLEXPORT it.
 	* configure.in: Look for libltdl.  Be win32-dll-capable.
 	* configure: Regenerated.
@@ -784,7 +793,7 @@
 	(instantiate_component): Don't automatically send new component
 	its name and creator.
 	(set_attribute): Don't automatically read-verify new attribute.
-	
+
 	* configure.in: Use new AC_CONFIG_AUX_DIR.
 	* configure: Regenerated.
 	* Makefile.am: Build libtool -modules.
@@ -793,7 +802,7 @@
 1999-03-16  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compConfig.cxx (parse): Use strerror for error messages instead
- 	of perror.  Adapt to renamed COMPONENT_LIBRARY_MAGIC macro.
+	of perror.  Adapt to renamed COMPONENT_LIBRARY_MAGIC macro.
 	* configure.in: Look for strerror.
 	* configure: Regenerated.
 	* config.in: Regenerated.
@@ -806,7 +815,7 @@
 
 1999-03-12  Ron Unrau  <runrau@cygnus.com>
 
-	* compConfig.cxx: check return values from setAccessor, connectPin, 
+	* compConfig.cxx: check return values from setAccessor, connectPin,
 	  disconnectPin, and setAttrValue.
 
 1993-03-12  Frank Ch. Eigler  <fche@cygnus.com>
@@ -824,16 +833,16 @@
 	* compConfig.cxx: incorporate revised pin API
 
 1999-03-05  Frank Ch. Eigler  <fche@cygnus.com>
-	
+
 	* compConfig.cxx (cfgroot_component): Remove unneeded virtual
- 	inheritance.  Make some members mutable.  Declare use of new
- 	relationship API.
+	inheritance.  Make some members mutable.  Declare use of new
+	relationship API.
 	(parse_command): Interpret new "relate" command.
 	(set_relation): New function.
 	(instantiate_component): Inform new component of creator
- 	relationship.
+	relationship.
 	(*Relate*): Add relationship API services to enumerate child
- 	components.
+	components.
 
 1999-03-01  Frank Ch. Eigler  <fche@cygnus.com>
 

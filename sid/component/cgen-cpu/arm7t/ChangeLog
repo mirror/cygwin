@@ -1,3 +1,9 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir.
+	* Makefile.in, aclocal.m4, configure: Regenerate.
+
 2010-02-12  Doug Evans  <dje@sebabeach.org>
 
 	* thumb-decode.cxx: Regenerate.
@@ -37,7 +43,7 @@
 2006-03-29  Harry Hsin-Hua Pan  <harry@andestech.com>
 
 	* arm7f.cxx (compute_operand2_immshift): Implement RRX.
-	
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.
@@ -80,8 +86,8 @@
 
 2002-09-07  Frank Ch. Eigler  <fche@redhat.com>
 
-        * arm-*, thumb-*: Regenerated files with Robert Cragie's new
-        cgen instructions.
+	* arm-*, thumb-*: Regenerated files with Robert Cragie's new
+	cgen instructions.
 	* arm-defs.h: Removed.
 	* arm7.h: Don't include arm-defs.h.
 	* Makefile.am: Stop arm-defs.h generation.
@@ -135,7 +141,7 @@
 	* arm7f.cxx (arm7f_cpu::memory_trap): Ignore bus::delayed.
 
 2001-06-21  matthew green  <mrg@redhat.com>
-	
+
 	* Makefile.am: Formatting consistency.
 	* Makefile.in: Regenerate.
 
@@ -165,9 +171,9 @@
 
 2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * configure: Regenerated.
-        * aclocal.m4: Ditto.
-        * Makefile.in: Ditto.
+	* configure: Regenerated.
+	* aclocal.m4: Ditto.
+	* Makefile.in: Ditto.
 
 2000-11-11  Frank Ch. Eigler  <fche@redhat.com>
 

@@ -1,3 +1,9 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir.
+	* Makefile.in, aclocal.m4, configure: Regenerate.
+
 2007-03-02  Dave Brolley  <brolley@redhat.com>
 
 	* arm7t-timer.h (~armTimerNoSched): New virtual destructor with empty
@@ -43,9 +49,9 @@
 
 2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * configure: Regenerated.
-        * aclocal.m4: Ditto.
-        * Makefile.in: Ditto.
+	* configure: Regenerated.
+	* aclocal.m4: Ditto.
+	* Makefile.in: Ditto.
 
 2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -137,7 +143,7 @@
 1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* Makefile.in: Regenerated.
-	
+
 1999-12-10  Ben Elliston  <bje@cygnus.com>
 
 	* arm.cxx (armTimer::triggerpoint_manager): New member.
@@ -169,7 +175,7 @@
 1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm.cxx (armTimerNoSched::tick): New callthrough function.
- 	(compTimerDelete): Use dynamic_cast<>.
+	(compTimerDelete): Use dynamic_cast<>.
 
 1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -265,12 +271,12 @@
 	(armTimerSched): Move public members to the top.
 
 	* README: Rewrite using standard documentation template.
-	
+
 1999-06-16  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm.cxx (armTimerSched): Use new scheduler_event_subscription
- 	interface class.  Forget about generic_scheduler_interface
- 	throughout.
+	interface class.  Forget about generic_scheduler_interface
+	throughout.
 
 1999-06-15  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -296,7 +302,7 @@
 1999-05-12  Ben Elliston  <bje@cygnus.com>
 
 	* configure.in (AC_OUTPUT): Do not output `timer-m32r.conf'.
-	* configure: Regenerate.	
+	* configure: Regenerate.
 
 1999-05-11  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -329,21 +335,21 @@
 1999-04-09  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm.cxx (armTimer): Moved some code out into new classes.  Make
- 	register attributes read-only temporarily.
+	register attributes read-only temporarily.
 	(armTimerNoSched): New class: equivalent to previous armTimer.
-  	Exposes pin "clock".
+	Exposes pin "clock".
 	(armTimerSched): New class: uses external scheduler to perform
- 	clock prescaling.  Exposes pin "divided-clock".
-	
+	clock prescaling.  Exposes pin "divided-clock".
+
 	(armTimerSched::reset_schedule): New function.  Update divisor in
- 	external scheduler.
+	external scheduler.
 	(word_write): Call it upon write to control register.
-	
+
 	(armTimer::tick): Don't use divisor.
 	(armTimerNoSched::tick): Divide here.
-	
+
 	(compTimerListTypes): Add new component type
- 	"timer-arm-ref-sched".   Add "timer-arm-ref-nosched" as alias
+	"timer-arm-ref-sched".   Add "timer-arm-ref-nosched" as alias
 	to old "timer-arm-ref".
 
 1999-04-03  Ron Unrau  <runrau@cygnus.com>
@@ -353,15 +359,15 @@
 1999-03-30  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm.cxx (operator <<,>>): Add streaming operators for enum
- 	armTimer::timer_mode.
+	armTimer::timer_mode.
 	(class armTimer): Make them friends.  Use plain unsigned ticks.
-  	Use smaller type for loadValue.
+ 	Use smaller type for loadValue.
 	(tick): Avoid division-by-zero for prescale value 0.  Reworked
- 	logic slightly to clarify interrupt / rollover policy.
+	logic slightly to clarify interrupt / rollover policy.
 	(word_write): During a write to the loadValue register, also
 	load the counter.  Return bus::unmapped for bad addresses.
 	(word_read): Return bus::unmapped for bad addresses.
-	
+
 	* configure.in (subdirs): Descend into testsuite/.
 	* Makefile.am: Ditto.
 	* configure: Regenerated.
@@ -376,14 +382,14 @@
 	* arm.cxx: Fixes for bugs exposed by testing.
 	(armTimer::counter): Use a 16-bit data type on the host.
 	(armTimer::tick): Simplify and correct the interrupt logic.
-	(armTimer::word_write): Mask the top 16 bits of incoming 
+	(armTimer::word_write): Mask the top 16 bits of incoming
 	values, not 24 bits.
 
 	* test.c: New file; test the timer with volatile pointers.
 	* test.s: Likewise. Tweak assembly output from m32r-elf-gcc.
 	* timer-m32r-conf.in: New file; a sample system configuration that
 	includes an ARM reference timer.
-	
+
 	* configure.in: Output timer-m32r.conf.
 	* configure: Regenerate.
 
@@ -397,7 +403,7 @@
 	(armTimer::bus_interface::word_write): Do the handler's work.
 	(armTimer::bus_interface::word_read): Likewise.
 	(compTimerListTypes): Rename `armpid' to `timer-arm-ref'.
-	
+
 1999-03-25  Ben Elliston  <bje@cygnus.com>
 
 	* arm.cxx (compTimer): Rename to `armTimer'. Apply throughout.

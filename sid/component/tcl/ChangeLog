@@ -1,3 +1,9 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir.
+	* Makefile.in, aclocal.m4, config.in, configure: Regenerate.
+
 2008-11-13  Frank Ch. Eigler  <fche@elastic.org>
 
 	From Alon Bar-Lev <alon.barlev@gmail.com>:
@@ -138,12 +144,12 @@
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.in, aclocal.m4, configure: Regenerated.
-	
+
 2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * configure: Regenerated.
-        * aclocal.m4: Ditto.
-        * Makefile.in: Ditto.
+	* configure: Regenerated.
+	* aclocal.m4: Ditto.
+	* Makefile.in: Ditto.
 
 2000-10-30  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -184,7 +190,7 @@
 
 2000-02-14  Frank Ch. Eigler  <fche@redhat.com>
 
-	* sid-control-tksm.tk (add_triggerpoint): Disable "Stop" mode 
+	* sid-control-tksm.tk (add_triggerpoint): Disable "Stop" mode
 	correctly.
 
 2000-02-11  Frank Ch. Eigler  <fche@redhat.com>
@@ -194,7 +200,7 @@
 	(components): New global array for mapping component name -> handle.
 	(relate): Maintain it.
 	(stop_tksm): New proc to shut down sid.  Bind to tksm <Destroy>.
-	
+
 2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
 
 	* compTcl.cxx (sid_bus_write_any): Emit more informative error on
@@ -307,7 +313,7 @@
 	* bridge-tk.tk.in: New file.
 	* hw-visual-probe-bus.blt.in: Renamed from hw-visual-probe-bus.blt.
 	* sid-control-tksm.tk.in: Renamed from sid-control-tksm.tk.
-	* Makefile.am (AM_CXXFLAGS): Define SID_EXEC_PREFIX.  
+	* Makefile.am (AM_CXXFLAGS): Define SID_EXEC_PREFIX.
 	(pkgdata_DATA): Install autoloading component files.
 	(noinst_DATA): Don't install trace.tcl & tester.tcl.
 	* configure.in: Look for dirent.h & opendir.  Create autoloaded files
@@ -357,14 +363,14 @@
 	(driven): Removed (void) variety.
 	* tester.tcl: Ditto.
 	* trace.tcl: Ditto.  Pass through modified API.
-	
+
 1999-11-17  Mary Lynn Kostash  <mkostash@cygnus.com>
 
 	* README: Fixed typos, grammar.
 
 1999-11-16  Mary Lynn Kostash  <mkostash@cygnus.com>
 
-	* README.api: Made a few minor grammar changes. 
+	* README.api: Made a few minor grammar changes.
 
 1999-11-12  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -375,11 +381,11 @@
 	* README.api: Replace "parametrized" with "parameterized".
 
 1999-11-11  Frank Ch. Eigler  <fche@cygnus.com>
-	
+
 	* README: Rewrote according to standard template.
 	* README.api: New file, extracting API parts of old README.
 	* README.misc: New file, extracting miscellaneous docs.
-	
+
 	* compTcl.cxx (pin_names): Don't include hidden pins in list.
 	(find_pin): Don't include "!event-control" output pin.
 	(connect_pin, disconnect_pin, connected_pins): Don't include
@@ -443,10 +449,10 @@
 
 	* README: Update for bool/number notation changes.
 	* compTcl.cxx (*): Major revamp for value<->string mapping.  Use
- 	make_attribute/make_numeric_attribute and parse_attribute
- 	consistently, checking for errors.  Removed defunct exception
- 	guards.  Reformatted slightly.
-	
+	make_attribute/make_numeric_attribute and parse_attribute
+	consistently, checking for errors.  Removed defunct exception
+	guards.  Reformatted slightly.
+
 	* hw-visual-probe-bus.blt: Don't unhexify PC & pin values.
 	* trace.tcl (related_components): Correct "=" typo.
 	(connected_pins): Initialize proxypins.
@@ -496,7 +502,7 @@
 1999-09-10  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* tester.tcl (command_io): Use "H*" instead of "h*" binary scan/format
-        for more readable nibble ordering.
+	for more readable nibble ordering.
 
 	* sid-control-tksm.tk (map_watchable_name): New proc.
 	(add_triggerpoint): Use it.  Quote name for bind-%-resistance.
@@ -508,21 +514,21 @@
 1999-09-08  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sid-control-tksm.tk: Major additions for triggerpoint control.
-  	Nod invitingly when mouse hovers over widgets equipped with a
- 	pop-up menu.
+	Nod invitingly when mouse hovers over widgets equipped with a
+	pop-up menu.
 
 1999-09-07  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compTcl.cxx (set_attribute_value): Replace "import!" attribute
- 	with general "eval!".
-	
+	with general "eval!".
+
 	(tcl_component): Add "event_control_pin" output and
- 	"poll_interval" counter.
+	"poll_interval" counter.
 	(pin_names, find_pin, connect_pin): Export "!event-control" pin.
 	(disconnect_pin, connected_pins): Same.
 	(tcl_component_ctor_0): Initialize poll_interval.
 	(event_pin_driven): Add code to adaptively control polling frequency.
-	
+
 	(make_object): Increment reference count of new Tcl_Obj.
 	(call_scalar, call_void, call_vector): Decrement ref count after use.
 	(sid_comp_*, sid_pin_*, sid_bus_*): Ditto.
@@ -530,7 +536,7 @@
 1999-09-05  Ron Unrau  <runrau@cygnus.com>
 
 	* compTcl.cxx (set_attribute_value) - add an "import!" attribute
- 	that passes an import command to the interpreter.
+	that passes an import command to the interpreter.
 
 1999-09-01  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -541,7 +547,7 @@
 1999-08-31  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compTcl.cxx (set_attribute_value): For load! attribute, on
- 	cygwin only, convert POSIX path name to Win32.
+	cygwin only, convert POSIX path name to Win32.
 	* configure.in: Segregate UNIX and Windows library checks.  Define
 	SIDTCL_MAP_CYGWIN_NAMES on cygwin, to enable the above conversion.
 	* configure, config.in: Regenerated.
@@ -580,7 +586,7 @@
 
 	* sid-control-tksm.tk (widgetname): New proc.
 	(open_component_window): Call it for making safe widget path
- 	names.
+	names.
 
 1999-08-11  Ian Carmichael  <iancarm@cygnus.com>
 
@@ -618,15 +624,15 @@
 
 1999-06-18  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* compTcl.cxx (string_auto_lut): Move lookup member functions 
+	* compTcl.cxx (string_auto_lut): Move lookup member functions
 	out-of-line.
- 	(tcl_component): Move a dozen utility functions out-of-line.
+	(tcl_component): Move a dozen utility functions out-of-line.
 	(tcl_component_ctor_0): New function, transplanting contents of ctor.
 
 1999-06-15  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compTcl.cxx (tcl_bus): Updated bus API calls throughout.
-	(sid_bus_read_*): Replaced functions with new bus API varieties. 
+	(sid_bus_read_*): Replaced functions with new bus API varieties.
 	(sid_bus_write_*): Ditto.
 	(register_callbacks): Updated bus API callback registrations.
 	* tester.tcl: Updated bus API calls throughout.
@@ -659,7 +665,7 @@
 1999-06-07  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compTcl.cxx (*): Bring back listAccessorNames, listPinNames,
- 	listBusNames from component API.  Reindented some code sections.
+	listBusNames from component API.  Reindented some code sections.
 	* README: Updated to match.
 
 1999-06-07  Ben Elliston  <bje@cygnus.com>
@@ -682,7 +688,7 @@
 
 	* tester.tcl (hexify_traffic_p): New attribute "hexify?".
 	(command_io): Use it to control command/result traffic hexification.
-	
+
 1999-05-26  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compTcl.cxx (bijection): Rip out class.  Find it in sidutil heaven.
@@ -702,7 +708,7 @@
 1999-05-17  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* configure.in: Check for -lm differently.  Find X11 libraries
- 	more properly.  
+	more properly.
 	* configure: Regenerated.
 
 1999-05-14  Ben Elliston  <bje@cygnus.com>
@@ -728,7 +734,7 @@
 	* configure.in: Look for needed win32 libs.
 	* configure: Regenerated.
 	* config.in: Regenerated.
-	
+
 1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compTcl.cxx (tcl_bridge_library): DLLEXPORT it.
@@ -739,7 +745,7 @@
 	* Makefile.in: Ditto.
 
 	* tcltest.conf.in: Use .la component DSO names.
-	
+
 1999-04-27  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* configure.in: Look for cygwin tcl/tk libraries.
@@ -753,11 +759,11 @@
 
 1999-04-21  Frank Ch. Eigler  <fche@cygnus.com>
 
-        * Makefile.am (LDFLAGS): Add -no-undefined
-        * Makefile.in: Regenerated.
+	* Makefile.am (LDFLAGS): Add -no-undefined
+	* Makefile.in: Regenerated.
 
-        * compTcl.cxx (tcl_api_component ctor): Qualify member function
-        pointers.
+	* compTcl.cxx (tcl_api_component ctor): Qualify member function
+	pointers.
 	(tcl_bus::read_any): Use proper arg types for make_pair.
 
 1999-04-19  Frank Ch. Eigler  <fche@cygnus.com>
@@ -770,11 +776,11 @@
 1999-04-14  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compTcl.cxx (quote): Use \xHH quoting to pass even binary
- 	strings through tcl parser.
+	strings through tcl parser.
 	(extract_string, make_object): New functions for robust
- 	string<->Tcl_Obj conversion.
+	string<->Tcl_Obj conversion.
 	(*) Use these new functions throughout to pass possibly-binary
- 	strings to/from tcl.
+	strings to/from tcl.
 	(*) Switch to Obj tcl callbacks throughout.
 	* tester.tcl (command_io): Use hex-encoding for command and result.
 	* trace.tcl (encode): New function for \xHH quoting strings.
@@ -783,16 +789,16 @@
 1999-04-12  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compTcl.cxx (quote): New function to quote outgoing tcl args.
-	(tcl_component::*) Call it for all incoming strings.  
+	(tcl_component::*) Call it for all incoming strings.
 	* tester.tcl (command_io): Accept multi-line commands using the "\"
- 	continuation code.
+	continuation code.
 	* trace.tcl (*): "{}"-quote incoming strings.
 	(list_accessor_names,list_pin_names,list_bus_names): Removed.
-	
+
 1999-04-09  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* tester.tcl: No longer maintain fixed VICTIM component pointer.
-  	(list_relationships): Generalize to several relationships.
+	(list_relationships): Generalize to several relationships.
 	(set_related_components): Ditto.
 	(get_related_components): Ditto.
 	(command_io): Remove VICTIM substitution.
@@ -800,13 +806,13 @@
 	* trace.tcl (get_pin): Return "" on no-pin condition.
 	(get_bus): Ditto.
 	(get_accessor): Ditto.
-	
+
 1999-04-06  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compTcl.cxx (*): Adapt to renamed component::status enum.  Adapt
- 	to renamed fixed_attribute_map functions.  Complete addr<->data
- 	swapping work.
-	
+	to renamed fixed_attribute_map functions.  Complete addr<->data
+	swapping work.
+
 1999-04-03  Ron Unrau  <runrau@cygnus.com>
 
 	* compTcl.cxx, trace.tcl: swap addr<->data in bus::read and bus::write
@@ -814,16 +820,16 @@
 1999-03-30  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compTcl.cxx (write_h8_h4): Use raw host_int values for
- 	stringification.
+	stringification.
 	(driven_h4): Ditto.
 	(register_callbacks): Correct registration for write_h1_h8 and
- 	read_h1_h8 functions.
+	read_h1_h8 functions.
 
 	* tester.tcl (driven_h4): Pass the driven pin value to the
 	hook function as a global variable.
 
 	* trace.tcl (list_attr_names): Style cleanup.
-	
+
 1999-03-29  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* tester.tcl (command_io): Evaluate incoming command at
@@ -839,7 +845,7 @@
 1999-03-26  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compTcl.cxx (*): Remove listAccessorNames, listPinNames,
- 	listBusNames from component API.
+	listBusNames from component API.
 
 	* configure.in: Tweaked tk/tcl library search.  Don't
 	imply references to $prefix just for them.
@@ -863,7 +869,7 @@
 	* test-uart2.conf.in: New file.  Tracing version of UART test.
 
 	* configure.in: Find installed tcl/tk libraries/headers differently.
-  	Use new AC_CONFIG_AUX_DIR.
+	Use new AC_CONFIG_AUX_DIR.
 	* configure: Regenerated.
 	* Makefile.in: Regenerated.
 	* config.in: Regenerated.
@@ -871,7 +877,7 @@
 	* c1.tcl: Removed junk file.
 	* sid.plain.tcl: Ditto.
 	* sid.tcl: Ditto.
-	
+
 1999-03-16  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compTcl.cxx: Adapt to renamed COMPONENT_LIBRARY_MAGIC macro.
@@ -888,7 +894,7 @@
 1999-03-05  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compTcl.cxx (class tcl_component): Remove unneeded virtual
- 	inheritance.  Add temporary relationship API stubs.
+	inheritance.  Add temporary relationship API stubs.
 
 1999-02-12  Frank Ch. Eigler  <fche@cygnus.com>
 

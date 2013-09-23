@@ -1,131 +1,176 @@
-/* config.in.  Generated automatically from configure.in by autoheader.  */
+/* config.in.  Generated from configure.in by autoheader.  */
 
-/* Define if you have the ANSI C header files.  */
-#undef STDC_HEADERS
-
-/* Define if you can safely include both <sys/time.h> and <time.h>.  */
-#undef TIME_WITH_SYS_TIME
-
-/* Define if you have the ftime function.  */
-#undef HAVE_FTIME
-
-/* Define if you have the gettimeofday function.  */
-#undef HAVE_GETTIMEOFDAY
-
-/* Define if you have the inet_addr function.  */
-#undef HAVE_INET_ADDR
-
-/* Define if you have the inet_aton function.  */
-#undef HAVE_INET_ATON
-
-/* Define if you have the sched_yield function.  */
-#undef HAVE_SCHED_YIELD
-
-/* Define if you have the select function.  */
-#undef HAVE_SELECT
-
-/* Define if you have the strtoul function.  */
-#undef HAVE_STRTOUL
-
-/* Define if you have the strtoull function.  */
-#undef HAVE_STRTOULL
-
-/* Define if you have the times function.  */
-#undef HAVE_TIMES
-
-/* Define if you have the usleep function.  */
-#undef HAVE_USLEEP
-
-/* Define if you have the vasprintf function.  */
-#undef HAVE_VASPRINTF
-
-/* Define if you have the vsnprintf function.  */
-#undef HAVE_VSNPRINTF
-
-/* Define if you have the <../ucbinclude/sys/ioctl.h> header file.  */
-#undef HAVE____UCBINCLUDE_SYS_IOCTL_H
-
-/* Define if you have the </usr/include/curses.h> header file.  */
-#undef HAVE__USR_INCLUDE_CURSES_H
-
-/* Define if you have the <arpa/inet.h> header file.  */
+/* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
 
-/* Define if you have the <curses.h> header file.  */
+/* Define to 1 if you have the <curses.h> header file. */
 #undef HAVE_CURSES_H
-
-/* Define if you have the <mmsystem.h> header file.  */
-#undef HAVE_MMSYSTEM_H
-
-/* Define if you have the <netinet/in.h> header file.  */
-#undef HAVE_NETINET_IN_H
-
-/* Define if you have the <netinet/tcp.h> header file.  */
-#undef HAVE_NETINET_TCP_H
-
-/* Define if you have the <sched.h> header file.  */
-#undef HAVE_SCHED_H
-
-/* Define if you have the <sys/socket.h> header file.  */
-#undef HAVE_SYS_SOCKET_H
-
-/* Define if you have the <sys/time.h> header file.  */
-#undef HAVE_SYS_TIME_H
-
-/* Define if you have the <sys/timeb.h> header file.  */
-#undef HAVE_SYS_TIMEB_H
-
-/* Define if you have the <sys/types.h> header file.  */
-#undef HAVE_SYS_TYPES_H
-
-/* Define if you have the <time.h> header file.  */
-#undef HAVE_TIME_H
-
-/* Define if you have the <unistd.h> header file.  */
-#undef HAVE_UNISTD_H
-
-/* Define if you have the <windows.h> header file.  */
-#undef HAVE_WINDOWS_H
-
-/* Define if you have the kernel32 library (-lkernel32).  */
-#undef HAVE_LIBKERNEL32
-
-/* Define if you have the m library (-lm).  */
-#undef HAVE_LIBM
-
-/* Define if you have the stdc++ library (-lstdc++).  */
-#undef HAVE_LIBSTDC__
-
-/* Define if you have the winmm library (-lwinmm).  */
-#undef HAVE_LIBWINMM
-
-/* Name of package */
-#undef PACKAGE
-
-/* Version number of package */
-#undef VERSION
 
 /* Define if curses library is usable */
 #undef HAVE_CURSES_LIBRARY
 
-/* Define if ISO C99 Features in use */
-#undef _ISOC99_SOURCE
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
 
-/* Define if GNU extensions in use */
-#undef _GNU_SOURCE
-
-/* Define if SVID extensions in use */
-#undef _SVID_SOURCE
-
-/* Define if SVID extensions in use */
-#undef _BSD_SOURCE
+/* Define to 1 if you have the `ftime' function. */
+#undef HAVE_FTIME
 
 /* Define if ftime(3) is declared via sys/timeb.h */
 #undef HAVE_FTIME_DECL
 
-/* Define if usleep(2) via unistd.h */
-#undef HAVE_USLEEP_DECL
+/* Define to 1 if you have the `gettimeofday' function. */
+#undef HAVE_GETTIMEOFDAY
+
+/* Define to 1 if you have the `inet_addr' function. */
+#undef HAVE_INET_ADDR
+
+/* Define to 1 if you have the `inet_aton' function. */
+#undef HAVE_INET_ATON
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `kernel32' library (-lkernel32). */
+#undef HAVE_LIBKERNEL32
+
+/* Define to 1 if you have the `m' library (-lm). */
+#undef HAVE_LIBM
+
+/* Define to 1 if you have the `stdc++' library (-lstdc++). */
+#undef HAVE_LIBSTDC__
+
+/* Define to 1 if you have the `winmm' library (-lwinmm). */
+#undef HAVE_LIBWINMM
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the <mmsystem.h> header file. */
+#undef HAVE_MMSYSTEM_H
+
+/* Define to 1 if you have the <netinet/in.h> header file. */
+#undef HAVE_NETINET_IN_H
+
+/* Define to 1 if you have the <netinet/tcp.h> header file. */
+#undef HAVE_NETINET_TCP_H
+
+/* Define to 1 if you have the <sched.h> header file. */
+#undef HAVE_SCHED_H
+
+/* Define to 1 if you have the `sched_yield' function. */
+#undef HAVE_SCHED_YIELD
+
+/* Define to 1 if you have the `select' function. */
+#undef HAVE_SELECT
 
 /* Define if socklen_t is declared via sys/socket.h */
 #undef HAVE_SOCKLEN_T
 
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the `strtoul' function. */
+#undef HAVE_STRTOUL
+
+/* Define to 1 if you have the `strtoull' function. */
+#undef HAVE_STRTOULL
+
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#undef HAVE_SYS_SOCKET_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/timeb.h> header file. */
+#undef HAVE_SYS_TIMEB_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the `times' function. */
+#undef HAVE_TIMES
+
+/* Define to 1 if you have the <time.h> header file. */
+#undef HAVE_TIME_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the `usleep' function. */
+#undef HAVE_USLEEP
+
+/* Define if usleep(2) via unistd.h */
+#undef HAVE_USLEEP_DECL
+
+/* Define to 1 if you have the `vasprintf' function. */
+#undef HAVE_VASPRINTF
+
+/* Define to 1 if you have the `vsnprintf' function. */
+#undef HAVE_VSNPRINTF
+
+/* Define to 1 if you have the <windows.h> header file. */
+#undef HAVE_WINDOWS_H
+
+/* Define to 1 if you have the </usr/include/curses.h> header file. */
+#undef HAVE__USR_INCLUDE_CURSES_H
+
+/* Define to 1 if you have the <../ucbinclude/sys/ioctl.h> header file. */
+#undef HAVE____UCBINCLUDE_SYS_IOCTL_H
+
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LT_OBJDIR
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#undef TIME_WITH_SYS_TIME
+
+/* Version number of package */
+#undef VERSION
+
+/* Define if SVID extensions in use */
+#undef _BSD_SOURCE
+
+/* Define if GNU extensions in use */
+#undef _GNU_SOURCE
+
+/* Define if ISO C99 Features in use */
+#undef _ISOC99_SOURCE
+
+/* Define if SVID extensions in use */
+#undef _SVID_SOURCE

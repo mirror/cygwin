@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.
@@ -109,7 +113,7 @@
 1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* Makefile.in: Regenerated.
-	
+
 1999-12-07  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* ParPort.{cxx,h} (read_parport): Renamed from ReadParPort.
@@ -129,15 +133,15 @@
 	(set_intp_ackhigh): Renamed from Set_INTP_ackhigh.
 	(intsel_attrhandler): New Method.
 	* ParPort.cxx: Removed TRISTATE_VAL.
- 	(set_intp_acklow): Drive irq pin to logic 0 during tristate.
+	(set_intp_acklow): Drive irq pin to logic 0 during tristate.
 	(set_intp_ackhigh): Likewise.
 	(reset_outputpins): Likewise.
 	(intsel_handler): Likewise.
 	(change_intp): Likewise.
-	(store_inputpinAttr): Changed call to add_attribute_notify from 
+	(store_inputpinAttr): Changed call to add_attribute_notify from
 	add_attribute for attribute "INTSEL_VAL".
 	(busy_handler): swaped Busy bit setting.
-	
+
 1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* hw-parport-ps_2.txt: New file.  Renamed from
@@ -158,10 +162,10 @@
 1999-11-19  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* ParPort.h (parport_iopin): Change inheritance to derive from
-	new sidutil::inputoutput_pin.  Add minor utility members.  
+	new sidutil::inputoutput_pin.  Add minor utility members.
 	(make_attribute, parse_attribute): New conversion routines for *iopin.
 	(iopins_readmode): Make this a const member function.
-	(data_bus): Declare these as an array member. 
+	(data_bus): Declare these as an array member.
 
 1999-11-17  Faisal Khoja  <fkhoja@cygnus.com>
 
@@ -174,7 +178,7 @@
 1999-11-09  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* README: Added sections for save/restore and default values
- 	* ParPort.h (sense_InputPins): New method
+	* ParPort.h (sense_InputPins): New method
 	* ParPort.cxx (sense_InputPins): New Mthod
 	(reset): Removed call to reset_OutputPin method
 	(reset_Internalregs): Added call to reset_OutputPin & sense_InputPins.
@@ -196,7 +200,7 @@
 
 1999-10-08  Faisal Khoja  <fkhoja@cygnus.com>
 
-	* ParPort.cxx (constr): Changed the order of initialization of data 
+	* ParPort.cxx (constr): Changed the order of initialization of data
 	members bus_size and reset_pin.
 
 1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
@@ -243,7 +247,7 @@
 
 1999-09-07  Faisal Khoja  <fkhoja@cygnus.com>
 
-	* ParPort.cxx, ParPort.h: Defined new class for I/O data pins, 
+	* ParPort.cxx, ParPort.h: Defined new class for I/O data pins,
 	parport_iopin.
 	(initialize_iodatapins): new method
 	(update_ipprreg):Likewise
@@ -261,7 +265,7 @@
 1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* ParPort.h: Introduced proper namespace usage. Include sidso.h.
-	* ParPort.cxx: Do not include sidso.h. 
+	* ParPort.cxx: Do not include sidso.h.
 
 1999-07-25 Faisal khoja <fkhoja@cygnus.com>
 
@@ -269,8 +273,8 @@
 	* ParPort.cxx: Likewise
 
 1999-07-15 Faisal Khoja <fkhoja@cygnus.com>
-	
-	* README: Removed names of private methods under save & 
+
+	* README: Removed names of private methods under save &
 	  restore documentation
 
 1999-07-12 Faisal Khoja <fkhoja@cygnus.com>
@@ -292,7 +296,7 @@
 1999-07-05 Faisal Khoja <fkhoja@cygnus.com>
 
 	* ParPort.cxx: removed attribute_coder_parport_reg class. Changed
-	function calls from add_attribute_coder to add_attribute. 
+	function calls from add_attribute_coder to add_attribute.
 
 1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -305,9 +309,9 @@
 	* stamp-h.in: Ditto.
 
 1999-07-05 Faisal Khoja <fkhoja@cygnus.com>
-	
+
 	* ParPort.cxx, ParPort.h: Formatted code, removed #define
- 	with enumerated types as guided by Ben.	
+	with enumerated types as guided by Ben.
 
 1999-06-30 Faisal Khoja <fkhoja@cygnus.com>
 

@@ -1,3 +1,8 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.am (ACLOCAL_AMFLAGS): Delete.
+	* Makefile.in: Regenerate.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

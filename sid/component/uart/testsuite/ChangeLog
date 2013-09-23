@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regnerate.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.
@@ -75,7 +79,7 @@
 	* hello.c: Likewise.
 	* hello.s: Likewise.
 	* hello.x: Likewise.
-	
+
 1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* driver.cxx (main): Drive output pin with sentinel value.
@@ -110,9 +114,9 @@
 1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* Devices.h (ldisc): Make member unsigned to activate sidutil
- 	attribute conversions.
+	attribute conversions.
 	* driver.cxx (main): Update attribute accesses for number notation
- 	changes.
+	changes.
 
 1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -141,7 +145,7 @@
 
 1999-07-10  Faisal khoja  <fkhoja@cygnus.com>
 
-	* driver.cxx (main): Introduced few lines to test saving & 
+	* driver.cxx (main): Introduced few lines to test saving &
 	restoring state.
 
 1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
@@ -189,6 +193,6 @@
 	* Makefile.am: new file
 	* Makefile.in: generate
 	* test-uart.conf.in: new file
-	* test2-uart.conf.in: new file	
+	* test2-uart.conf.in: new file
 	* uart-m32r.conf.in: new file
 	* uart-def.h: new file

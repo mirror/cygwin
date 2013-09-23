@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2009-04-08  DJ Delorie  <dj@redhat.com>
 
 	* cache.cxx (cache_component::cache_component):
@@ -114,8 +118,8 @@
 
 2005-05-10  Dave Brolley  <brolley@redhat.com>
 
-	* cache.h (flush_all_lines, flush_line, flush_set) 
-	(flush_and_invalidate_set, flush_and_invalidate_line) 
+	* cache.h (flush_all_lines, flush_line, flush_set)
+	(flush_and_invalidate_set, flush_and_invalidate_line)
 	(prefetch_line): Now virtual. Also, new methods of
 	blocking_cache_component.
 	(setup_flush_all_transaction, setup_flush_line_transaction)
@@ -130,8 +134,8 @@
 	* cache.cxx (blocking_cache_component::write): Remove log message. Don't
 	need return code from continue_child_thread_and_wait.
 	blocking_cache_component::read): Ditto.
-	(flush_all_lines, flush_line, flush_set) 
-	(flush_and_invalidate_set, flush_and_invalidate_line) 
+	(flush_all_lines, flush_line, flush_set)
+	(flush_and_invalidate_set, flush_and_invalidate_line)
 	(prefetch_line): New methods of blocking_cache_component.
 
 2005-05-10  Dave Brolley  <brolley@redhat.com>
@@ -364,9 +368,9 @@
 	* hw-cache.xml, hw-cache.txt: Modified accordingly.
 
 2001-12-04  Frank Ch. Eigler  <fche@redhat.com>
- 
- 	* cache.cxx (cache_sizes): Add "4" for "4kb".
- 	* hw-cache.xml, hw-cache.txt: Modified accordingly.
+
+	* cache.cxx (cache_sizes): Add "4" for "4kb".
+	* hw-cache.xml, hw-cache.txt: Modified accordingly.
 
 2001-11-30  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -408,7 +412,7 @@
 
 2001-07-13  Dave Brolley  <brolley@redhat.com>
 
-        * cache.h (cache:bus::DEFN_METHOD): Generate function prototypes only.
+	* cache.h (cache:bus::DEFN_METHOD): Generate function prototypes only.
 	(::DEFN_METHOD): Generate actual inline function bodies after
 	cache_component is defined.
 
@@ -466,7 +470,7 @@
 
 2001-06-15  Ben Elliston  <bje@redhat.com>
 
-	* cache.cxx: New file. 
+	* cache.cxx: New file.
 	* cache.h: Likewise.
 	* cacheutil.cxx: Likewise.
 	* cacheutil.h: Likewise.

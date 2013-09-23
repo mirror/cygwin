@@ -1,3 +1,9 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir.
+	* Makefile.in, aclocal.m4, config.in, configure: Regenerate.
+
 2009-04-30  DJ Delorie  <dj@redhat.com>
 
 	* mainDynamic: Regenerate.
@@ -247,7 +253,7 @@
 	(long_options): Add gbif, lbif and gbmif.
 	(main): Propogate default for gbmif to boards. Handle opt_gbif,
 	opt_lbif, opt_gbmif.
-	
+
 	2004-10-12  Dave Brolley  <brolley@redhat.com>
 
 	* mepCfg.cxx (MepMemCfg): Initialize gbmif.
@@ -612,7 +618,7 @@
 
 	* mepCfg.h:  Changed imem to have two banks instead of one.
 	Added dmem_bank_num configurable member.
-	Changed dmem to use an array of four (dmem[4]) instead of two static 
+	Changed dmem to use an array of four (dmem[4]) instead of two static
 	banks (dmem0 and dmem1).
 	Removed prototypes for methods to set_[icache|dcache]_[way|line_size]
 	* mepCfg.cxx : Removed methods to set_[icache|dcache]_[way|line_size]
@@ -620,9 +626,9 @@
 	(set_dmem_bank_num): Added new method to set the number of dmem banks.
 	(set_dmem_size):  Changed to initialize two to four banks, depending
 	on the number of banks configured (dmem_bank_num).
-	(MepBoardCfg::write_config):  Changed to emit the bank specifiers for two imem 
-	banks and two to four dmem banks.  
-	Modified the way the dmem bank specifiers are determined to use a table based 
+	(MepBoardCfg::write_config):  Changed to emit the bank specifiers for two imem
+	banks and two to four dmem banks.
+	Modified the way the dmem bank specifiers are determined to use a table based
 	on the data in the architecture manual.
 	Updated rcfg register configuration for new format.
 
@@ -630,7 +636,7 @@
 
 	* commonCfg.h (BoardCfg::final_insn_count): Declare.
 	* commonCfg.cxx (BoardCfg::final_insn_count): Implement.
-	* mainDynamic.cxx (usage): Document --final-insn-count.	
+	* mainDynamic.cxx (usage): Document --final-insn-count.
 	(Defs::final_insn_count): New option flag.
 	(Defs::Defs): Initialise it.
 	(enum option_num): Add opt_final_insn_count.
@@ -778,7 +784,7 @@
 	* commonCfg.cxx (BoardCfg::add_memory): Call main_mapper->map.
 	* mainDynamic.cxx (try_add_memory): Use BoardCfg::add_memory.
 	* mepCfg.h (MepBoardCfg::add_memory): New method.
-	* mepCfg.cxx (MepBoardCfg::add_memory): Also call 
+	* mepCfg.cxx (MepBoardCfg::add_memory): Also call
 	{i,d}cache->pass.
 	(MepGlobalMapperCfg): Rename from MepMapperCfg.
 
@@ -841,7 +847,7 @@
 	2002-04-30  Graydon Hoare  <graydon@redhat.com>
 
 	* mepCfg.cxx (set_opt_cp): Set cp-option? rather than uci-option?
-	* mepCfg.cxx (MepBoardCfg::write_config): Shift DRBA left 12 bits 
+	* mepCfg.cxx (MepBoardCfg::write_config): Shift DRBA left 12 bits
 	in rcfg (csr27).
 
 	2002-04-29  Graydon Hoare  <graydon@redhat.com>
@@ -976,7 +982,7 @@
 	2002-02-08  Graydon Hoare  <graydon@redhat.com>
 
 	* mepCfg.cxx: New file.
-	* mepCfg.h: New file.	
+	* mepCfg.h: New file.
 
 	2001-07-19  Ben Elliston  <bje@redhat.com>
 
@@ -1198,7 +1204,7 @@
 	options specified for that --board. Call set_warmup, add_warmup_func and
 	add_profile_func for each board. Handle new option enums.
 	* commonCfg.h (add_profile_config): New method of SessionCfg.
-	(profile_config_error, profile_opt_value, profile_opt_int_value) 
+	(profile_config_error, profile_opt_value, profile_opt_int_value)
 	(profile_opt_gprof_value, match_profile_opt, profile_config): New
 	methods of SessionCfg.
 	(GprofCfg): New constructor.
@@ -1209,7 +1215,7 @@
 	(start_config,warmup_funcs,profile_funcs): New members of BoardCfg.
 	* commonCfg.cxx (SessionCfg): Initialize need_gprof.
 	(add_profile_config): New method of SessionCfg.
-	(profile_config_error, profile_opt_value, profile_opt_int_value) 
+	(profile_config_error, profile_opt_value, profile_opt_int_value)
 	(profile_opt_gprof_value, match_profile_opt, profile_config): New
 	methods of SessionCfg.
 	(GprofCfg): Always add a sunscription to sim_sched. Set the
@@ -1237,7 +1243,7 @@
 	* commonCfg.cxx (~BlockingCacheCfg): New destructor.
 	(BlockingCacheCfg): New constructors.
 	* commonCfg.h (BlockingCacheCfg): New class.
-	
+
 2004-06-29  Stan Cox  <scox@redhat.com>
 
 	* commonCfg.cxx (add_cpu):  Add eflags-set pin.
@@ -1310,7 +1316,7 @@
 2003-04-16  Dave Brolley  <brolley@redhat.com>
 
 	* commonCfg.cxx (final_insn_count): Set cpu attribute 'final-insn-count'.
-	
+
 2003-01-31  Frank Ch. Eigler  <fche@redhat.com>
 
 	* baseCfg.cxx, commonCfg.cxx: More of the same.
@@ -1406,8 +1412,8 @@
 
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 
-        * Makefile.am (ACLOCAL_AMFLAGS): Refer to $srcdir.
-        * Makefile.in: Regenerated.
+	* Makefile.am (ACLOCAL_AMFLAGS): Refer to $srcdir.
+	* Makefile.in: Regenerated.
 
 2001-06-19  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -1558,14 +1564,14 @@
 1999-05-13  Ron Unrau  <runrau@cygnus.com>
 
 	* mainDynamic.cxx: Configure via API vs pin
-	* Makefile.am: includes now include cfgroot 
+	* Makefile.am: includes now include cfgroot
 	* Makefile.in: regenerate
 
 1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* mainDynamic.cxx: DLLIMPORT config_component_library.
 	(main): Drive cfgroot's <<run>> pin without value.
-	
+
 	* Makefile.am: Link in libconfig.la [cfgroot] statically.
 	* configure.in: Look for AR tool.
 	* Makefile.in: Regenerated.
@@ -1612,26 +1618,26 @@
 	* aclocal.m4: Rebuilt.
 	* configure: Rebuilt.
 	* config.in: Rebuilt.
-	
+
 1999-02-02  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* mainDynamic.cxx (main_component): Add "running" pin to indicate
 	post-configuration state.  Use fixed_pin_map mix-in.
 	(set_attribute): Read back attribute values just written, to confirm
 	acceptance.
-	
+
 1998-12-23  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* Makefile.am (INCLUDES): Added . and ../include.
 	* configure.in: Removed compulsory checks.  Use local config.h.
 	* Makefile.in: Rebuilt.
- 	* configure: Rebuilt.
+	* configure: Rebuilt.
 	* config.in: Generated new file
 	* acconfig.m4: New file.
 	* mainDynamic.cxx (register_la): Load libtool-style ".la" DSO.
-	Experimental. 
+	Experimental.
 	(parse_command): Call it for "dso" command.
-	
+
 1998-12-18  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* configure.in: Look for strstream.h.
@@ -1641,18 +1647,18 @@
 1998-12-17  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* mainDynamic.cxx (main_component): Use new stub functions from
- 	sidcomputil.h to mix in unused sub-APIs.
+	sidcomputil.h to mix in unused sub-APIs.
 	(register_dso): Return true for success.
 	(instantiate_component): Return true for success.
 	(connect_pin): Return true for success.
 	(connect_bus): Return true for success.
 	(set_attribute): New function.
 	(config_parser): New class for parsing configuration file.  Use
- 	"->"/"<-"/"<->" for pin connection directions.  Support attribute
- 	setting.
+	"->"/"<-"/"<->" for pin connection directions.  Support attribute
+	setting.
 	(main): Run simulator only if configuration was successful.
 	(sid.conf.in): Removed memory test parts.
-	
+
 	* aclocal.m4: New file to enable local configuration.
 	* configure.in: Make script self-contained.
 	* Makefile.in: Rebuilt.

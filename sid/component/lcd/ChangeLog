@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2007-01-03  Dave Brolley  <brolley@redhat.com>
 
 	* lcd-char-display.cxx (_BOOL): New macro definition.
@@ -19,7 +23,7 @@
 
 Wed Oct 22 19:03:57 UTC 2003  Brendan Conoboy  <blc@redhat.com>
 
-        * lcd-char-display.cxx: Prefix std:: to cout and endl.
+	* lcd-char-display.cxx: Prefix std:: to cout and endl.
 
 2002-11-11  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -103,14 +107,14 @@ Wed Oct 22 19:03:57 UTC 2003  Brendan Conoboy  <blc@redhat.com>
 
 2000-02-24  Ron Unrau  <runrau@redhat.com>
 
-	* hw-visual-lcd.txt: reformat Behavior and Reference sections 
+	* hw-visual-lcd.txt: reformat Behavior and Reference sections
 	  to follow documentation conventions
-     
+
 2000-02-08  Mary Lynn Kostash  <mkostash@redhat.com>
 
 	* hw-lcd-char-display.txt: Minor rewording. Fixed typo in
 	  Behavior section: "depth" attribute renamed "height".
-     
+
 2000-02-08  Ron Unrau  <runrau@redhat.com>
 
 	* T6963C.cxx (T6963C ctor): add "settings" configuration to attributes
@@ -167,7 +171,7 @@ Wed Oct 22 19:03:57 UTC 2003  Brendan Conoboy  <blc@redhat.com>
 
 2000-01-05  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* hw-visual-lcd.tk: New file.  Renamed from lcd.tcl.  
+	* hw-visual-lcd.tk: New file.  Renamed from lcd.tcl.
 	(*): Removed lcd:: namespace use.
 	(driven_h4): Simplified.
 	(driven): Removed.
@@ -220,11 +224,11 @@ Wed Oct 22 19:03:57 UTC 2003  Brendan Conoboy  <blc@redhat.com>
 	* Makefile.am: incorporate the new rom files
 	* Makefile.in: Regenerated.
 	* T6963C.cxx (reset): initialize rom explicitly
-	
+
 1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* Makefile.in: Regenerated.
-	
+
 1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* Makefile.in: Regenerated.
@@ -239,7 +243,7 @@ Wed Oct 22 19:03:57 UTC 2003  Brendan Conoboy  <blc@redhat.com>
 1999-11-17  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* HD44780U.cxx (operator >>): Cleanup.
- 	(operator <<): Likewise.
+	(operator <<): Likewise.
 	* HD44780U.H: Removed extra decl of host_int_1 and host_int_4.
 	* T6963C.cxx (operator >>): Cleanup.
 	(operator <<): Likewise.
@@ -284,7 +288,7 @@ Wed Oct 22 19:03:57 UTC 2003  Brendan Conoboy  <blc@redhat.com>
 1999-09-17 Faisal khoja  <fkhoja@cygnus.com>
 
 	* T6963C.h, T6963C.cxx (save_state): New method
- 	(restore_state): Likewise
+	(restore_state): Likewise
 	(operator <<): Likewise
 	(operator >>): Likewise
 
@@ -292,7 +296,7 @@ Wed Oct 22 19:03:57 UTC 2003  Brendan Conoboy  <blc@redhat.com>
 
 	* HD44780U.cxx (*): Use host_int_X, not compiler_int_X.
 	* HD44780U.h, T6963C.cxx T6963C.h: Ditto.
-	
+
 1999-09-09  Ron Unrau  <runrau@cygnus.com>
 
 	* lcd.tcl: (set_attr_value) remove puts

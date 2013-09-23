@@ -1,3 +1,9 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir.
+	* Makefile.in, aclocal.m4, configure: Regenerate.
+
 2013-09-22  Alan Modra  <amodra@gmail.com>
 
 	* sh.h (sh_cpu_impl::~sh_cpu_impl): New.
@@ -144,7 +150,7 @@
 
 	* sh_compact.h:	(step_insns): Moved from sh_cpu.
 	(step_one_insn): Likewise.
-	(model_insn_before, model_step_latency, model_before) 
+	(model_insn_before, model_step_latency, model_before)
 	(model_after, model_insn_after): Moved to sh5.cxx.
 	(cfg_address,branch_prediction,branch_optimization):
 	Moved lower in the class heirarchy.
@@ -157,13 +163,13 @@
 	(execute_insn): New method takes scache argument.
 	(prefetch): New method.
 	(trace_counter): New method.
-	(model_insn_before, model_step_latency, model_before) 
+	(model_insn_before, model_step_latency, model_before)
 	(model_after, model_insn_after): New methods.
 	(sh64_save_cfg_address,sh64_get_cfg_address)
 	(save_branch_predication,get_branch_predication)
 	(save_branch_optimization,get_branch_optimization)
 	(prefetch,compact_insn_pending,fetch_insn): New methods.
-	(model_insn_before, model_step_latency, model_before) 
+	(model_insn_before, model_step_latency, model_before)
 	(model_after, model_insn_after): Moved to sh5.cxx.
 	(cfg_address,branch_prediction,branch_optimization):
 	New members.
@@ -173,12 +179,12 @@
 	(execute_insn): New method takes scache argument.
 	(prefetch): New method.
 	(trace_counter): New method.
-	(model_insn_before, model_step_latency, model_before) 
+	(model_insn_before, model_step_latency, model_before)
 	(model_after, model_insn_after): Moved from sh5.h.
 	* sh2a_model.cxx: Don't #include "config.h".
 	#include "sh4*.h". Add additional explicit template
 	instantiations.
-	(sh2a_model): Initialize vbr_busy. 
+	(sh2a_model): Initialize vbr_busy.
 	(model_u_memory_access_after): Use exec_cycles.
 	(model_u_macw_after): Use exec_cycles. Use add_multiply_busy.
 	(model_u_macl_after): New method.
@@ -283,8 +289,8 @@
 	(sh_common_model): Initialize fpu_busy. Use num_gpr.
 	(set_fpu_busy): New method.
 	(model_before): Don't call check_vliw. Initialize exec_cycles.
-	(model_u_exec_after, model_u_sx_after, model_u_logic_b_after) 
-	(model_u_ldcl_after, model_u_ldcl_vbr_after) 
+	(model_u_exec_after, model_u_sx_after, model_u_logic_b_after)
+	(model_u_ldcl_after, model_u_ldcl_vbr_after)
 	(model_u_sts_pr_after, model_u_tas_after, model_u_lds_pr_after):
 	New methods.
 	(model_u_jmp_after, model_u_jsr_after): New methods.

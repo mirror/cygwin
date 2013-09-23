@@ -1,3 +1,14 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir.
+	* Makefile.in, aclocal.m4, configure: Regenerate.
+	* cmos/Makefile.in, cpu/Makefile.in, cpu/fpu/Makefile.in: Regenerate.
+	* cpu/memory/Makefile.in, dma/Makefile.in: Regenerate.
+	* floppy/Makefile.in, gui/Makefile.in, harddrv/Makefile.in: Regenerate.
+	* keyboard/Makefile.in, pic/Makefile.in, pit/Makefile.in: Regenerate.
+	* unmapped/Makefile.in, vga/Makefile.in: Regenerate.
+
 2006-07-11  Thiemo Seufer  <ths@networkno.de>
 
 	* cpu/sid-x86-cpu-wrapper.* (get_pc): Implement function.

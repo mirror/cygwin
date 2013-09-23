@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 SUBDIRS = @cpu_subdirs@ .
-ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
+ACLOCAL_AMFLAGS = -I ../../config -I ../../..
 
 pkglib_LTLIBRARIES = libtimers.la
 

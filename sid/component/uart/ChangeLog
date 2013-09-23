@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.
@@ -82,7 +86,7 @@
 1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* Makefile.in: Regenerated.
-	
+
 1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* hw-uart-ns16550.txt: New file.  Renamed from
@@ -135,7 +139,7 @@
 	(pin_factory): New method.
 	(pin_junkyard): Likewise.
 	* Uart.cxx: Added triggerpoint support.
- 	(operator  <<): Cleanup and added save state for sio_framing_p,
+	(operator  <<): Cleanup and added save state for sio_framing_p,
 	rxrdy, and txrdy data members.
 	(operator >>): Likewise. Added call to method busWriteHandler.
 	Restored intr pin.
@@ -166,7 +170,7 @@
 
 1999-09-07  Mary Lynn Kostash  <mkostash@cygnus.com>
 
-	* README:  Minor grammatical changes. 
+	* README:  Minor grammatical changes.
 
 1999-09-02  Ben Elliston  <bje@cygnus.com>
 
@@ -196,8 +200,8 @@
 
 1999-08-11  Ian Carmichael  <iancarm@cygnus.com>
 
-	* Devices.cxx, driver.cxx: (*) Change big_int_N and 
-	little_int_N so that the default operations all use 
+	* Devices.cxx, driver.cxx: (*) Change big_int_N and
+	little_int_N so that the default operations all use
 	their integer values.  Attributes now in HEX format.
 
 1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
@@ -235,12 +239,12 @@
 	* Uart.cxx (Uart_ctor_*): New functions.
 	(Uart ctor): Amputate body parts and put them into Uart_ctor_*.
 	* Uart.h: Declare new functions.
-	
+
 1999-06-16  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* Uart.cxx (Uart): Use new scheduler_event_subscription
- 	interface class.  Forget about generic_scheduler_interface
- 	throughout.
+	interface class.  Forget about generic_scheduler_interface
+	throughout.
 	(ctor): Don't set obsolete "regs" attribute.
 	* Uart.h (Uart): Updated declarations accordingly.  Remove
 	obsolete *_attr_names members.
@@ -248,7 +252,7 @@
 1999-06-14  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* Uart.cxx (Uart ctor): Register some attributes with "register"
- 	or "pin" categories.
+	or "pin" categories.
 
 1999-06-11  Ron Unrau <runrau@cygnus.com>
 
@@ -269,8 +273,8 @@
 
 	* Uart.cxx (UartListTypes, UartCreate):
 	Renamed type: "Uart" -> "hw-uart-ns16550".
-	* testsuite/driver.cxx (main): Updated with new component 
-	type names.	
+	* testsuite/driver.cxx (main): Updated with new component
+	type names.
 
 1999-06-08  Ron Unrau <runrau@cygnus.com>
 
@@ -338,7 +342,7 @@
 
 1999-05-18  Ron Unrau  <runrau@cygnus.com>
 
-	* Uart.h: declare new overloaded methods listExtraAttrNames, 
+	* Uart.h: declare new overloaded methods listExtraAttrNames,
 	  getExtraAttrValue, and setExtaAttrValue
 	* Uart.cxx: implement above methods to support get/set register
 	* driver.cxx: add simple test for register attributes
@@ -365,7 +369,7 @@
 	* test-uart.conf.in: Use .la component DSO names.
 	* test2-uart.conf.in: Ditto.
 	* uart-m32r.conf.in: Ditto.
-	
+
 1999-05-01  Ron Unrau  <runrau@cygnus.com>
 
 	* uart-m32r.conf.in: put uart at stride 4, using hex address
@@ -386,7 +390,7 @@
 	* Uart.h, Uart.cxx: Stop using Scheduler.h.  Use external
 	scheduler component via generic_scheduler_interface.
 	* Devices.h, Devices.cxx: Ditto.
-	
+
 	* Makefile.am: Link libsched.la into uart-driver binary.
 	* Makefile.in: Regenerated.
 
@@ -394,11 +398,11 @@
 	* test2-uart.conf.in: New file.  Trace all UART interactions.
 	* configure.in: Process it.
 	* configure: Regenerated.a
-	
+
 1999-04-15  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* Devices.cxx (Main::run): Make explicit the ghastly
- 	cast between char* and host_int_4.
+	cast between char* and host_int_4.
 	* Devices.h (WriteTrigger::driven): Ditto.
 
 1999-04-03  Ron Unrau  <runrau@cygnus.com>
@@ -415,13 +419,13 @@
 1999-03-17  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* Devices.h, Uart.h: Adapt stragglers to changed
- 	sid::pin::driven(...) signature.
+	sid::pin::driven(...) signature.
 
 1999-03-16  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* Devices.{h,cxx}, Uart.{h,cxx}, driver.cxx: Adapt to renamed
- 	COMPONENT_LIBRARY_MAGIC macro.  Switch to sidutil::callback_pin
- 	only.  Adapt to changed sid::pin::driven(...) signature.
+	COMPONENT_LIBRARY_MAGIC macro.  Switch to sidutil::callback_pin
+	only.  Adapt to changed sid::pin::driven(...) signature.
 
 1999-03-15  Ron Unrau  <runrau@cygnus.com>
 
@@ -444,7 +448,7 @@
 	(bin_PROGRAMS): Remove.
 
 	* Makefile.in: Regenerate.
-	
+
 1999-03-10  Ron Unrau  <runrau@cygnus.com>
 
 	* Uart.h, Uart.cxx: incorporate revised pin API
@@ -456,11 +460,11 @@
 	type of init(..) to `int' to silence a warning from EGCS.
 	(class WriteTrigger): Likewise.
 	(class SerialInputPin): Likewise.
-	
+
 1999-03-05  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* Devices.h (class DeviceDriver): Remove unneeded virtual
- 	inheritance.  Add relationship API stub.
+	inheritance.  Add relationship API stub.
 	(class SerialSink) Ditto.
 	(class Main) Ditto.
 	* Uart.h (class Uart): Ditto.
@@ -474,6 +478,3 @@ Sun Feb 21, 1999  Ron Unrau <runrau@cygnus.com>
 
 	* Initial check-in of Uart code
 
-
-
-	

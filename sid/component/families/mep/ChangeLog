@@ -1,3 +1,9 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Define.
+	* Makefile.in, aclocal.m4, configure: Regenerate.
+
 2009-04-08  DJ Delorie  <dj@redhat.com>
 
 	* Makefile.in: Regenerate.
@@ -9,7 +15,7 @@
 
 2007-10-31  Dave Brolley  <brolley@redhat.com>
 
-        * components.cxx (mepfamily_component_library): Correct DLLEXPORT
+	* components.cxx (mepfamily_component_library): Correct DLLEXPORT
 	specification.
 
 2006-11-07  Dave Brolley  <brolley@redhat.com>
@@ -350,7 +356,7 @@
 	(set_R): Correct setting of the R bit.
 	(write_any_filtered): Make sure cache is associative before allowing the
 	R bit to be updated.
-	* mep-cache.h (mep_cache_line): Now takes cache index as an argument. 
+	* mep-cache.h (mep_cache_line): Now takes cache index as an argument.
 	Update all callers.
 	(mep_cache_line_factory::make_line): Now takes cache index as an
 	argument. Update all callers.
@@ -409,7 +415,7 @@
 	For Stan Cox  <scox@redhat.com>
 	* toshapi.h (MemoryMap): New class.
 	(Memory): New methods base_address, size.
-	(toshapi_component): New member memmap.	 
+	(toshapi_component): New member memmap.
 	* toshapi.cxx (toshapi_component): Likewise.
 	(toshapi_component::relate): Add m to memmap.
 	(Memory::base_address, Memory::size, MemoryMap::getMem): New methods
@@ -584,7 +590,7 @@
 
 	For Brendan Conoboy  <blc@redhat.com>
 	* intc.h, timer.cxx, toshapi.cxx, toshapi.h: More throw() fixes.
-	
+
 2003-10-07  Dave Brolley  <brolley@redhat.com>
 
 	For Frank Ch. Eigler  <fche@redhat.com>
@@ -921,7 +927,7 @@
 	channels only.
 	* intc.cxx (update_state): Correct signalling and register-updating
 	logic.
-	
+
 2002-02-06  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (ACLOCAL_AMFLAGS): Define.
@@ -1057,7 +1063,7 @@
 
 2001-07-19  Frank Ch. Eigler  <fche@redhat.com>
 
-	* components.cxx (compMepFamilyListTypes): Make conditional 
+	* components.cxx (compMepFamilyListTypes): Make conditional
 	on SIDTARGET_MEP.
 	(compMepFamilyCreate, compMepFamilyDelete): Ditto.
 	* dmac.cxx: Tweak comment header.  #include tconfig.h.

@@ -1,3 +1,9 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir.
+	* Makefile.in, aclocal.m4, config.in, configure: Regenerate.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.
@@ -36,13 +42,13 @@
 
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
 
-        * configure, aclocal.m4, Makefile.in: Regenerated.
+	* configure, aclocal.m4, Makefile.in: Regenerated.
 
 2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * configure: Regenerated.
-        * aclocal.m4: Ditto.
-        * Makefile.in: Ditto.
+	* configure: Regenerated.
+	* aclocal.m4: Ditto.
+	* Makefile.in: Ditto.
 
 2000-09-22  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -52,7 +58,7 @@
 
 	* Makefile.am (checkme): Remove recursion.
 	* Makefile.in, aclocal.m4, configure, stamp-h.in: Regenerated.
-	
+
 2000-07-14  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* compTIMERS.cxx: Added header files and namespace information

@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2012-04-20  Aurelien Buhrig <aurelien.buhrig.gcc@gmail.com>
 
 	* components.h (ds1742): Declare throw-nothing destructor.
@@ -135,7 +139,7 @@
 
 	* ds1x42.cxx (ds1642 ctor): Add new "gui" category attribute.
 	* hw-rtc-ds1x42.txt (Related components): Corrected conf syntax.
-	* hw-visual-clock.tk (relate, unrelate): Use "target" relation, not 
+	* hw-visual-clock.tk (relate, unrelate): Use "target" relation, not
 	"time-source".
 	(refresh_periodically): Redraw face & hands.
 	(draw_face): Don't resize windows.
@@ -145,7 +149,7 @@
 	* clockdemo.conf: New demo file.
 
 2000-01-06  Frank Ch. Eigler  <fche@cygnus.com>
-	
+
 	* hw-visual-clock.txt: Added mention of tcl nature.
 	* Makefile.am (pkgdata_DATA): Add hw-visual-clock.txt.
 	* Makefile.in: Regenerated.
@@ -233,7 +237,7 @@
 
 1999-11-03  Mary Lynn Kostash <mkostash@cygnus.com>
 
-        * README: Doc fixes.  Removed reference to year 2038.
+	* README: Doc fixes.  Removed reference to year 2038.
 
 1999-11-01  Permaine Cheung  <pcheung@cygnus.com>
 
@@ -250,7 +254,7 @@
 
 1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* ds1x42.cxx (set_century_attribute): Check value range before 
+	* ds1x42.cxx (set_century_attribute): Check value range before
 	passing to set_century().
 	* Makefile.am (DEJAGNU_TESTS): Add rtcmonkey.exp.
 	* Makefile.in: Regenerated.
@@ -335,7 +339,7 @@
 
 	* ds1742.cxx: Introduced four new methods to help save
 	and restore of states in rtc.
-	save_state, restore_state, operator <<, and operator >>	
+	save_state, restore_state, operator <<, and operator >>
 
 1999-07-13  Ben Elliston  <bje@cygnus.com>
 
@@ -344,7 +348,7 @@
 	(ds1742::ds1742_bus::write_data): Use std::time() and not the time
 	recorded at the instant that the `write' bit was set when
 	computing delta `t'.
-	
+
 1999-07-09  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* Makefile.in: Regenerated.

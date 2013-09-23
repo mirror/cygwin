@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2013-09-22  Alan Modra  <amodra@gmail.com>
 
 	* angel.h (arm_angel::~arm_angel): New.
@@ -211,7 +215,7 @@
 	* gloss.cxx (gloss32::read): Fix argument type mismatch for min.
 
 2001-08-03  matthew green  <mrg@redhat.com>
-	
+
 	* gloss.cxx (~gloss32): Add throw() specifier.
 	(gloss32::read): Use `std::min' not `min.'
 	* gloss.h (~gloss32, ~gloss64): Add throw() specifier.
@@ -248,9 +252,9 @@
 
 2001-04-18  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * gloss.cxx (gloss32::reset): Move check for std streams into
-        hostops::close.
-        * hostops.cxx (hostops::close): Don't close host std streams.
+	* gloss.cxx (gloss32::reset): Move check for std streams into
+	hostops::close.
+	* hostops.cxx (hostops::close): Don't close host std streams.
 
 2001-03-23  John Healy  <jhealy@redhat.com>
 
@@ -273,10 +277,10 @@
 
 2001-01-17  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * gloss.cxx (gloss32::read): Change use_rx_p code to extract as much
-        as possible from the rx buffer (up to the len requested)
-        and to exit at the end of the main loop if any characters
-        are successfully read.
+	* gloss.cxx (gloss32::read): Change use_rx_p code to extract as much
+	as possible from the rx buffer (up to the len requested)
+	and to exit at the end of the main loop if any characters
+	are successfully read.
 
 2001-01-08  matthew green  <mrg@redhat.com>
 
@@ -406,7 +410,7 @@
 	(do_readc): Signal blockedness with halted_p flag too.
 	* m32r.cxx (syscall_trap): Don't send trap disposition code.
 	* mips.cxx (syscall_trap): Ditto.
- 	(syscall_trap_p): Simplify.
+	(syscall_trap_p): Simplify.
 
 2000-02-08  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -496,21 +500,21 @@
 
 1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* compGloss.cxx: Conditionally define mips/arm/m32r gloss component 
+	* compGloss.cxx: Conditionally define mips/arm/m32r gloss component
 	types.
 	* Makefile.am: Conditionally build mips/arm/m32r objects.
 	* Makefile.in: Regenerated.
 
 1999-10-14  Mary Lynn Kostash  <mkostash@cygnus.com>
 
-	* README:  Doc fixes based on review comments. 
+	* README:  Doc fixes based on review comments.
 
 1999-10-10  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* gloss.cxx (read): Changed xfr_type to unsigned.
 	(write): Likewise.
 	(lseek): Explicitly cast seek_type to int.
-	* hostops.cxx (open_flags_to_host): Add a comment. 
+	* hostops.cxx (open_flags_to_host): Add a comment.
 
 1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -609,15 +613,15 @@
 	(angel_component::rx_handler): Remove debugging output.
 	(angel_component::do_open): Likewise.
 	* README: Update documentation.
-	
+
 	* Makefile.am (DEJAGNUTESTS): Define.
 	(checkme): New target.
 	* Makefile.in: Regenerate.
-	
+
 1999-08-11  Ian Carmichael  <iancarm@cygnus.com>
 
-	* angel.cxx, m32r.cxx: (*) Change big_int_N and 
-	little_int_N so that the default operations all use 
+	* angel.cxx, m32r.cxx: (*) Change big_int_N and
+	little_int_N so that the default operations all use
 	their integer values.
 
 1999-08-10  Frank Ch. Eigler  <fche@cygnus.com>
@@ -688,7 +692,7 @@ Wed Aug  4 09:32:27 1999  Faisal Khoja  <fkhoja@cygnus.com>
 1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compGloss.cxx (compGlossListTypes, compGlossCreate):
-	Renamed types "m32r-gloss" -> "sw-gloss-m32r", 
+	Renamed types "m32r-gloss" -> "sw-gloss-m32r",
 	"arm-angel" -> "sw-gloss-arm/angel".
 	* hellotestconf.in: Updated with new component type names.
 
@@ -700,12 +704,12 @@ Wed Aug  4 09:32:27 1999  Faisal Khoja  <fkhoja@cygnus.com>
 	(angel_component::resume_handler): New method; restart a trap.
 	(angel_component::do_readc): Block the CPU when necessary.
 	(angel_component::do_read): Likewise.
-	
+
 1999-05-29  Ben Elliston  <bje@cygnus.com>
 
 	* angel.h (angel_component::rx_pin): New member.
 	(angel_component::tx_pin): Likewise.
-	(angel_component::rx_handler): Likewise. 
+	(angel_component::rx_handler): Likewise.
 	(angel_component::rxBuffer): Likewise.
 	* angel.cxx (angel_component ctor): Add tx and rx pins for I/O.
 	(angel_component::rx_handler): New method.
@@ -738,7 +742,7 @@ Wed Aug  4 09:32:27 1999  Faisal Khoja  <fkhoja@cygnus.com>
 	* angel.h (angel_component::cpu): New member. Rename from
 	`target_component'.
 	* angel.cxx: Apply throughout. Rename unirelation to `cpu'.
-	
+
 1999-05-17  Ben Elliston  <bje@cygnus.com>
 
 	* angel.h (angel_component::commandLine): New member.
@@ -793,7 +797,7 @@ Wed Aug  4 09:32:27 1999  Faisal Khoja  <fkhoja@cygnus.com>
 	* Makefile.in: Ditto.
 
 	* hellotest.conf.in: Use .la component DSO names.
-	
+
 1999-05-04  Ben Elliston  <bje@cygnus.com>
 
 	* Makefile.am (SUBDIRS): Add.
@@ -862,7 +866,7 @@ Wed Aug  4 09:32:27 1999  Faisal Khoja  <fkhoja@cygnus.com>
 1999-04-15  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* angel.cxx (getWord, setWord): Change idioms for modified
- 	endianness conversion types.
+	endianness conversion types.
 	(*) Stop using already implied sid:: namespace prefix.
 
 1999-04-15  Ben Elliston  <bje@cygnus.com>
@@ -884,7 +888,7 @@ Wed Aug  4 09:32:27 1999  Faisal Khoja  <fkhoja@cygnus.com>
 	* m32r.cxx: Include "config.h".
 	* compGloss.cxx: Include "config.h".
 	* config.in: Regenerated.
-	
+
 1999-04-13  Ben Elliston  <bje@cygnus.com>
 
 	* angel.cxx (angel_component::do_heapinfo): R1 points to a pointer
@@ -910,7 +914,7 @@ Wed Aug  4 09:32:27 1999  Faisal Khoja  <fkhoja@cygnus.com>
 	* compGloss.cxx (libgloss_component): Move class declaration to
 	gloss.h. Include it.
 	(m32r_libgloss_component): Move class declaration to
-	m32r.h. Include it. 
+	m32r.h. Include it.
 	(m32r_libgloss_component::*): Move method bodies to m32r.cxx.
 	* gloss.h: New file; split out from compGloss.cxx.
 	* m32r.h: Likewise.
@@ -928,7 +932,7 @@ Wed Aug  4 09:32:27 1999  Faisal Khoja  <fkhoja@cygnus.com>
 	protected and private access levels in class definition.
 	(libgloss_component::libgloss_component): Do not inline; move
 	method body outside class definition.
-	(libgloss_component::~libgloss_component): Remove.	
+	(libgloss_component::~libgloss_component): Remove.
 
 1999-03-24  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -940,8 +944,8 @@ Wed Aug  4 09:32:27 1999  Faisal Khoja  <fkhoja@cygnus.com>
 1999-03-16  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compGloss.cxx: Adapt to renamed COMPONENT_LIBRARY_MAGIC macro.
-  	Switch to sidutil::callback_pin only.  Adapt to changed
- 	sid::pin::driven(...) signature.
+	Switch to sidutil::callback_pin only.  Adapt to changed
+	sid::pin::driven(...) signature.
 
 1999-03-10  Ron Unrau  <runrau@cygnus.com>
 

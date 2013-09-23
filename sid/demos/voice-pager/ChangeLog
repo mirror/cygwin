@@ -1,3 +1,9 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir.
+	* Makefile.in, aclocal.m4, configure: Regenerate.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* configure.in: Remove call to AC_ARG_PROGRAM, to avoid autoconf

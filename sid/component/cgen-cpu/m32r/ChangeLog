@@ -1,3 +1,9 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir.
+	* Makefile.in, aclocal.m4, configure: Regenerate.
+
 2010-02-11  Doug Evans  <dje@sebabeach.org>
 
 	* m32r-decode.cxx, * m32r-decode.h, * m32r-sem.cxx: Regenerate.
@@ -97,9 +103,9 @@
 
 2001-06-28  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * hw-cpu-m32r.txt: Remove debug-exec? setting references.
-        * m32rbf.cxx (m32r_cpu::memory_trap): Remove
-        error message code under control of removed debug_exec_p flag.
+	* hw-cpu-m32r.txt: Remove debug-exec? setting references.
+	* m32rbf.cxx (m32r_cpu::memory_trap): Remove
+	error message code under control of removed debug_exec_p flag.
 
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -134,9 +140,9 @@
 
 2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * configure: Regenerated.
-        * aclocal.m4: Ditto.
-        * Makefile.in: Ditto.
+	* configure: Regenerated.
+	* aclocal.m4: Ditto.
+	* Makefile.in: Ditto.
 
 2000-11-11  Frank Ch. Eigler  <fche@redhat.com>
 

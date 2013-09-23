@@ -1,3 +1,9 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir.
+	* Makefile.in, aclocal.m4, sidconfutil.in, configure: Regenerate.
+
 2008-06-17  Dave Brolley  <brolley@redhat.com>
 
 	* sidmiscutil.h (change_log): New utility class.
@@ -137,7 +143,7 @@
 
 	2005-06-24  Dave Brolley  <brolley@redhat.com>
 
-	* sidattrutil.h (fixed_attribute_map_with_logging_component): 
+	* sidattrutil.h (fixed_attribute_map_with_logging_component):
 	Initialize buffer_output to false.
 
 	2005-06-21  Dave Brolley  <brolley@redhat.com>
@@ -276,7 +282,7 @@
 2004-06-29  Stan Cox  <scox@redhat.com>
 
 	* sidcpuutil.h (basic_cpu): Add eflags_set_pin, set_eflags.
-	
+
 2004-03-22  Dave Brolley  <brolley@redhat.com>
 
 	* sidcpuutil.h (trace_pin): New member of basic_cpu.
@@ -332,7 +338,7 @@
 
 	* sidattrutil.h (iostream): #include it.
 	(log): Use std::cerr and std::endl.
-	
+
 2003-10-07  Dave Brolley  <brolley@redhat.com>
 
 	* sidattrutil.h (fixed_attribute_map_with_logging_component):
@@ -402,7 +408,7 @@
 	* sidcpuutil.h (cpu_trace_stream): Add some std:: qualifiers.
 
 2002-10-03  Dave Brolley  <brolley@redhat.com>
-       From Ben Elliston  <bje@redhat.com>
+	    From Ben Elliston  <bje@redhat.com>
 
 	* sidcpuutil.h (basic_cpu::disassembler_bus): New accessor.
 	(basic_cpu::basic_cpu): Initialise; register "disassembler-memory".
@@ -525,7 +531,7 @@
 	* sidcomp.h (bus::status::code): Change type to host_int_1.
 	(bus::status constructors): Cast status_t to host_int_1.
 	(API_MINOR_VERSION): Bump it.
-	
+
 2001-06-24  Ben Elliston  <bje@redhat.com>
 
 	* sidcpuutil.h (basic_cpu::total_latency): New member.
@@ -635,8 +641,8 @@
 
 2001-11-17  Jeff Johnston <jjohnstn@redhat.com>
 
-        * sidbusutil.h (passthrough_word_bus): Changed do_direct_passthrough
-        to use reference parameter so address can be modified by routine.
+	* sidbusutil.h (passthrough_word_bus): Changed do_direct_passthrough
+	to use reference parameter so address can be modified by routine.
 
 2001-01-12  Jeff Johnston  <jjohnstn@redhat.com>
 
@@ -692,7 +698,7 @@
 	* sidcpuutil.h (basic_cpu): Made data_bus and insn_bus protected
 	members instead of private.  Also changed read_insn_memory template
 	to add address parameter in addition to pc.  Added write_insn_memory
-	template.  Changed read_insn_memory_1, read_insn_memory_2, 
+	template.  Changed read_insn_memory_1, read_insn_memory_2,
 	read_insn_memory_4, and read_insn_memory_8 to use extra parameter
 	to get storage and to use pc when reporting memory fault.
 	Added write_insn_memory_1, write_insn_memory_2, write_insn_memory_4,
@@ -769,7 +775,7 @@
 
 2000-01-18  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* sidmiscutil.h (ok): New member function in recursion_limited, 
+	* sidmiscutil.h (ok): New member function in recursion_limited,
 	recursion_record.
 	(recursion_limited): Print supplied label and counts in error
 	message in case of recursion overflow.  Do not abort().
@@ -825,7 +831,7 @@
 1999-11-26  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sidwatchutil.h (map_watchable_name): Export as standalone function.
-	
+
 1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sidcomp.h: (API_MAJOR,MINOR_VERSION): Bump to 2/1.
@@ -838,7 +844,7 @@
 
 	* sidattrutil.h (make_numeric_attribute): Really set incoming flags.
 	(parse_unsigned_numeric_attribute): Reject empty strings.
-	
+
 	(fixed_attribute_map_component): Make
 	inherited members non-const.
 	* sidbusutil.h (fixed_accessor_map_component): Ditto.
@@ -855,17 +861,17 @@
 	(event_handler): New callthrough function.
 	(now): Drive output pin with sentinel value.
 	* sidwatchutil.h (check_and_inform): Ditto.
-	
+
 1999-11-19  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sidpinutil.h (output_pin): Rewrite.  No longer is-a sid::pin.
 	(inputoutput_pin): New class.
 	(add_pin): Overload for classes separately.
- 	(find_pin): Search only input_pin list.
+	(find_pin): Search only input_pin list.
 	(connect_pin): Return error code from output_pin::connect.
 	Defend better against null pointers.
 	(disconnect_pin): Ditto.
-	
+
 	* sidpinattrutil.h (make_attribute, parse_attribute): Rewrote
 	functions.  Replaced attribute_coder<> templates.
 
@@ -897,7 +903,7 @@
 
 1999-10-10  Faisal Khoja  <fkhoja@cygnus.com>
 
-	* sidattrutil.h (class attribute_coder_base): Introduced virtual 
+	* sidattrutil.h (class attribute_coder_base): Introduced virtual
 	destr.
 	(class attribute_coder_virtual): Introduced destructor
 	(class attribute_coder_virtual_parametrized): Likewise
@@ -912,7 +918,7 @@
 
 	* sidattrutil.h (parse_unsigned_numeric_attribute): changed type of var
 	c from char to unsigned char.
-	
+
 1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sidcomp.h (bus, pin): Take integers as values, not const-refs.
@@ -922,7 +928,7 @@
 	* sidso.h (COMPONENT_LIBRARY_MAGIC): Declare as host_int_4.
 	* sidbusutil.h (*): Corresponding changes.
 	* sidpinutil.h (*): Corresponding changes.
-	
+
 1999-10-07  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* sidattrutil.h: Removed try and catch. Did some indenting
@@ -1049,7 +1055,7 @@
 	(fixed_attribute_map_component): Remove supervisory() stub.
 	(parse_attribute): Check for stream errors more ANSI-abidingly.
 	* sidbusutil.h (passthrough_bus): New class.
-	* sidmiscutil.h (operator >>): Use ANSI setstate() instead of setf(). 
+	* sidmiscutil.h (operator >>): Use ANSI setstate() instead of setf().
 
 1999-08-16  Ian Carmichael  <iancarm@cygnus.com>
 
@@ -1074,7 +1080,7 @@
 	the default operations all use their integer values.
 	* sidattrutil.h, sidbusutil.h: (*): Ditto.
 
- 	* sidattrutil.h: (make_attribute_*, parse_attribute_*): All
+	* sidattrutil.h: (make_attribute_*, parse_attribute_*): All
 	attributes now in HEX format.  TODO: Change these to 0xHEX
 	and/or DECIMAL.
 
@@ -1117,7 +1123,7 @@
 	sid::component::status.
 
 1999-07-21  Faisal Khoja  <fkhoja@cygnus.com>
-	 
+
 	* sidtypes.h: Document.
 	* sidcomp.h: Likewise.
 	* sidbusutil.h: Likewise.
@@ -1127,7 +1133,7 @@
 	* sidcomp.h: Introduced enum in sid::pin class.
 	* sidpinutil.h (disconnect): Change return type from void to
 	sid::pin::status.
-	
+
 1999-07-17  Ron Unrau  <runrau@cygnus.com>
 
 	* supervisory.h: Add SUP_REG_NUM to get number of registers.
@@ -1139,11 +1145,11 @@
 
 	* sidmiscutil.h (recursion_limited ctor): Use a default recursion
 	limit of 1000.
-	
+
 1999-07-16  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sidbusutil.h (fixed_accessor_map_component::listAccessorNames):
- 	Remove debugging output to cerr.
+	Remove debugging output to cerr.
 	(*): Change idiom "(*iterator).field" => "iterator->field".
 
 1999-07-15  Frank Ch. Eigler  <fche@cygnus.com>
@@ -1162,9 +1168,9 @@
 	(byte_bus::read): Reorganize.
 
 	* sidmiscutil.h (tokenize): New function.
-	
+
 	* sidpinattrutil.h <binary_output_pin attribute_coder>: Use sid::
- 	namespace prefix consistently.
+	namespace prefix consistently.
 
 	* sidpinutil.h (output_pin): Slightly reorganize
 	inline member functions.
@@ -1181,7 +1187,7 @@
 	out-of-line.
 
 1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
-	
+
 	* sidcomp.h: Remove unnecessary #include <memory> that arouses
 	a conflict with source tree directory ../component/memory.
 
@@ -1202,7 +1208,7 @@
 1999-06-16  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sidschedutil.h (generic_scheduler_interface): Dropped class.
- 	(scheduler_event_subscription): Smaller & faster utility class for
+	(scheduler_event_subscription): Smaller & faster utility class for
 	event control.
 	(scheduler_time_query): Small utility class for "time" query.
 
@@ -1213,7 +1219,7 @@
 	begin.
 	(operator <<,>>): Print any_int number in natural digit order by
 	converting to/from host-endian.
-	
+
 1999-06-16  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* sidtypes.h (operator<<, operator>>): Removed the seperate
@@ -1224,24 +1230,24 @@
 
 	* sidtypes.h  (any_int(copyconstructor)): made two copies of copy
 	constructor one with bool true and other with bool false to compile on
-	NT. 
+	NT.
 	(operator<<, operator>>): seperate copies for bool equals true & bool
-	equals false. 
-	
+	equals false.
+
 1999-06-15  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sidcomp.h (bus::read, bus::write): Remove 8-byte address
- 	variants.  Replace host_int_X data with little_* and big_*
+	variants.  Replace host_int_X data with little_* and big_*
 	variants.
 	(API_MINOR_VERSION): Bump it.
-	
+
 	* sidbusutil.h (word_bus): Remove AddrType template parameter.
 	Use host_int_4 address type throughout.
 	(writeAny, readAny): Clean up data endianness handling.
 	(byte_bus): Match sid::bus API changes.
 	(control_register_bank): Replace AddrType with host_int_4 througout.
-	(control_register_bus): Ditto.	
-	
+	(control_register_bus): Ditto.
+
 	* sidtypes.h (any_int): Add host_int_type derived typedef.
 	Designate all members inline.
 
@@ -1260,13 +1266,13 @@
 	(API_MINOR_VERSION): Bump it.
 	* sidcomputil.h (no_attribute_component): Implement stub function.
 	* sidattrutil.h (fixed_attribute_map_component): Implement
-	new function by interpointing string->set<string> maps. 
+	new function by interpointing string->set<string> maps.
 	(categorize, uncategorize): New functions to manage maps.
 	(add_attribute*): New overloaded functions with category arguments.
 	(remove_attribute): Uncategorize dying attribute.
-	
+
 	(attribute_coder_virtual ctor): Allow getter/setter arguments to
- 	come in transposed.
+	come in transposed.
 
 	(listExtraAttrNames): Removed unneeded function.  Adjust callers.
 	(getExtraAttrValue): Ditto.
@@ -1274,7 +1280,7 @@
 
 1999-06-11  Ron Unrau  <runrau@cygnus.com>
 
-        * sidbusutil.h: byte_bus, callback_byte_bus: New Classes.
+	* sidbusutil.h: byte_bus, callback_byte_bus: New Classes.
 
 1999-06-11  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -1301,7 +1307,7 @@
 1999-06-07  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sidcomp.h (component): Reincarnate listAccessorNames, listPinNames,
- 	listBusNames into component API.
+	listBusNames into component API.
 	* sidcomputil.h: Ditto.
 	* sidbusutil.h: Ditto.
 	* sidpinutil.h: Ditto.
@@ -1325,7 +1331,7 @@
 1999-05-21  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* configure.in: Add "--disable-assert" option.  Stop building
- 	useless libtool here.
+	useless libtool here.
 	* aclocal.m4: Regenerated.
 	* configure: Regenerated.
 	* sidconf.in: Regenerated.
@@ -1379,9 +1385,9 @@
 1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sidso.h: Define DLLEXPORT/DLLIMPORT for CYGWIN.
-	
+
 	* sidbusutil.h: Revert last two sets of changes temporarily.
-	
+
 	* Makefile.in: Regenerated for new libtool.
 	* aclocal.m4: Ditto.
 	* configure: Ditto.
@@ -1392,7 +1398,7 @@
 
 1999-05-01  Ron Unrau  <runrau@cygnus.com>
 
-	* sidbusutil.h (word_bus::readAny/writeAny): some progress towards 
+	* sidbusutil.h (word_bus::readAny/writeAny): some progress towards
 	  getting masks right.
 
 1999-04-27  Frank Ch. Eigler  <fche@cygnus.com>
@@ -1438,8 +1444,8 @@
 
 1999-04-09  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* sidschedutil.h: New file for new class generic_scheduler_interface, 
-	a functional interface to an external scheduler component.  
+	* sidschedutil.h: New file for new class generic_scheduler_interface,
+	a functional interface to an external scheduler component.
 	* Makefile.am: Include it in noinst_HEADERS.
 	* Makefile.in: Regenerated.
 
@@ -1461,9 +1467,9 @@
 	(add_attribute_ro): New function to use this coder.
 	(attribute_coder_notify): Rename from attribute_coder_callback.
 	(add_attribute_notify): New function to use this coder.
-	(remove_attribute): Assert existence of about-to-be removed 
+	(remove_attribute): Assert existence of about-to-be removed
 	attribute.
-	
+
 1999-04-03  Ron Unrau  <runrau@cygnus.com>
 
 	* sidcomp.h, sidbusutil.h: swap addr<->data in bus::read and bus::write
@@ -1499,7 +1505,7 @@
 	* sidcomp.h: Style cleanup.
 	* sidso.h: Junk cleanup.
 	* sidtypes.h: Add istream>> for host_int types.
-	
+
 1999-03-17  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sidtypes.h (any_int_base): New base type for types.
@@ -1522,17 +1528,17 @@
 	(class callback_pin): Derive from output_pin.  Add new pmf for value-less
 	pin event callbacks.  Add new constructors to set it.
 	(class callback_event_pin): Remove.
-	(class callback_output_pin): Remove.	
+	(class callback_output_pin): Remove.
 	* sidso.h (COMPONENT_LIBRARY_MAGIC): New const value.
 	(SID_COMPONENT_LIBRARY_MAGIC): Gone.
-	
+
 1999-03-12  Ron Unrau  <runrau@cygnus.com>
 
 	* Scheduler.h: do not use component* for callback object state
 
 1999-03-12  Ron Unrau  <runrau@cygnus.com>
 
-	* sidcomp.h: setAccessor, connectPin, disconnectPin, and setAttrValue 
+	* sidcomp.h: setAccessor, connectPin, disconnectPin, and setAttrValue
 	  now return status
 	* sid{bus,pin,attr,comp}util.h: track changes in sidcomp.h
 
@@ -1541,7 +1547,7 @@
 	* sidcomp.h (class component): Make destructor public - temporarily.
 	Add abstract relationship API.
 	* sidcomputil.h (class no_relation_component): New mix-in class for
-	uninterested components.  
+	uninterested components.
 	(class fixed_relation_map_component): New mix-in class for social
 	components.
 	* sidattrutil.h (class fixed_attribute_map_component): Make some
@@ -1550,7 +1556,7 @@
 	(class fixed_accessor_map_component): Ditto.
 	* sidpinutil.h (class fixed_pin_map_component): Ditto.
 	(class callback_storage_pin): Use value-less callback fn.
-	
+
 1999-03-01  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* Makefile.am: Don't install sidutil mix-in headers.
@@ -1565,7 +1571,7 @@
 	* Makefile.am (INCLUDE_HEADERS): Also install recently added
  	headers.
 	* Makefile.in: Rebuilt.
-	
+
 1999-02-21  Ron Unrau <runrau@cygnus.com>
 
 	* Scheduler.h: new file
@@ -1580,14 +1586,14 @@
 
 	* sidtypes.h (HOST_IS_*_ENDIAN): Use #ifdef *BIG/LITTLE* consistently.
 	(big/little/host_int_N): Add assignment operator.
-	
+
 1999-02-12  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sidattrutil.h (attribute_coder_callback): New helper class for
  	fixed_attribute_map_component that wants to monitor attribute
  	writes with a callback member function.
 	* sidcomp.h (*): Declare all component API calls as "throw ()".
-	
+
 	* Makefile.am: Switch to foreign mode.  Adjust for automake 1.4.
 	* configure.in: Adjust for autoconf 2.13.
 	* Makefile.in: Rebuilt.
@@ -1603,7 +1609,7 @@
 	attribute mappings.
 	* sidbusutil.h: Add extra #includes.
 	* sidcomputil.h: Correct #include guard typo.
-	* sidpinutil.h (callback_pin): New pin subtype for component member function 
+	* sidpinutil.h (callback_pin): New pin subtype for component member function
 	callbacks.
 	(callbcak_storage_pin): As above, except also like storage_pin<>.
 	* sidtypes.h (big_int, host_int, little_int): Add raw() member to return
@@ -1635,9 +1641,10 @@
 
 	* sidcomp.h: Removed attribute classes.  Using std::string
 	for attribute values instead.
-	* sidso.h: Use explicit std:: namespace ref for some classes. 
+	* sidso.h: Use explicit std:: namespace ref for some classes.
 	* sidpinutil.h: Moved contents into sidutil:: namespace.
-	(fixed_pin_map_component): New class for components with a fixed group of pins. 
+	(fixed_pin_map_component): New class for components with a fixed
+	group of pins.
 	* sidattrutil.h: New file: attribute utilities
 	(make_attribute): Template to stream arbitrary type to string.
 	(parse_attribute): Same, in reverse.

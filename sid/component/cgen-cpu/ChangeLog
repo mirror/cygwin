@@ -1,9 +1,15 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir.
+	* Makefile.in, aclocal.m4, config.in, configure: Regenerate.
+
 2010-02-17  Nick Clifton  <nickc@redhat.com>
 
 	* acinclude.m4 (gcc_AC_CHECK_DECL): Add parameter type to function
 	pointer cast, in order to allow compilation by newer versions of
 	g++.
-        * configure: Regenerate.
+	* configure: Regenerate.
 
 2010-01-24  Doug Evans  <dje@sebabeach.org>
 
@@ -40,8 +46,8 @@
 	2005-04-17  Nick Clifton  <nickc@redhat.com>
 
 	* common_model.h (class mep_common_model): Add default
-          defintions of MAX_UNITS and UNIT_U_EXEC in case they are not
-          defined.
+	defintions of MAX_UNITS and UNIT_U_EXEC in case they are not
+	defined.
 
 	2003-10-07  Dave Brolley  <brolley@redhat.com>
 
@@ -81,7 +87,7 @@
 2006-10-18  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:
-	
+
 	2006-05-11  Dave Brolley  <brolley@redhat.com>
 
 	* configure.in: Add sh support.
@@ -143,12 +149,12 @@
 	(eqdf, ltdf, ledf, gtdf, gedf, gedf): Implemented.
 	(unordereddf): New method.
 	(unordereddf, fextsfdf): Implemented.
-	(floatdisf, fixsfsi, fixsfdi, floatsidf, floatdidf, fixdfsi) 
+	(floatdisf, fixsfsi, fixsfdi, floatsidf, floatdidf, fixdfsi)
 	(fixdfdi): Implemented.
 	* cgen-fpu.h: Likewise.
 	* cgen-cpu.h (trace_counter): Now virtual.
 	(SETMEMBI): Write to data memory
-	(class cgen_bi_endian_cpu, class cgen_bi_endian_cpu) 
+	(class cgen_bi_endian_cpu, class cgen_bi_endian_cpu)
 	(class cgen_bi_endian_cpu, class cgen_bi_endian_cpu): Read/write
 	from data memory.
 	* CGEN.sh.in: Correct usage comment.
@@ -192,7 +198,7 @@
 
 	2005-05-29  Dave Brolley  <brolley@redhat.com>
 
-	* cgen-cpu.h (branch, done_insn, done_cti_insn, notify_ret): 
+	* cgen-cpu.h (branch, done_insn, done_cti_insn, notify_ret):
 	New virtual overrides.
 	(was_return): New member of cgen_bi_endian_cpu.
 
@@ -204,7 +210,7 @@
 	* Makefile.in: Regenerated.
 	* Contribute the following enhancements to floating point
 	support:
-	
+
 	2005-06-14  Dave Brolley  <brolley@redhat.com>
 
 	* fp.h (do_round,do_normal_round,do_normal_underflow,do_normal_overflow):
@@ -251,7 +257,7 @@
 	* fp.h: To here. Make some methods virtual. Make private members
 	protected.
 	(is_inexact): New method.
-	
+
 2005-06-30  Frank Ch. Eigler  <fche@elastic.org>
 
 	* cgen-cpu.h (GETMEM?F, SETMEM?F): Use pointer-cast-based
@@ -428,9 +434,9 @@
 	(operator<<): Likewise.
 	(fp::round_32): Don't specify a default argument at definition.
 	(fp::round_64): Likewise.
-	
+
 2002-11-29  Ben Elliston  <bje@redhat.com>
- 
+
 	* common-xml/interface.xml (print-insn-summary!): New pin.
 	* common-xml/behavior.xml (tracing): Mention print-insn-summary!.
 
@@ -519,7 +525,7 @@
 	(trace_counter): Print also the current scheduler time.  Flush
 	scaches to avoid distorting memory latency counts.
 	* tracedis.c (cgen_disassemble): Defeat initialization bypass cache.
-	
+
 2001-12-18  Dave Brolley  <brolley@redhat.com>
 
 	* cgen-ops.h (ROLHI): New macro.
@@ -727,9 +733,9 @@
 
 2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * configure: Regenerated.
-        * aclocal.m4: Ditto.
-        * Makefile.in: Ditto.
+	* configure: Regenerated.
+	* aclocal.m4: Ditto.
+	* Makefile.in: Ditto.
 
 2000-11-01  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -740,7 +746,7 @@
 
 2000-10-25  Frank Ch. Eigler  <fche@redhat.com>
 
-	* Makefile.am (MAKEOVERRIDES): Define empty macro to prevent 
+	* Makefile.am (MAKEOVERRIDES): Define empty macro to prevent
 	automatic override of local CXXFLAGS from top-level Makefile.
 	* Makefile.in: Regenerated.
 
@@ -779,7 +785,7 @@
 
 2000-08-30  Jeff Johnston  <jjohnstn@redhat.com>
 
-	* cgen-cpu.h: (GETIMEMQI, GETIMEMHI, GETIMEMSI, GETIMEMDI):  Changed 
+	* cgen-cpu.h: (GETIMEMQI, GETIMEMHI, GETIMEMSI, GETIMEMDI):  Changed
 	to specify pc argument as well as address.  New argument is passed on
 	to appropriate read_insn routine.
 	* arm7t/arm7f.cxx: Changed all callers of GETIMEMxx to duplicate
@@ -862,8 +868,8 @@
 	* CGEN.sh (rootdir): Expect to be run from said subdirectories.
 	* configure, Makefile.in, aclocal.m4: Generated.
 	* stamp-h.in, config.in: Ditto.
-	
+
 	* ChangeLog.1: New file to collect historical entries.
-	
+
 	* arm7t: New directory.  Populate with old arm* files.
 	* m32r: New directory.  Populate with old m32r* files.

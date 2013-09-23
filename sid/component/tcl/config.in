@@ -1,71 +1,130 @@
-/* config.in.  Generated automatically from configure.in by autoheader.  */
+/* config.in.  Generated from configure.in by autoheader.  */
+/* Name of package.  */
+#undef PACKAGE
 
-/* Define if the X Window System is missing or not being used.  */
-#undef X_DISPLAY_MISSING
+/* Version of package.  */
+#undef VERSION
 
-/* Define if you have the cygwin_conv_to_full_posix_path function.  */
-#undef HAVE_CYGWIN_CONV_TO_FULL_POSIX_PATH
-
-/* Define if you have the cygwin_conv_to_full_win32_path function.  */
-#undef HAVE_CYGWIN_CONV_TO_FULL_WIN32_PATH
-
-/* Define if you have the opendir function.  */
-#undef HAVE_OPENDIR
-
-/* Define if you have the <blt.h> header file.  */
+/* Define to 1 if you have the <blt.h> header file. */
 #undef HAVE_BLT_H
 
-/* Define if you have the <dirent.h> header file.  */
+/* Define to 1 if you have the `cygwin_conv_to_full_posix_path' function. */
+#undef HAVE_CYGWIN_CONV_TO_FULL_POSIX_PATH
+
+/* Define to 1 if you have the `cygwin_conv_to_full_win32_path' function. */
+#undef HAVE_CYGWIN_CONV_TO_FULL_WIN32_PATH
+
+/* Define to 1 if you have the <dirent.h> header file. */
 #undef HAVE_DIRENT_H
 
-/* Define if you have the <sys/cygwin.h> header file.  */
-#undef HAVE_SYS_CYGWIN_H
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
 
-/* Define if you have the <tcl.h> header file.  */
-#undef HAVE_TCL_H
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
 
-/* Define if you have the <tk.h> header file.  */
-#undef HAVE_TK_H
-
-/* Define if you have the X11 library (-lX11).  */
-#undef HAVE_LIBX11
-
-/* Define if you have the advapi32 library (-ladvapi32).  */
+/* Define to 1 if you have the `advapi32' library (-ladvapi32). */
 #undef HAVE_LIBADVAPI32
 
-/* Define if you have the comdlg32 library (-lcomdlg32).  */
+/* Define to 1 if you have the `comdlg32' library (-lcomdlg32). */
 #undef HAVE_LIBCOMDLG32
 
-/* Define if you have the dl library (-ldl).  */
+/* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
 
-/* Define if you have the gdi32 library (-lgdi32).  */
+/* Define to 1 if you have the `gdi32' library (-lgdi32). */
 #undef HAVE_LIBGDI32
 
-/* Define if you have the kernel32 library (-lkernel32).  */
+/* Define to 1 if you have the `kernel32' library (-lkernel32). */
 #undef HAVE_LIBKERNEL32
 
-/* Define if you have the m library (-lm).  */
+/* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
-/* Define if you have the tcl80 library (-ltcl80).  */
-#undef HAVE_LIBTCL80
+/* Define to 1 if you have the `tcl' library (-ltcl). */
+#undef HAVE_LIBTCL
 
-/* Define if you have the tk80 library (-ltk80).  */
-#undef HAVE_LIBTK80
+/* Define to 1 if you have the `tk' library (-ltk). */
+#undef HAVE_LIBTK
 
-/* Define if you have the user32 library (-luser32).  */
+/* Define to 1 if you have the `user32' library (-luser32). */
 #undef HAVE_LIBUSER32
 
-/* Define if you have the winspool library (-lwinspool).  */
+/* Define to 1 if you have the `winspool' library (-lwinspool). */
 #undef HAVE_LIBWINSPOOL
+
+/* Define to 1 if you have the `X11' library (-lX11). */
+#undef HAVE_LIBX11
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `opendir' function. */
+#undef HAVE_OPENDIR
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/cygwin.h> header file. */
+#undef HAVE_SYS_CYGWIN_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <tcl.h> header file. */
+#undef HAVE_TCL_H
+
+/* Define to 1 if you have the <tk.h> header file. */
+#undef HAVE_TK_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LT_OBJDIR
 
 /* Name of package */
 #undef PACKAGE
 
-/* Version number of package */
-#undef VERSION
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
 
 /* Define if POSIX file names should be mapped to win32 */
 #undef SIDTCL_MAP_CYGWIN_NAMES
 
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Version number of package */
+#undef VERSION
+
+/* Define to 1 if the X Window System is missing or not being used. */
+#undef X_DISPLAY_MISSING

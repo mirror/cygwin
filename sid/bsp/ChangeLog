@@ -1,3 +1,9 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir.
+	* Makefile.in, aclocal.m4, configure: Regenerate.
+
 2007-02-05  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:
@@ -97,7 +103,7 @@
 	* configrun-sid.in (gprof): Connect call-graph pins.
 
 2001-10-29  Frank Ch. Eigler  <fche@redhat.com>
-	
+
 	* configrun-sid.in (memory-region): Create component in first section.
 
 2001-10-29  Frank Ch. Eigler  <fche@redhat.com>
@@ -156,7 +162,7 @@
 	Always create mappers, separately from opt_load logic.
 
 2001-08-06  Ben Elliston  <bje@redhat.com>
-	
+
 	* configrun-sid.in (%component_libs): Add "cache" key/value.
 
 2001-08-01  Dave Brolley  <brolley@redhat.com>
@@ -206,12 +212,12 @@
 	($opt_trace_counter): Display a count for instructions as they
 	run, either for semantic or disassembly tracing, using new
 	`--trace-counter' option.
-	
+
 2001-04-05  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configrun-sid.in: Remove unused "--board=none" clause.
 	(board=pid7t): Support "redboot", a new alternative to "cygmon",
- 	and "eCosstub".
+	and "eCosstub".
 
 2001-04-04  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -250,8 +256,8 @@
 
 2001-02-23  John Healy  <jhealy@redhat.com>
 
-        * configrun-sid.in: Added $gloss_specified variable.
-        Added error reporting for sim run.
+	* configrun-sid.in: Added $gloss_specified variable.
+	Added error reporting for sim run.
 
 2001-01-23  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -277,7 +283,7 @@
 	if corresponding command line option is given.
 
 2001-01-13  matthew green  <mrg@redhat.com>
-	
+
 	* configrun-sid.in: `load-accessor' becomes Harvard architecture
 	friendly.  Split into `load-accessor-insn' and `load-accessor-data'.
 
@@ -288,10 +294,10 @@
 
 2001-01-04  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * configrun-sid.in: Imply --persistent if --gdb=xxxx specified.
-        Also set gdb "exit-on-detach" setting if gdb specified and
-        connect gdb restart pin to hw-reset-net.  This will cause hw reset
-        if gdb restarts a program or if gdb terminates and is run again.
+	* configrun-sid.in: Imply --persistent if --gdb=xxxx specified.
+	Also set gdb "exit-on-detach" setting if gdb specified and
+	connect gdb restart pin to hw-reset-net.  This will cause hw reset
+	if gdb restarts a program or if gdb terminates and is run again.
 
 2000-12-15  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -347,8 +353,8 @@
 
 	* configrun-sid.in (gprof): Changed option so that it is binary and
 	there is no N value specified.
-	(insn-count): New option to specify number of ticks that insns will 
-	be processed uninterrupted and number of ticks for gprof profiling.  
+	(insn-count): New option to specify number of ticks that insns will
+	be processed uninterrupted and number of ticks for gprof profiling.
 	Changed code that sets cpu_insn_count default to use insn-count.
 
 2000-10-08  Frank Ch. Eigler  <fche@redhat.com>
@@ -440,7 +446,7 @@
 
 	* arm-elf-sid.in: Update for split up interrupt controller
 	irq-registers and fiq-registers.
-		 
+
 2000-03-14  Frank Ch. Eigler  <fche@redhat.com>
 
 	* arm-elf-sid.in: Remove cpu/gloss "halt!" pin.  Set default
@@ -527,7 +533,7 @@
 	(hw-reset-net): New glue component for hardware reset signals.
 	(pid7t): Connect intctrl etc. to hw-reset-net.  Add "normalmap"
 	board option to disable remapper as if by jumper.
-	
+
 1999-12-06  Patrick Macdonald  <patrickm@cygnus.com>
 
 	* arm-elf-sid.in: add verbose? to targetview
@@ -541,8 +547,8 @@
 1999-12-03  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm-elf-sid.in (pid7t): When connected to socketio, make UART
- 	receive fifos quite big.
-	
+	receive fifos quite big.
+
 1999-12-03  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* armpid-cygmon.img: Rebuilt as of 1999-11-19.  Now includes
@@ -608,12 +614,12 @@
 1999-11-22  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm-elf-sid.in: Include CVS id of script in generated
- 	configuration files.
+	configuration files.
 
 1999-11-22  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm-elf-sid.in (gloss): Don't connect "halt!" redundantly
- 	between cpu and angel components.
+	between cpu and angel components.
 
 1999-11-15  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -647,10 +653,10 @@
 1999-11-02  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm-elf-sid.in (board=pid7t): Disable remapper temporarily.
-	
+
 	* Makefile.am: Add spaces between conditional DATA targets.
 	* Makefile.in: Regenerated.
-	
+
 	* aclocal.m4: Regenerated.
 	* configure: Regenerated.
 
@@ -691,7 +697,7 @@
 	* Makefile.in: Regenerated.
 	* arm-elf-sid.in (board=pid7t-cygmon): Arrange to load cygmon.img.
 	Configure remapper partially.
-  	(*): Warn about missing executable but don't instantiate loader.
+	(*): Warn about missing executable but don't instantiate loader.
 	Look for "--board" matches by regexp, not string equality.
 
 1999-10-13  Frank Ch. Eigler  <fche@cygnus.com>
@@ -702,10 +708,10 @@
 1999-10-12  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm-elf-sid.in (opt_no_run): New option "--no-run": generate
- 	config file but don't run sid on it.  Infer "--save-temps".
+	config file but don't run sid on it.  Infer "--save-temps".
 
 	* Makefile.am (pkgdata_DATA): New target.  Create default
- 	churchill/sid configuration files.
+	churchill/sid configuration files.
 	* Makefile.in: Regenerated.
 
 1999-09-29  Frank Ch. Eigler  <fche@cygnus.com>
@@ -736,7 +742,7 @@
 1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm-elf-sid.in: Warn if -EL/-EB not specified, and nor is an
- 	executable.  Stop hexifying gdb/tv port numbers, memory size,
+	executable.  Stop hexifying gdb/tv port numbers, memory size,
 	timing parameters.
 	(board=gloss): Don't instantiate sw-io-stdio if also have --gdb.
 
@@ -747,7 +753,7 @@
 
 1999-09-16  Patrick Macdonald  <patrickm@cygnus.com>
 
-	* arm-elf-sid.in: Connect the targetview triggerpoint pin 
+	* arm-elf-sid.in: Connect the targetview triggerpoint pin
 	to gdb's stop-target pin.
 
 1999-09-16  Ben Elliston  <bje@cygnus.com>
@@ -757,7 +763,7 @@
 1999-09-08  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm-elf-sid.in: Reduce CPU step-insn-count and tksm refresh
- 	rate, to account for temporary attribute hexification.  Add tksm<->gdb
+	rate, to account for temporary attribute hexification.  Add tksm<->gdb
 	connection for triggerpoint signalling.
 
 1999-09-07  Frank Ch. Eigler  <fche@cygnus.com>
@@ -779,7 +785,7 @@
 
 	* arm-elf-sid.in: Supply more host- and target-time scheduler slots.
 	(--gdb): Create gdb-socket component.  Connect it up.  Rename boolean
-	gdb attributes. 
+	gdb attributes.
 
 1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -801,7 +807,7 @@
 	* arm-elf-sid.in: Add "deinit-sequence" for shutdown notification.
 	Inform gdb.  Use fork/exec instead of system to manage sid process.
 	Teleport incoming signals to it.
-	
+
 1999-08-13  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm-elf-sid.in: Add "--persistent" option.  Put informative gunk
@@ -831,7 +837,7 @@
 
 1999-08-07  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* arm-elf-sid.in: Add "--trace-core" option.  Use new 
+	* arm-elf-sid.in: Add "--trace-core" option.  Use new
 	"hw-glue-probe-bus" component for effect.
 
 1999-08-06  Frank Ch. Eigler  <fche@cygnus.com>
@@ -861,8 +867,8 @@
 1999-07-21  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm-elf-sid.in (*): Reworked script.  Added "--board", "--tv",
- 	"--gdb" options.  Begin hookup of CPU to target scheduler.  Begin
- 	GDB hookup.
+	"--gdb" options.  Begin hookup of CPU to target scheduler.  Begin
+	GDB hookup.
 
 1999-06-20  Faisal Khoja  <fkhoja@cygnus.com>
 
@@ -883,7 +889,7 @@
 	(host-sched): New component instance.
 	(target-sched): Likewise.
 	(timer1, timer2, stdio): Use them.
-	
+
 1999-06-09  Doug Evans  <devans@casey.cygnus.com>
 
 	* arm-pid7t.conf.in (bus - mem range): Fix off by one error.
@@ -894,7 +900,7 @@
 
 	* arm-pid7t.conf.in: New file.
 	Connect the main bus to the remapper's register bus.
-	
+
 	* configure.in (AC_OUTPUT): Add arm-pid7t.conf.
 	* configure: Regenerate.
 
@@ -966,7 +972,7 @@
 1999-04-23  Ben Elliston  <bje@cygnus.com>
 
 	* arm-elf-sid.in: Rename `verbose?' attribute to `verbose'.
-	
+
 1999-04-22  Ben Elliston  <bje@cygnus.com>
 
 	* arm-elf-sid.in: Connect the Angel `process-signal' pin to the
@@ -984,7 +990,7 @@
 
 	* arm-elf-sid.in: Give more meaningful error diagnostics.
 	* m32r-elf-sid.in: Likewise.
-	
+
 1999-03-30  Ben Elliston  <bje@cygnus.com>
 
 	* arm-elf-sid.in: Replace `m32r' with `arm' in some places.

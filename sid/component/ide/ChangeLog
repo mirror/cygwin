@@ -1,3 +1,7 @@
+2013-09-22  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.
@@ -84,7 +88,7 @@
 1999-12-22  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compIDE.cxx (operator <<,>>): Save/restore num-heads and
- 	num-sectors-per-track as 16-bit quantities.
+	num-sectors-per-track as 16-bit quantities.
 
 1999-12-21  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -174,12 +178,12 @@
 
 1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
 
-	* compIDE.cxx: Introduce proper namespace usage. 
+	* compIDE.cxx: Introduce proper namespace usage.
 
 1999-07-25  Faisal Khoja  <fkhoja@cygnus.com>
- 	
+
 	* compIDE.cxx: Introduced Exception Handlings
-	
+
 1999-07-16  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compIDE.cxx (*): Remove debugging output to cerr.
@@ -196,7 +200,7 @@
 	(add_watchable_register): New function.
 	(ide_controller_ctor_0): Call it for all the control registers.
 	(drive): Use host_int values for state dumps variables.
-	
+
 	* README: Documented new attributes/watchables.
 	* Makefile.am (DEJAGNUTESTS): Add idetrigger.exp.
 	* Makefile.in: Regenerated.
@@ -227,7 +231,7 @@
 
 	* README: Rewrote using new component doc template.
 	* compIDE.cxx (drive): Use smaller integer types for attribute-accessed
- 	configurable values.
+	configurable values.
 
 1999-06-24  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -243,7 +247,7 @@
 	(command_set): Signal errors for attempted access to missing drives.
 	Detect misaddressed writes early.
 	(current_block_valid): Reject case of partial configuration.
-	
+
 	* configure.in: Look for strerror.
 	* configure: Regenerated.
 	* config.in: Regenerated.
@@ -262,15 +266,15 @@
 1999-06-15  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compIDE.cxx (ide_controller): Remove address type declaration
- 	from word_bus template.
+	from word_bus template.
 
 1999-06-14  Faisal Khoja  <fkhoja@cygnus.com>
 
-	* compIDE.cxx (write): changed the syntax for calling write 
+	* compIDE.cxx (write): changed the syntax for calling write
 	function from file word_bus in order to compile on native NT.
- 	(read): changed the syntax for calling read function for
+	(read): changed the syntax for calling read function for
 	same reason.  Fixed typo in write-vs-read function call.
-	  
+
 1999-06-11  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compIDE.cxx (proxy_commandbus): New class for handling weird
@@ -279,9 +283,9 @@
 	(ide_controller::drive ctor): New function.
 	(operator <<,>>): Reduce state snapshot size.  Encode
 	strings safely.
-	
+
 	* README: New skeleton file.
-	
+
 	* configure.in: Recurse into testsuite/.
 	* Makefile.am (SUBDIRS): Define.
 	* Makefile.in: Regenerated.
@@ -355,26 +359,26 @@
 1999-03-05  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compIDE.cxx (class ide_controller): Remove unneeded virtual
- 	inheritance.  Add relationship API stub.
+	inheritance.  Add relationship API stub.
 
 1999-03-01  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compIDE.cxx (data_port_set): Reset to idle state after
 	transfer done.
 	(data_port_get): Ditto.
- 	(read_current_block): Ditto.
+	(read_current_block): Ditto.
 	(command_set): Clear boot-time-only AMNF bit.
- 	* idetest.conf.in: Added disk configuration attributes.
+	* idetest.conf.in: Added disk configuration attributes.
 
 1999-02-26  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compIDE.cxx (ide_controller): Fix member/ctor ordering.
 	Fill in much missing code.
-	
+
 	* idetest.c: IDE target-domain test driver.
 	* idetest.conf.in: New file to run test.
 	* configure.in: Create idetest.conf in build tree.
-	
+
 	* configure: Rebuilt.
 	* Makefile.in: Rebuilt.
 

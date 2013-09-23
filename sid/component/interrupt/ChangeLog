@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.
@@ -132,7 +136,7 @@
 	* arm.cxx: Remove the code that is now in components.cxx and
 	components.h.
 	* cma222.cxx: Likewise.
-	* arm.h: New header for arm/ref controller, defining class 
+	* arm.h: New header for arm/ref controller, defining class
 	armIntController with the new scheme.
 	* cma222.h: New header for cogent/cma222 controller, defining class
 	cma222IntController with the new scheme.
@@ -190,18 +194,18 @@
 1999-12-21  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm.cxx (driveOutputs): New function.  Send output interrupt
- 	signal edges.  Check triggerpoints.
+	signal edges.  Check triggerpoints.
 	(fastInterrupt): Defer to new function.
 	(word_write, word_read): Ditto.
 	(raiseInterrupt, clearInterrupt): Ditto.  Don't use reference args.
 	(interrupt_line::driven): Don't check triggerpoints again.
 	(drive_irqpin,drive_fiqpin): Removed functions.
- 
+
 	* hw-interrupt-arm_ref.txt: Added note on differences between this
 	component and PID7T hardware.
 	* Makefile.am (DEJAGNUTESTS): Add docs & monkey tests.
 	* Makefile.in: Regenerated.
-	
+
 1999-12-16  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm.cxx (operator >>): Don't generate pin traffic during restore.
@@ -233,7 +237,7 @@
 1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* Makefile.in: Regenerated.
-	
+
 1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* hw-interrupt-arm_ref.txt: New file.  Renamed from
@@ -267,7 +271,7 @@
 1999-10-10  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* arm.cxx (armIntController ctor): Change order of initialization.
-	
+
 1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* arm.cxx (word_write, word_read, driven): Take value, not const-ref.
@@ -318,7 +322,7 @@
 
 1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* arm.cxx (operator >>): Use ANSI setstate() instead of setf().  
+	* arm.cxx (operator >>): Use ANSI setstate() instead of setf().
 	Remove error messages.
 
 1999-08-11  Ian Carmichael  <iancarm@cygnus.com>
@@ -339,9 +343,9 @@
 	* arm.cxx: Introduced state save & restore.
 	  Added four methods namely save_state, restore_state,
 	  operator << , and operator >>.
-	  Changed inheritance from no_attribute_component to 
+	  Changed inheritance from no_attribute_component to
 	  fixed_attribute_map_component.
-	
+
 1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* testsuite: Removed directory.

@@ -1,7 +1,7 @@
 ## Process this with automake to create Makefile.in
 
 AUTOMAKE_OPTIONS = foreign
-ACLOCAL_AMFLAGS = -I ../../../config
+ACLOCAL_AMFLAGS = -I ../../../config -I ../../../..
 
 noinst_LTLIBRARIES = libxstormy16.la
 

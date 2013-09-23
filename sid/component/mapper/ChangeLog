@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.
@@ -76,11 +80,11 @@
 	* compMapper.cxx (make_name_mapping): Support mapping
 	names with word size included as constant multiplier.
 	* hw-mapper-basic.xml: Document this change.
-	* hw-mapper-basic.txt: Likewise.	
-	
+	* hw-mapper-basic.txt: Likewise.
+
 2001-07-13  matthew green  <mrg@redhat.com>
 
-        * compMapper.cxx (generic_mapper_bus::write_any,
+	* compMapper.cxx (generic_mapper_bus::write_any,
 	generic_mapper_bus::read_any): Move function definition after
 	generic_mapper is defined.
 
@@ -203,7 +207,7 @@
 1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* Makefile.in: Regenerated.
-	
+
 1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* Makefile.in: Regenerated.
@@ -276,7 +280,7 @@
 	(accessor_names): Likewise
 	(connect_accessor): Likewise
 	(connected_bus): Likewise
-		
+
 1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compMapper.cxx (make_mapping_name): Use make_numeric_attribute
@@ -302,8 +306,8 @@
 
 1999-08-11  Ian Carmichael  <iancarm@cygnus.com>
 
-	* compMapper.cxx, maptest.cxx: (*) Change big_int_N 
-	and little_int_N so that the default operations all use 
+	* compMapper.cxx, maptest.cxx: (*) Change big_int_N
+	and little_int_N so that the default operations all use
 	their integer values.
 
 1999-08-06  Frank Ch. Eigler  <fche@cygnus.com>
@@ -338,22 +342,22 @@
 1999-06-15  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compMapper.cxx (never_match): Become an static class variable
- 	in generic_mapper_bus.
+	in generic_mapper_bus.
 	(generic_mapper_bus): Updated bus API calls throughout.
-	* maptest.cxx (Dummy): Remove address type declaration from word_bus 
+	* maptest.cxx (Dummy): Remove address type declaration from word_bus
 	template.  Use host_int_4 throughout.
 	(main): Update mapper component type name.
 
 1999-06-10  Faisal Khoja  <fkhoja@cygnus.com>
 
-	* compMapper.cxx : Introduced word "struct" in  following 
+	* compMapper.cxx : Introduced word "struct" in  following
 	two lines to compile using gnupro 99r1 on NT.
 	static struct mapping_record never_match = { 10, 0, 0, 0, 0, 0 };
-	mutable struct mapping_record* tlb; 
+	mutable struct mapping_record* tlb;
 
 1999-06-09  Ian Carmichael  <iancarm@cygnus.com>
 
-	* compMapper.cxx (locate): A few performance tweaks.  Not 
+	* compMapper.cxx (locate): A few performance tweaks.  Not
 	enough though.  The entier mapper needs to be reworked.
 
 1999-06-09  Frank Ch. Eigler  <fche@cygnus.com>
@@ -381,7 +385,7 @@
 
 	* compMapper.cxx (make_name_mapping): Use strtoul instead of strtol.
 	(locate): Don't mask off bottom two address bits.
-	
+
 	(mapper_component_library): DLLEXPORT it.
 	* configure.in: Be win32-dll-capable.
 	* configure: Regenerated.
@@ -389,7 +393,7 @@
 	* Makefile.in: Ditto.
 
 	* maptest.conf.in: Use .la component DSO names.
-	
+
 1999-05-01  Ron Unrau  <runrau@cygnus.com>
 
 	* compMapper.cxx: add some support for stride offset
@@ -434,13 +438,13 @@
 
 1999-03-12  Ron Unrau  <runrau@cygnus.com>
 
-	* compMapper.cxx: setAccessor, connectPin, disconnectPin, and 
+	* compMapper.cxx: setAccessor, connectPin, disconnectPin, and
 	  setAttrValue now return status
 
 1999-03-05  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compMapper.cxx (class compMapper): Remove unneeded virtual
- 	inheritance.  Add relationship API stub.
+	inheritance.  Add relationship API stub.
 
 1999-02-12  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -450,7 +454,7 @@
 	* aclocal.m4: Rebuilt.
 	* configure: Rebuilt.
 	* config.in: Rebuilt.
-	
+
 1999-01-08  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compMapper.cxx (generic_mapper): Use fixed_bus_map_component
@@ -461,7 +465,7 @@
 	* Makefile.am (INCLUDES): Added . and ../include.
 	* configure.in: Removed compulsory checks.
 	* Makefile.in: Rebuilt.
- 	* configure: Rebuilt.
+	* configure: Rebuilt.
 	* config.in: Rebuilt.
 
 1998-12-18  Frank Ch. Eigler  <fche@cygnus.com>

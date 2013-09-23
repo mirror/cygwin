@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2008-06-17  Dave Brolley  <brolley@redhat.com>
 
 	* gdbserv-target.h (set_exec_direction): New member of
@@ -173,9 +177,9 @@
 
 2001-01-04  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * gdb.cxx (restart_program): Added code to drive
-        new "restart" output pin.
-        * gdb.h (restart_pin): New output pin.
+	* gdb.cxx (restart_program): Added code to drive
+	new "restart" output pin.
+	* gdb.h (restart_pin): New output pin.
 
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -205,18 +209,18 @@
 Wed Apr  5 20:56:28 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* gdbserv-target.h (enum gdbserv_target_rc, enum
- 	gdbserv_target_bp): Declare.
+	gdbserv_target_bp): Declare.
 	(struct gdbserv_target): Add alternative remove_breakpoint and
- 	set_breakpoint that use these enums.
+	set_breakpoint that use these enums.
 	* gdbserv-state.c (gdbserv_data_packet): Rewrite Z/z packet code
- 	making use of enums.
+	making use of enums.
 
 Wed Apr  5 08:50:02 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* gdbserv-input.h (struct gdbserv_input): Make buf
- 	unsigned. Rename bufsiz to sizeof_buf.
+	unsigned. Rename bufsiz to sizeof_buf.
 	* gdbserv-input.c (gdbserv_input_attach, add_char_to_packet):
- 	Update.
+	Update.
 
 Wed Mar 29 17:10:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
@@ -224,27 +228,27 @@ Wed Mar 29 17:10:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 	* gdbserv.h: Update.
 
 	* gdbserv-state.c: Partial merge with libstub/asvp.
- 	(gdbserv_data_packet): Update support for ``g'' and ``G'' packets.
+	(gdbserv_data_packet): Update support for ``g'' and ``G'' packets.
 	(gdbserv_data_packet): Replace some gdbserv_input_reg with
- 	gdbserv_input_reg_beb.
+	gdbserv_input_reg_beb.
 	(gdbserv_data_packet): Don't try to parse a breakpoint packet when
- 	it isn't supported.
+	it isn't supported.
 
 Fri Mar 24 18:42:58 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* gdbserv-state.c: Partial merge with libstub/asvp.
- 	(state2str): Formatting.
+	(state2str): Formatting.
 	(gdbserv_fromclient_detach): Formatting.
 	(gdbserv_fromclient_data): Ditto.
 	(gdbserv_data_packet): Add support for ``i'', ``qRcmd''
 	(gdbserv_fromtarget_break): Use expedied_reg_nr to expedite
- 	registers when available.
+	registers when available.
 
 Fri Mar 24 18:38:49 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* gdbserv-target.h (struct gdbserv_target): Add process_rcmd,
- 	input_reg, output_reg, gg_reg_nr, expedited_reg_nr, sizeof_reg,
- 	set_reg, get_reg, cyclestep_program, get_mem, set_mem.
+	input_reg, output_reg, gg_reg_nr, expedited_reg_nr, sizeof_reg,
+	set_reg, get_reg, cyclestep_program, get_mem, set_mem.
 
 Fri Mar 24 15:49:03 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
@@ -255,11 +259,11 @@ Tue Mar 21 16:17:42 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* gdbserv-input.c: Merge with libstub/asvp.
 	(gdbserv_input_hex_ulong): Rename gdbserv_input_ulong.
- 	(gdbserv_input_string_match, gdbserv_input_reg_leb,
- 	gdbserv_input_reg_beb, unpack_reg_bytes): New function.
+	(gdbserv_input_string_match, gdbserv_input_reg_leb,
+	gdbserv_input_reg_beb, unpack_reg_bytes): New function.
 	(gdbserv_input_escaped_binary): Reformat.
 	(gdbserv_input_wait_for_ack, add_char_to_packet): Update
- 	documentation.
+	documentation.
 
 	* gdbserv.h (gdbserv_input_ulong): Delete declaration.
 	* gdbserv-state.c (gdbserv_data_packet): Update.
@@ -267,22 +271,22 @@ Tue Mar 21 16:17:42 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 Fri Mar 17 17:52:02 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* gdbserv-utils.c: Merge with libstub/asvp/gdbserv.h.
- 	(gdbserv_reg_to_ulonglong, gdbserv_reg_to_ulong): Negate negative
- 	values.
+	(gdbserv_reg_to_ulonglong, gdbserv_reg_to_ulong): Negate negative
+	values.
 	* gdbserv-utils.h: Fix indentation.
 	* gdbserv-input.c (gdbserv_input_reg): Use memset to clear reg.
 
 Fri Mar 17 14:45:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* gdbserv.h: Merge with libstub/asvp/gdbserv.h.  Move #include
- 	<stdio.h> to gdb.cxx.  Add negative_p to struct gdbserv_reg.
+	<stdio.h> to gdb.cxx.  Add negative_p to struct gdbserv_reg.
 	(gdbserv_output_reg_beb, gdbserv_output_reg_leb,
- 	gdbserv_input_reg_beb, gdbserv_input_reg_leb): Add declarations.
+	gdbserv_input_reg_beb, gdbserv_input_reg_leb): Add declarations.
 	(gdbserv_input_reg, gdbserv_input_ulong): Deprecate.
 
 	* gdb.cxx: Include <stdio.h>.
 	* gdbserv-state.c (gdbserv_fromtarget_break,
- 	gdbserv_fromtarget_exit): Update sigval parameter.
+	gdbserv_fromtarget_exit): Update sigval parameter.
 
 2000-02-15  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -329,7 +333,7 @@ Fri Mar 17 14:45:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* Makefile.in: Regenerated.
-	
+
 1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* Makefile.in: Regenerated.
@@ -337,7 +341,7 @@ Fri Mar 17 14:45:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 1999-12-03  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* gdb.cxx (cpu_trap_handler): Ignore incoming breakpoint instruction
-	signals if emulating breakpoints with triggerpoints. 
+	signals if emulating breakpoints with triggerpoints.
 
 1999-11-26  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -372,7 +376,7 @@ Fri Mar 17 14:45:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* gdb.cxx (flush_i_cache): Drive output pin with sentinel value.
 	(target_power): Ditto.
-	(remote_rx_handler): Ditto.  Conditionally dispatch to 
+	(remote_rx_handler): Ditto.  Conditionally dispatch to
 	remote_rx_eof_handler.
 	(init_handler): Take unused arg.  Update callers.
 	(deinit_handler, stop_handler, start_handler): Ditto.
@@ -393,10 +397,10 @@ Fri Mar 17 14:45:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 	Support `Z'/`z' breakpoint packets, though cripple them temporarily.
 	* gdbserv-target.h (gdbserv_target): Remove set_baud_rate hook.
 	Add LEN parameter to set_breakpoint and remove_breakpoint.
-	
+
 	* gdb.cxx (remove_breakpoint_*, set_breakpoint_*): Add LEN parameter.
 	* gdb.h: Matching declaration changes.
-	
+
 1999-11-05  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* gdb.cxx (gdb ctor): Initialize more pointer member variables.
@@ -423,7 +427,7 @@ Fri Mar 17 14:45:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 	(target_power): Likewise.
 	(set_breakpoint): Removed unused variable pc.
 	(write_bus_word): Added bus->write(...) and commented s=bus->write(...)
-	* gdbserv-target.h: changed return type of (*sigkill_program) 
+	* gdbserv-target.h: changed return type of (*sigkill_program)
 	(struct gdbserv*) function to void from int.
 	* gdb.h: Changed return type of sigkill_program_hook to void
 	Changed return type of sigkill_program to void.
@@ -446,7 +450,7 @@ Fri Mar 17 14:45:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* gdb.cxx (process_set_reg, process_set_regs): Use 
+	* gdb.cxx (process_set_reg, process_set_regs): Use
 	make_numeric_attribute to generate register attribute names.
 	* gdb.h: Import make_numeric_attribute.
 
@@ -607,7 +611,7 @@ Fri Mar 17 14:45:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 	  type of arg2 from enum to int to compile on NT.
 	* gdbserv-state.c (gdbserv_fromtarget_break) changed
 	  arg2 to int.
-	* gdbsocket.c: Introduced #ifdef as netinet/tcp.h 
+	* gdbsocket.c: Introduced #ifdef as netinet/tcp.h
 	  is not found on NT (thanks Ben).
 
 1999-07-17  Ron Unrau  <runrau@cygnus.com>

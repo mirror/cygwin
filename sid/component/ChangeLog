@@ -1,3 +1,12 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir.
+	* Makefile.in, aclocal.m4, config.in, configure: Regenerate.
+	* families/configure.in (AC_CONFIG_AUX_DIR): Specify top dir.
+	* families/Makefile.am (ACLOCAL_AMFLAGS): Add -I top dir.
+	* families/{Makefile.in, aclocal.m4, configure}: Regenerate.
+
 2009-08-18  Frank Ch. Eigler  <fche@elastic.org>
 
 	* component_html.xsl: Correct minor errors caught by recent xslt.
@@ -142,7 +151,7 @@
 2001-07-25  Frank Ch. Eigler  <fche@redhat.com>
 
 	From Corinna Vinschen <vinschen@redhat.com>
-	* configure.in (lcd_libs): Look for -lncurses too, if -lcurses 
+	* configure.in (lcd_libs): Look for -lncurses too, if -lcurses
 	is not found.
 
 2001-07-23  Frank Ch. Eigler  <fche@redhat.com>
@@ -178,7 +187,7 @@
 	* component_html.xsl: Tweak to allow libxml2/libxslt to process.
 
 2001-07-10  matthew green  <mrg@redhat.com>
-	
+
 	* tconfig.in: Add xstormy16 support.
 
 2001-07-10  matthew green  <mrg@redhat.com>
@@ -194,7 +203,7 @@
 	* Makefile.am: Add maintainer-mode doc building.
 	* Makefile.in: Regenerate.
 	* component_html.xsl: Add.
-	
+
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.am (ACLOCAL_AMFLAGS): Refer to $srcdir.
@@ -255,7 +264,7 @@
 2000-10-27  Ben Elliston  <bje@redhat.com>
 
 	* CATALOG (sw-gloss-mips32/idt): Give correct description.
-	
+
 2000-09-21  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.in, aclocal.m4: Regenerated.
@@ -361,7 +370,7 @@
 
 	* Makefile.in: Regenerated.
 	* configure: Regenerated
-	* configure.in: Removed parport/testsuite from AC_OUTPUT 
+	* configure.in: Removed parport/testsuite from AC_OUTPUT
 
 1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -395,17 +404,17 @@
 
 	* aclocal.m4: Regenerated.
 	* configure: Regenerated.
-	
+
 	* CATALOG: Update cgen-cpu maintainer list.
 
 1999-10-25  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* CATALOG: Mention new sw-profile-gprof component.
 	* configure.in: Build new sid/component/profiling directory.
-	
+
 	* aclocal.m4: Regenerated.
 	* configure: Regenerated.
-	
+
 1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* configure.in: Call CY_SIDTARGET_CHECK.  Generate tconfig.h.
@@ -433,7 +442,7 @@
 1999-08-27  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* configure.in: Check for select function.
-	(AC_CONFIG_SUBDIRS): Remove gdb.  
+	(AC_CONFIG_SUBDIRS): Remove gdb.
 	(make_subdirs, AC_OUTPUT): Configure gdb it at this level now.
 	* configure, config.in: Regenerated.
 
@@ -449,7 +458,7 @@
 
 	* configure.in: Perform checks for libcurses more accurately.
 	* configure: Regenerate.
-	
+
 1999-08-12  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* CATALOG: Rename "sid-scheduler-host-precise" -> "...-accurate".
@@ -487,7 +496,7 @@
 1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* testsuite: New directory.
-	
+
 	* configure.in: Rewrote to avoid needless recursive configuration.
 	* Makefile.am (SUBDIRS): Matching changes.
 	* stamp-h.in: New generated file.
@@ -578,8 +587,8 @@
 
 1999-03-13  Ben Elliston  <bje@cygnus.com>
 
-        * Makefile.am (SUBDIRS): Remove .
-        * Makefile.in: Regenerate.
+	* Makefile.am (SUBDIRS): Remove .
+	* Makefile.in: Regenerate.
 
 1999-03-06  Frank Ch. Eigler  <fche@cygnus.com>
 

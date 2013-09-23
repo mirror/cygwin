@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2008-06-17  Dave Brolley  <brolley@redhat.com>
 
 	* generic.h: Remove 'using sidutil::no_relation_component'. Add
@@ -271,7 +275,7 @@
 1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* Makefile.in: Regenerated.
-	
+
 1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* Makefile.in: Regenerated.
@@ -323,7 +327,7 @@
 
 1999-10-26  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* generic.cxx (attempt_resize): Standardize error messages. 
+	* generic.cxx (attempt_resize): Standardize error messages.
 	(imagestore_handler, imageload_handler): Ditto.
 
 1999-10-20  Permaine Cheung  <pcheung@cygnus.com>
@@ -421,8 +425,8 @@
 	(imageload_handler, imagesave_handler): New functions.
 	(stream_generic_state, destream_generic_state): New functions.
 	Replace old (operator<<,>>).  Tolerate malloc errors.
-	(get_size_attr, set_size_attr): Tolerate malloc errors.	
-	
+	(get_size_attr, set_size_attr): Tolerate malloc errors.
+
 	* README: Mention new pins/attributes.
 	* Makefile.am: Mention new files.
 	* Makefile.in: Regenerated.
@@ -461,8 +465,8 @@
 
 1999-08-11  Ian Carmichael  <iancarm@cygnus.com>
 
-	* at29.cxx, generic.cxx: (*) Change big_int_N and 
-	little_int_N so that the default operations all use 
+	* at29.cxx, generic.cxx: (*) Change big_int_N and
+	little_int_N so that the default operations all use
 	their integer values.
 
 1999-08-09  Frank Ch. Eigler  <fche@cygnus.com>
@@ -489,7 +493,7 @@
 	* generic.cxx: Add exception handling.
 
 1999-07-25  Faisal Khoja  <fkhoja@cygnus.com>
-	
+
 	* flash.h: Add exception handlers.
 	* at29.h: Likewise.
 	* at29.cxx: Likewise.
@@ -517,16 +521,16 @@
 1999-07-07  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* at29.cxx (at29_flash_memory ctor): Call resize() after setting
- 	memory size.  Accept ctor arguments to customize model.
+	memory size.  Accept ctor arguments to customize model.
 	(at29_flash_memory::types): New static const table.
 	* at29.h (at29_flash_memory): Corresponding declaration changes.
 	(at29_flash_memory_type): New struct.
 	* flash.h (resize): Make protected instead of private.
 	* generic.cxx (compMemoryListTypes): Add at29_flash_memory::types.
 	(compMemoryCreate): Use at29_flash_memory::types.
-	
+
 	* README: Updated to list AT29 family members, add attribute
- 	defaults, etc.
+	defaults, etc.
 
 1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -535,7 +539,7 @@
 	* Makefile.in: Regenerated.
 
 1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
-	
+
 	* generic.cxx (operator >>): Don't new[] buffer redundantly.
 
 1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
@@ -561,7 +565,7 @@
 	* at29.h (NOPERM_READ): New macro.
 	(NOPERM_WRITE): Likewise.
 	Use these macros to declare unpermitted bus read/write methods.
-	
+
 1999-06-22  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* at29.cxx (at29_flash_memory): Use add_attribute_ro_value for
@@ -586,7 +590,7 @@
 	(generic_memory dtor): Simplify.
 	(write_any): Assert that access address is in range.
 	(read_any): Ditto.
-	
+
 1999-06-15  Ben Elliston  <bje@cygnus.com>
 
 	* generic.cxx (generic_read_only_bus): Put public members first.
@@ -609,15 +613,15 @@
 	(mem_component_library): Register it.
 
 1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
-	
+
 	* compMemory.cxx (compMemoryListTypes, compMemoryCreate):
 	Renamed type "memory" -> "hw-memory-ram/rom-basic".
 	* README: Update with new component type names.
-	
+
 1999-06-01  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compMemory.cxx (operator>>,<<): Implement simple-minded RLE
- 	encoding for memory state-snapshot.
+	encoding for memory state-snapshot.
 
 1999-05-26  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -657,7 +661,7 @@
 1999-04-14  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* README: New file.
-	* compMemory.cxx (operator <<, >>): Use unencoded binary string 
+	* compMemory.cxx (operator <<, >>): Use unencoded binary string
 	for state snapshot.
 
 1999-04-12  Frank Ch. Eigler  <fche@cygnus.com>
@@ -665,11 +669,11 @@
 	* compMemory.cxx (generic_memory_bus): Use compiler_int_X
 	for more members.  Add "state-snapshot" virtual attribute.
 	(save_state, restore_state): New functions. Call:
-	(operator <<, operator >>): New functions. Very rudimentary state 
+	(operator <<, operator >>): New functions. Very rudimentary state
 	streaming.
 	(memory_tester): Removed class and its traces.
 	* memtest.conf.in: Removed.
-	
+
 	* configure.in (AC_CONFIG_SUBDIRS): Configure testsuite/.
 	* Makefile.am (SUBDIRS): Descend there.
 	* configure: Regenerated.
@@ -705,7 +709,7 @@
 1999-03-05  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compMemory.cxx (class generic_memory): Remove unneeded virtual
- 	inheritance.  Add relationship API stub.
+	inheritance.  Add relationship API stub.
 	(class memory_tester): Ditto.
 
 1999-02-26  Frank Ch. Eigler  <fche@cygnus.com>
@@ -715,10 +719,10 @@
 1999-02-12  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compMemory.cxx (generic_memory): Add "wait-states" attribute for
- 	returning "sid::bus::notready" indication on every N-1 out of N
- 	accesses.  Use attribute-change callback for memory resizing.
+	returning "sid::bus::notready" indication on every N-1 out of N
+	accesses.  Use attribute-change callback for memory resizing.
 	(generic_memory_bus): Use it.
-	
+
 	* Makefile.am: Switch to foreign mode.  Adjust for automake 1.4.
 	* configure.in: Adjust for autoconf 2.13.
 	* Makefile.in: Rebuilt.
@@ -736,7 +740,7 @@
 	* Makefile.am (INCLUDES): Added . and ../include.
 	* configure.in: Removed compulsory checks.
 	* Makefile.in: Rebuilt.
- 	* configure: Rebuilt.
+	* configure: Rebuilt.
 
 1998-12-18  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -747,9 +751,9 @@
 1998-12-17  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* compMemory.cxx (compMemory): Use new stub functions from
- 	sidcomputil.h to mix in unused sub-APIs.
+	sidcomputil.h to mix in unused sub-APIs.
 	(memory_tester): New component that performs basic memory
- 	component testing that was previously done in compDummy.
+	component testing that was previously done in compDummy.
 	(compMemoryListTypes): Register new component type.
 	(compMemoryCreate): Register new component type.
 	* memtest.conf.in: New sid config file to drive memory tests.

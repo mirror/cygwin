@@ -1,3 +1,9 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* libtool.m4, ltconfig, ltdl.m4, ltmain.sh: Delete.
+	* config.sub, config.guess, install-sh: Delete.
+	* missing, mkinstalldirs, depcomp: Delete.
+
 2007-02-05  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:
@@ -54,7 +60,7 @@
 	* sidtarget.m4 (CY_SIDTARGET_CHECK): No need to specify the shell
 	when running $ac_config_sub; $ac_config_sub contains the shell
 	itself now, and it's an error to specify it twice.
-	
+
 	* libtool.m4, ltdl.m4, ltmain.sh: Update from libtool 1.5.18.
 
 2003-10-10  Ben Elliston  <bje@wasabisystems.com>
@@ -81,7 +87,7 @@
 	* docbuild.m4: Look for xsltproc.
 
 2001-07-10  matthew green  <mrg@redhat.com>
-	
+
 	* config.sub: Add xstormy16 support.
 	* info.tcl.in: Add xstormy16 support.
 	* sidtargets.m4: Add xstormy16 support.
@@ -146,8 +152,8 @@
 
 2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * ltconfig: Changed to accept host AR which is needed by libtool.
-        * libtool.m4: Changed to find host AR and to pass host AR to libtool.
+	* ltconfig: Changed to accept host AR which is needed by libtool.
+	* libtool.m4: Changed to find host AR and to pass host AR to libtool.
 
 2000-09-22  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -204,7 +210,7 @@
 	* unix.exp (sid_config_component_etc_test): Set tester's
 	"real-victim" relation.
 	(sid_config_component_etc_test_with_tracing): Ditto.
- 
+
 2000-01-17  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sidtargets.m4: Add ppc*/powerpc* target detection.
@@ -289,7 +295,7 @@
 
 1999-09-30  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* unix.exp (sid_cmd): Produce more informative dejagnu messages. 
+	* unix.exp (sid_cmd): Produce more informative dejagnu messages.
 	Call a sid crash a failure.  Call subsequent tests unresolved.
 	(prettyprint): New minor proc.
 	(sid_stop): Tolerate early death from sid.
@@ -301,16 +307,16 @@
 
 1999-09-21  Permaine Cheung  <pcheung@cygnus.com>
 
-	* unix.exp (sid_config_component_etc_test): Turn off tracing. The 
+	* unix.exp (sid_config_component_etc_test): Turn off tracing. The
 	original proc is now called sid_(...)_test_with_tracing.
 
 1999-09-16  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* config.guess, config.sub: Replaced files, taken from current
- 	libtool 1.3c development snapshot.
+	libtool 1.3c development snapshot.
 	* libtool.m4: New file, from same place.
 	* ltmain.sh: Ditto.
-	* ltconfig: Ditto.  
+	* ltconfig: Ditto.
 	(archive_expsym_cmds): Use $nonopt instead of $CC for cygwin.
 
 1999-09-10  Frank Ch. Eigler  <fche@cygnus.com>
@@ -326,7 +332,7 @@
 1999-07-08  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* unix.exp (sid_find_file): Look only two levels deep (../..) for
- 	files.
+	files.
 
 1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -344,10 +350,10 @@
 1999-05-17  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* ltmain.sh (file_magic): Search for win32 DLLs by more possible
- 	names.
+	names.
 
 	* unix.exp (sid_start): Use statically linked mksid executable if
- 	TOOL_OPTIONS includes "static"
+	TOOL_OPTIONS includes "static"
 	(sid_find_file): Accept TOOL_OPTIONS substring "install".
 
 1999-05-14  Ben Elliston  <bje@cygnus.com>
@@ -374,10 +380,10 @@
 	* ltconfig: Ditto.
 	* ltmain.sh: Ditto.  Add back one personal patch that didn't make it
 	into libtool 1.3 release.
-	
+
 	* info.tcl.in: New file.
 	* unix.exp (sidcomp_start): Load it.
-	
+
 	(sid_find_file): New procedure to find simulation pieces
 	in build and source or install directory.  Use TOOL_OPTIONS to choose.
 	(sid_config_component_etc_test): Use sid_find_file.
@@ -416,23 +422,23 @@
 1999-04-09  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* unix.exp (sid_config_component_etc_test): New routine.  Adds
- 	given strings to beginning and end of sid.conf file.
+	given strings to beginning and end of sid.conf file.
 	(sid_config_component_test): Call new routine with
- 	backward-compatible arguments.
+	backward-compatible arguments.
 	(sid_start): Set global $victim after startup.
 	(sid_stop): Kill sid process at stop.
 	(sid_cmd): Make more verbose "unresolved" messages.  Return "" on
- 	errors.
-	
+	errors.
+
 1999-04-06  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* unix.exp (sid_cmd): Upon an ERROR return from the tcl bridge,
- 	make test case "unresolved".
+	make test case "unresolved".
 
 1999-03-30  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* unix.exp (sid_config_component_test): Interject a tcl tracer
- 	between tester and victim.
+	between tester and victim.
 
 1999-03-25  Frank Ch. Eigler  <fche@cygnus.com>
 

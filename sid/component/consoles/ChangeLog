@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2006-07-14  Dave Brolley  <brolley@redhat.com>
 
 	* stdio.cxx (stdioConsole): Initialize eof_p. Add "eof" pin.
@@ -59,7 +63,7 @@
 	* sid-io-fileio.xml: New file.
 	* sid-io-stdio.xml: Refer to sid-io-fileio component.
 	* sid-io-stdio.txt: Regenerated.
-	
+
 2002-03-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* socketio.cxx (tx_handler): Expedite poll.
@@ -69,7 +73,7 @@
 	* socketio.cxx (~socketio): Define.
 
 2001-08-03  matthew green  <mrg@redhat.com>
-	
+
 	* components.h (~socketio): Add prototype.
 
 2001-07-13  Ben Elliston  <bje@redhat.com>
@@ -113,8 +117,8 @@
 
 2001-01-17  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * stdio.cxx (stdioConsole::read): Change to read a reasonable size of
-        data each time stdin gets polled.
+	* stdio.cxx (stdioConsole::read): Change to read a reasonable size of
+	data each time stdin gets polled.
 
 2000-11-16  matthew green  <mrg@redhat.com>
 
@@ -201,7 +205,7 @@
 1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* Makefile.in: Regenerated.
-	
+
 1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* sid-io-stdio.txt: New file.  Contents come from old README.
@@ -232,7 +236,7 @@
 	(tx_handler): Conditionally dispatch to tx_eof_handler.
 	(poll_receive, poll_transmit): Drive -1 on EOF.
 	(update_poll_interval): Clamp max_poll_interval too.
-	(socketio ctor): Notify on max_poll_interval change too. 
+	(socketio ctor): Notify on max_poll_interval change too.
 	* stdio.cxx (read): Take unused host_int_4 arg.
 	* components.h: Matching changes.
 	* components.cxx (compConsoleDelete): Use dynamic_cast<>.
@@ -294,12 +298,12 @@
 	(tx_handler): Same.
 	* stdio.cxx (write): Same.
 	* components.h (*): Corresponding changes.
-	
+
 1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* README: Update for bool/number notation changes.
 	* socketio.cxx (operator <<): Use make_numeric_attribute for port
- 	number.
+	number.
 	* socketio.h: Import make_numeric_attribute.
 
 1999-09-20  Frank Ch. Eigler  <fche@cygnus.com>
@@ -318,7 +322,7 @@
 1999-09-16  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* socketio.cxx (asyncificate): Use ioctl/FIONBIO instead of
- 	fcntl/O_NONBLOCK on cygwin.
+	fcntl/O_NONBLOCK on cygwin.
 	* components.h: #include a few more system headers for ioctl decl.
 
 1999-09-13  Frank Ch. Eigler  <fche@cygnus.com>
@@ -353,7 +357,7 @@
 	Set sin_family.
 	(socketio ctor): Set sin_family on sock_name and peer_name.
 	(init_handler): Bind socket unconditionally.
-	
+
 	* stdio.cxx (save_state): Remove tracing message.
 
 1999-08-27  Frank Ch. Eigler  <fche@cygnus.com>
@@ -363,7 +367,7 @@
 	(init_handler): Accept mistimed event without crashing.
 	(tx_eof_handler): New function.  Disconnect.
 	(socketio ctor): Trigger it on incoming driven() call.  Export
- 	new "avg-tx-buffer-size" attribute.
+	new "avg-tx-buffer-size" attribute.
 	(poll_receive): Be less verbose.  Forward EOF indication via
 	driven() when appropriate.  shutdown() before close().
 	(poll_transmit): Ditto.
@@ -421,9 +425,9 @@
 
 1999-05-31  Faisal Khoja <fkhoja@cygnus.com>
 	* stdio.cxx (read): added #include<unistd.h>
-	to call read (int, void*, size_t) from above mentioned 
-	header file. Header is added in order to compile on NT using 
-	cygwin 99r1. 
+	to call read (int, void*, size_t) from above mentioned
+	header file. Header is added in order to compile on NT using
+	cygwin 99r1.
 
 1999-05-30  Ben Elliston  <bje@cygnus.com>
 

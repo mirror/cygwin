@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2006-08-29  Dave Brolley  <brolley@redhat.com>
 
 	* glue.cxx (base_address): New member of bus_prober.
@@ -143,7 +147,7 @@
 2000-01-18  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* glue.cxx (sequence_component ctor): Initialize recursion limiter.
- 	(dispatch_h4, num_clients_changed): Prevent harmful recursion.
+	(dispatch_h4, num_clients_changed): Prevent harmful recursion.
 	* hw-glue-sequence.txt: Clarify policy.
 
 2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
@@ -203,7 +207,7 @@
 
 1999-10-10  Faisal Khoja  <fkhoja@cygnus.com>
 
-	* glue.cxx (probing_bus::writeAny): Commented out line 
+	* glue.cxx (probing_bus::writeAny): Commented out line
 	host_int_4 result = static_cast<unsigned>(s);
 	(probing_bus::read_Any): Likewise.
 
@@ -227,7 +231,7 @@
 	(readAny): Likewise
 	(write): Likewise
 	(read):	Likewise
-	
+
 1999-10-07  Ben Elliston  <bje@cygnus.com>
 
 	* README (hw-glue-probe-bus): Update documentation to reflect the
@@ -239,7 +243,7 @@
 	* components.h (sequence_component): Change type of num_clients to
 	host_int_1 to limit maximum number of outputs.
 	* glue.cxx (num_clients_changed): Removed redundant max-size check.
- 	Use make_numeric_attribute to generate pin/attribute names.
+	Use make_numeric_attribute to generate pin/attribute names.
 
 1999-09-23  Ben Elliston  <bje@cygnus.com>
 
@@ -281,7 +285,7 @@
 1999-08-12  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* glue.cxx (readAny, writeAny): Format trace data as hex by force.
- 	(bus_prober ctor): Rename attribute "verbose?" -> "trace?".
+	(bus_prober ctor): Rename attribute "verbose?" -> "trace?".
 	* README: Corresponding changes.
 
 1999-08-09  Frank Ch. Eigler  <fche@cygnus.com>
@@ -327,13 +331,13 @@
 
 	(list_types): Add preconfigured hw-glue-sequence-{1,2,8} types.
 	(create): Support them.
-	
+
 	* Makefile.am (DEJAGNUTESTS): New macro.
 	(checkme): New target.
 	(libglue_la_LDFLAGS): Add -export-symbols-regex clause to restrict
 	list of exported symbols.
 	* Makefile.in: Regenerated.
-	
+
 	* README: Rewrote, in component-template format.
 
 1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>

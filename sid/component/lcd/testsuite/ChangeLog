@@ -1,3 +1,7 @@
+2013-09-23  Alan Modra  <amodra@gmail.com>
+
+	* Makefile.in: Regenerate.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.in: Regenerated with Automake 1.9.5.
@@ -117,7 +121,7 @@
 1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* Makefile.in: Regenerated.
-	
+
 1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* Makefile.in: Regenerated.
@@ -133,7 +137,7 @@
 
 	* t6963c-tester.h (run_ipin, run_opin): New members; forks of
 	run_pin.
-	* t6963c-tester.cxx (*): Drive new *opin, sense new *ipin.	
+	* t6963c-tester.cxx (*): Drive new *opin, sense new *ipin.
 
 1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
 
@@ -143,7 +147,7 @@
 
 	* t6963-tester.cxx (draw_string): Changed type of i to unsigned.
 	(test_or_mode): Changed j's type to unsigned.
-	
+
 1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* lcdcontroller.tk (*): Don't hexify bus address/data traffic.
@@ -151,16 +155,16 @@
 1999-09-19  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* t6963c-tester.cxx (draw_string): Removed debugging messages.
- 	(draw_logo): Likewise
-	
+	(draw_logo): Likewise
+
 1999-09-17  Faisal Khoja  <fkhoja@cygnus.com>
 
 	* t6963c-tester.h: Inherit From fixed_relation_map_component
 	Added a data member to establish relation with T6963C.
 	* t6963c-tester.cxx(T6963C-tester): added uni_relation;
- 	(draw_string): Added test to check save/restore.
-	(draw_logo): Likewise		 	
-	
+	(draw_string): Added test to check save/restore.
+	(draw_logo): Likewise
+
 1999-09-17  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* simplcddemo.conf.in: Fix typo in "namespace import" command.

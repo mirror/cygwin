@@ -4,7 +4,7 @@
 ## released and the += operator works correctly inside conditionals.
 
 AUTOMAKE_OPTIONS = foreign
-ACLOCAL_AMFLAGS = -I $(srcdir)/../config
+ACLOCAL_AMFLAGS = -I ../config -I ../..
 
 SUBDIRS = . pregen
 

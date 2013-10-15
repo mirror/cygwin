@@ -1,5 +1,5 @@
 /*
- *  $Id: _types.h,v 1.9 2013/10/15 17:36:16 joel Exp $
+ *  $Id: _types.h,v 1.10 2013/10/15 17:37:37 joel Exp $
  */
 
 #ifndef _MACHINE__TYPES_H
@@ -9,6 +9,9 @@
 
 typedef __int32_t blksize_t;
 typedef __int32_t blkcnt_t;
+
+typedef __uint64_t __dev_t;
+#define __dev_t_defined 1
 
 #if defined(__arm__) || defined(__i386__) || defined(__m68k__) || defined(__mips__) || defined(__PPC__) || defined(__sparc__)
 /* Use 64bit types */

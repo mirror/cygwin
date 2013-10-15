@@ -1,9 +1,12 @@
 /*
- *  $Id: _types.h,v 1.10 2013/10/15 17:37:37 joel Exp $
+ *  $Id: _types.h,v 1.11 2013/10/15 17:39:19 joel Exp $
  */
 
 #ifndef _MACHINE__TYPES_H
 #define _MACHINE__TYPES_H
+
+/* This disables some conflicting type definitions in <machine/types.h> */
+#define _HAVE_SYSTYPES
 
 #include <machine/_default_types.h>
 

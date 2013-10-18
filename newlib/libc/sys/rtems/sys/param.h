@@ -32,7 +32,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)param.h	8.3 (Berkeley) 4/4/95
- * $Id: param.h,v 1.6 2013/10/15 17:40:02 joel Exp $
+ * $Id: param.h,v 1.7 2013/10/18 08:30:29 corinna Exp $
  */
 
 #ifndef _SYS_PARAM_H_
@@ -156,9 +156,7 @@
  * It should be set high enough to allow all legitimate uses, but halt
  * infinite loops reasonably quickly.
  */
-#if !defined(__rtems__)
 #define	MAXPATHLEN	PATH_MAX
-#endif
 #define MAXSYMLINKS	32
 
 /* Bit map related macros. */

@@ -1,3 +1,12 @@
+2013-10-29  Marc Glisse  <marc.glisse@inria.fr>
+
+	PR tree-optimization/58689
+	* concat.c: Remove note about xmalloc.
+
+2013-10-27  Gerald Pfeifer  <gerald@pfeifer.com>
+
+	* testsuite/test-demangle.c: Include unistd.h.
+	
 2013-10-25  Gary Benson  <gbenson@redhat.com>
 
 	* cp-demangle.c (struct d_saved_scope): New structure.

@@ -15,7 +15,7 @@
  *  OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
  *  SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  *
- *  $Id: pthread.h,v 1.11 2013/11/29 23:14:56 joel Exp $
+ *  $Id: pthread.h,v 1.12 2013/11/29 23:35:34 joel Exp $
  */
 
 #ifndef __PTHREAD_h
@@ -33,6 +33,13 @@ extern "C" {
 #include <time.h>
 #include <sys/sched.h>
 #include <sys/cdefs.h>
+
+struct _pthread_cleanup_context {
+  void (*_routine)(void *);
+  void *_arg;
+  int _canceltype;
+  struct _pthread_cleanup_context *_previous;
+};
 
 /* Register Fork Handlers */
 int	_EXFUN(pthread_atfork,(void (*prepare)(void), void (*parent)(void),
@@ -304,9 +311,43 @@ void 	_EXFUN(pthread_testcancel, (void));
 
 /* Establishing Cancellation Handlers, P1003.1c/Draft 10, p. 184 */
 
-void 	_EXFUN(pthread_cleanup_push,
-	(void (*__routine)( void * ), void *__arg));
-void 	_EXFUN(pthread_cleanup_pop, (int __execute));
+void	_EXFUN(_pthread_cleanup_push,
+	(struct _pthread_cleanup_context *_context,
+	void (*_routine)(void *), void *_arg));
+
+void	_EXFUN(_pthread_cleanup_pop,
+	(struct _pthread_cleanup_context *_context,
+	int _execute));
+
+/* It is intentional to open and close the scope in two different macros */
+#define pthread_cleanup_push(_routine, _arg) \
+  do { \
+    struct _pthread_cleanup_context _pthread_clup_ctx; \
+    _pthread_cleanup_push(&_pthread_clup_ctx, (_routine), (_arg))
+
+#define pthread_cleanup_pop(_execute) \
+    _pthread_cleanup_pop(&_pthread_clup_ctx, (_execute)); \
+  } while (0)
+
+#if defined(_GNU_SOURCE)
+void	_EXFUN(_pthread_cleanup_push_defer,
+	(struct _pthread_cleanup_context *_context,
+	void (*_routine)(void *), void *_arg));
+
+void	_EXFUN(_pthread_cleanup_pop_restore,
+	(struct _pthread_cleanup_context *_context,
+	int _execute));
+
+/* It is intentional to open and close the scope in two different macros */
+#define pthread_cleanup_push_defer_np(_routine, _arg) \
+  do { \
+    struct _pthread_cleanup_context _pthread_clup_ctx; \
+    _pthread_cleanup_push_defer(&_pthread_clup_ctx, (_routine), (_arg))
+
+#define pthread_cleanup_pop_restore_np(_execute) \
+    _pthread_cleanup_pop_restore(&_pthread_clup_ctx, (_execute)); \
+  } while (0)
+#endif /* defined(_GNU_SOURCE) */
 
 #if defined(_POSIX_THREAD_CPUTIME)
  

@@ -1,5 +1,5 @@
 /*
- *  $Id: _types.h,v 1.11 2013/10/15 17:39:19 joel Exp $
+ *  $Id: _types.h,v 1.12 2013/12/03 16:04:41 corinna Exp $
  */
 
 #ifndef _MACHINE__TYPES_H
@@ -9,6 +9,7 @@
 #define _HAVE_SYSTYPES
 
 #include <machine/_default_types.h>
+#include <stdint.h> /* For FreeBSD compatibility */
 
 typedef __int32_t blksize_t;
 typedef __int32_t blkcnt_t;

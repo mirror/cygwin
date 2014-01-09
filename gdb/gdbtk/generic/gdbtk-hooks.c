@@ -1,7 +1,7 @@
 /* Startup code for Insight.
 
    Copyright (C) 1994, 1995, 1996, 1997, 1998, 2000, 200, 2002, 2003, 2004,
-   2008, 2010, 2011, 2012, 2013 Free Software Foundation, Inc.
+   2008, 2010, 2011, 2012, 2013, 2014 Free Software Foundation, Inc.
 
    Written by Stu Grossman <grossman@cygnus.com> of Cygnus Support.
 
@@ -98,7 +98,7 @@ static void gdbtk_context_change (int);
 static void gdbtk_error_begin (void);
 void report_error (void);
 static void gdbtk_annotate_signal (void);
-static void gdbtk_set_hook (struct cmd_list_element *cmdblk);
+static void gdbtk_param_changed (const char *, const char *);
 
 /*
  * gdbtk_fputs can't be static, because we need to call it in gdbtk.c.
@@ -125,10 +125,10 @@ gdbtk_add_hooks (void)
   observer_attach_breakpoint_deleted (gdbtk_delete_breakpoint);
   observer_attach_architecture_changed (gdbtk_architecture_changed);
   observer_attach_memory_changed (gdbtk_memory_changed);
+  observer_attach_command_param_changed (gdbtk_param_changed);
 
   /* Hooks */
   deprecated_call_command_hook = gdbtk_call_command;
-  deprecated_set_hook = gdbtk_set_hook;
   deprecated_readline_begin_hook = gdbtk_readline_begin;
   deprecated_readline_hook = gdbtk_readline;
   deprecated_readline_end_hook = gdbtk_readline_end;
@@ -547,66 +547,16 @@ gdbtk_call_command (struct cmd_list_element *cmdblk,
    the first argument and the new value as the second argument.  */
 
 static void
-gdbtk_set_hook (struct cmd_list_element *cmdblk)
+gdbtk_param_changed (const char *param, const char *value)
 {
   Tcl_DString cmd;
-  char *p;
   char *buffer = NULL;
 
   Tcl_DStringInit (&cmd);
   Tcl_DStringAppendElement (&cmd, "gdbtk_tcl_set_variable");
 
-  /* Append variable name as sublist.  */
-  Tcl_DStringStartSublist (&cmd);
-  p = cmdblk->prefixname;
-  while (p && *p)
-    {
-      char *q = strchr (p, ' ');
-      char save = '\0';
-      if (q)
-	{
-	  save = *q;
-	  *q = '\0';
-	}
-      Tcl_DStringAppendElement (&cmd, p);
-      if (q)
-	*q = save;
-      p = q + 1;
-    }
-  Tcl_DStringAppendElement (&cmd, cmdblk->name);
-  Tcl_DStringEndSublist (&cmd);
-
-  switch (cmdblk->var_type)
-    {
-    case var_string_noescape:
-    case var_filename:
-    case var_enum:
-    case var_string:
-      Tcl_DStringAppendElement (&cmd, (*(char **) cmdblk->var
-				       ? *(char **) cmdblk->var
-				       : "(null)"));
-      break;
-
-    case var_boolean:
-      Tcl_DStringAppendElement (&cmd, (*(int *) cmdblk->var ? "1" : "0"));
-      break;
-
-    case var_uinteger:
-    case var_zinteger:
-      buffer = xstrprintf ("%u", *(unsigned int *) cmdblk->var);
-      Tcl_DStringAppendElement (&cmd, buffer);
-      break;
-
-    case var_integer:
-      buffer = xstrprintf ("%d", *(int *) cmdblk->var);
-      Tcl_DStringAppendElement (&cmd, buffer);
-      break;
-
-    default:
-      /* This case should already be trapped by the hook caller.  */
-      Tcl_DStringAppendElement (&cmd, "error");
-      break;
-    }
+  Tcl_DStringAppendElement (&cmd, param);
+  Tcl_DStringAppendElement (&cmd, value);
 
   if (Tcl_Eval (gdbtk_interp, Tcl_DStringValue (&cmd)) != TCL_OK)
     report_error ();

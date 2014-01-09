@@ -1,3 +1,9 @@
+2014-01-09  Tom Tromey  <tromey@redhat.com>
+
+	* generic/gdbtk-hooks.c (gdbtk_add_hooks): Use
+	command_param_changed observer, not deprecated_set_hook.
+	(gdbtk_param_changed): Rename from gdbtk_set_hook.  Simplify.
+
 2013-09-20  Andrew Burgess  <aburgess@broadcom.com>
 
 	* generic/gdbtk-register.c (register_changed_p): Replace use of

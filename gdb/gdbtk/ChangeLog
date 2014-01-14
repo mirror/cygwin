@@ -1,3 +1,7 @@
+2014-01-13  Tom Tromey  <tromey@redhat.com>
+
+	* generic/gdbtk-main.c (main): Don't set use_windows.
+
 2014-01-09  Tom Tromey  <tromey@redhat.com>
 
 	* generic/gdbtk-hooks.c (gdbtk_add_hooks): Use

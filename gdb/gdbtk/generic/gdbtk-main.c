@@ -1,6 +1,6 @@
 /* Main function for gdb with insight.  
 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2014 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -31,7 +31,6 @@ main (int argc, char **argv)
   memset (&args, 0, sizeof args);
   args.argc = argc;
   args.argv = argv;
-  args.use_windows = 1;
   args.interpreter_p = "insight";
   return gdb_main (&args);
 }

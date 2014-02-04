@@ -832,9 +832,7 @@ loop:
   if ((mode == _P_DETACH || mode == _P_NOWAIT) && !iscygwin ())
     synced = false;
   else
-    /* Just mark a non-cygwin process as 'synced'.  We will still eventually
-       wait for it to exit in maybe_set_exit_code_from_windows(). */
-    synced = iscygwin () ? sync (pi.dwProcessId, pi.hProcess, INFINITE) : true;
+    synced = sync (pi.dwProcessId, pi.hProcess, INFINITE);
 
   switch (mode)
     {

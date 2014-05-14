@@ -1,3 +1,42 @@
+2014-05-14  Andrew Burgess  <aburgess@broadcom.com>
+
+	* cplus-dmem.c (internal_cplus_demangle): Free any resources
+	allocated by possible previous call to gnu_special.
+	(squangle_mop_up): Reset pointers to NULL after calling free.
+	* testsuite/demangle-expected: New test case.
+
+2014-05-08  Gary Benson  <gbenson@redhat.com>
+
+	* cp-demangle.c (struct d_component_stack): New structure.
+	(struct d_print_info): New field component_stack.
+	(d_print_init): Initialize the above.
+	(d_print_comp_inner): Renamed from d_print_comp.
+	Do not restore template stack if it would cause a loop.
+	(d_print_comp): New function.
+	* testsuite/demangle-expected: New test cases.
+
+2014-04-17  Jakub Jelinek  <jakub@redhat.com>
+
+	PR sanitizer/56781
+	* maint-tool: Also emit rule for noasan/ subdirectory.
+	* configure.ac (NOASANFLAG): Set and substitute.
+	* Makefile.in: Regenerated.
+	(NOASANFLAG): Set.
+	(all, $(TARGETLIB), mostlyclean): Handle noasan subdir like pic
+	subdir.
+	(stamp-noasandir): New goal.
+	* configure: Regenerated.
+
+2014-04-01  Richard Biener  <rguenther@suse.de>
+
+	* simple-object.c (simple_object_internal_write): Handle
+	EINTR and short writes.
+
+2014-03-28  Richard Biener  <rguenther@suse.de>
+
+	* simple-object.c (simple_object_internal_read): Handle
+	EINTR and short reads.
+
 2014-03-13  Uros Bizjak  <ubizjak@gmail.com>
 
 	* regex.c (bzero) [!_LIBC]: Define without coma expression.

@@ -1,5 +1,5 @@
 ; Simulator generator support routines.
-; Copyright (C) 2000, 2009 Red Hat, Inc.
+; Copyright (C) 2000, 2009, 2014 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Utilities of cgen-arch.h.
@@ -100,10 +100,10 @@
    "\n"
    "#define TARGET_BIG_ENDIAN 1\n\n" ; FIXME
    ;(gen-mem-macros)
-   ;"/* FIXME: split into 32/64 parts */\n"
-   ;"#define WI SI\n"
-   ;"#define UWI USI\n"
-   ;"#define AI USI\n\n"
+   "#define WI  " (mode:c-type WI)  "\n"
+   "#define UWI " (mode:c-type UWI) "\n"
+   "#define AI  " (mode:c-type AI)  "\n" "\n"
+   "#define IAI " (mode:c-type IAI)  "\n" "\n"
    /gen-cpuall-defines
    /gen-support-decls
    /gen-arch-model-decls

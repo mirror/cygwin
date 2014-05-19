@@ -1,5 +1,5 @@
 ; RTL->C translation support.
-; Copyright (C) 2000, 2005, 2009, 2010 Red Hat, Inc.
+; Copyright (C) 2000, 2005, 2009, 2010, 2014 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -1746,6 +1746,14 @@
 (define-fn mul (*estate* options mode s1 s2)
   (s-binop *estate* "MUL" "*" mode s1 s2)
 )
+; 1's complement overflow
+(define-fn mul-o1flag (*estate* options mode s1 s2)
+  (s-binop *estate* "MUL1OF" #f mode s1 s2)
+)
+; 2's complement overflow
+(define-fn mul-o2flag (*estate* options mode s1 s2)
+  (s-binop *estate* "MUL2OF" #f mode s1 s2)
+)
 (define-fn div (*estate* options mode s1 s2)
   (s-binop *estate* "DIV" "/" mode s1 s2)
 )
@@ -1757,6 +1765,9 @@
 )
 (define-fn umod (*estate* options mode s1 s2)
   (s-binop *estate* "UMOD" "%" mode s1 s2)
+)
+(define-fn rem (*estate* options mode s1 s2)
+  (s-binop *estate* "REM" #f mode s1 s2)
 )
 
 (define-fn sqrt (*estate* options mode s1)

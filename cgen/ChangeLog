@@ -1,3 +1,9 @@
+2014-05-19  Peter Gavin  <pgavin@gmail.com>
+
+        * sim-arch.scm (WI, UWI, AI, IAI): Define.
+        * rtl-c.scm (mul-o1flag, mul-o2flag, rem): New.
+        * rtx-funcs.scn (mul-o1flag, mul-o2flag, rem): New.
+
 2012-12-17  Nick Clifton  <nickc@redhat.com>
 
 	* AUTHORS: Add copyright notice.
